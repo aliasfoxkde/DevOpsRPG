@@ -1,8 +1,24 @@
-# Plan - DevOpsQuest
+# Architecture - DevOpsQuest
 
 **Version**: 1.0.0
 **Last Updated**: 2026-06-22
 **Status**: APPROVED
+
+---
+
+## Technology Stack
+
+| Layer | Technology | Justification |
+|-------|------------|---------------|
+| Frontend | ViteJS + React 19 | CSR-first SPA, excellent DX, fast builds |
+| Styling | Tailwind CSS v4 | Theme system, dark/light modes via @tailwindcss/vite |
+| State | React Context + localStorage | Simple, offline-capable |
+| Backend | Cloudflare Workers | Edge computing, free tier |
+| Database | Cloudflare D1 (SQLite) | SQL at edge, zero config |
+| Sessions | Cloudflare KV | Fast key-value session store |
+| Auth | Google/GitHub OAuth | Standard SSO, Workers integration |
+| Deployment | Cloudflare Pages | Free hosting, global CDN |
+| Testing | Vitest + Playwright | Unit and E2E coverage |
 
 ---
 
@@ -12,7 +28,7 @@
 ┌─────────────────────────────────────────────────────────────┐
 │                    Cloudflare Pages                         │
 │  ┌─────────────────────────────────────────────────────┐    │
-│  │              Next.js 14 App (CSR-first)             │    │
+│  │              ViteJS + React SPA                      │    │
 │  │  ┌──────────┐  ┌──────────┐  ┌──────────────────┐  │    │
 │  │  │   PWA    │  │  Theme    │  │  Progress Track  │  │    │
 │  │  │  Service │  │  Manager  │  │  & Gamification  │  │    │
@@ -32,23 +48,21 @@
                     ▼                    ▼
          ┌──────────────────┐  ┌─────────────────┐
          │   Cloudflare D1   │  │  Cloudflare KV  │
-         │   (User Data)     │  │   (Sessions)    │
+         │   (User Data)     │  │   (Sessions)   │
          └──────────────────┘  └─────────────────┘
 ```
 
-## Technology Stack
+---
 
-| Layer | Technology | Justification |
-|-------|------------|---------------|
-| Frontend | Next.js 14 + TypeScript | App Router, CSR-first, excellent DX |
-| Styling | Tailwind CSS + CSS Variables | Theme system, dark/light modes |
-| State | React Context + localStorage | Simple, offline-capable |
-| Backend | Cloudflare Workers | Edge computing, free tier |
-| Database | Cloudflare D1 (SQLite) | SQL at edge, zero config |
-| Sessions | Cloudflare KV | Fast key-value session store |
-| Auth | Google/GitHub OAuth | Standard SSO, Workers integration |
-| Deployment | Cloudflare Pages | Free hosting, global CDN |
-| Testing | Vitest + Playwright | 80% coverage target |
+## Career Path Themes
+
+1. **Web Developer**: HTML → CSS → JS → React → NodeJS → SQL → Bootstrap → jQuery
+2. **Backend Engineer**: Python → Java → SQL → PostgreSQL → NodeJS → Django → Docker
+3. **DevOps Engineer**: Git → Bash → AWS → Docker → Cybersecurity → Python → Tools
+4. **Data Scientist**: Python → SQL → NumPy → Pandas → SciPy → R → Data Science
+5. **Mobile Developer**: Swift → Kotlin → React → NodeJS → SASS
+
+---
 
 ## Learning Path Order (47 Technologies)
 
@@ -67,34 +81,7 @@ TYPESCRIPT → ANGULAR → ANGULARJS → GIT → POSTGRESQL → MONGODB → ASP 
 ### Phase 5 - Modern DevOps (13)
 GO → KOTLIN → SWIFT → SASS → VUE → GEN AI → SCIPY → AWS → CYBERSECURITY → DATA SCIENCE → BASH → RUST → TOOLS
 
-## Career Path Themes
-
-1. **Web Developer**: HTML → CSS → JS → React → NodeJS → SQL → Bootstrap → jQuery
-2. **Backend Engineer**: Python → Java → SQL → PostgreSQL → NodeJS → Django → Docker
-3. **DevOps Engineer**: Git → Bash → AWS → Docker → Cybersecurity → Python → Tools
-4. **Data Scientist**: Python → SQL → NumPy → Pandas → SciPy → R → Data Science
-5. **Mobile Developer**: Swift → Kotlin → React → NodeJS → SASS
-
-## Gamification System
-
-### XP & Leveling
-- Topic completion: 50-200 XP (difficulty-scaled)
-- Quiz pass: 25-100 XP
-- Daily streak: +10% XP per consecutive day
-- Level formula: `level = floor(sqrt(xp / 100))`
-
-### Achievements
-- First Steps (complete 1 topic)
-- Dedicated Learner (7-day streak)
-- Polyglot (5 categories)
-- Master (complete a phase)
-- Speed Demon (<5 min per topic)
-
-### Daily Rewards
-- Day 1: 10 XP bonus
-- Day 3: 25 XP bonus
-- Day 7: 50 XP + badge
-- Day 30: 200 XP + "Monthly Champion"
+---
 
 ## Database Schema
 
@@ -135,63 +122,16 @@ CREATE TABLE achievements (
 );
 ```
 
-## Implementation Phases
+---
 
-### Phase 1: Foundation (Current)
-- [x] Project setup with Next.js 14
-- [ ] Tailwind CSS with dark/light mode
-- [ ] Theme system (CSS variables)
-- [ ] PWA manifest + service worker
-- [ ] Basic layout components
+## Cloudflare Deployment
 
-### Phase 2: Authentication
-- [ ] Cloudflare Workers setup
-- [ ] Google OAuth
-- [ ] GitHub OAuth
-- [ ] Session management
-- [ ] D1 schema + migrations
+### Pages Configuration
+- Build command: `npm run build:cloudflare`
+- Output directory: `dist`
+- Node version: 18
 
-### Phase 3: Core Learning UI
-- [ ] Technology catalog
-- [ ] Topic viewer (W3Schools iframe)
-- [ ] Progress tracking
-- [ ] Navigation
-
-### Phase 4: Gamification
-- [ ] XP system
-- [ ] Level calculations
-- [ ] Achievement system
-- [ ] Streak tracker
-- [ ] Theme selection
-
-### Phase 5: Polish & PWA
-- [ ] Service worker
-- [ ] Offline support
-- [ ] Install prompt
-
-### Phase 6: Testing & Deployment
-- [ ] Unit tests (Vitest)
-- [ ] E2E tests (Playwright)
-- [ ] CI/CD pipeline
-- [ ] 80% coverage
-- [ ] Cloudflare Pages deploy
-
-## Timeline
-
-```
-Week 1-2: Phase 1 (Foundation)
-Week 3-4: Phase 2 (Authentication)
-Week 5-6: Phase 3 (Core UI)
-Week 7: Phase 4 (Gamification)
-Week 8: Phase 5 (Polish)
-Week 9-10: Phase 6 (Testing + Deploy)
-```
-
-## Success Metrics
-
-- PWA Lighthouse: 90+
-- FCP: <1.5s
-- TTI: <3s
-- Test coverage: 80%+
-- All core features functional
-- Deployed on Cloudflare Pages
+### Workers Configuration
+- Wrangler.toml for worker bindings
+- D1 database bindings
+- KV namespace bindings

@@ -1,7 +1,0 @@
-# Cloudflare Pages configuration for DevOpsQuest
-name = "devopsquest"
-pages_build_output_dir = ".next"
-
-# Environment variables
-[vars]
-ENVIRONMENT = "production"
