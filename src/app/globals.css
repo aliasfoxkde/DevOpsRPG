@@ -1,0 +1,165 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Variables for Theming */
+:root {
+  /* Light mode (default when not in dark class) */
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f1f5f9;
+  --color-border: #e2e8f0;
+  --color-text: #1e293b;
+  --color-text-muted: #64748b;
+  --color-primary: #4f46e5;
+  --color-secondary: #0891b2;
+  --color-accent: #d97706;
+  --color-success: #16a34a;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+}
+
+.dark {
+  /* Dark mode */
+  --color-bg: #0f0f23;
+  --color-surface: #1a1a2e;
+  --color-surface-hover: #252542;
+  --color-border: #2d2d4a;
+  --color-text: #e2e8f0;
+  --color-text-muted: #94a3b8;
+  --color-primary: #6366f1;
+  --color-secondary: #22d3ee;
+  --color-accent: #fbbf24;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+}
+
+/* Base styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-[var(--color-bg)] text-[var(--color-text)] transition-colors duration-200;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-[var(--color-surface)];
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-[var(--color-border)] rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-[var(--color-text-muted)];
+}
+
+/* Selection */
+::selection {
+  @apply bg-primary-500/30 text-primary-900 dark:text-primary-100;
+}
+
+/* Focus visible */
+:focus-visible {
+  @apply outline-2 outline-offset-2 outline-primary-500;
+}
+
+/* Utility classes */
+.glass {
+  background-color: rgba(var(--color-surface-rgb, 255, 255, 255), 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-border);
+}
+
+.card {
+  @apply bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl shadow-sm;
+}
+
+.card-hover {
+  @apply card hover:bg-[var(--color-surface-hover)] hover:border-primary-500/50 transition-all duration-200;
+}
+
+/* XP and Achievement animations */
+.xp-pop {
+  animation: xp-pop 0.5s ease-out;
+}
+
+@keyframes xp-pop {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.achievement-unlock {
+  animation: achievement-unlock 0.6s ease-out;
+}
+
+@keyframes achievement-unlock {
+  0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+  50% { transform: scale(1.2) rotate(5deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.level-up {
+  animation: level-up 0.8s ease-out;
+}
+
+@keyframes level-up {
+  0% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.3); filter: brightness(1.5) hue-rotate(20deg); }
+  100% { transform: scale(1); filter: brightness(1) hue-rotate(0deg); }
+}
+
+.streak-fire {
+  animation: streak-fire 1.5s ease-in-out infinite;
+}
+
+@keyframes streak-fire {
+  0%, 100% { transform: scaleY(1) translateY(0); opacity: 1; }
+  50% { transform: scaleY(1.1) translateY(-2px); opacity: 0.8; }
+}
+
+/* Progress bar */
+.progress-bar {
+  @apply h-2 bg-[var(--color-border)] rounded-full overflow-hidden;
+}
+
+.progress-bar-fill {
+  @apply h-full bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full transition-all duration-500 ease-out;
+}
+
+/* Glow effects */
+.glow-primary {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+.glow-accent {
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+}
+
+.glow-success {
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+}
+
+/* PWA install prompt */
+.pwa-install-banner {
+  @apply fixed bottom-0 left-0 right-0 p-4 bg-[var(--color-surface)] border-t border-[var(--color-border)] z-50;
+}
+
+/* Offline indicator */
+.offline-indicator {
+  @apply fixed top-0 left-0 right-0 bg-warning text-white px-4 py-2 text-center text-sm;
+}
+
+/* Loading skeleton */
+.skeleton {
+  @apply bg-[var(--color-border)] animate-pulse rounded;
+}

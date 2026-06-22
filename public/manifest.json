@@ -1,0 +1,41 @@
+{
+  "name": "DevOpsQuest",
+  "short_name": "DevOpsQuest",
+  "description": "Gamified DevOps Learning Platform - Master DevOps skills through an RPG-style experience",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0f23",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "games"],
+  "shortcuts": [
+    {
+      "name": "Start Learning",
+      "short_name": "Learn",
+      "url": "/learn",
+      "description": "Continue your learning journey"
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "url": "/dashboard",
+      "description": "View your progress"
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
+}
