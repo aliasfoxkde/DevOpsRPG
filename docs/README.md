@@ -1,4 +1,4 @@
-# Documentation Index - DevOpsQuest
+# Documentation - DevOpsQuest
 
 **Last Updated**: 2026-06-22
 
@@ -17,12 +17,25 @@
 ```
 docs/
 ├── README.md              # This index
+├── CHANGELOG.md           # Version history
+├── DECISIONS.md           # Architecture decisions
+├── PROGRESS.md            # Project progress tracking
+├── RESEARCH.md            # Research findings
+├── TASKS.md               # Task management
+│
 ├── architecture/
-│   └── ARCHITECTURE.md     # System architecture
+│   ├── ARCHITECTURE.md    # System architecture
+│   └── PLAN.md            # Implementation plan
+│
+├── development/
+│   └── DEVELOPMENT.md     # Developer guide
+│
 ├── guides/
-│   └── DEPLOYMENT.md       # Deployment instructions
-└── development/
-    └── DEVELOPMENT.md      # Developer guide
+│   └── DEPLOYMENT.md      # Deployment instructions
+│
+└── process/
+    ├── TDD.md             # Test-driven development
+    └── VALIDATION.md      # Validation procedures
 ```
 
 ---
