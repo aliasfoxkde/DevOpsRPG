@@ -92,6 +92,10 @@ interface GameContextType {
   getAvailableSkillPoints: () => number
   // Realm completion
   dismissRealmCompletion: () => void
+  // Direct XP/Gold (for mini-games)
+  addXP: (amount: number) => void
+  addGold: (amount: number) => void
+  grantBadge: (badgeId: string) => void
 }
 
 const STORAGE_KEY = 'devopsquest_game'
@@ -689,6 +693,45 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setGame(prev => ({ ...prev, showRealmCompletion: null }))
   }, [])
 
+  // Add XP to character (used by mini-games)
+  const addXP = useCallback((amount: number) => {
+    setGame(prev => {
+      const newXp = prev.character.xp + amount
+      const newLevel = calculateLevel(newXp)
+      return {
+        ...prev,
+        character: {
+          ...prev.character,
+          xp: newXp,
+          level: newLevel,
+        },
+      }
+    })
+  }, [])
+
+  // Add gold to character
+  const addGold = useCallback((amount: number) => {
+    setGame(prev => ({
+      ...prev,
+      character: {
+        ...prev.character,
+        gold: prev.character.gold + amount,
+      },
+    }))
+  }, [])
+
+  // Grant a badge directly
+  const grantBadge = useCallback((badgeId: string) => {
+    setGame(prev => {
+      const badge = BADGES.find(b => b.id === badgeId)
+      if (!badge || prev.badges.some(b => b.id === badgeId)) return prev
+      return {
+        ...prev,
+        badges: [...prev.badges, { ...badge, unlockedAt: new Date().toISOString() }],
+      }
+    })
+  }, [])
+
   return (
     <GameContext.Provider
       value={{
@@ -721,6 +764,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
         getAvailableSkillPoints,
         // Realm completion
         dismissRealmCompletion,
+        // Direct XP/Gold for mini-games
+        addXP,
+        addGold,
+        grantBadge,
       }}
     >
       {children}

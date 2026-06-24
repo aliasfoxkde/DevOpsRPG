@@ -1,10 +1,13 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useGame } from '../contexts/GameContext'
+import { MiniGameHub } from '../components/minigames/MiniGameHub'
 
 export default function HomePage() {
   const { game, getNextQuest, completedCount, totalQuests } = useGame()
   const { character } = game
   const nextQuest = getNextQuest()
+  const [showMiniGames, setShowMiniGames] = useState(false)
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
@@ -145,8 +148,27 @@ export default function HomePage() {
               </div>
             </Link>
           )}
+
+          {/* Mini Games */}
+          <button
+            onClick={() => setShowMiniGames(true)}
+            className="group p-6 bg-gradient-to-br from-purple-900/30 to-slate-900 rounded-xl border border-purple-600/30 hover:border-purple-500/50 transition-all hover:shadow-lg hover:shadow-purple-500/10 text-left"
+          >
+            <div className="text-4xl mb-4">🎮</div>
+            <h3 className="text-xl font-bold text-slate-100 mb-2 group-hover:text-purple-400 transition-colors">
+              Mini-Games
+            </h3>
+            <p className="text-slate-400 text-sm">
+              Practice DevOps skills and earn bonus XP and gold!
+            </p>
+          </button>
         </div>
       </section>
+
+      {/* Mini Games Modal */}
+      {showMiniGames && (
+        <MiniGameHub onClose={() => setShowMiniGames(false)} />
+      )}
 
       {/* Realm Preview */}
       <section className="bg-slate-800/30 border-t border-slate-800">

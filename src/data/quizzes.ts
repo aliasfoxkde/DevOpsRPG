@@ -1,12 +1,16 @@
 // Quiz questions for each topic - these are auto-generated from W3Schools content
 // and serve as knowledge checks before completing quests
 
+export type QuestionType = 'multiple_choice' | 'true_false' | 'fill_blank'
+
 export interface QuizQuestion {
   id: string
   topicId: string
   question: string
-  options: string[]
-  correctIndex: number
+  type?: QuestionType // defaults to 'multiple_choice' if not specified
+  options?: string[]
+  correctIndex?: number
+  correctAnswer?: string
   explanation: string
 }
 
