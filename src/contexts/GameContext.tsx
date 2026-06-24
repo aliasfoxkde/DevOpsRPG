@@ -1,5 +1,9 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import { allQuests, getNextQuest, isRealmUnlocked, type Quest, type Realm } from '../data/quests'
+import { BADGES, shouldUnlockBadge, type Badge } from '../data/badges'
+import { MILESTONES, checkMilestone, type Milestone } from '../data/milestones'
+import { generateDailyQuests, generateWeeklyQuests, generateSecretQuests, type SideQuest } from '../data/sidequests'
+import { getRandomCollectible, COLLECTIBLES_POOL, DAILY_REWARDS, spinWheel as doSpin, type Collectible } from '../data/collectibles'
 
 export type CharacterClass = 'Cloud Knight' | 'Script Warrior' | 'Data Mage' | 'DevOps Sage'
 
@@ -44,7 +48,14 @@ export interface GameState {
   currentQuestId: string | null
   achievements: Achievement[]
   showVictory: boolean
-  lastVictory: { xp: number; levelUp: boolean; newLevel: number } | null
+  lastVictory: { xp: number; levelUp: boolean; newLevel: number; milestone?: Milestone; badge?: Badge } | null
+  // New engagement systems
+  sideQuests: SideQuest[]
+  badges: Badge[]
+  milestones: Milestone[]
+  collectibles: Collectible[]
+  dailyRewardsClaimed: number[]
+  lastDailyReset: string
 }
 
 interface GameContextType {
@@ -60,6 +71,17 @@ interface GameContextType {
   getCompletedTopicIds: () => Set<string>
   totalQuests: number
   completedCount: number
+  // Badge/Sidequest/Milestone/Collectible methods
+  claimDailyReward: (day: number) => { type: string; value?: number; collectible?: Collectible }
+  spinWheel: () => { segment: { id: string; label: string; icon: string; reward: { type: string; value?: number; collectibleId?: string } } }
+  useCollectible: (collectibleId: string) => boolean
+  getActiveCollectibles: () => Collectible[]
+  checkAndUnlockBadges: () => Badge[]
+  checkAndUnlockMilestones: () => Milestone[]
+  refreshSideQuests: () => void
+  claimSideQuest: (questId: string) => { xp: number; gold: number }
+  claimMilestone: (milestoneId: string) => { xpBonus: number }
+  claimBadge: (badgeId: string) => { xp: number; gold: number }
 }
 
 const STORAGE_KEY = 'devopsquest_game'
@@ -120,6 +142,7 @@ function createDefaultCharacter(): Character {
 }
 
 function createDefaultGame(): GameState {
+  const today = new Date().toISOString().split('T')[0]
   return {
     character: createDefaultCharacter(),
     completedQuests: [],
@@ -127,6 +150,13 @@ function createDefaultGame(): GameState {
     achievements: ACHIEVEMENTS.map(a => ({ ...a })),
     showVictory: false,
     lastVictory: null,
+    // Engagement systems - initialized fresh
+    sideQuests: [...generateDailyQuests(), ...generateWeeklyQuests(), ...generateSecretQuests()],
+    badges: BADGES.map(b => ({ ...b })),
+    milestones: MILESTONES.map(m => ({ ...m })),
+    collectibles: [],
+    dailyRewardsClaimed: [],
+    lastDailyReset: today,
   }
 }
 
@@ -240,6 +270,62 @@ export function GameProvider({ children }: { children: ReactNode }) {
         new Set([...prev.completedQuests.map(q => q.topicId), quest.topicId])
       )
 
+      // Check for new badges
+      const stats = {
+        questCount: completedCount,
+        streakDays: newStreak,
+        level: newLevel,
+        quizCount: 0,
+        minigameCount: 0,
+        perfectQuiz: false,
+        quizStreak: 0,
+        techCompleted: [] as string[],
+        realmCompleted: 0,
+        typerCount: 0,
+        memoryCount: 0,
+        mathCount: 0,
+      }
+
+      let newBadge: Badge | undefined
+      const updatedBadges = prev.badges.map(b => {
+        if (b.unlockedAt) return b
+        if (!newBadge && shouldUnlockBadge(b, stats)) {
+          newBadge = { ...b, unlockedAt: new Date().toISOString() }
+          return newBadge
+        }
+        return b
+      })
+
+      // Check for new milestones
+      const milestoneState = {
+        completedQuests: completedCount,
+        streakDays: newStreak,
+        level: newLevel,
+        completedRealms: [],
+        completedTechnologies: [],
+        quizStreak: 0,
+        minigamesCompleted: 0,
+        hasDefeatedBoss: false,
+        hasPerfectQuiz: false,
+      }
+
+      let newMilestone: Milestone | undefined
+      const updatedMilestones = prev.milestones.map(m => {
+        if (m.unlocked) return m
+        if (!newMilestone && checkMilestone(m, milestoneState)) {
+          newMilestone = { ...m, unlocked: true, unlockedAt: new Date().toISOString() }
+          return newMilestone
+        }
+        return m
+      })
+
+      // Maybe give a collectible
+      let newCollectibles = prev.collectibles
+      if (Math.random() < 0.15) { // 15% chance
+        const collectible = getRandomCollectible()
+        newCollectibles = [...prev.collectibles, collectible]
+      }
+
       return {
         ...prev,
         character: {
@@ -270,7 +356,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
           xp: quest.xpReward,
           levelUp: leveledUp,
           newLevel: leveledUp ? newLevel : prev.character.level,
+          milestone: newMilestone,
+          badge: newBadge,
         },
+        badges: updatedBadges,
+        milestones: updatedMilestones,
+        collectibles: newCollectibles,
       }
     })
   }, [])
@@ -324,6 +415,208 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  // Check for daily reset
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0]
+    if (game.lastDailyReset !== today) {
+      // Reset daily quests and claim new ones
+      setGame(prev => ({
+        ...prev,
+        sideQuests: [...generateDailyQuests(), ...generateWeeklyQuests(), ...generateSecretQuests()],
+        lastDailyReset: today,
+      }))
+    }
+  }, [game.lastDailyReset])
+
+  // Badge/Sidequest/Milestone/Collectible methods
+  const claimDailyReward = useCallback((day: number) => {
+    let result = { type: 'xp' as const, value: 50 }
+    setGame(prev => {
+      if (prev.dailyRewardsClaimed.includes(day)) return prev
+      const reward = DAILY_REWARDS[day - 1]
+      if (!reward) return prev
+      result = reward.reward as typeof result
+      const newCollectibles = [...prev.collectibles]
+      if (reward.reward.collectibleId) {
+        const collectible = COLLECTIBLES_POOL.find(c => c.id === reward.reward.collectibleId)
+        if (collectible) newCollectibles.push({ ...collectible, used: false })
+      }
+      return {
+        ...prev,
+        dailyRewardsClaimed: [...prev.dailyRewardsClaimed, day],
+        collectibles: newCollectibles,
+        character: {
+          ...prev.character,
+          xp: prev.character.xp + (reward.reward.value || 0),
+          gold: prev.character.gold + (reward.reward.type === 'gold' ? reward.reward.value || 0 : 0),
+        },
+      }
+    })
+    return result
+  }, [])
+
+  const spinWheel = useCallback(() => {
+    const segment = doSpin()
+    setGame(prev => {
+      const newCollectibles = [...prev.collectibles]
+      if (segment.reward.collectibleId) {
+        const collectible = COLLECTIBLES_POOL.find(c => c.id === segment.reward.collectibleId)
+        if (collectible) newCollectibles.push({ ...collectible, used: false })
+      }
+      return {
+        ...prev,
+        collectibles: newCollectibles,
+        character: {
+          ...prev.character,
+          xp: prev.character.xp + (segment.reward.value || 0),
+          gold: prev.character.gold + (segment.reward.type === 'gold' ? segment.reward.value || 0 : 0),
+        },
+      }
+    })
+    return { segment }
+  }, [])
+
+  const useCollectible = useCallback((collectibleId: string): boolean => {
+    let found = false
+    setGame(prev => ({
+      ...prev,
+      collectibles: prev.collectibles.map(c => {
+        if (c.id === collectibleId && !c.used) {
+          found = true
+          return { ...c, used: true }
+        }
+        return c
+      }),
+    }))
+    return found
+  }, [])
+
+  const getActiveCollectibles = useCallback((): Collectible[] => {
+    return game.collectibles.filter(c => !c.used)
+  }, [game.collectibles])
+
+  const checkAndUnlockBadges = useCallback((): Badge[] => {
+    const newlyUnlocked: Badge[] = []
+    setGame(prev => {
+      const stats = {
+        questCount: prev.completedQuests.length,
+        streakDays: prev.character.streakDays,
+        level: prev.character.level,
+        quizCount: 0,
+        minigameCount: 0,
+        perfectQuiz: false,
+        quizStreak: 0,
+        techCompleted: [] as string[],
+        realmCompleted: 0,
+        typerCount: 0,
+        memoryCount: 0,
+        mathCount: 0,
+      }
+      const updated = prev.badges.map(b => {
+        if (b.unlockedAt) return b
+        if (shouldUnlockBadge(b, stats)) {
+          const unlocked = { ...b, unlockedAt: new Date().toISOString() }
+          newlyUnlocked.push(unlocked)
+          return unlocked
+        }
+        return b
+      })
+      return { ...prev, badges: updated }
+    })
+    return newlyUnlocked
+  }, [])
+
+  const checkAndUnlockMilestones = useCallback((): Milestone[] => {
+    const newlyUnlocked: Milestone[] = []
+    setGame(prev => {
+      const state = {
+        completedQuests: prev.completedQuests.length,
+        streakDays: prev.character.streakDays,
+        level: prev.character.level,
+        completedRealms: [],
+        completedTechnologies: [],
+        quizStreak: 0,
+        minigamesCompleted: 0,
+        hasDefeatedBoss: false,
+        hasPerfectQuiz: false,
+      }
+      const updated = prev.milestones.map(m => {
+        if (m.unlocked) return m
+        if (checkMilestone(m, state)) {
+          const unlocked = { ...m, unlocked: true, unlockedAt: new Date().toISOString() }
+          newlyUnlocked.push(unlocked)
+          return unlocked
+        }
+        return m
+      })
+      return { ...prev, milestones: updated }
+    })
+    return newlyUnlocked
+  }, [])
+
+  const refreshSideQuests = useCallback(() => {
+    setGame(prev => ({
+      ...prev,
+      sideQuests: [...generateDailyQuests(), ...generateWeeklyQuests(), ...generateSecretQuests()],
+    }))
+  }, [])
+
+  const claimSideQuest = useCallback((questId: string): { xp: number; gold: number } => {
+    let rewards = { xp: 0, gold: 0 }
+    setGame(prev => {
+      const quest = prev.sideQuests.find(q => q.id === questId)
+      if (!quest || quest.completed) return prev
+      rewards = quest.rewards
+      return {
+        ...prev,
+        sideQuests: prev.sideQuests.map(q =>
+          q.id === questId ? { ...q, completed: true } : q
+        ),
+        character: {
+          ...prev.character,
+          xp: prev.character.xp + quest.rewards.xp,
+          gold: prev.character.gold + quest.rewards.gold,
+        },
+      }
+    })
+    return rewards
+  }, [])
+
+  const claimMilestone = useCallback((milestoneId: string): { xpBonus: number } => {
+    let xpBonus = 0
+    setGame(prev => {
+      const milestone = prev.milestones.find(m => m.id === milestoneId)
+      if (!milestone || !milestone.unlocked) return prev
+      xpBonus = milestone.xpBonus
+      return {
+        ...prev,
+        character: {
+          ...prev.character,
+          xp: prev.character.xp + milestone.xpBonus,
+        },
+      }
+    })
+    return { xpBonus }
+  }, [])
+
+  const claimBadge = useCallback((badgeId: string): { xp: number; gold: number } => {
+    let rewards = { xp: 0, gold: 0 }
+    setGame(prev => {
+      const badge = prev.badges.find(b => b.id === badgeId)
+      if (!badge || !badge.unlockedAt) return prev
+      rewards = { xp: badge.xpReward, gold: badge.goldReward }
+      return {
+        ...prev,
+        character: {
+          ...prev.character,
+          xp: prev.character.xp + badge.xpReward,
+          gold: prev.character.gold + badge.goldReward,
+        },
+      }
+    })
+    return rewards
+  }, [])
+
   return (
     <GameContext.Provider
       value={{
@@ -339,6 +632,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
         getCompletedTopicIds,
         totalQuests: allQuests.length,
         completedCount: game.completedQuests.length,
+        // New engagement systems
+        claimDailyReward,
+        spinWheel,
+        useCollectible,
+        getActiveCollectibles,
+        checkAndUnlockBadges,
+        checkAndUnlockMilestones,
+        refreshSideQuests,
+        claimSideQuest,
+        claimMilestone,
+        claimBadge,
       }}
     >
       {children}
