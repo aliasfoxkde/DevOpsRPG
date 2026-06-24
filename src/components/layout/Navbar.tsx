@@ -19,20 +19,44 @@ export default function Navbar() {
             Home
           </Link>
           <Link
-            to="/learn"
+            to="/quests"
             className="hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1"
-            aria-current={location.pathname.startsWith('/learn') ? 'page' : undefined}
+            aria-current={location.pathname.startsWith('/quests') ? 'page' : undefined}
             role="listitem"
           >
-            Learn
+            Quests
           </Link>
           <Link
-            to="/dashboard"
+            to="/rewards"
             className="hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1"
-            aria-current={location.pathname === '/dashboard' ? 'page' : undefined}
+            aria-current={location.pathname === '/rewards' ? 'page' : undefined}
             role="listitem"
           >
-            Dashboard
+            🎁 Rewards
+          </Link>
+          <Link
+            to="/sidequests"
+            className="hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1"
+            aria-current={location.pathname === '/sidequests' ? 'page' : undefined}
+            role="listitem"
+          >
+            📜 Side Quests
+          </Link>
+          <Link
+            to="/profile"
+            className="hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1"
+            aria-current={location.pathname === '/profile' ? 'page' : undefined}
+            role="listitem"
+          >
+            📊 Profile
+          </Link>
+          <Link
+            to="/skills"
+            className="hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1"
+            aria-current={location.pathname === '/skills' ? 'page' : undefined}
+            role="listitem"
+          >
+            ⚡ Skills
           </Link>
         </div>
       </div>

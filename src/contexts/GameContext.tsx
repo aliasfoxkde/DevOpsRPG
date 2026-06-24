@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
-import { allQuests, getNextQuest, isRealmUnlocked, type Quest, type Realm } from '../data/quests'
+import { allQuests, getNextQuest, isRealmUnlocked, realms, type Quest, type Realm } from '../data/quests'
 import { BADGES, shouldUnlockBadge, type Badge } from '../data/badges'
 import { MILESTONES, checkMilestone, type Milestone } from '../data/milestones'
 import { generateDailyQuests, generateWeeklyQuests, generateSecretQuests, type SideQuest } from '../data/sidequests'
@@ -23,6 +23,8 @@ export interface Character {
   streakDays: number
   lastActive: string
   joinedAt: string
+  skillPoints: number // Points to spend on skills
+  skillAllocations: Record<string, number> // skillId -> level
 }
 
 export interface TopicProgress {
@@ -56,6 +58,8 @@ export interface GameState {
   collectibles: Collectible[]
   dailyRewardsClaimed: number[]
   lastDailyReset: string
+  completedRealms: string[] // Track which realms have been completed
+  showRealmCompletion: string | null // Realm ID if showing realm completion modal
 }
 
 interface GameContextType {
@@ -82,6 +86,12 @@ interface GameContextType {
   claimSideQuest: (questId: string) => { xp: number; gold: number }
   claimMilestone: (milestoneId: string) => { xpBonus: number }
   claimBadge: (badgeId: string) => { xp: number; gold: number }
+  // Skill allocation
+  allocateSkillPoint: (skillId: string) => boolean
+  getSkillLevel: (skillId: string) => number
+  getAvailableSkillPoints: () => number
+  // Realm completion
+  dismissRealmCompletion: () => void
 }
 
 const STORAGE_KEY = 'devopsquest_game'
@@ -138,6 +148,8 @@ function createDefaultCharacter(): Character {
     streakDays: 0,
     lastActive: new Date().toISOString().split('T')[0],
     joinedAt: new Date().toISOString(),
+    skillPoints: 0,
+    skillAllocations: {},
   }
 }
 
@@ -157,6 +169,8 @@ function createDefaultGame(): GameState {
     collectibles: [],
     dailyRewardsClaimed: [],
     lastDailyReset: today,
+    completedRealms: [],
+    showRealmCompletion: null,
   }
 }
 
@@ -326,6 +340,27 @@ export function GameProvider({ children }: { children: ReactNode }) {
         newCollectibles = [...prev.collectibles, collectible]
       }
 
+      // Check for realm completion
+      const completedRealmIds = [...prev.completedRealms]
+      let newShowRealmCompletion: string | null = null
+
+      for (const realm of Object.values(realms)) {
+        if (completedRealmIds.includes(realm.id)) continue
+        const realmQuests = allQuests.filter(q => q.realmId === realm.id)
+        const allComplete = realmQuests.every(rq =>
+          prev.completedQuests.some(cq => cq.questId === rq.id) || rq.id === questId
+        )
+        if (allComplete) {
+          completedRealmIds.push(realm.id)
+          newShowRealmCompletion = realm.id
+          break
+        }
+      }
+
+      // Skill points on level up (1 point per level gained)
+      const levelsGained = newLevel - prev.character.level
+      const newSkillPoints = prev.character.skillPoints + levelsGained
+
       return {
         ...prev,
         character: {
@@ -337,6 +372,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           streakDays: newStreak,
           lastActive: today,
           gold: prev.character.gold + Math.floor(quest.xpReward / 10),
+          skillPoints: newSkillPoints,
         },
         completedQuests: [
           ...prev.completedQuests,
@@ -362,6 +398,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
         badges: updatedBadges,
         milestones: updatedMilestones,
         collectibles: newCollectibles,
+        completedRealms: completedRealmIds,
+        showRealmCompletion: newShowRealmCompletion,
       }
     })
   }, [])
@@ -617,6 +655,40 @@ export function GameProvider({ children }: { children: ReactNode }) {
     return rewards
   }, [])
 
+  // Skill allocation methods
+  const allocateSkillPoint = useCallback((skillId: string): boolean => {
+    let success = false
+    setGame(prev => {
+      if (prev.character.skillPoints <= 0) return prev
+      const currentLevel = prev.character.skillAllocations[skillId] || 0
+      success = true
+      return {
+        ...prev,
+        character: {
+          ...prev.character,
+          skillPoints: prev.character.skillPoints - 1,
+          skillAllocations: {
+            ...prev.character.skillAllocations,
+            [skillId]: currentLevel + 1,
+          },
+        },
+      }
+    })
+    return success
+  }, [])
+
+  const getSkillLevel = useCallback((skillId: string): number => {
+    return game.character.skillAllocations[skillId] || 0
+  }, [game.character.skillAllocations])
+
+  const getAvailableSkillPoints = useCallback((): number => {
+    return game.character.skillPoints
+  }, [game.character.skillPoints])
+
+  const dismissRealmCompletion = useCallback(() => {
+    setGame(prev => ({ ...prev, showRealmCompletion: null }))
+  }, [])
+
   return (
     <GameContext.Provider
       value={{
@@ -643,6 +715,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
         claimSideQuest,
         claimMilestone,
         claimBadge,
+        // Skill allocation
+        allocateSkillPoint,
+        getSkillLevel,
+        getAvailableSkillPoints,
+        // Realm completion
+        dismissRealmCompletion,
       }}
     >
       {children}
