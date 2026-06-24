@@ -32,39 +32,15 @@ export function MathChallengeGame({ rounds = 5, onComplete, onSkip }: MathChalle
   const currentProblem = gameProblems[currentIndex]
   const maxScore = rounds * 150
 
-  // Initialize game
-  useEffect(() => {
-    const problems = shuffle(mathChallenges).slice(0, rounds)
-    setGameProblems(problems)
-    inputRef.current?.focus()
-  }, [rounds])
+  // Declare callbacks before useEffect that depends on them
+  const handleFinish = useCallback(() => {
+    setGameState('finished')
+    if (timerRef.current) clearInterval(timerRef.current)
+  }, [])
 
-  // Timer
-  useEffect(() => {
-    if (gameState !== 'playing') return
-
-    timerRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(timerRef.current!)
-          handleFinish()
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current)
-    }
-  }, [gameState])
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (gameState !== 'playing') return
-    // Only allow numbers and basic math symbols
-    const value = e.target.value.replace(/[^0-9+\-*/() ]/g, '')
-    setInput(value)
-  }
+  const handleComplete = useCallback(() => {
+    onComplete(score, maxScore)
+  }, [onComplete, score, maxScore])
 
   const checkAnswer = useCallback(() => {
     if (!currentProblem || input.trim() === '') return
@@ -91,7 +67,14 @@ export function MathChallengeGame({ rounds = 5, onComplete, onSkip }: MathChalle
     } else {
       handleFinish()
     }
-  }, [input, currentProblem, currentIndex, gameProblems.length, timeLeft])
+  }, [currentProblem, input, currentIndex, gameProblems.length, timeLeft, handleFinish])
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (gameState !== 'playing') return
+    // Only allow numbers and basic math symbols
+    const value = e.target.value.replace(/[^0-9+\-*/() ]/g, '')
+    setInput(value)
+  }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -99,14 +82,32 @@ export function MathChallengeGame({ rounds = 5, onComplete, onSkip }: MathChalle
     }
   }
 
-  const handleFinish = () => {
-    setGameState('finished')
-    if (timerRef.current) clearInterval(timerRef.current)
-  }
+  // Initialize game
+  useEffect(() => {
+    const problems = shuffle(mathChallenges).slice(0, rounds)
+    setGameProblems(problems)
+    inputRef.current?.focus()
+  }, [rounds])
 
-  const handleComplete = () => {
-    onComplete(score, maxScore)
-  }
+  // Timer
+  useEffect(() => {
+    if (gameState !== 'playing') return
+
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current!)
+          handleFinish()
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current)
+    }
+  }, [gameState, handleFinish])
 
   // Focus input on mount
   useEffect(() => {

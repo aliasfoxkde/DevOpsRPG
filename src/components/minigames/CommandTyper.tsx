@@ -24,6 +24,40 @@ export function CommandTyper({ category, rounds = 5, onComplete, onSkip }: Comma
   const currentCommand = gameCommands[currentIndex]
   const maxScore = rounds * 100
 
+  // Declare callbacks before useEffect that depends on them
+  const handleFinish = useCallback(() => {
+    setGameState('finished')
+    if (timerRef.current) clearInterval(timerRef.current)
+  }, [])
+
+  const handleComplete = useCallback(() => {
+    onComplete(score, maxScore)
+  }, [onComplete, score, maxScore])
+
+  const checkAnswer = useCallback(() => {
+    if (!currentCommand || input.trim() === '') return
+
+    const isCorrect = input.trim() === currentCommand.command
+
+    if (isCorrect) {
+      setCorrectCount(c => c + 1)
+      // Base score + time bonus
+      const timeBonus = Math.floor(timeLeft / 3) * 10
+      const roundScore = 100 + timeBonus
+      setScore(s => s + roundScore)
+    } else {
+      setWrongCount(c => c + 1)
+    }
+
+    // Move to next or finish
+    if (currentIndex < gameCommands.length - 1) {
+      setCurrentIndex(i => i + 1)
+      setInput('')
+    } else {
+      handleFinish()
+    }
+  }, [currentCommand, input, currentIndex, gameCommands.length, timeLeft, handleFinish])
+
   // Initialize game
   useEffect(() => {
     const cmds = getRandomCommands(rounds, category)
@@ -50,7 +84,7 @@ export function CommandTyper({ category, rounds = 5, onComplete, onSkip }: Comma
     return () => {
       if (timerRef.current) clearInterval(timerRef.current)
     }
-  }, [gameState, currentIndex])
+  }, [gameState, currentIndex, handleFinish])
 
   // Update character states as user types
   useEffect(() => {
@@ -79,39 +113,6 @@ export function CommandTyper({ category, rounds = 5, onComplete, onSkip }: Comma
     if (e.key === 'Enter') {
       checkAnswer()
     }
-  }
-
-  const checkAnswer = useCallback(() => {
-    if (!currentCommand || input.trim() === '') return
-
-    const isCorrect = input.trim() === currentCommand.command
-
-    if (isCorrect) {
-      setCorrectCount(c => c + 1)
-      // Base score + time bonus
-      const timeBonus = Math.floor(timeLeft / 3) * 10
-      const roundScore = 100 + timeBonus
-      setScore(s => s + roundScore)
-    } else {
-      setWrongCount(c => c + 1)
-    }
-
-    // Move to next or finish
-    if (currentIndex < gameCommands.length - 1) {
-      setCurrentIndex(i => i + 1)
-      setInput('')
-    } else {
-      handleFinish()
-    }
-  }, [input, currentCommand, currentIndex, gameCommands.length, timeLeft])
-
-  const handleFinish = () => {
-    setGameState('finished')
-    if (timerRef.current) clearInterval(timerRef.current)
-  }
-
-  const handleComplete = () => {
-    onComplete(score, maxScore)
   }
 
   // Focus input on mount and whenever window is clicked

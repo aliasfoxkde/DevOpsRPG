@@ -1,15 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { ProgressProvider } from '@/contexts/ProgressContext'
+import { GameProvider } from '@/contexts/GameContext'
 import DashboardPage from './DashboardPage'
 
-function renderWithRouter(ui: React.ReactElement, totalTopics = 100) {
+function renderWithRouter(ui: React.ReactElement) {
   return render(ui, { wrapper: ({ children }) => (
     <MemoryRouter>
-      <ProgressProvider totalTopics={totalTopics}>
-        {children}
-      </ProgressProvider>
+      <GameProvider>{children}</GameProvider>
     </MemoryRouter>
   )})
 }
@@ -64,79 +62,269 @@ describe('DashboardPage', () => {
   })
 
   it('displays XP achievement when xp is 1000+', () => {
-    // Pre-set progress with 1000+ XP to trigger XP Hunter achievement
-    const storedProgress = {
-      xp: 1100,
-      level: 12,
-      streakDays: 5,
-      lastActive: new Date().toISOString().split('T')[0],
-      completedTopics: [],
+    // Pre-set game state with 1000+ XP to trigger XP Hunter achievement
+    const storedGame = {
+      character: {
+        name: 'Hero',
+        class: 'Cloud Knight',
+        avatar: '🧙',
+        title: 'Novice',
+        level: 12,
+        xp: 1100,
+        xpToNextLevel: 100,
+        hp: 100,
+        maxHp: 100,
+        mp: 50,
+        maxMp: 50,
+        gold: 0,
+        streakDays: 5,
+        lastActive: new Date().toISOString().split('T')[0],
+        joinedAt: new Date().toISOString(),
+        skillPoints: 0,
+        skillAllocations: {},
+      },
+      completedQuests: [],
+      currentQuestId: null,
+      achievements: [],
+      showVictory: false,
+      lastVictory: null,
+      sideQuests: [],
+      badges: [],
+      milestones: [],
+      collectibles: [],
+      dailyRewardsClaimed: [],
+      lastDailyReset: new Date().toISOString().split('T')[0],
+      completedRealms: [],
+      showRealmCompletion: null,
+      lastRealmCompletion: null,
+      stats: {
+        quizCount: 0,
+        quizPerfectCount: 0,
+        quizStreak: 0,
+        minigameCount: 0,
+        typerCount: 0,
+        memoryCount: 0,
+        mathCount: 0,
+        perfectQuiz: false,
+      },
     }
-    localStorage.setItem('devopsquest_progress', JSON.stringify(storedProgress))
+    localStorage.setItem('devopsquest_game', JSON.stringify(storedGame))
 
     renderWithRouter(<DashboardPage />)
     expect(screen.getByText('XP Hunter')).toBeInTheDocument()
   })
 
   it('displays level achievement when level is 5+', () => {
-    // Pre-set progress with level 5+
-    const storedProgress = {
-      xp: 450,
-      level: 5,
-      streakDays: 0,
-      lastActive: new Date().toISOString().split('T')[0],
-      completedTopics: [],
+    // Pre-set game with level 5+
+    const storedGame = {
+      character: {
+        name: 'Hero',
+        class: 'Cloud Knight',
+        avatar: '🧙',
+        title: 'Novice',
+        level: 5,
+        xp: 450,
+        xpToNextLevel: 100,
+        hp: 100,
+        maxHp: 100,
+        mp: 50,
+        maxMp: 50,
+        gold: 0,
+        streakDays: 0,
+        lastActive: new Date().toISOString().split('T')[0],
+        joinedAt: new Date().toISOString(),
+        skillPoints: 0,
+        skillAllocations: {},
+      },
+      completedQuests: [],
+      currentQuestId: null,
+      achievements: [],
+      showVictory: false,
+      lastVictory: null,
+      sideQuests: [],
+      badges: [],
+      milestones: [],
+      collectibles: [],
+      dailyRewardsClaimed: [],
+      lastDailyReset: new Date().toISOString().split('T')[0],
+      completedRealms: [],
+      showRealmCompletion: null,
+      lastRealmCompletion: null,
+      stats: {
+        quizCount: 0,
+        quizPerfectCount: 0,
+        quizStreak: 0,
+        minigameCount: 0,
+        typerCount: 0,
+        memoryCount: 0,
+        mathCount: 0,
+        perfectQuiz: false,
+      },
     }
-    localStorage.setItem('devopsquest_progress', JSON.stringify(storedProgress))
+    localStorage.setItem('devopsquest_game', JSON.stringify(storedGame))
 
     renderWithRouter(<DashboardPage />)
     expect(screen.getByText('Rising Star')).toBeInTheDocument()
   })
 
   it('displays streak achievement when streak is 7+', () => {
-    // Pre-set progress with 7+ day streak
-    const storedProgress = {
-      xp: 100,
-      level: 2,
-      streakDays: 7,
-      lastActive: new Date().toISOString().split('T')[0],
-      completedTopics: [],
+    // Pre-set game with 7+ day streak
+    const storedGame = {
+      character: {
+        name: 'Hero',
+        class: 'Cloud Knight',
+        avatar: '🧙',
+        title: 'Novice',
+        level: 2,
+        xp: 100,
+        xpToNextLevel: 100,
+        hp: 100,
+        maxHp: 100,
+        mp: 50,
+        maxMp: 50,
+        gold: 0,
+        streakDays: 7,
+        lastActive: new Date().toISOString().split('T')[0],
+        joinedAt: new Date().toISOString(),
+        skillPoints: 0,
+        skillAllocations: {},
+      },
+      completedQuests: [],
+      currentQuestId: null,
+      achievements: [],
+      showVictory: false,
+      lastVictory: null,
+      sideQuests: [],
+      badges: [],
+      milestones: [],
+      collectibles: [],
+      dailyRewardsClaimed: [],
+      lastDailyReset: new Date().toISOString().split('T')[0],
+      completedRealms: [],
+      showRealmCompletion: null,
+      lastRealmCompletion: null,
+      stats: {
+        quizCount: 0,
+        quizPerfectCount: 0,
+        quizStreak: 0,
+        minigameCount: 0,
+        typerCount: 0,
+        memoryCount: 0,
+        mathCount: 0,
+        perfectQuiz: false,
+      },
     }
-    localStorage.setItem('devopsquest_progress', JSON.stringify(storedProgress))
+    localStorage.setItem('devopsquest_game', JSON.stringify(storedGame))
 
     renderWithRouter(<DashboardPage />)
     expect(screen.getByText('Dedicated Learner')).toBeInTheDocument()
   })
 
   it('displays topics achievement when 10+ topics completed', () => {
-    // Pre-set progress with 10 completed topics
-    const storedProgress = {
-      xp: 250,
-      level: 3,
-      streakDays: 0,
-      lastActive: new Date().toISOString().split('T')[0],
-      completedTopics: Array(10).fill(null).map((_, i) => ({
-        topicId: `topic-${i}`,
-        technologyId: 'html',
-        completed: true,
-        xpEarned: 25,
+    // Pre-set game with completed quests
+    const storedGame = {
+      character: {
+        name: 'Hero',
+        class: 'Cloud Knight',
+        avatar: '🧙',
+        title: 'Novice',
+        level: 3,
+        xp: 250,
+        xpToNextLevel: 100,
+        hp: 100,
+        maxHp: 100,
+        mp: 50,
+        maxMp: 50,
+        gold: 0,
+        streakDays: 0,
+        lastActive: new Date().toISOString().split('T')[0],
+        joinedAt: new Date().toISOString(),
+        skillPoints: 0,
+        skillAllocations: {},
+      },
+      completedQuests: Array(10).fill(null).map((_, i) => ({
+        id: `topic-${i}`,
+        title: `Topic ${i}`,
+        xpRewarded: 25,
+        completedAt: new Date().toISOString(),
       })),
+      currentQuestId: null,
+      achievements: [],
+      showVictory: false,
+      lastVictory: null,
+      sideQuests: [],
+      badges: [],
+      milestones: [],
+      collectibles: [],
+      dailyRewardsClaimed: [],
+      lastDailyReset: new Date().toISOString().split('T')[0],
+      completedRealms: [],
+      showRealmCompletion: null,
+      lastRealmCompletion: null,
+      stats: {
+        quizCount: 0,
+        quizPerfectCount: 0,
+        quizStreak: 0,
+        minigameCount: 0,
+        typerCount: 0,
+        memoryCount: 0,
+        mathCount: 0,
+        perfectQuiz: false,
+      },
     }
-    localStorage.setItem('devopsquest_progress', JSON.stringify(storedProgress))
+    localStorage.setItem('devopsquest_game', JSON.stringify(storedGame))
 
     renderWithRouter(<DashboardPage />)
     expect(screen.getByText('Knowledge Seeker')).toBeInTheDocument()
   })
 
   it('displays progress bar at 0% when no topics completed', () => {
-    const storedProgress = {
-      xp: 0,
-      level: 1,
-      streakDays: 0,
-      lastActive: new Date().toISOString().split('T')[0],
-      completedTopics: [],
+    const storedGame = {
+      character: {
+        name: 'Hero',
+        class: 'Cloud Knight',
+        avatar: '🧙',
+        title: 'Novice',
+        level: 1,
+        xp: 0,
+        xpToNextLevel: 100,
+        hp: 100,
+        maxHp: 100,
+        mp: 50,
+        maxMp: 50,
+        gold: 0,
+        streakDays: 0,
+        lastActive: new Date().toISOString().split('T')[0],
+        joinedAt: new Date().toISOString(),
+        skillPoints: 0,
+        skillAllocations: {},
+      },
+      completedQuests: [],
+      currentQuestId: null,
+      achievements: [],
+      showVictory: false,
+      lastVictory: null,
+      sideQuests: [],
+      badges: [],
+      milestones: [],
+      collectibles: [],
+      dailyRewardsClaimed: [],
+      lastDailyReset: new Date().toISOString().split('T')[0],
+      completedRealms: [],
+      showRealmCompletion: null,
+      lastRealmCompletion: null,
+      stats: {
+        quizCount: 0,
+        quizPerfectCount: 0,
+        quizStreak: 0,
+        minigameCount: 0,
+        typerCount: 0,
+        memoryCount: 0,
+        mathCount: 0,
+        perfectQuiz: false,
+      },
     }
-    localStorage.setItem('devopsquest_progress', JSON.stringify(storedProgress))
+    localStorage.setItem('devopsquest_game', JSON.stringify(storedGame))
 
     renderWithRouter(<DashboardPage />)
     // XP progress text format is "{xpProgress}/{100} XP to next level"
@@ -145,19 +333,57 @@ describe('DashboardPage', () => {
 
   it('displays multiple achievements when conditions are met', () => {
     // Set up state that triggers multiple achievements
-    const storedProgress = {
-      xp: 1500,
-      level: 16,
-      streakDays: 10,
-      lastActive: new Date().toISOString().split('T')[0],
-      completedTopics: Array(15).fill(null).map((_, i) => ({
-        topicId: `topic-${i}`,
-        technologyId: 'html',
-        completed: true,
-        xpEarned: 25,
+    const storedGame = {
+      character: {
+        name: 'Hero',
+        class: 'Cloud Knight',
+        avatar: '🧙',
+        title: 'Novice',
+        level: 16,
+        xp: 1500,
+        xpToNextLevel: 100,
+        hp: 100,
+        maxHp: 100,
+        mp: 50,
+        maxMp: 50,
+        gold: 0,
+        streakDays: 10,
+        lastActive: new Date().toISOString().split('T')[0],
+        joinedAt: new Date().toISOString(),
+        skillPoints: 0,
+        skillAllocations: {},
+      },
+      completedQuests: Array(15).fill(null).map((_, i) => ({
+        id: `topic-${i}`,
+        title: `Topic ${i}`,
+        xpRewarded: 25,
+        completedAt: new Date().toISOString(),
       })),
+      currentQuestId: null,
+      achievements: [],
+      showVictory: false,
+      lastVictory: null,
+      sideQuests: [],
+      badges: [],
+      milestones: [],
+      collectibles: [],
+      dailyRewardsClaimed: [],
+      lastDailyReset: new Date().toISOString().split('T')[0],
+      completedRealms: [],
+      showRealmCompletion: null,
+      lastRealmCompletion: null,
+      stats: {
+        quizCount: 0,
+        quizPerfectCount: 0,
+        quizStreak: 0,
+        minigameCount: 0,
+        typerCount: 0,
+        memoryCount: 0,
+        mathCount: 0,
+        perfectQuiz: false,
+      },
     }
-    localStorage.setItem('devopsquest_progress', JSON.stringify(storedProgress))
+    localStorage.setItem('devopsquest_game', JSON.stringify(storedGame))
 
     renderWithRouter(<DashboardPage />)
     // Should show XP Hunter (1000+ XP), Rising Star (level 5+), Dedicated Learner (7+ streak), Knowledge Seeker (10+ topics)
@@ -168,37 +394,111 @@ describe('DashboardPage', () => {
   })
 
   it('displays XP Hunter and XP Master achievements', () => {
-    const storedProgress = {
-      xp: 5500,
-      level: 56,
-      streakDays: 0,
-      lastActive: new Date().toISOString().split('T')[0],
-      completedTopics: [],
+    const storedGame = {
+      character: {
+        name: 'Hero',
+        class: 'Cloud Knight',
+        avatar: '🧙',
+        title: 'Novice',
+        level: 56,
+        xp: 5500,
+        xpToNextLevel: 100,
+        hp: 100,
+        maxHp: 100,
+        mp: 50,
+        maxMp: 50,
+        gold: 0,
+        streakDays: 0,
+        lastActive: new Date().toISOString().split('T')[0],
+        joinedAt: new Date().toISOString(),
+        skillPoints: 0,
+        skillAllocations: {},
+      },
+      completedQuests: [],
+      currentQuestId: null,
+      achievements: [],
+      showVictory: false,
+      lastVictory: null,
+      sideQuests: [],
+      badges: [],
+      milestones: [],
+      collectibles: [],
+      dailyRewardsClaimed: [],
+      lastDailyReset: new Date().toISOString().split('T')[0],
+      completedRealms: [],
+      showRealmCompletion: null,
+      lastRealmCompletion: null,
+      stats: {
+        quizCount: 0,
+        quizPerfectCount: 0,
+        quizStreak: 0,
+        minigameCount: 0,
+        typerCount: 0,
+        memoryCount: 0,
+        mathCount: 0,
+        perfectQuiz: false,
+      },
     }
-    localStorage.setItem('devopsquest_progress', JSON.stringify(storedProgress))
+    localStorage.setItem('devopsquest_game', JSON.stringify(storedGame))
 
     renderWithRouter(<DashboardPage />)
     expect(screen.getByText('XP Hunter')).toBeInTheDocument()
     expect(screen.getByText('XP Master')).toBeInTheDocument()
   })
 
-  it('handles totalTopics of 0 without division by zero', () => {
-    // This exercises the totalTopics > 0 ternary branch (false path)
-    renderWithRouter(<DashboardPage />, 0)
-    expect(screen.getByText('0% complete')).toBeInTheDocument()
-  })
-
-  it('shows percentage when totalTopics is greater than 0', () => {
-    // This exercises the totalTopics > 0 ternary branch (true path)
-    const storedProgress = {
-      xp: 100,
-      level: 2,
-      streakDays: 0,
-      lastActive: new Date().toISOString().split('T')[0],
-      completedTopics: [],
+  it('displays percentage when topics are completed', () => {
+    const storedGame = {
+      character: {
+        name: 'Hero',
+        class: 'Cloud Knight',
+        avatar: '🧙',
+        title: 'Novice',
+        level: 2,
+        xp: 100,
+        xpToNextLevel: 100,
+        hp: 100,
+        maxHp: 100,
+        mp: 50,
+        maxMp: 50,
+        gold: 0,
+        streakDays: 0,
+        lastActive: new Date().toISOString().split('T')[0],
+        joinedAt: new Date().toISOString(),
+        skillPoints: 0,
+        skillAllocations: {},
+      },
+      completedQuests: Array(5).fill(null).map((_, i) => ({
+        id: `topic-${i}`,
+        title: `Topic ${i}`,
+        xpRewarded: 25,
+        completedAt: new Date().toISOString(),
+      })),
+      currentQuestId: null,
+      achievements: [],
+      showVictory: false,
+      lastVictory: null,
+      sideQuests: [],
+      badges: [],
+      milestones: [],
+      collectibles: [],
+      dailyRewardsClaimed: [],
+      lastDailyReset: new Date().toISOString().split('T')[0],
+      completedRealms: [],
+      showRealmCompletion: null,
+      lastRealmCompletion: null,
+      stats: {
+        quizCount: 0,
+        quizPerfectCount: 0,
+        quizStreak: 0,
+        minigameCount: 0,
+        typerCount: 0,
+        memoryCount: 0,
+        mathCount: 0,
+        perfectQuiz: false,
+      },
     }
-    localStorage.setItem('devopsquest_progress', JSON.stringify(storedProgress))
-    renderWithRouter(<DashboardPage />, 100)
-    expect(screen.getByText('0% complete')).toBeInTheDocument()
+    localStorage.setItem('devopsquest_game', JSON.stringify(storedGame))
+    renderWithRouter(<DashboardPage />)
+    expect(screen.getByText('1% complete')).toBeInTheDocument()
   })
 })

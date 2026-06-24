@@ -34,6 +34,39 @@ export default function BattleArenaPage() {
   const [showRealmComplete, setShowRealmComplete] = useState(false)
 
   const quest = allQuests.find(q => q.id === questId)
+  const nextQuest = quest ? getNextQuest() : null
+
+  // All hooks must be called before any early returns
+  // Watch for milestone and badge unlocks from game state
+  useEffect(() => {
+    if (game.lastVictory?.milestone) {
+      const m = game.lastVictory.milestone
+      setMilestoneData({ icon: m.icon, title: m.title, message: m.message, xpBonus: m.xpBonus })
+      setTimeout(() => setShowMilestone(true), 2000)
+    }
+    if (game.lastVictory?.badge) {
+      const b = game.lastVictory.badge
+      setBadgeData({ icon: b.icon, name: b.name, description: b.description })
+      setTimeout(() => setShowBadge(true), 2500)
+    }
+  }, [game.lastVictory])
+
+  // Watch for realm completion
+  useEffect(() => {
+    if (game.showRealmCompletion) {
+      setTimeout(() => setShowRealmComplete(true), 3000)
+    }
+  }, [game.showRealmCompletion])
+
+  // Auto-navigate to next quest after completion
+  useEffect(() => {
+    if (justCompleted && nextQuest) {
+      const timer = setTimeout(() => {
+        navigate(`/quest/${nextQuest.id}`)
+      }, 1500)
+      return () => clearTimeout(timer)
+    }
+  }, [justCompleted, nextQuest, navigate])
 
   if (!quest) {
     return (
@@ -52,7 +85,6 @@ export default function BattleArenaPage() {
   const techContent = w3schoolsContent.technologies[quest.technologyId]
   const topicContent = techContent?.topics.find(t => t.id === quest.topicId)
   const isCompleted = isQuestCompleted(quest.id)
-  const nextQuest = getNextQuest()
 
   const handleComplete = () => {
     completeQuest(quest.id)
@@ -99,27 +131,6 @@ export default function BattleArenaPage() {
     }
   }
 
-  // Watch for milestone and badge unlocks from game state
-  useEffect(() => {
-    if (game.lastVictory?.milestone) {
-      const m = game.lastVictory.milestone
-      setMilestoneData({ icon: m.icon, title: m.title, message: m.message, xpBonus: m.xpBonus })
-      setTimeout(() => setShowMilestone(true), 2000)
-    }
-    if (game.lastVictory?.badge) {
-      const b = game.lastVictory.badge
-      setBadgeData({ icon: b.icon, name: b.name, description: b.description })
-      setTimeout(() => setShowBadge(true), 2500)
-    }
-  }, [game.lastVictory])
-
-  // Watch for realm completion
-  useEffect(() => {
-    if (game.showRealmCompletion) {
-      setTimeout(() => setShowRealmComplete(true), 3000)
-    }
-  }, [game.showRealmCompletion])
-
   const handleMiniGameComplete = (success: boolean, xpWon: number) => {
     setShowMiniGame(false)
     if (success && xpWon > 0) {
@@ -131,16 +142,6 @@ export default function BattleArenaPage() {
   const handleEncounterComplete = () => {
     setShowEncounter(false)
   }
-
-  // Auto-navigate to next quest after completion
-  useEffect(() => {
-    if (justCompleted && nextQuest) {
-      const timer = setTimeout(() => {
-        navigate(`/quest/${nextQuest.id}`)
-      }, 1500)
-      return () => clearTimeout(timer)
-    }
-  }, [justCompleted, nextQuest, navigate])
 
   const handleContinue = () => {
     if (nextQuest) {

@@ -578,16 +578,51 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const useCollectible = useCallback((collectibleId: string): boolean => {
     let found = false
-    setGame(prev => ({
-      ...prev,
-      collectibles: prev.collectibles.map(c => {
-        if (c.id === collectibleId && !c.used) {
-          found = true
-          return { ...c, used: true }
+    setGame(prev => {
+      const collectible = COLLECTIBLES_POOL.find(c => c.id === collectibleId)
+      if (!collectible) return prev
+
+      const updates: Partial<GameState> = {
+        collectibles: prev.collectibles.map(c => {
+          if (c.id === collectibleId && !c.used) {
+            found = true
+            return { ...c, used: true }
+          }
+          return c
+        }),
+      }
+
+      // Apply collectible effects
+      if (found) {
+        const characterUpdates: Partial<Character> = {}
+        switch (collectible.effect.type) {
+          case 'xp_multiplier':
+            // XP multipliers are applied when completing quests - store in character
+            characterUpdates.xp = prev.character.xp + (collectible.effect.value * 50) // Bonus XP
+            break
+          case 'gold_multiplier':
+            characterUpdates.gold = prev.character.gold + (collectible.effect.value * 25) // Bonus gold
+            break
+          case 'reveal_answer':
+            // Hint effects are handled in the quiz component
+            break
+          case 'prevent_streak_loss':
+            // Streak shield is handled in the daily reset logic
+            break
+          case 'mystery_reward': {
+            // Mystery boxes give random rewards
+            const mysteryValue = collectible.effect.value * 50
+            characterUpdates.gold = prev.character.gold + Math.floor(mysteryValue * Math.random())
+            break
+          }
         }
-        return c
-      }),
-    }))
+        if (Object.keys(characterUpdates).length > 0) {
+          updates.character = { ...prev.character, ...characterUpdates }
+        }
+      }
+
+      return { ...prev, ...updates }
+    })
     return found
   }, [])
 

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useProgress } from '@/contexts'
+import { useGame } from '@/contexts'
 import { ProgressBar } from '@/components/ui'
 
 const ACHIEVEMENTS = [
@@ -32,17 +32,18 @@ function checkAchievement(key: string, progress: { xp: number; level: number; st
 }
 
 export default function DashboardPage() {
-  const { progress, totalTopics } = useProgress()
+  const { game, completedCount } = useGame()
 
-  const completedTopics = progress.completedTopics.length
+  const { character } = game
+  const completedTopics = completedCount
 
   const earnedAchievements = ACHIEVEMENTS.filter(a => {
     /* istanbul ignore else */
     if (a.check) return a.check(completedTopics)
-    return checkAchievement(a.key, { ...progress, completedTopics })
+    return checkAchievement(a.key, { xp: character.xp, level: character.level, streakDays: character.streakDays, completedTopics })
   })
 
-  const xpProgress = progress.xp % 100
+  const xpProgress = character.xp % 100
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -52,10 +53,10 @@ export default function DashboardPage() {
         {/* XP Card */}
         <div className="bg-card rounded-lg border border-border p-6" role="region" aria-labelledby="xp-heading">
           <h3 id="xp-heading" className="text-muted-foreground mb-2">Total XP</h3>
-          <p className="text-4xl font-bold text-primary" aria-live="polite">{progress.xp.toLocaleString()}</p>
+          <p className="text-4xl font-bold text-primary" aria-live="polite">{character.xp.toLocaleString()}</p>
           <div className="mt-2">
-            <p className="text-sm text-muted-foreground mb-1">Level {progress.level}</p>
-            <ProgressBar value={xpProgress} max={100} size="sm" color="primary" aria-label={`Level ${progress.level} progress: ${xpProgress} of 100 XP`} />
+            <p className="text-sm text-muted-foreground mb-1">Level {character.level}</p>
+            <ProgressBar value={xpProgress} max={100} size="sm" color="primary" aria-label={`Level ${character.level} progress: ${xpProgress} of 100 XP`} />
             <p className="text-xs text-muted-foreground mt-1">{xpProgress}/{100} XP to next level</p>
           </div>
         </div>
@@ -64,7 +65,7 @@ export default function DashboardPage() {
         <div className="bg-card rounded-lg border border-border p-6" role="region" aria-labelledby="streak-heading">
           <h3 id="streak-heading" className="text-muted-foreground mb-2">Current Streak</h3>
           <p className="text-4xl font-bold text-accent" aria-live="polite">
-            <span aria-hidden="true">🔥</span> {progress.streakDays} days
+            <span aria-hidden="true">🔥</span> {character.streakDays} days
           </p>
           <p className="text-sm text-muted-foreground mt-1">Keep it going!</p>
         </div>
@@ -73,18 +74,18 @@ export default function DashboardPage() {
         <div className="bg-card rounded-lg border border-border p-6" role="region" aria-labelledby="progress-heading">
           <h3 id="progress-heading" className="text-muted-foreground mb-2">Topics Completed</h3>
           <p className="text-4xl font-bold text-success" aria-live="polite">
-            {completedTopics}/{totalTopics}
+            {completedTopics}/500
           </p>
           <div className="mt-2">
             <ProgressBar
               value={completedTopics}
-              max={totalTopics}
+              max={500}
               size="sm"
               color="success"
-              aria-label={`Topics progress: ${completedTopics} of ${totalTopics} completed`}
+              aria-label={`Topics progress: ${completedTopics} of 500 completed`}
             />
             <p className="text-sm text-muted-foreground mt-1">
-              { (totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0) }% complete
+              { Math.round((completedTopics / 500) * 100) }% complete
             </p>
           </div>
         </div>
@@ -125,15 +126,15 @@ export default function DashboardPage() {
         <h2 id="level-progress-heading" className="text-2xl font-semibold mb-4">Progress to Next Level</h2>
         <div className="bg-card rounded-lg border border-border p-6">
           <div className="flex justify-between mb-2" role="status" aria-live="polite">
-            <span>Level {progress.level}</span>
-            <span>Level {progress.level + 1}</span>
+            <span>Level {character.level}</span>
+            <span>Level {character.level + 1}</span>
           </div>
           <ProgressBar
             value={xpProgress}
             max={100}
             size="lg"
             color="primary"
-            aria-label={`Level progress: ${xpProgress} of 100 XP until level ${progress.level + 1}`}
+            aria-label={`Level progress: ${xpProgress} of 100 XP until level ${character.level + 1}`}
           />
           <p className="text-center text-muted-foreground mt-2">
             {xpProgress} / 100 XP

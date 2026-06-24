@@ -5,7 +5,7 @@ import { COLLECTIBLES_POOL, openMysteryBox, type Collectible } from '../data/col
 import { REWARD_TIERS } from '../data/milestones'
 
 export default function RewardsPage() {
-  const { game, claimDailyReward, spinWheel, useCollectible, getActiveCollectibles, completedCount } = useGame()
+  const { game, claimDailyReward, spinWheel, useCollectible, getActiveCollectibles, completedCount, addXP, addGold, grantBadge } = useGame()
   const [wheelSpinning, setWheelSpinning] = useState(false)
   const [wheelResult, setWheelResult] = useState<{ label: string; icon: string } | null>(null)
   const [mysteryBoxToOpen, setMysteryBoxToOpen] = useState<Collectible | null>(null)
@@ -43,8 +43,15 @@ export default function RewardsPage() {
 
   const handleClaimTier = (tier: typeof REWARD_TIERS[0]) => {
     if (!canClaimTier(tier)) return
+    // Grant XP reward
+    addXP(tier.rewards.xp)
+    // Grant gold reward
+    addGold(tier.rewards.gold)
+    // Grant badge if present
+    if (tier.rewards.badge) {
+      grantBadge(tier.rewards.badge)
+    }
     setClaimedTiers([...claimedTiers, tier.id])
-    // In a real implementation, this would call a function to grant the rewards
   }
 
   const handleClaimDaily = (day: number) => {
