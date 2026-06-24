@@ -19,8 +19,6 @@ export function useKeyboardShortcuts(enabled = true) {
     { key: 'g l', action: () => navigate('/learn'), description: 'Go to Learn' },
     /* istanbul ignore next */
     { key: 'g d', action: () => navigate('/dashboard'), description: 'Go to Dashboard' },
-    /* istanbul ignore next */
-    { key: 'n', action: () => window.dispatchEvent(new CustomEvent('game:next')), description: 'Next/Continue' },
   ]
 
   const pendingKeyRef = useRef<string | null>(null)
@@ -35,19 +33,79 @@ export function useKeyboardShortcuts(enabled = true) {
     pendingKeyRef.current = null
   }, [])
 
+  // 'N' key - Click focused button OR primary button OR first button
+  const handleNKey = useCallback(() => {
+    // Priority 1: Click already focused element if it's a button
+    const activeElement = document.activeElement as HTMLButtonElement
+    if (activeElement && activeElement.tagName === 'BUTTON' && !activeElement.disabled) {
+      activeElement.click()
+      return
+    }
+
+    // Priority 2: Find primary action button (ones with prominent styling)
+    const primarySelectors = [
+      'button[class*="from-amber-600"]',  // Amber gradient buttons
+      'button[class*="from-green-600"]',  // Green gradient buttons
+      'button[class*="from-purple-600"]', // Purple gradient buttons
+      'button[class*="bg-amber-600"]',   // Amber solid buttons
+      'button[class*="bg-green-600"]',   // Green solid buttons
+      'button[class*="bg-purple-600"]',  // Purple solid buttons
+    ]
+
+    for (const selector of primarySelectors) {
+      const btn = document.querySelector(selector) as HTMLButtonElement
+      if (btn && !btn.disabled) {
+        btn.click()
+        return
+      }
+    }
+
+    // Priority 3: Click any enabled button with "Take Quiz", "Complete", "Begin", "Start", "Continue" text
+    const actionButtons = document.querySelectorAll('button')
+    for (const btn of actionButtons) {
+      if (btn.disabled) continue
+      const text = btn.textContent?.toLowerCase() || ''
+      if (text.includes('take quiz') || text.includes('complete') ||
+          text.includes('begin') || text.includes('start') ||
+          text.includes('continue') || text.includes('next') ||
+          text.includes('finish') || text.includes('submit')) {
+        btn.click()
+        return
+      }
+    }
+
+    // Priority 4: Click first visible enabled button
+    for (const btn of actionButtons) {
+      if (!btn.disabled && !btn.closest('[class*="hidden"]')) {
+        btn.click()
+        return
+      }
+    }
+  }, [])
+
   useEffect(() => {
     if (!enabled) return
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Ignore if user is typing in an input
+      // Ignore if user is typing in an input (unless it's the N key for quiz fill-blank)
       const target = event.target as HTMLElement
-      if (
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
-        target.isContentEditable
-      ) {
+      const isTyping = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable
+
+      // 'N' key works EVERYWHERE to click buttons (even in inputs if not disabled)
+      if (event.key.toLowerCase() === 'n') {
+        event.preventDefault()
+
+        // If in an input/textarea, blur it first then click button
+        if (isTyping && target.tagName !== 'TEXTAREA') {
+          target.blur()
+        }
+
+        handleNKey()
         return
       }
+
+      // Ignore other shortcuts if typing
+      if (isTyping) return
 
       const key = event.key.toLowerCase()
 
@@ -93,7 +151,7 @@ export function useKeyboardShortcuts(enabled = true) {
       window.removeEventListener('keydown', handleKeyDown)
       clearPendingKey()
     }
-  }, [enabled, navigate, clearPendingKey])
+  }, [enabled, navigate, clearPendingKey, handleNKey])
 
   return { shortcuts: SHORTCUTS }
 }
