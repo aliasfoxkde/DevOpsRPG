@@ -1190,5 +1190,436 @@ export const w3schoolsContent: W3SchoolsData = {
         },
       ],
     },
+
+    // Phase 6: AI & Intelligence
+    machine_learning: {
+      name: 'Machine Learning',
+      icon: '🤖',
+      description: 'Learn ML fundamentals, algorithms, and deployment',
+      topics: [
+        {
+          id: 'ml_intro',
+          name: 'ML Introduction',
+          sections: [
+            {
+              heading: 'What is Machine Learning?',
+              content: 'Machine Learning (ML) is a subset of AI that enables systems to learn and improve from experience without being explicitly programmed. ML algorithms build models based on sample data to make predictions or decisions.',
+            },
+            {
+              heading: 'ML vs Traditional Programming',
+              content: 'In traditional programming, you write rules that the computer follows. In ML, the computer learns rules from data. This is especially useful when rules are too complex to code manually.',
+            },
+            {
+              heading: 'Types of ML Problems',
+              content: 'Classification: Predicting categories (spam/not spam). Regression: Predicting continuous values (house prices). Clustering: Grouping similar data points. Dimensionality Reduction: Simplifying data while preserving structure.',
+            },
+          ],
+          codeExamples: [
+            '# Traditional Programming\nif email.contains("free") and email.contains("winner"):\n    return "spam"\n\n# Machine Learning\nmodel.fit(emails, labels)  # Learn rules from data\nprediction = model.predict(new_email)',
+          ],
+        },
+        {
+          id: 'ml_types',
+          name: 'Types of Machine Learning',
+          sections: [
+            {
+              heading: 'Supervised Learning',
+              content: 'Learning from labeled training data. The algorithm learns to map input features to correct outputs. Used for classification and regression problems. Examples: spam detection, house price prediction.',
+            },
+            {
+              heading: 'Unsupervised Learning',
+              content: 'Learning from unlabeled data to find patterns. The algorithm tries to structure data without knowing the outcomes. Used for clustering and dimensionality reduction. Examples: customer segmentation, anomaly detection.',
+            },
+            {
+              heading: 'Reinforcement Learning',
+              content: 'Learning through interaction with an environment. An agent takes actions and receives rewards or penalties. The goal is to learn a policy that maximizes cumulative reward. Used in robotics and game AI.',
+            },
+          ],
+          codeExamples: [
+            '# Supervised\nX_train, y_train = load_data("labeled_emails")\nmodel.fit(X_train, y_train)\n\n# Unsupervised\nX_unlabeled = load_data("customer_behavior")\nkmeans = KMeans(n_clusters=4)\nclusters = kmeans.fit_predict(X_unlabeled)',
+          ],
+        },
+        {
+          id: 'ml_supervised',
+          name: 'Supervised Learning',
+          sections: [
+            {
+              heading: 'Classification Algorithms',
+              content: 'Decision Trees: Tree-like model of decisions. Random Forest: Ensemble of decision trees. Logistic Regression: Probabilistic classifier for binary outcomes. Support Vector Machines: Find optimal hyperplane for separation. Naive Bayes: Probabilistic classifier based on Bayes theorem.',
+            },
+            {
+              heading: 'Regression Algorithms',
+              content: 'Linear Regression: Models linear relationship between inputs and continuous output. Polynomial Regression: Models non-linear relationships. Ridge/Lasso: Regularized linear regression to prevent overfitting.',
+            },
+            {
+              heading: 'Evaluation Metrics',
+              content: 'Classification: Accuracy, Precision, Recall, F1-Score, ROC-AUC. Regression: Mean Absolute Error (MAE), Mean Squared Error (MSE), R-squared. Cross-validation helps assess model generalization.',
+            },
+          ],
+          codeExamples: [
+            'from sklearn.model_selection import train_test_split\nfrom sklearn.ensemble import RandomForestClassifier\nfrom sklearn.metrics import accuracy_score\n\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)\nclf = RandomForestClassifier(n_estimators=100)\nclf.fit(X_train, y_train)\npredictions = clf.predict(X_test)\nprint(f"Accuracy: {accuracy_score(y_test, predictions)}")',
+          ],
+        },
+        {
+          id: 'ml_unsupervised',
+          name: 'Unsupervised Learning',
+          sections: [
+            {
+              heading: 'Clustering Algorithms',
+              content: 'K-Means: Partitions data into K clusters based on similarity. Hierarchical Clustering: Creates tree of clusters. DBSCAN: Density-based clustering that finds arbitrary shaped clusters. Gaussian Mixture Models: Probabilistic clustering with soft assignments.',
+            },
+            {
+              heading: 'Dimensionality Reduction',
+              content: 'PCA (Principal Component Analysis): Projects data onto orthogonal axes that maximize variance. t-SNE: Non-linear method for visualization. UMAP: Preserves both local and global structure better than t-SNE.',
+            },
+            {
+              heading: 'Association Rules',
+              content: 'Finding patterns in transactional data. Market basket analysis is a common example: "Customers who buy bread also tend to buy butter." Apriori and FP-Growth are popular algorithms for association rule mining.',
+            },
+          ],
+          codeExamples: [
+            'from sklearn.cluster import KMeans\nfrom sklearn.decomposition import PCA\n\n# Clustering\nkmeans = KMeans(n_clusters=3, random_state=42)\ncluster_labels = kmeans.fit_predict(customer_features)\n\n# Dimensionality Reduction\npca = PCA(n_components=2)\nX_2d = pca.fit_transform(X_high_dim)\nprint(f"Explained variance: {pca.explained_variance_ratio_}")',
+          ],
+        },
+        {
+          id: 'ml_neural_nets',
+          name: 'Neural Networks',
+          sections: [
+            {
+              heading: 'What are Neural Networks?',
+              content: 'Neural networks are computing systems inspired by biological neural networks. They consist of layers of interconnected nodes (neurons). Input layer receives data, hidden layers process it, output layer produces predictions.',
+            },
+            {
+              heading: 'Key Concepts',
+              content: 'Weights and Biases: Parameters that are learned. Activation Functions: ReLU, Sigmoid, Tanh introduce non-linearity. Loss Function: Measures prediction error. Backpropagation: Algorithm for updating weights. Gradient Descent: Optimization algorithm for minimizing loss.',
+            },
+            {
+              heading: 'Deep Learning',
+              content: 'Deep learning uses neural networks with many hidden layers. CNNs excel at image processing. RNNs and LSTMs handle sequential data. Transformers power modern NLP models like GPT and BERT.',
+            },
+          ],
+          codeExamples: [
+            'import tensorflow as tf\nfrom tensorflow.keras import layers, models\n\nmodel = models.Sequential([\n    layers.Dense(64, activation="relu", input_shape=(784,)),\n    layers.Dense(32, activation="relu"),\n    layers.Dense(10, activation="softmax")\n])\nmodel.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"])\nmodel.fit(X_train, y_train, epochs=10, validation_split=0.2)',
+          ],
+        },
+        {
+          id: 'ml_tensorflow',
+          name: 'TensorFlow Basics',
+          sections: [
+            {
+              heading: 'What is TensorFlow?',
+              content: 'TensorFlow is an open-source ML framework by Google. It provides a comprehensive ecosystem for building and deploying ML models. TensorFlow Hub offers pre-trained models for transfer learning.',
+            },
+            {
+              heading: 'Tensors',
+              content: 'Tensors are the core data structure in TensorFlow. They are multidimensional arrays similar to NumPy arrays. Operations (ops) create, transform, and combine tensors.',
+            },
+            {
+              heading: 'Keras API',
+              content: 'Keras is the high-level API built into TensorFlow. It simplifies model creation with layers, optimizers, and callbacks. Sequential API for simple models, Functional API for complex architectures.',
+            },
+          ],
+          codeExamples: [
+            'import tensorflow as tf\n\n# Create tensors\nx = tf.constant([[1.0, 2.0], [3.0, 4.0]])\ny = tf.constant([[5.0, 6.0], [7.0, 8.0]])\n\n# Matrix multiplication\nresult = tf.matmul(x, y)\n\n# Using Keras\nmodel = tf.keras.Sequential([\n    tf.keras.layers.Dense(128, activation="relu"),\n    tf.keras.layers.Dropout(0.5),\n    tf.keras.layers.Dense(10)\n])',
+          ],
+        },
+        {
+          id: 'ml_sklearn',
+          name: 'Scikit-Learn',
+          sections: [
+            {
+              heading: 'What is Scikit-Learn?',
+              content: 'Scikit-Learn (sklearn) is Python\'s most popular ML library. Provides simple and efficient tools for data mining and analysis. Consistent API across all algorithms. Built on NumPy, SciPy, and Matplotlib.',
+            },
+            {
+              heading: 'Pipeline',
+              content: 'Pipelines chain together multiple transformation steps with a final estimator. They ensure proper preprocessing during both training and inference. Use Pipeline to prevent data leakage in cross-validation.',
+            },
+            {
+              heading: 'Model Selection',
+              content: 'GridSearchCV: Exhaustive search over hyperparameter values. RandomizedSearchCV: Random search when parameter space is large. train_test_split: Simple train/validation split. Cross-validation: Robust performance estimation.',
+            },
+          ],
+          codeExamples: [
+            'from sklearn.pipeline import Pipeline\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.model_selection import GridSearchCV\n\npipe = Pipeline([\n    ("scaler", StandardScaler()),\n    ("classifier", LogisticRegression())\n])\nparam_grid = {"classifier__C": [0.1, 1, 10]}\ngrid_search = GridSearchCV(pipe, param_grid, cv=5)\ngrid_search.fit(X_train, y_train)',
+          ],
+        },
+        {
+          id: 'ml_mlops',
+          name: 'MLOps Practices',
+          sections: [
+            {
+              heading: 'What is MLOps?',
+              content: 'MLOps combines DevOps practices with ML systems. Goal: reliable, scalable ML applications. Key principles: reproducibility, automation, continuous training, monitoring.',
+            },
+            {
+              heading: 'ML Lifecycle',
+              content: '1. Data Collection & Analysis. 2. Feature Engineering. 3. Model Training & Evaluation. 4. Model Serving & Monitoring. 5. Continuous training when data drifts. 6. Model versioning with model registry.',
+            },
+            {
+              heading: 'ML Infrastructure',
+              content: 'Experiment Tracking: MLflow, Weights & Biases, TensorBoard. Model Registry: Store and version models. Feature Store: Centralized feature management. Model Serving: REST APIs, batch inference, edge deployment.',
+            },
+          ],
+          codeExamples: [
+            '# MLflow tracking\nimport mlflow\n\nmlflow.set_experiment("spam_classifier")\nwith mlflow.start_run():\n    mlflow.log_param("model_type", "random_forest")\n    mlflow.log_param("n_estimators", 100)\n    mlflow.log_metric("accuracy", accuracy)\n    mlflow.sklearn.log_model(model, "model")\n\n# Dockerize model serving\n# FROM python:3.9\n# COPY model.pkl /app/\n# RUN pip install flask sklearn\n# CMD ["python", "serve.py"]',
+          ],
+        },
+      ],
+    },
+
+    // Additional AI/DevOps topics
+    networking: {
+      name: 'Networking',
+      icon: '🌐',
+      description: 'Modern networking concepts for DevOps',
+      topics: [
+        {
+          id: 'net_intro',
+          name: 'Networking Fundamentals',
+          sections: [
+            {
+              heading: 'OSI Model',
+              content: '7 layers: Physical, Data Link, Network, Transport, Session, Presentation, Application. DevOps focuses on Layers 4-7 (TCP/UDP, HTTP, TLS, DNS). Understanding layers helps troubleshoot connectivity issues.',
+            },
+            {
+              heading: 'TCP vs UDP',
+              content: 'TCP: Connection-oriented, reliable, ordered delivery, flow control. UDP: Connectionless, faster, no guarantee of delivery. HTTP/HTTPS runs on TCP. DNS and streaming often use UDP.',
+            },
+          ],
+          codeExamples: [
+            '# TCP connection (Python)\nimport socket\ns = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\ns.connect(("example.com", 80))\ns.sendall(b"GET / HTTP/1.1\\r\\nHost: example.com\\r\\n\\r\\n")',
+          ],
+        },
+        {
+          id: 'net_dns',
+          name: 'DNS & Service Discovery',
+          sections: [
+            {
+              heading: 'DNS Records',
+              content: 'A: IPv4 address. AAAA: IPv6 address. CNAME: Canonical name (alias). MX: Mail exchange. TXT: Text data for verification. TTL: Time to live in seconds.',
+            },
+            {
+              heading: 'Service Discovery',
+              content: 'CoreDNS: Kubernetes default DNS. Consul: Service mesh and service discovery. etcd: Distributed key-value store used by Kubernetes. SkyDNS: Kubernetes DNS addon.',
+            },
+          ],
+          codeExamples: [
+            '# DNS lookup (dig)\ndig A example.com\n\n# Kubernetes service discovery\n# my-service.my-namespace.svc.cluster.local\n# Headless service for pod discovery',
+          ],
+        },
+        {
+          id: 'net_http',
+          name: 'HTTP/HTTPS Deep Dive',
+          sections: [
+            {
+              heading: 'HTTP Methods',
+              content: 'GET: Retrieve resource. POST: Create resource. PUT: Update/replace. PATCH: Partial update. DELETE: Remove resource. OPTIONS: CORS preflight. HEAD: Headers only.',
+            },
+            {
+              heading: 'HTTP Status Codes',
+              content: '2xx: Success (200 OK, 201 Created). 3xx: Redirect (301, 302, 304). 4xx: Client error (400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found). 5xx: Server error (500, 502, 503).',
+            },
+          ],
+          codeExamples: [
+            'curl -X POST https://api.example.com/users \\\n  -H "Content-Type: application/json" \\\n  -H "Authorization: Bearer $TOKEN" \\\n  -d \'{"name": "Alice", "email": "alice@example.com"}\'',
+          ],
+        },
+        {
+          id: 'net_loadbalancers',
+          name: 'Load Balancers',
+          sections: [
+            {
+              heading: 'Types of Load Balancing',
+              content: 'Layer 4 (Transport): Routes based on IP and port. Layer 7 (Application): Routes based on HTTP headers. Global Server Load Balancing (GSLB): Geographic distribution.',
+            },
+            {
+              heading: 'Algorithms',
+              content: 'Round Robin: Sequential distribution. Least Connections: Route to least busy server. IP Hash: Consistent hashing by client IP. Weighted: Traffic based on server capacity.',
+            },
+          ],
+          codeExamples: [
+            '# Nginx upstream configuration\nupstream backend {\n    least_conn;\n    server backend1.example.com weight=3;\n    server backend2.example.com;\n    server backup.example.com:8081 backup;\n}',
+          ],
+        },
+      ],
+    },
+
+    api_design: {
+      name: 'API Design',
+      icon: '🔌',
+      description: 'RESTful API design and best practices',
+      topics: [
+        {
+          id: 'api_intro',
+          name: 'API Fundamentals',
+          sections: [
+            {
+              heading: 'What is an API?',
+              content: 'API (Application Programming Interface) allows software to communicate. Web APIs use HTTP for requests/responses. APIs abstract complexity, enabling integration between systems.',
+            },
+            {
+              heading: 'API Design Principles',
+              content: 'Use nouns, not verbs in endpoints. Use plural names for collections. Version your APIs (v1, v2). Return appropriate HTTP status codes. Provide consistent error responses.',
+            },
+          ],
+          codeExamples: [
+            '# Good API design\nGET    /api/users      # List users\nPOST   /api/users      # Create user\nGET    /api/users/123  # Get user 123\nPATCH  /api/users/123  # Update user 123\nDELETE /api/users/123  # Delete user 123',
+          ],
+        },
+        {
+          id: 'api_rest',
+          name: 'REST API Best Practices',
+          sections: [
+            {
+              heading: 'REST Constraints',
+              content: 'Client-Server: Separation of concerns. Stateless: No session state on server. Cacheable: Responses can be cached. Uniform Interface: Consistent resource identification.',
+            },
+            {
+              heading: 'Pagination & Filtering',
+              content: 'Use query params: ?page=1&limit=20. Support sorting: ?sort=-created_at. Enable filtering: ?status=active&role=admin. Return total count in response headers.',
+            },
+          ],
+          codeExamples: [
+            'GET /api/users?page=2&limit=10&status=active&sort=-created_at\n\n# Response headers\nX-Total-Count: 156\nX-Total-Pages: 16\nLink: <http://api.example.com/users?page=3>; rel="next"',
+          ],
+        },
+        {
+          id: 'api_auth',
+          name: 'API Authentication',
+          sections: [
+            {
+              heading: 'Authentication Methods',
+              content: 'API Keys: Simple but limited. Basic Auth: Username/password (use with HTTPS). Bearer Tokens (JWT): Stateless, self-contained. OAuth 2.0: Delegated authorization. mTLS: Mutual TLS certificates.',
+            },
+            {
+              heading: 'JWT Structure',
+              content: 'JSON Web Tokens have 3 parts: Header (algorithm, type), Payload (claims), Signature. Tokens are Base64 encoded, not encrypted. Include expiration (exp) and issuer (iss) claims.',
+            },
+          ],
+          codeExamples: [
+            'import jwt\n\n# Create token\npayload = {"sub": "user123", "role": "admin", "exp": datetime.utcnow() + timedelta(hours=1)}\ntoken = jwt.encode(payload, SECRET_KEY, algorithm="HS256")\n\n# Verify token\ntry:\n    data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])\nexcept jwt.ExpiredSignatureError:\n    return "Token expired"',
+          ],
+        },
+        {
+          id: 'api_graphql',
+          name: 'GraphQL APIs',
+          sections: [
+            {
+              heading: 'What is GraphQL?',
+              content: 'GraphQL is a query language for APIs. Clients specify exactly what data they need. Single endpoint for all requests. No over-fetching or under-fetching.',
+            },
+            {
+              heading: 'Schema & Types',
+              content: 'Define types with fields in schema. Query type defines read operations. Mutation type defines write operations. Use interfaces and unions for complex types.',
+            },
+          ],
+          codeExamples: [
+            'type User {\n  id: ID!\n  name: String!\n  email: String!\n  posts: [Post!]!\n}\n\ntype Query {\n  user(id: ID!): User\n  users(limit: Int, offset: Int): [User!]!\n}\n\ntype Mutation {\n  createUser(name: String!, email: String!): User!\n}',
+          ],
+        },
+      ],
+    },
+
+    observability: {
+      name: 'Observability',
+      icon: '📊',
+      description: 'Monitoring, logging, and tracing',
+      topics: [
+        {
+          id: 'obs_intro',
+          name: 'Observability Overview',
+          sections: [
+            {
+              heading: 'The Three Pillars',
+              content: 'Metrics: Numerical measurements over time (Prometheus). Logs: Event records (Loki, ELK). Traces: Request paths through distributed systems (Jaeger). Together they provide full system visibility.',
+            },
+            {
+              heading: 'SLOs and SLAs',
+              content: 'SLA (Service Level Agreement): Contractual obligation to customers. SLO (Service Level Objective): Internal goal for service. SLI (Service Level Indicator): Actual measured value.',
+            },
+          ],
+          codeExamples: [
+            '# Prometheus metric\nhttp_requests_total{method="GET", status="200"} 12345\n\n# Loki log query\n{job="api-server"} |= "error" | json | duration > 500ms',
+          ],
+        },
+        {
+          id: 'obs_grafana',
+          name: 'Grafana Dashboards',
+          sections: [
+            {
+              heading: 'Dashboard Structure',
+              content: 'Panels: Individual visualizations (graph, stat, table). Rows: Group panels horizontally. Variables: Dynamic filtering. Time range: Global or panel-specific.',
+            },
+            {
+              heading: 'Queries',
+              content: 'PromQL for Prometheus. LogQL for Loki. InfluxQL for InfluxDB. Mixed ds for combining datasources. Use recording rules for expensive queries.',
+            },
+          ],
+          codeExamples: [
+            '# PromQL query\nsum(rate(http_requests_total{service=~"$service"}[5m])) by (status_code)\n\n# Grafana alerting rule\n- alert: HighErrorRate\n  expr: sum(rate(http_requests_total{status=~"5.."}[5m])) > 0.05\n  for: 5m\n  labels:\n    severity: critical',
+          ],
+        },
+        {
+          id: 'obs_tracing',
+          name: 'Distributed Tracing',
+          sections: [
+            {
+              heading: 'Why Tracing?',
+              content: 'Trace requests across microservices. Identify latency bottlenecks. Understand service dependencies. Debug cascading failures.',
+            },
+            {
+              heading: 'OpenTelemetry',
+              content: 'Vendor-neutral instrumentation. Traces, metrics, and logs in one SDK. Automatic and manual instrumentation. Collector for processing and export.',
+            },
+          ],
+          codeExamples: [
+            'from opentelemetry import trace\nfrom opentelemetry.sdk.trace import TracerProvider\n\ntracer = trace.get_tracer(__name__)\n\nwith tracer.start_as_current_span("process_order") as span:\n    span.set_attribute("order.id", order_id)\n    span.add_event("Validating payment")\n    # process payment\n    span.set_attribute("order.amount", amount)',
+          ],
+        },
+      ],
+    },
+
+    gitops: {
+      name: 'GitOps',
+      icon: '🔄',
+      description: 'Git-based deployment workflows',
+      topics: [
+        {
+          id: 'gitops_intro',
+          name: 'GitOps Fundamentals',
+          sections: [
+            {
+              heading: 'What is GitOps?',
+              content: 'GitOps uses Git as the single source of truth for declarative infrastructure and applications. Changes are made via pull requests. Automated sync ensures actual state matches desired state.',
+            },
+            {
+              heading: 'Core Principles',
+              content: 'Declarative: Everything defined as code. Versioned: Complete history in Git. Auto-Sync: Automatic deployment on merge. Agent-Based: Operators reconcile state.',
+            },
+          ],
+          codeExamples: [
+            '# ArgoCD sync\nargocd app sync my-app\n\n# Flux reconcile\nflux reconcile kustomization webapp',
+          ],
+        },
+        {
+          id: 'gitops_argocd',
+          name: 'ArgoCD',
+          sections: [
+            {
+              heading: 'ArgoCD Overview',
+              content: 'GitOps continuous delivery tool for Kubernetes. Web UI and CLI for application management. Automatic sync when Git changes. Health checks for deployed resources.',
+            },
+            {
+              heading: 'Application Definition',
+              content: 'Define apps via Application CRD. Kustomize, Helm, and plain YAML supported. Sync policies: Manual, auto-prune, self-heal. Multi-cluster support.',
+            },
+          ],
+          codeExamples: [
+            'apiVersion: argoproj.io/v1alpha1\nkind: Application\nmetadata:\n  name: my-app\n  namespace: argocd\nspec:\n  project: default\n  source:\n    repoURL: https://github.com/org/gitops.git\n    targetRevision: main\n    path: ./k8s\n  destination:\n    server: https://kubernetes.default.svc\n    namespace: my-app',
+          ],
+        },
+      ],
+    },
   },
 }
