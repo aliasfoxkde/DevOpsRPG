@@ -26,11 +26,11 @@ describe('useKeyboardShortcuts', () => {
   it('returns shortcuts list', () => {
     const { result } = renderHook(() => useKeyboardShortcuts(), { wrapper })
 
-    expect(result.current.shortcuts).toHaveLength(4)
+    expect(result.current.shortcuts).toHaveLength(11)
     expect(result.current.shortcuts[0].key).toBe('g h')
     expect(result.current.shortcuts[1].key).toBe('g l')
     expect(result.current.shortcuts[2].key).toBe('g d')
-    expect(result.current.shortcuts[3].key).toBe('n')
+    expect(result.current.shortcuts[3].key).toBe('g q')
   })
 
   it('does not trigger when disabled', () => {
@@ -45,7 +45,7 @@ describe('useKeyboardShortcuts', () => {
     expect(result.current.shortcuts[0].description).toBe('Go to Home')
     expect(result.current.shortcuts[1].description).toBe('Go to Learn')
     expect(result.current.shortcuts[2].description).toBe('Go to Dashboard')
-    expect(result.current.shortcuts[3].description).toBe('Next/Continue')
+    expect(result.current.shortcuts[3].description).toBe('Go to Quests')
   })
 
   it('does not trigger when typing in input', () => {

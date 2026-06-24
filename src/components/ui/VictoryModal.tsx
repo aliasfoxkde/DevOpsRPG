@@ -3,6 +3,39 @@ import { useGame } from '../../contexts/GameContext'
 import { XPBar } from './XPBar'
 import { RARITY_COLORS } from '../../data/badges'
 
+// Particle component defined outside render to avoid "Cannot create components during render"
+function Particles({ show }: { show: boolean }) {
+  if (!show) return null
+
+  const particles = Array.from({ length: 50 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    delay: Math.random() * 2,
+    duration: 2 + Math.random() * 2,
+    size: 4 + Math.random() * 8,
+    color: ['✨', '⭐', '💫', '🌟', '🎉'][Math.floor(Math.random() * 5)],
+  }))
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {particles.map(p => (
+        <div
+          key={p.id}
+          className="absolute animate-float-up text-xl"
+          style={{
+            left: `${p.x}%`,
+            bottom: '-20px',
+            animationDelay: `${p.delay}s`,
+            animationDuration: `${p.duration}s`,
+          }}
+        >
+          {p.color}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export function VictoryModal() {
   const { game, dismissVictory } = useGame()
   const [showParticles, setShowParticles] = useState(false)
@@ -29,44 +62,11 @@ export function VictoryModal() {
 
   const { xp, levelUp, newLevel, milestone, badge } = game.lastVictory
 
-  // Particle effect component
-  const Particles = () => {
-    if (!showParticles) return null
-
-    const particles = Array.from({ length: 50 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      delay: Math.random() * 2,
-      duration: 2 + Math.random() * 2,
-      size: 4 + Math.random() * 8,
-      color: ['✨', '⭐', '💫', '🌟', '🎉'][Math.floor(Math.random() * 5)],
-    }))
-
-    return (
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {particles.map(p => (
-          <div
-            key={p.id}
-            className="absolute animate-float-up text-xl"
-            style={{
-              left: `${p.x}%`,
-              bottom: '-20px',
-              animationDelay: `${p.delay}s`,
-              animationDuration: `${p.duration}s`,
-            }}
-          >
-            {p.color}
-          </div>
-        ))}
-      </div>
-    )
-  }
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
       {/* Particles background */}
       <div className="absolute inset-0 overflow-hidden">
-        <Particles />
+        <Particles show={showParticles} />
       </div>
 
       <div className="relative w-full max-w-md bg-gradient-to-b from-amber-900/95 to-amber-950/95 border-2 border-amber-500 rounded-xl shadow-2xl overflow-hidden animate-[victory-scale_0.5s_ease-out]">

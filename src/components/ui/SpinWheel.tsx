@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 interface SpinWheelProps {
   onSpinComplete: (prize: { type: string; value: number; name: string }) => void
@@ -31,13 +31,7 @@ export default function SpinWheel({ onSpinComplete, isSpinning }: SpinWheelProps
   const [rotation, setRotation] = useState(0)
   const [spinning, setSpinning] = useState(false)
 
-  useEffect(() => {
-    if (isSpinning && !spinning) {
-      spin()
-    }
-  }, [isSpinning])
-
-  const spin = () => {
+  const spin = useCallback(() => {
     setSpinning(true)
     const prize = getRandomPrize()
     const segmentAngle = 360 / prizes.length
@@ -54,7 +48,13 @@ export default function SpinWheel({ onSpinComplete, isSpinning }: SpinWheelProps
       setSpinning(false)
       onSpinComplete(prize)
     }, 4000)
-  }
+  }, [onSpinComplete, rotation])
+
+  useEffect(() => {
+    if (isSpinning && !spinning) {
+      spin()
+    }
+  }, [isSpinning, spinning, spin])
 
   const segmentAngle = 360 / prizes.length
 

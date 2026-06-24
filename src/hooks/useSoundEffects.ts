@@ -158,7 +158,7 @@ class SoundGenerator {
           oscillator.start(now)
           oscillator.stop(now + 0.1)
       }
-    } catch (e) {
+    } catch {
       // Silently fail if audio not supported
     }
   }
@@ -209,7 +209,7 @@ export const globalSound = {
       const stored = localStorage.getItem('soundEnabled')
       if (stored === 'false') return
       soundGenerator.play(type)
-    } catch (e) {
+    } catch {
       // Silently fail
     }
   }

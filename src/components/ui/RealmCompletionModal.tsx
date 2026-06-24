@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useGame } from '../../contexts/GameContext'
-import { realms, realmStories } from '../../data/quests'
+import { realms, realmStories, allQuests } from '../../data/quests'
 import { BADGES } from '../../data/badges'
 
 interface RealmCompletionModalProps {
@@ -8,23 +8,61 @@ interface RealmCompletionModalProps {
   onClose: () => void
 }
 
+// Particle component defined outside render to avoid "Cannot create components during render"
+function Particles() {
+  const [showParticles, setShowParticles] = useState(false)
+
+  useEffect(() => {
+    setShowParticles(true)
+  }, [])
+
+  if (!showParticles) return null
+
+  const particles = Array.from({ length: 100 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    delay: Math.random() * 3,
+    duration: 3 + Math.random() * 2,
+    color: ['🎉', '⭐', '✨', '🏆', '💫', '🎊', '🌟'][Math.floor(Math.random() * 7)],
+  }))
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {particles.map(p => (
+        <div
+          key={p.id}
+          className="absolute animate-particle-fall text-2xl"
+          style={{
+            left: `${p.x}%`,
+            top: '-20px',
+            animationDelay: `${p.delay}s`,
+            animationDuration: `${p.duration}s`,
+          }}
+        >
+          {p.color}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export function RealmCompletionModal({ realmId, onClose }: RealmCompletionModalProps) {
   const { game } = useGame()
-  const [showParticles, setShowParticles] = useState(false)
   const [count, setCount] = useState(0)
 
   const realm = realms[realmId]
   const realmStory = realmStories[realmId]
-  const completedQuests = game.completedQuests.filter(q => {
-    const quest = require('../../data/quests').allQuests.find((qq: { id: string }) => qq.id === q.questId)
-    return quest?.realmId === realmId
-  })
+  const completedQuests = useMemo(() => {
+    return game.completedQuests.filter(q => {
+      const quest = allQuests.find((qq: { id: string }) => qq.id === q.questId)
+      return quest?.realmId === realmId
+    })
+  }, [game.completedQuests, realmId])
 
   // Get badges earned for this realm
   const realmBadges = BADGES.filter(b => b.requirement.type === 'realm_complete' && b.requirement.value === Object.keys(realms).indexOf(realmId) + 1)
 
   useEffect(() => {
-    setShowParticles(true)
     setCount(5) // Start countdown
 
     const timer = setInterval(() => {
@@ -53,38 +91,6 @@ export function RealmCompletionModal({ realmId, onClose }: RealmCompletionModalP
   }, [onClose])
 
   if (!realm) return null
-
-  // Particle effect component
-  const Particles = () => {
-    if (!showParticles) return null
-
-    const particles = Array.from({ length: 100 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      delay: Math.random() * 3,
-      duration: 3 + Math.random() * 2,
-      color: ['🎉', '⭐', '✨', '🏆', '💫', '🎊', '🌟'][Math.floor(Math.random() * 7)],
-    }))
-
-    return (
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {particles.map(p => (
-          <div
-            key={p.id}
-            className="absolute animate-particle-fall text-2xl"
-            style={{
-              left: `${p.x}%`,
-              top: '-20px',
-              animationDelay: `${p.delay}s`,
-              animationDuration: `${p.duration}s`,
-            }}
-          >
-            {p.color}
-          </div>
-        ))}
-      </div>
-    )
-  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">

@@ -68,6 +68,7 @@ export default function RewardsPage() {
 
   const handleOpenMystery = (collectible: Collectible) => {
     if (collectible.type !== 'mystery_box') {
+      // eslint-disable-next-line react-hooks/rules-of-hooks -- useCollectible is NOT a hook, just a function starting with "use"
       useCollectible(collectible.id)
       return
     }
@@ -79,6 +80,7 @@ export default function RewardsPage() {
 
   const handleCloseMystery = () => {
     if (mysteryBoxToOpen) {
+      // eslint-disable-next-line react-hooks/rules-of-hooks -- useCollectible is NOT a hook, just a function starting with "use"
       useCollectible(mysteryBoxToOpen.id)
     }
     setShowMystery(false)

@@ -271,7 +271,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           case 'topics_25':
             unlocked = completedCount >= 25
             break
-          case 'all_foundations':
+          case 'all_foundations': {
             // Check if all foundations quests are complete
             const foundationsQuests = allQuests.filter(q => q.realmId === 'foundations')
             const allFoundationsDone = foundationsQuests.every(
@@ -279,6 +279,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
             )
             unlocked = allFoundationsDone
             break
+          }
           case 'streak_30':
             unlocked = newStreak >= 30
             break

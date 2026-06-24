@@ -45,8 +45,15 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   const correctCountRef = useRef(correctCount)
   const allQuestionsLengthRef = useRef(allQuestions.length)
   const finishHandledRef = useRef(false)
-  correctCountRef.current = correctCount
-  allQuestionsLengthRef.current = allQuestions.length
+
+  // Keep refs in sync with state using useEffect
+  useEffect(() => {
+    correctCountRef.current = correctCount
+  }, [correctCount])
+
+  useEffect(() => {
+    allQuestionsLengthRef.current = allQuestions.length
+  }, [allQuestions.length])
 
   // currentQuestion is guaranteed non-null when hasQuestions is true
   // because we return early in the render when !hasQuestions
