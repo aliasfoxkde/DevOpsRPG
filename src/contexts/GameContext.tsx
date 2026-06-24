@@ -414,6 +414,24 @@ export function GameProvider({ children }: { children: ReactNode }) {
         collectibles: newCollectibles,
         completedRealms: completedRealmIds,
         showRealmCompletion: newShowRealmCompletion,
+        // Update side quest progress
+        sideQuests: prev.sideQuests.map(sq => {
+          if (sq.completed) return sq
+          // Increment progress for quest completion type
+          if (sq.requirement.type === 'complete_quests') {
+            return { ...sq, progress: sq.progress + 1 }
+          }
+          // Increment progress for XP earned (check if enough XP)
+          if (sq.requirement.type === 'earn_xp') {
+            const xpGained = quest.xpReward
+            return { ...sq, progress: sq.progress + xpGained }
+          }
+          // Streak quests - if today counts toward streak
+          if (sq.requirement.type === 'maintain_streak' && newStreak >= 1) {
+            return { ...sq, progress: sq.progress + 1 }
+          }
+          return sq
+        }),
       }
     })
   }, [])
