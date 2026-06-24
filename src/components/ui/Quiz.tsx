@@ -33,10 +33,12 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   const [wrongCount, setWrongCount] = useState(0)
   const [quizComplete, setQuizComplete] = useState(false)
   const [localCorrect, setLocalCorrect] = useState(false)
+  const [isFinishing, setIsFinishing] = useState(false)
 
   // Use ref to avoid stale closure in handleFinish
   const correctCountRef = useRef(correctCount)
   const allQuestionsLengthRef = useRef(allQuestions.length)
+  const finishHandledRef = useRef(false)
   correctCountRef.current = correctCount
   allQuestionsLengthRef.current = allQuestions.length
 
@@ -90,6 +92,9 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   }, [currentIndex, allQuestions.length])
 
   const handleFinish = useCallback(() => {
+    if (finishHandledRef.current) return
+    finishHandledRef.current = true
+    setIsFinishing(true)
     if (!hasQuestions) {
       onPass()
       return
@@ -190,13 +195,16 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
           <div className="flex items-center justify-center gap-4">
             <button
               onClick={handleFinish}
-              className={`px-8 py-3 font-bold rounded-lg shadow-lg transform transition-all hover:scale-105 ${
+              disabled={isFinishing}
+              className={`px-8 py-3 font-bold rounded-lg shadow-lg transform transition-all ${
+                isFinishing ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'
+              } ${
                 passed
                   ? 'bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white'
                   : 'bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white'
               }`}
             >
-              {passed ? '✨ Complete Quest' : '🔄 Practice More'}
+              {isFinishing ? '⏳ Finishing...' : passed ? '✨ Complete Quest' : '🔄 Practice More'}
             </button>
           </div>
         </div>

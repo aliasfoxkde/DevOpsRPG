@@ -100,6 +100,12 @@ export function HUD() {
             >
               👤 Hero
             </Link>
+            <Link
+              to="/rewards"
+              className="px-3 py-1 text-sm text-slate-300 hover:text-amber-400 hover:bg-slate-700/50 rounded transition-all"
+            >
+              🎁 Rewards
+            </Link>
           </nav>
         </div>
 

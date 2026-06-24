@@ -4,15 +4,22 @@ import { useGame } from '../contexts/GameContext'
 import { allQuests, realms } from '../data/quests'
 import { w3schoolsContent } from '../data/w3schools-content'
 import Quiz from '../components/ui/Quiz'
+import QuickMiniGame from '../components/ui/QuickMiniGame'
+import TreasureChest from '../components/ui/TreasureChest'
+import { getRandomLoot } from '../components/ui/TreasureChest'
 
 type ViewMode = 'study' | 'quiz'
 
 export default function BattleArenaPage() {
   const { questId } = useParams<{ questId: string }>()
   const navigate = useNavigate()
-  const { completeQuest, isQuestCompleted, getNextQuest } = useGame()
+  const { completeQuest, isQuestCompleted, getNextQuest, addXP, addGold } = useGame()
   const [viewMode, setViewMode] = useState<ViewMode>('study')
   const [justCompleted, setJustCompleted] = useState(false)
+  const [showMiniGame, setShowMiniGame] = useState(false)
+  const [chestLoot, setChestLoot] = useState<{ type: string; value: number; name: string; rarity: string } | null>(null)
+  const [showChest, setShowChest] = useState(false)
+  const [bonusXP, setBonusXP] = useState(0)
 
   const quest = allQuests.find(q => q.id === questId)
 
@@ -38,6 +45,30 @@ export default function BattleArenaPage() {
   const handleComplete = () => {
     completeQuest(quest.id)
     setJustCompleted(true)
+
+    // 25% chance for bonus mini-game
+    if (Math.random() < 0.25) {
+      setTimeout(() => setShowMiniGame(true), 800)
+    }
+
+    // 30% chance for treasure chest
+    if (Math.random() < 0.30) {
+      const loot = getRandomLoot(quest.difficulty)
+      setChestLoot(loot)
+      setTimeout(() => {
+        if (loot.type === 'xp') addXP(loot.value)
+        if (loot.type === 'gold') addGold(loot.value)
+        setShowChest(true)
+      }, 1200)
+    }
+  }
+
+  const handleMiniGameComplete = (success: boolean, xpWon: number) => {
+    setShowMiniGame(false)
+    if (success && xpWon > 0) {
+      addXP(xpWon)
+      setBonusXP(xpWon)
+    }
   }
 
   // Auto-navigate to next quest after completion
@@ -215,6 +246,20 @@ export default function BattleArenaPage() {
                     {justCompleted && nextQuest && (
                       <p className="text-sm text-green-200 mt-1">⚔️ {nextQuest.title}</p>
                     )}
+                    {(bonusXP > 0 || chestLoot) && (
+                      <div className="mt-3 flex items-center justify-center gap-3 flex-wrap">
+                        {bonusXP > 0 && (
+                          <span className="px-3 py-1 bg-purple-900/50 rounded-full text-purple-300 text-sm font-bold">
+                            🎮 +{bonusXP} Bonus XP!
+                          </span>
+                        )}
+                        {chestLoot && (
+                          <span className="px-3 py-1 bg-amber-900/50 rounded-full text-amber-300 text-sm font-bold">
+                            📦 {chestLoot.name}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                   {!justCompleted && (
                     <button
@@ -244,6 +289,31 @@ export default function BattleArenaPage() {
             onPass={handleComplete}
             onSkip={() => setViewMode('study')}
           />
+        )}
+
+        {/* Mini-game popup */}
+        {showMiniGame && (
+          <QuickMiniGame
+            onComplete={handleMiniGameComplete}
+            onSkip={() => setShowMiniGame(false)}
+          />
+        )}
+
+        {/* Treasure Chest popup */}
+        {showChest && chestLoot && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div className="text-center">
+              <TreasureChest questDifficulty={quest.difficulty} onChestOpen={() => {}} />
+              <p className="mt-4 text-2xl font-bold text-amber-400">{chestLoot.name}!</p>
+              <p className="text-slate-400 mt-2 capitalize">{chestLoot.rarity} loot acquired!</p>
+              <button
+                onClick={() => setShowChest(false)}
+                className="mt-4 px-6 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg"
+              >
+                Awesome!
+              </button>
+            </div>
+          </div>
         )}
 
         {/* Quest Navigation */}
