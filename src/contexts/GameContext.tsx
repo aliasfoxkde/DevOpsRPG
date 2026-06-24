@@ -471,10 +471,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0]
     if (game.lastDailyReset !== today) {
-      // Reset daily quests and claim new ones
+      // Reset daily quests and daily rewards for new day
       setGame(prev => ({
         ...prev,
         sideQuests: [...generateDailyQuests(), ...generateWeeklyQuests(), ...generateSecretQuests()],
+        dailyRewardsClaimed: [], // Reset daily rewards on new day
         lastDailyReset: today,
       }))
     }
