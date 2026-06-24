@@ -133,6 +133,13 @@ export function shouldUnlockBadge(badge: Badge, stats: {
   typerCount: number
   memoryCount: number
   mathCount: number
+  wrongAnswerCount?: number
+  sessionQuestCount?: number
+  earlyQuests?: number
+  nightQuests?: number
+  fastestQuestTime?: number
+  jackpotSpins?: number
+  mysteryBoxesOpened?: number
 }): boolean {
   switch (badge.requirement.type) {
     case 'quest_count':
@@ -159,6 +166,26 @@ export function shouldUnlockBadge(badge: Badge, stats: {
       return stats.memoryCount >= badge.requirement.value
     case 'math_count':
       return stats.mathCount >= badge.requirement.value
+    case 'early_quest':
+      return (stats.earlyQuests || 0) >= badge.requirement.value
+    case 'night_quest':
+      return (stats.nightQuests || 0) >= badge.requirement.value
+    case 'speed_quest':
+      return (stats.fastestQuestTime || Infinity) > 0 && (stats.fastestQuestTime || Infinity) <= badge.requirement.value * 60
+    case 'all_categories':
+      // Requires badges from quest, streak, skill, and secret categories - tracked separately
+      return false // Must be tracked via badge unlock events
+    case 'all_badges':
+      // Requires all other badges to be earned - tracked via badge unlock events
+      return false
+    case 'jackpot_spin':
+      return (stats.jackpotSpins || 0) >= badge.requirement.value
+    case 'mystery_open':
+      return (stats.mysteryBoxesOpened || 0) >= badge.requirement.value
+    case 'no_mistakes':
+      return (stats.wrongAnswerCount || 0) === 0 && stats.questCount >= badge.requirement.value
+    case 'marathon':
+      return (stats.sessionQuestCount || 0) >= badge.requirement.value
     default:
       return false
   }

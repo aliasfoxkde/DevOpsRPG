@@ -25,6 +25,8 @@ export interface Character {
   joinedAt: string
   skillPoints: number // Points to spend on skills
   skillAllocations: Record<string, number> // skillId -> level
+  xpMultiplier: number // Active XP multiplier (1 = no multiplier)
+  goldMultiplier: number // Active gold multiplier (1 = no multiplier)
 }
 
 export interface TopicProgress {
@@ -71,6 +73,13 @@ export interface GameState {
     memoryCount: number
     mathCount: number
     perfectQuiz: boolean // Had at least one perfect quiz
+    wrongAnswerCount: number // Total wrong answers for no_mistakes badge
+    sessionQuestCount: number // Quests in current session for marathon badge
+    earlyQuests: number // Quests completed before 8 AM
+    nightQuests: number // Quests completed after 10 PM
+    fastestQuestTime: number // Fastest quest completion in seconds
+    jackpotSpins: number // Times won 500+ gold on wheel
+    mysteryBoxesOpened: number // Mystery boxes opened
   }
 }
 
@@ -171,6 +180,8 @@ function createDefaultCharacter(): Character {
     joinedAt: new Date().toISOString(),
     skillPoints: 0,
     skillAllocations: {},
+    xpMultiplier: 1,
+    goldMultiplier: 1,
   }
 }
 
@@ -202,6 +213,13 @@ function createDefaultGame(): GameState {
       memoryCount: 0,
       mathCount: 0,
       perfectQuiz: false,
+      wrongAnswerCount: 0,
+      sessionQuestCount: 0,
+      earlyQuests: 0,
+      nightQuests: 0,
+      fastestQuestTime: Infinity,
+      jackpotSpins: 0,
+      mysteryBoxesOpened: 0,
     },
   }
 }
@@ -247,8 +265,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const today = new Date().toISOString().split('T')[0]
       const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
 
+      // Apply XP and gold multipliers from collectibles
+      const xpReward = Math.floor(quest.xpReward * prev.character.xpMultiplier)
+      const goldReward = Math.floor((quest.xpReward / 10) * prev.character.goldMultiplier)
+
       // Calculate new XP and level
-      const newXp = prev.character.xp + quest.xpReward
+      const newXp = prev.character.xp + xpReward
       const newLevel = calculateLevel(newXp)
       const leveledUp = newLevel > prev.character.level
 
@@ -344,20 +366,20 @@ export function GameProvider({ children }: { children: ReactNode }) {
         if (allTechComplete) completedTechIds.push(quest.technologyId)
       }
 
-      // Check for new badges with proper stats
+      // Check for new badges with proper stats (use actual game stats)
       const badgeStats = {
         questCount: completedCount,
         streakDays: newStreak,
         level: newLevel,
-        quizCount: 0,
-        minigameCount: 0,
-        perfectQuiz: false,
-        quizStreak: 0,
+        quizCount: prev.stats.quizCount,
+        minigameCount: prev.stats.minigameCount,
+        perfectQuiz: prev.stats.perfectQuiz,
+        quizStreak: prev.stats.quizStreak,
         techCompleted: completedTechIds,
         realmCompleted: completedRealmIds.length,
-        typerCount: 0,
-        memoryCount: 0,
-        mathCount: 0,
+        typerCount: prev.stats.typerCount,
+        memoryCount: prev.stats.memoryCount,
+        mathCount: prev.stats.mathCount,
       }
 
       let newBadge: Badge | undefined
@@ -370,17 +392,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return b
       })
 
-      // Check for new milestones with proper state
+      // Check for new milestones with proper state (use actual game stats)
       const milestoneState = {
         completedQuests: completedCount,
         streakDays: newStreak,
         level: newLevel,
         completedRealms: completedRealmIds,
         completedTechnologies: completedTechIds,
-        quizStreak: 0,
-        minigamesCompleted: 0,
+        quizStreak: prev.stats.quizStreak,
+        minigamesCompleted: prev.stats.minigameCount,
         hasDefeatedBoss: quest.type === 'boss',
-        hasPerfectQuiz: false,
+        hasPerfectQuiz: prev.stats.perfectQuiz,
       }
 
       let newMilestone: Milestone | undefined
@@ -414,8 +436,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
           title: getTitle(newLevel),
           streakDays: newStreak,
           lastActive: today,
-          gold: prev.character.gold + Math.floor(quest.xpReward / 10),
+          gold: prev.character.gold + goldReward,
           skillPoints: newSkillPoints,
+          xpMultiplier: 1, // Reset after use
+          goldMultiplier: 1, // Reset after use
         },
         completedQuests: [
           ...prev.completedQuests,
@@ -424,7 +448,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
             technologyId: quest.technologyId,
             questId,
             completed: true,
-            xpEarned: quest.xpReward,
+            xpEarned: xpReward, // Track actual XP earned (with multiplier)
             completedAt: new Date().toISOString(),
           },
         ],
@@ -432,7 +456,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         achievements: newAchievements,
         showVictory: true,
         lastVictory: {
-          xp: quest.xpReward,
+          xp: xpReward, // Show multiplied XP in victory screen
           levelUp: leveledUp,
           newLevel: leveledUp ? newLevel : prev.character.level,
           milestone: newMilestone,
@@ -461,6 +485,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
           }
           return sq
         }),
+        // Track secret badge stats
+        stats: {
+          ...prev.stats,
+          sessionQuestCount: prev.stats.sessionQuestCount + 1,
+          earlyQuests: new Date().getHours() < 8 ? prev.stats.earlyQuests + 1 : prev.stats.earlyQuests,
+          nightQuests: new Date().getHours() >= 22 ? prev.stats.nightQuests + 1 : prev.stats.nightQuests,
+        },
       }
     })
   }, [])
@@ -563,6 +594,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
         const collectible = COLLECTIBLES_POOL.find(c => c.id === segment.reward.collectibleId)
         if (collectible) newCollectibles.push({ ...collectible, used: false })
       }
+      // Track jackpot spin (500+ gold)
+      const isJackpot = segment.reward.type === 'gold' && (segment.reward.value || 0) >= 500
       return {
         ...prev,
         collectibles: newCollectibles,
@@ -570,6 +603,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
           ...prev.character,
           xp: prev.character.xp + (segment.reward.value || 0),
           gold: prev.character.gold + (segment.reward.type === 'gold' ? segment.reward.value || 0 : 0),
+        },
+        stats: {
+          ...prev.stats,
+          jackpotSpins: isJackpot ? prev.stats.jackpotSpins + 1 : prev.stats.jackpotSpins,
         },
       }
     })
@@ -597,11 +634,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
         const characterUpdates: Partial<Character> = {}
         switch (collectible.effect.type) {
           case 'xp_multiplier':
-            // XP multipliers are applied when completing quests - store in character
-            characterUpdates.xp = prev.character.xp + (collectible.effect.value * 50) // Bonus XP
+            // Set XP multiplier for next quest
+            characterUpdates.xpMultiplier = collectible.effect.value
             break
           case 'gold_multiplier':
-            characterUpdates.gold = prev.character.gold + (collectible.effect.value * 25) // Bonus gold
+            // Set gold multiplier for next quest
+            characterUpdates.goldMultiplier = collectible.effect.value
             break
           case 'reveal_answer':
             // Hint effects are handled in the quiz component
@@ -618,6 +656,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
         }
         if (Object.keys(characterUpdates).length > 0) {
           updates.character = { ...prev.character, ...characterUpdates }
+        }
+        // Track mystery box opens
+        if (collectible.type === 'mystery_box') {
+          updates.stats = {
+            ...prev.stats,
+            mysteryBoxesOpened: prev.stats.mysteryBoxesOpened + 1,
+          }
         }
       }
 
