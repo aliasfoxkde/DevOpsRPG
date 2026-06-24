@@ -21,6 +21,7 @@ import SkillsPage from './pages/SkillsPage'
 import WorldMapPage from './pages/WorldMapPage'
 import LeaderboardPage from './pages/LeaderboardPage'
 import BadgesPage from './pages/BadgesPage'
+import MilestonesPage from './pages/MilestonesPage'
 
 // Toast types
 interface Toast {
@@ -65,6 +66,7 @@ function AppContent() {
           <Route path="worldmap" element={<WorldMapPage />} />
           <Route path="leaderboard" element={<LeaderboardPage />} />
           <Route path="badges" element={<BadgesPage />} />
+          <Route path="milestones" element={<MilestonesPage />} />
         </Route>
       </Routes>
       <VictoryModal />
