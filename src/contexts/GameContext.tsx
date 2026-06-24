@@ -314,16 +314,45 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return b
       })
 
-      // Check for new milestones
+      // Check for realm completion
+      const completedRealmIds = [...prev.completedRealms]
+      let newShowRealmCompletion: string | null = null
+
+      for (const realm of Object.values(realms)) {
+        if (completedRealmIds.includes(realm.id)) continue
+        const realmQuests = allQuests.filter(q => q.realmId === realm.id)
+        const allComplete = realmQuests.every(rq =>
+          prev.completedQuests.some(cq => cq.questId === rq.id) || rq.id === questId
+        )
+        if (allComplete) {
+          completedRealmIds.push(realm.id)
+          newShowRealmCompletion = realm.id
+          break
+        }
+      }
+
+      // Calculate completed technologies
+      const completedTechIds = [...new Set(prev.completedQuests.map(q => q.technologyId))]
+      if (!completedTechIds.includes(quest.technologyId)) {
+        const techQuests = allQuests.filter(q => q.technologyId === quest.technologyId)
+        const allTechComplete = techQuests.every(tq =>
+          prev.completedQuests.some(cq => cq.questId === tq.id) || tq.id === questId
+        )
+        if (allTechComplete) {
+          completedTechIds.push(quest.technologyId)
+        }
+      }
+
+      // Check for new milestones with proper state
       const milestoneState = {
         completedQuests: completedCount,
         streakDays: newStreak,
         level: newLevel,
-        completedRealms: [],
-        completedTechnologies: [],
+        completedRealms: completedRealmIds,
+        completedTechnologies: completedTechIds,
         quizStreak: 0,
         minigamesCompleted: 0,
-        hasDefeatedBoss: false,
+        hasDefeatedBoss: quest.type === 'boss',
         hasPerfectQuiz: false,
       }
 
@@ -342,23 +371,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
       if (Math.random() < 0.15) { // 15% chance
         const collectible = getRandomCollectible()
         newCollectibles = [...prev.collectibles, collectible]
-      }
-
-      // Check for realm completion
-      const completedRealmIds = [...prev.completedRealms]
-      let newShowRealmCompletion: string | null = null
-
-      for (const realm of Object.values(realms)) {
-        if (completedRealmIds.includes(realm.id)) continue
-        const realmQuests = allQuests.filter(q => q.realmId === realm.id)
-        const allComplete = realmQuests.every(rq =>
-          prev.completedQuests.some(cq => cq.questId === rq.id) || rq.id === questId
-        )
-        if (allComplete) {
-          completedRealmIds.push(realm.id)
-          newShowRealmCompletion = realm.id
-          break
-        }
       }
 
       // Skill points on level up (1 point per level gained)

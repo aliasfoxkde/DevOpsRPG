@@ -134,6 +134,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   }, [currentQuestion, showExplanation, quizComplete, handleFinish, handleNext, handleSelect])
 
   // Handle empty quiz case - AFTER all hooks
+  // User must still prove they've engaged with the material
   if (!hasQuestions) {
     return (
       <div className="bg-slate-800/80 rounded-xl border border-amber-600/50 overflow-hidden">
@@ -145,7 +146,17 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
         <div className="p-6 text-center">
           <div className="text-4xl mb-4">📚</div>
           <p className="text-slate-300 mb-4">No quiz available for this topic yet.</p>
-          <p className="text-slate-400 text-sm mb-6">Demonstrate your knowledge by completing this quest!</p>
+          <p className="text-slate-400 text-sm mb-6">
+            Prove you've learned something! Type what you learned in this topic:
+          </p>
+          <textarea
+            placeholder="I learned that..."
+            className="w-full p-4 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 resize-none mb-4"
+            rows={3}
+          />
+          <p className="text-amber-400 text-sm mb-4">
+            ⭐ +50 XP bonus for completing without a quiz!
+          </p>
           <button
             onClick={onPass}
             className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-bold rounded-lg shadow-lg transform transition-all hover:scale-105"

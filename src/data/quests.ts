@@ -101,21 +101,39 @@ export function generateQuests(): Quest[] {
 
     tech.topics.forEach((topic: Topic, index: number) => {
       // Difficulty: based on technology phase + position within tech
-      // Phase 1 techs: difficulty 1-2, Phase 6 techs: difficulty 4-5
+      // First topics are EASY (intro), complexity increases with position
       const positionInTech = index + 1
       const totalTopics = tech.topics.length
-      const techProgress = positionInTech / totalTopics
 
-      // Phase-based base difficulty (1-5) + position modifier
-      const phaseBase = Math.min(5, tech.phase)
-      const positionBonus = Math.ceil(techProgress * 2) // 0-2 bonus based on position
-      const difficulty = Math.min(5, Math.max(1, phaseBase - 1 + positionBonus)) as 1 | 2 | 3 | 4 | 5
+      // Realistic difficulty: intro topics are always easy (1-2), hard topics come later
+      // Intro = 1, basics = 2, intermediate = 3, advanced = 4, expert = 5
+      let difficulty: 1 | 2 | 3 | 4 | 5
+      if (positionInTech === 1) {
+        difficulty = 1 // First topic is always easy intro
+      } else if (positionInTech <= 3) {
+        difficulty = Math.min(2, Math.max(1, tech.phase - 1)) as 1 | 2
+      } else if (positionInTech <= totalTopics * 0.6) {
+        difficulty = Math.min(3, Math.max(2, tech.phase - 1)) as 1 | 2 | 3
+      } else if (positionInTech <= totalTopics * 0.8) {
+        difficulty = Math.min(4, Math.max(3, tech.phase)) as 1 | 2 | 3 | 4
+      } else {
+        difficulty = Math.min(5, Math.max(4, tech.phase)) as 1 | 2 | 3 | 4 | 5
+      }
 
-      // Time estimates: intro topics are short (~5 min), scale up based on complexity
-      // Basic intros: 3-5 min, advanced topics: 10-20 min
-      const baseMinutes = 5
-      const maxMinutes = Math.min(25, Math.ceil(tech.estimatedHours * 60 / totalTopics) + 5)
-      const estimatedMinutes = Math.max(baseMinutes, Math.min(maxMinutes, Math.ceil(baseMinutes + (maxMinutes - baseMinutes) * techProgress)))
+      // Time estimates: intro topics are quick (~3-5 min), scale up realistically
+      // First topic: 3 min, middle: 5-10 min, advanced: 10-15 min
+      let estimatedMinutes: number
+      if (positionInTech === 1) {
+        estimatedMinutes = 3 // Quick intro
+      } else if (positionInTech <= 3) {
+        estimatedMinutes = 5 // Basics
+      } else if (positionInTech <= totalTopics * 0.6) {
+        estimatedMinutes = 8 // Intermediate
+      } else if (positionInTech <= totalTopics * 0.8) {
+        estimatedMinutes = 12 // Advanced
+      } else {
+        estimatedMinutes = 15 // Expert topics
+      }
 
       quests.push({
         id: `quest_${topic.id}`,
@@ -123,9 +141,10 @@ export function generateQuests(): Quest[] {
         topicId: topic.id,
         realmId,
         title: topic.name,
-        description: `Study ${topic.name} in ${tech.name}`,
+        description: `Learn ${topic.name} - ${tech.name}`,
         type: positionInTech === 1 && totalTopics > 3 ? 'boss' : 'battle',
-        xpReward: tech.xpPerTopic,
+        // XP scales with difficulty: base * difficulty multiplier
+        xpReward: Math.round(tech.xpPerTopic * (0.7 + difficulty * 0.15)),
         difficulty,
         estimatedMinutes,
         order: positionInTech,

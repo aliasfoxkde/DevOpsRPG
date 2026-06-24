@@ -7,7 +7,7 @@ import Quiz from '../components/ui/Quiz'
 import QuickMiniGame from '../components/ui/QuickMiniGame'
 import TreasureChest from '../components/ui/TreasureChest'
 import { getRandomLoot } from '../components/ui/TreasureChest'
-import CelebrationOverlay, { StreakBonus } from '../components/ui/CelebrationOverlay'
+import CelebrationOverlay, { StreakBonus, MilestonePopup } from '../components/ui/CelebrationOverlay'
 
 type ViewMode = 'study' | 'quiz'
 
@@ -26,6 +26,8 @@ export default function BattleArenaPage() {
   const [encounterGold, setEncounterGold] = useState(0)
   const [showStreak, setShowStreak] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
+  const [showMilestone, setShowMilestone] = useState(false)
+  const [milestoneData, setMilestoneData] = useState<{ icon: string; title: string; message: string; xpBonus: number } | null>(null)
 
   const quest = allQuests.find(q => q.id === questId)
 
@@ -92,6 +94,15 @@ export default function BattleArenaPage() {
       }, 1500)
     }
   }
+
+  // Watch for milestone unlocks from game state
+  useEffect(() => {
+    if (game.lastVictory?.milestone) {
+      const m = game.lastVictory.milestone
+      setMilestoneData({ icon: m.icon, title: m.title, message: m.message, xpBonus: m.xpBonus })
+      setTimeout(() => setShowMilestone(true), 2000)
+    }
+  }, [game.lastVictory])
 
   const handleMiniGameComplete = (success: boolean, xpWon: number) => {
     setShowMiniGame(false)
@@ -376,6 +387,17 @@ export default function BattleArenaPage() {
 
         {/* Streak milestone celebration */}
         {showStreak && <StreakBonus streak={game.character.streakDays} />}
+
+        {/* Milestone unlock celebration */}
+        {showMilestone && milestoneData && (
+          <MilestonePopup
+            icon={milestoneData.icon}
+            title={milestoneData.title}
+            message={milestoneData.message}
+            xpBonus={milestoneData.xpBonus}
+            onComplete={() => setShowMilestone(false)}
+          />
+        )}
 
         {/* Quest Navigation */}
         <div className="mt-12 pt-8 border-t border-slate-800">
