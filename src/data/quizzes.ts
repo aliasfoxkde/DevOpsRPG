@@ -1,0 +1,1598 @@
+// Quiz questions for each topic - these are auto-generated from W3Schools content
+// and serve as knowledge checks before completing quests
+
+export interface QuizQuestion {
+  id: string
+  topicId: string
+  question: string
+  options: string[]
+  correctIndex: number
+  explanation: string
+}
+
+// Generate quiz questions from technologies data
+export function generateQuizzes(): Record<string, QuizQuestion[]> {
+  const quizzes: Record<string, QuizQuestion[]> = {
+    // HTML Quizzes
+    html_intro: [
+      {
+        id: 'html_intro_q1',
+        topicId: 'html_intro',
+        question: 'What does HTML stand for?',
+        options: [
+          'Hyper Text Markup Language',
+          'High Tech Modern Language',
+          'Hyper Transfer Markup Language',
+          'Home Tool Markup Language'
+        ],
+        correctIndex: 0,
+        explanation: 'HTML stands for Hyper Text Markup Language - the standard language for creating web pages.'
+      },
+      {
+        id: 'html_intro_q2',
+        topicId: 'html_intro',
+        question: 'What is the correct HTML element for the largest heading?',
+        options: ['<heading>', '<h6>', '<h1>', '<head>'],
+        correctIndex: 2,
+        explanation: '<h1> defines the most important heading. Headings go from <h1> (largest) to <h6> (smallest).'
+      }
+    ],
+    html_basic: [
+      {
+        id: 'html_basic_q1',
+        topicId: 'html_basic',
+        question: 'Which HTML element defines the visible content?',
+        options: ['<body>', '<content>', '<visible>', '<html>'],
+        correctIndex: 0,
+        explanation: 'The <body> element contains all the visible contents of the page.'
+      },
+      {
+        id: 'html_basic_q2',
+        topicId: 'html_basic',
+        question: 'Which tag creates a hyperlink?',
+        options: ['<link>', '<a>', '<href>', '<url>'],
+        correctIndex: 1,
+        explanation: 'The <a> (anchor) tag creates hyperlinks. The href attribute specifies the link destination.'
+      }
+    ],
+    html_elements: [
+      {
+        id: 'html_elements_q1',
+        topicId: 'html_elements',
+        question: 'What are HTML elements made of?',
+        options: [
+          'Only start tags',
+          'Start tag, content, and end tag',
+          'Only end tags',
+          'Only content'
+        ],
+        correctIndex: 1,
+        explanation: 'HTML elements consist of a start tag, content, and an end tag (for most elements).'
+      },
+      {
+        id: 'html_elements_q2',
+        topicId: 'html_elements',
+        question: 'Which is an example of an empty (self-closing) element?',
+        options: ['<div>', '<span>', '<br>', '<p>'],
+        correctIndex: 2,
+        explanation: '<br> is an empty element that defines a line break. It has no end tag.'
+      }
+    ],
+    html_attributes: [
+      {
+        id: 'html_attr_q1',
+        topicId: 'html_attributes',
+        question: 'What do HTML attributes provide?',
+        options: [
+          'Additional information about elements',
+          'Styles for elements',
+          'JavaScript functionality',
+          'Database connections'
+        ],
+        correctIndex: 0,
+        explanation: 'Attributes provide additional information about HTML elements and are specified in the start tag.'
+      },
+      {
+        id: 'html_attr_q2',
+        topicId: 'html_attributes',
+        question: 'Which attribute specifies alternative text for an image?',
+        options: ['title', 'src', 'alt', 'description'],
+        correctIndex: 2,
+        explanation: 'The alt attribute provides alternative text that displays when an image cannot be loaded.'
+      }
+    ],
+    html_headings: [
+      {
+        id: 'html_headings_q1',
+        topicId: 'html_headings',
+        question: 'How many heading levels does HTML support?',
+        options: ['3', '4', '5', '6'],
+        correctIndex: 3,
+        explanation: 'HTML supports 6 heading levels: <h1> (most important) through <h6> (least important).'
+      },
+      {
+        id: 'html_headings_q2',
+        topicId: 'html_headings',
+        question: 'What does the <hr> tag represent?',
+        options: [
+          'A hyperlink reference',
+          'A horizontal rule/thematic break',
+          'A header section',
+          'A highlighted region'
+        ],
+        correctIndex: 1,
+        explanation: '<hr> defines a thematic break and is most often displayed as a horizontal rule.'
+      }
+    ],
+    html_paragraphs: [
+      {
+        id: 'html_p_q1',
+        topicId: 'html_paragraphs',
+        question: 'Which tag defines a paragraph?',
+        options: ['<text>', '<paragraph>', '<p>', '<para>'],
+        correctIndex: 2,
+        explanation: 'The <p> tag defines a paragraph. Browsers automatically add margin before and after.'
+      },
+      {
+        id: 'html_p_q2',
+        topicId: 'html_paragraphs',
+        question: 'What does <br> do that <p> does not?',
+        options: [
+          'Creates bold text',
+          'Creates a line break without starting a new paragraph',
+          'Creates a list',
+          'Creates a heading'
+        ],
+        correctIndex: 1,
+        explanation: '<br> inserts a single line break, while <p> creates a new paragraph with space around it.'
+      }
+    ],
+    html_forms: [
+      {
+        id: 'html_form_q1',
+        topicId: 'html_forms',
+        question: 'What is the purpose of HTML forms?',
+        options: [
+          'To style content',
+          'To collect user input',
+          'To create animations',
+          'To connect to databases'
+        ],
+        correctIndex: 1,
+        explanation: 'HTML forms are used to collect user input like text, selections, and buttons.'
+      },
+      {
+        id: 'html_form_q2',
+        topicId: 'html_forms',
+        question: 'Which input type creates a checkbox?',
+        options: ['type="check"', 'type="box"', 'type="checkbox"', 'type="tick"'],
+        correctIndex: 2,
+        explanation: 'type="checkbox" creates a checkbox input that can be checked or unchecked.'
+      }
+    ],
+
+    // CSS Quizzes
+    css_intro: [
+      {
+        id: 'css_intro_q1',
+        topicId: 'css_intro',
+        question: 'What does CSS stand for?',
+        options: [
+          'Computer Style Sheets',
+          'Cascading Style Sheets',
+          'Creative Style System',
+          'Colorful Style Sheets'
+        ],
+        correctIndex: 1,
+        explanation: 'CSS stands for Cascading Style Sheets - used to style HTML elements.'
+      },
+      {
+        id: 'css_intro_q2',
+        topicId: 'css_intro',
+        question: 'Where is the best place to define CSS styles for a single page?',
+        options: [
+          'In an external .css file',
+          'In the <head> with <style>',
+          'In each HTML tag',
+          'In JavaScript'
+        ],
+        correctIndex: 1,
+        explanation: 'Internal CSS using <style> in the <head> is good for single-page customization.'
+      }
+    ],
+    css_syntax: [
+      {
+        id: 'css_syntax_q1',
+        topicId: 'css_syntax',
+        question: 'What is the correct syntax for a CSS rule?',
+        options: [
+          'element {property: value;}',
+          'element = {property: value}',
+          'element: property = value;',
+          'element {property = value;}'
+        ],
+        correctIndex: 0,
+        explanation: 'CSS rules consist of a selector and declaration blocks with property: value pairs.'
+      },
+      {
+        id: 'css_syntax_q2',
+        topicId: 'css_syntax',
+        question: 'How do you select an element by its ID in CSS?',
+        options: ['.idname', '#idname', 'id="idname"', '*idname'],
+        correctIndex: 1,
+        explanation: 'Use #idname to select an element with a specific ID attribute.'
+      }
+    ],
+    css_boxmodel: [
+      {
+        id: 'css_box_q1',
+        topicId: 'css_boxmodel',
+        question: 'What does the CSS box model include?',
+        options: [
+          'Only content',
+          'Content, padding, border, and margin',
+          'Only padding and margin',
+          'Content and border only'
+        ],
+        correctIndex: 1,
+        explanation: 'The CSS box model includes: content, padding, border, and margin (outside in).'
+      },
+      {
+        id: 'css_box_q2',
+        topicId: 'css_boxmodel',
+        question: 'Which CSS property adds space between content and border?',
+        options: ['margin', 'padding', 'spacing', 'gap'],
+        correctIndex: 1,
+        explanation: 'padding creates space between content and the element\'s border.'
+      }
+    ],
+    css_flexbox: [
+      {
+        id: 'css_flex_q1',
+        topicId: 'css_flexbox',
+        question: 'What CSS property enables flexbox?',
+        options: ['flex: true', 'display: flex', 'flexbox: enable', 'layout: flex'],
+        correctIndex: 1,
+        explanation: 'display: flex turns an element into a flex container.'
+      },
+      {
+        id: 'css_flex_q2',
+        topicId: 'css_flexbox',
+        question: 'Which flexbox property centers items horizontally?',
+        options: ['align-items', 'justify-content', 'flex-center', 'center-items'],
+        correctIndex: 1,
+        explanation: 'justify-content aligns items along the main axis (horizontally by default).'
+      }
+    ],
+    css_grid: [
+      {
+        id: 'css_grid_q1',
+        topicId: 'css_grid',
+        question: 'What does grid-template-columns define?',
+        options: [
+          'The height of grid rows',
+          'The number and width of grid columns',
+          'The gap between cells',
+          'The grid container size'
+        ],
+        correctIndex: 1,
+        explanation: 'grid-template-columns defines the column structure of the grid.'
+      },
+      {
+        id: 'css_grid_q2',
+        topicId: 'css_grid',
+        question: 'Which value creates equal columns that auto-fit?',
+        options: [
+          '1fr 1fr 1fr',
+          'auto auto auto',
+          'repeat(3, 1fr)',
+          'All of the above'
+        ],
+        correctIndex: 3,
+        explanation: 'All these approaches can create equal columns. 1fr is generally preferred for flexibility.'
+      }
+    ],
+
+    // JavaScript Quizzes
+    js_intro: [
+      {
+        id: 'js_intro_q1',
+        topicId: 'js_intro',
+        question: 'What is JavaScript primarily used for?',
+        options: [
+          'Styling web pages',
+          'Structuring web content',
+          'Adding interactivity to web pages',
+          'Database management'
+        ],
+        correctIndex: 2,
+        explanation: 'JavaScript is the programming language of the web, used for adding interactivity.'
+      },
+      {
+        id: 'js_intro_q2',
+        topicId: 'js_intro',
+        question: 'Which method changes HTML content?',
+        options: [
+          'document.getElementById()',
+          'document.innerHTML()',
+          'element.getContent()',
+          'element.setHTML()'
+        ],
+        correctIndex: 1,
+        explanation: 'document.getElementById(id).innerHTML = "new content" changes element content.'
+      }
+    ],
+    js_variables: [
+      {
+        id: 'js_var_q1',
+        topicId: 'js_variables',
+        question: 'Which keyword declares a block-scoped variable?',
+        options: ['var', 'let', 'const', 'Both let and const'],
+        correctIndex: 3,
+        explanation: 'Both let and const are block-scoped. var is function-scoped.'
+      },
+      {
+        id: 'js_var_q2',
+        topicId: 'js_variables',
+        question: 'What is a valid variable name in JavaScript?',
+        options: ['2name', 'my-var', 'my_var', 'my var'],
+        correctIndex: 2,
+        explanation: 'Variable names can contain letters, numbers, underscores, and dollar signs. Cannot start with a number.'
+      }
+    ],
+    js_functions: [
+      {
+        id: 'js_func_q1',
+        topicId: 'js_functions',
+        question: 'How do you call a function named "myFunction"?',
+        options: [
+          'call myFunction()',
+          'myFunction',
+          'myFunction()',
+          'run myFunction'
+        ],
+        correctIndex: 2,
+        explanation: 'Functions are called by writing their name followed by parentheses: myFunction().'
+      },
+      {
+        id: 'js_func_q2',
+        topicId: 'js_functions',
+        question: 'What does a function return if no return statement is specified?',
+        options: ['0', 'null', 'undefined', 'false'],
+        correctIndex: 2,
+        explanation: 'Functions return undefined by default if no explicit return value is given.'
+      }
+    ],
+    js_objects: [
+      {
+        id: 'js_obj_q1',
+        topicId: 'js_objects',
+        question: 'How do you access the "name" property of an object called "person"?',
+        options: [
+          'person->name',
+          'person.name',
+          'person[name]',
+          'Both B and C'
+        ],
+        correctIndex: 3,
+        explanation: 'Object properties can be accessed with dot notation (person.name) or bracket notation (person["name"]).'
+      },
+      {
+        id: 'js_obj_q2',
+        topicId: 'js_objects',
+        question: 'Which keyword is used to create an object?',
+        options: ['object', 'new Object()', 'create', 'make'],
+        correctIndex: 1,
+        explanation: 'new Object() or object literal syntax { } creates objects.'
+      }
+    ],
+    js_arrays: [
+      {
+        id: 'js_arr_q1',
+        topicId: 'js_arrays',
+        question: 'What is the index of the first element in a JavaScript array?',
+        options: ['1', '0', 'first', 'A'],
+        correctIndex: 1,
+        explanation: 'JavaScript arrays are zero-indexed, meaning the first element is at index 0.'
+      },
+      {
+        id: 'js_arr_q2',
+        topicId: 'js_arrays',
+        question: 'Which method adds an element to the end of an array?',
+        options: ['push()', 'pop()', 'shift()', 'unshift()'],
+        correctIndex: 0,
+        explanation: 'push() adds elements to the end. pop() removes from end, shift() removes from start.'
+      }
+    ],
+
+    // Git Quizzes
+    git_intro: [
+      {
+        id: 'git_intro_q1',
+        topicId: 'git_intro',
+        question: 'What is Git?',
+        options: [
+          'A programming language',
+          'A distributed version control system',
+          'A text editor',
+          'A web browser'
+        ],
+        correctIndex: 1,
+        explanation: 'Git is a distributed version control system for tracking changes in source code.'
+      },
+      {
+        id: 'git_intro_q2',
+        topicId: 'git_intro',
+        question: 'Who created Git?',
+        options: ['Bill Gates', 'Linus Torvalds', 'Steve Jobs', 'Mark Zuckerberg'],
+        correctIndex: 1,
+        explanation: 'Git was created by Linus Torvalds in 2005 for Linux kernel development.'
+      }
+    ],
+    git_branch: [
+      {
+        id: 'git_branch_q1',
+        topicId: 'git_branch',
+        question: 'What command creates a new Git branch?',
+        options: ['git new branch', 'git branch <name>', 'git create branch', 'git add branch'],
+        correctIndex: 1,
+        explanation: 'git branch <name> creates a new branch. Use git checkout -b to create and switch.'
+      },
+      {
+        id: 'git_branch_q2',
+        topicId: 'git_branch',
+        question: 'How do you switch to an existing branch called "feature"?',
+        options: ['git switch feature', 'git checkout feature', 'git change feature', 'Both A and B'],
+        correctIndex: 3,
+        explanation: 'Both git checkout feature and git switch feature work to switch branches.'
+      }
+    ],
+    git_remote: [
+      {
+        id: 'git_remote_q1',
+        topicId: 'git_remote',
+        question: 'What command uploads your commits to a remote repository?',
+        options: ['git upload', 'git send', 'git push', 'git sync'],
+        correctIndex: 2,
+        explanation: 'git push uploads your local commits to the remote repository.'
+      },
+      {
+        id: 'git_remote_q2',
+        topicId: 'git_remote',
+        question: 'Which service is NOT a Git hosting platform?',
+        options: ['GitHub', 'GitLab', 'Bitbucket', 'GitWare'],
+        correctIndex: 3,
+        explanation: 'GitHub, GitLab, and Bitbucket are popular Git hosting services. GitWare is not real.'
+      }
+    ],
+
+    // SQL Quizzes
+    sql_intro: [
+      {
+        id: 'sql_intro_q1',
+        topicId: 'sql_intro',
+        question: 'What does SQL stand for?',
+        options: [
+          'Simple Query Language',
+          'Structured Query Language',
+          'Standard Question Language',
+          'Sequential Query Logic'
+        ],
+        correctIndex: 1,
+        explanation: 'SQL stands for Structured Query Language - the standard language for databases.'
+      },
+      {
+        id: 'sql_intro_q2',
+        topicId: 'sql_intro',
+        question: 'What can SQL do with databases?',
+        options: [
+          'Only read data',
+          'Execute, query, and manage databases',
+          'Only write data',
+          'Create web pages'
+        ],
+        correctIndex: 1,
+        explanation: 'SQL can execute queries, insert data, update data, delete records, and manage databases.'
+      }
+    ],
+    sql_select: [
+      {
+        id: 'sql_select_q1',
+        topicId: 'sql_select',
+        question: 'Which SQL statement retrieves all data from a table?',
+        options: [
+          'GET * FROM table',
+          'SELECT * FROM table',
+          'FIND * FROM table',
+          'ALL FROM table'
+        ],
+        correctIndex: 1,
+        explanation: 'SELECT * FROM table_name retrieves all columns and rows.'
+      },
+      {
+        id: 'sql_select_q2',
+        topicId: 'sql_select',
+        question: 'What does SELECT DISTINCT do?',
+        options: [
+          'Selects distinct rows only',
+          'Selects unique values only',
+          'Selects from multiple tables',
+          'Selects in descending order'
+        ],
+        correctIndex: 1,
+        explanation: 'SELECT DISTINCT returns only unique values, eliminating duplicates.'
+      }
+    ],
+    sql_where: [
+      {
+        id: 'sql_where_q1',
+        topicId: 'sql_where',
+        question: 'What clause filters records in SQL?',
+        options: ['FILTER', 'WHERE', 'CONDITION', 'HAVING'],
+        correctIndex: 1,
+        explanation: 'WHERE filters records based on specified conditions.'
+      },
+      {
+        id: 'sql_where_q2',
+        topicId: 'sql_where',
+        question: 'Which operator means "not equal" in SQL?',
+        options: ['!=', '~=', '!==', 'Both A and C typically work'],
+        correctIndex: 3,
+        explanation: 'Both != and <> are commonly used for not equal. SQL standard is <>.'
+      }
+    ],
+    sql_insert: [
+      {
+        id: 'sql_insert_q1',
+        topicId: 'sql_insert',
+        question: 'What SQL statement adds new records to a table?',
+        options: ['ADD RECORD', 'INSERT INTO', 'NEW RECORD', 'CREATE ROW'],
+        correctIndex: 1,
+        explanation: 'INSERT INTO adds new rows to a table.'
+      },
+      {
+        id: 'sql_insert_q2',
+        topicId: 'sql_insert',
+        question: 'What is the VALUES clause used for in INSERT?',
+        options: [
+          'To specify the values to insert',
+          'To list table names',
+          'To define conditions',
+          'To order results'
+        ],
+        correctIndex: 0,
+        explanation: 'VALUES specifies the actual data values being inserted.'
+      }
+    ],
+    sql_update: [
+      {
+        id: 'sql_update_q1',
+        topicId: 'sql_update',
+        question: 'What SQL statement modifies existing records?',
+        options: ['MODIFY', 'UPDATE', 'CHANGE', 'EDIT'],
+        correctIndex: 1,
+        explanation: 'UPDATE modifies existing records in a table.'
+      },
+      {
+        id: 'sql_update_q2',
+        topicId: 'sql_update',
+        question: 'Why is the WHERE clause critical in UPDATE?',
+        options: [
+          'It speeds up the query',
+          'Without it, ALL records get updated',
+          'It creates new records',
+          'It deletes records'
+        ],
+        correctIndex: 1,
+        explanation: 'UPDATE without WHERE updates ALL rows. Always include WHERE to target specific rows.'
+      }
+    ],
+    sql_delete: [
+      {
+        id: 'sql_delete_q1',
+        topicId: 'sql_delete',
+        question: 'What SQL statement removes records from a table?',
+        options: ['REMOVE', 'DELETE', 'DROP', 'ERASE'],
+        correctIndex: 1,
+        explanation: 'DELETE removes rows from a table. Use with WHERE to avoid deleting everything.'
+      },
+      {
+        id: 'sql_delete_q2',
+        topicId: 'sql_delete',
+        question: 'What happens if you DELETE without a WHERE clause?',
+        options: [
+          'Nothing happens',
+          'All records are deleted',
+          'Only the first record is deleted',
+          'An error occurs'
+        ],
+        correctIndex: 1,
+        explanation: 'DELETE without WHERE deletes ALL rows from the table. Use with caution!'
+      }
+    ],
+
+    // Python Quizzes
+    python_intro: [
+      {
+        id: 'py_intro_q1',
+        topicId: 'python_intro',
+        question: 'Who created Python?',
+        options: ['James Gosling', 'Guido van Rossum', 'Bjarne Stroustrup', 'Dennis Ritchie'],
+        correctIndex: 1,
+        explanation: 'Python was created by Guido van Rossum and released in 1991.'
+      },
+      {
+        id: 'py_intro_q2',
+        topicId: 'python_intro',
+        question: 'Which of these is NOT a typical use of Python?',
+        options: ['Web development', 'Data analysis', 'Hardware programming', 'Automation'],
+        correctIndex: 2,
+        explanation: 'Python is used for web dev, data analysis, automation, AI/ML - not typically hardware-level programming.'
+      }
+    ],
+    python_syntax: [
+      {
+        id: 'py_syntax_q1',
+        topicId: 'python_syntax',
+        question: 'What does Python use for code blocks instead of curly braces?',
+        options: ['Curly braces', 'Indentation', 'Keywords', 'Parentheses'],
+        correctIndex: 1,
+        explanation: 'Python uses indentation to define code blocks, making it readability-focused.'
+      },
+      {
+        id: 'py_syntax_q2',
+        topicId: 'python_syntax',
+        question: 'Which statement correctly assigns a variable in Python?',
+        options: ['int x = 5', 'var x = 5', 'x = 5', 'let x = 5'],
+        correctIndex: 2,
+        explanation: 'Python uses dynamic typing: x = 5 creates a variable without type declaration.'
+      }
+    ],
+    python_variables: [
+      {
+        id: 'py_var_q1',
+        topicId: 'python_variables',
+        question: 'What is a valid Python variable name?',
+        options: ['2variable', 'my-var', 'my_variable', 'class'],
+        correctIndex: 2,
+        explanation: 'my_variable is valid. Variable names cannot start with numbers or use hyphens. class is a keyword.'
+      },
+      {
+        id: 'py_var_q2',
+        topicId: 'python_variables',
+        question: 'Can Python variables change their type after assignment?',
+        options: ['No, never', 'Yes, Python is dynamically typed', 'Only numbers', 'Only strings'],
+        correctIndex: 1,
+        explanation: 'Python is dynamically typed - variables can change type by reassignment.'
+      }
+    ],
+    python_lists: [
+      {
+        id: 'py_list_q1',
+        topicId: 'python_lists',
+        question: 'How do you create a list in Python?',
+        options: ['list = (1, 2, 3)', 'list = [1, 2, 3]', 'list = {1, 2, 3}', 'list = <1, 2, 3>'],
+        correctIndex: 1,
+        explanation: 'Lists use square brackets: my_list = [1, 2, 3]'
+      },
+      {
+        id: 'py_list_q2',
+        topicId: 'python_lists',
+        question: 'What index accesses the first element of a list?',
+        options: ['1', '0', 'first', '-1'],
+        correctIndex: 1,
+        explanation: 'Like most languages, Python lists are zero-indexed. First element is at index 0.'
+      }
+    ],
+    python_functions: [
+      {
+        id: 'py_func_q1',
+        topicId: 'python_functions',
+        question: 'What keyword defines a function in Python?',
+        options: ['function', 'func', 'def', 'define'],
+        correctIndex: 2,
+        explanation: 'def function_name(): defines a function in Python.'
+      },
+      {
+        id: 'py_func_q2',
+        topicId: 'python_functions',
+        question: 'How do you call a function named "greet"?',
+        options: ['call greet()', 'greet()', 'run greet', 'execute greet'],
+        correctIndex: 1,
+        explanation: 'Functions are called by name with parentheses: greet()'
+      }
+    ],
+
+    // Bash Quizzes
+    bash_intro: [
+      {
+        id: 'bash_intro_q1',
+        topicId: 'bash_intro',
+        question: 'What is Bash?',
+        options: [
+          'A programming language',
+          'A Unix shell and command language',
+          'A text editor',
+          'A web browser'
+        ],
+        correctIndex: 1,
+        explanation: 'Bash (Bourne Again SHell) is a Unix shell and command language.'
+      },
+      {
+        id: 'bash_intro_q2',
+        topicId: 'bash_intro',
+        question: 'What character starts a comment in Bash?',
+        options: ['//', '#', '--', '/*'],
+        correctIndex: 1,
+        explanation: '# starts a comment in Bash. Everything after # on a line is ignored.'
+      }
+    ],
+    bash_variables: [
+      {
+        id: 'bash_var_q1',
+        topicId: 'bash_variables',
+        question: 'How do you access a variable named "name" in Bash?',
+        options: ['$name', '#name', '@name', 'name'],
+        correctIndex: 0,
+        explanation: '$name or ${name} accesses the variable. Without $, it\'s just the literal string.'
+      },
+      {
+        id: 'bash_var_q2',
+        topicId: 'bash_variables',
+        question: 'What is special about variable assignment in Bash?',
+        options: [
+          'Must use let keyword',
+          'No spaces around equals sign',
+          'Must declare type',
+          'Must use $ prefix'
+        ],
+        correctIndex: 1,
+        explanation: 'Bash requires no spaces: name="John" works, but name = "John" does not.'
+      }
+    ],
+    bash_script: [
+      {
+        id: 'bash_script_q1',
+        topicId: 'bash_script',
+        question: 'Which statement starts a conditional in Bash?',
+        options: ['if (condition)', 'if [ condition ]', 'if condition then', 'when condition'],
+        correctIndex: 1,
+        explanation: 'if [ condition ] then ... fi is the Bash if syntax. Spaces inside brackets are required.'
+      },
+      {
+        id: 'bash_script_q2',
+        topicId: 'bash_script',
+        question: 'How do you loop over items in Bash?',
+        options: ['foreach', 'for item in list', 'loop item', 'iterate item'],
+        correctIndex: 1,
+        explanation: 'for item in list; do ... done loops through items in Bash.'
+      }
+    ],
+
+    // Docker Quizzes
+    docker_intro: [
+      {
+        id: 'docker_intro_q1',
+        topicId: 'docker_intro',
+        question: 'What is a Docker container?',
+        options: [
+          'A type of database',
+          'A runnable instance of an image',
+          'A programming language',
+          'A web browser'
+        ],
+        correctIndex: 1,
+        explanation: 'A container is a runnable instance of an image - it\'s isolated from other containers.'
+      },
+      {
+        id: 'docker_intro_q2',
+        topicId: 'docker_intro',
+        question: 'What is a Docker image?',
+        options: [
+          'A screenshot of an application',
+          'A read-only template with instructions for creating containers',
+          'A video recording',
+          'A type of database backup'
+        ],
+        correctIndex: 1,
+        explanation: 'An image is a read-only template with instructions for creating Docker containers.'
+      }
+    ],
+    docker_images: [
+      {
+        id: 'docker_img_q1',
+        topicId: 'docker_images',
+        question: 'What command lists Docker images?',
+        options: ['docker list', 'docker images', 'docker show', 'docker ps'],
+        correctIndex: 1,
+        explanation: 'docker images lists all local images.'
+      },
+      {
+        id: 'docker_img_q2',
+        topicId: 'docker_images',
+        question: 'What does docker pull do?',
+        options: [
+          'Removes an image',
+          'Downloads an image from a registry',
+          'Uploads an image',
+          'Lists images'
+        ],
+        correctIndex: 1,
+        explanation: 'docker pull downloads an image from Docker Hub or another registry.'
+      }
+    ],
+    docker_containers: [
+      {
+        id: 'docker_cont_q1',
+        topicId: 'docker_containers',
+        question: 'What command runs a new container?',
+        options: ['docker create', 'docker run', 'docker start', 'docker new'],
+        correctIndex: 1,
+        explanation: 'docker run creates and starts a new container. docker create just creates it.'
+      },
+      {
+        id: 'docker_cont_q2',
+        topicId: 'docker_containers',
+        question: 'What does docker ps show?',
+        options: [
+          'All containers (running and stopped)',
+          'Only running containers',
+          'Only stopped containers',
+          'Docker images'
+        ],
+        correctIndex: 1,
+        explanation: 'docker ps shows only running containers. docker ps -a shows all containers.'
+      }
+    ],
+    docker_dockerfile: [
+      {
+        id: 'docker_df_q1',
+        topicId: 'docker_dockerfile',
+        question: 'What does the FROM instruction in a Dockerfile specify?',
+        options: [
+          'The output image name',
+          'The base image',
+          'The working directory',
+          'The port to expose'
+        ],
+        correctIndex: 1,
+        explanation: 'FROM specifies the base image to use for building this image.'
+      },
+      {
+        id: 'docker_df_q2',
+        topicId: 'docker_dockerfile',
+        question: 'What does CMD in a Dockerfile specify?',
+        options: [
+          'The image author',
+          'The default command to run when container starts',
+          'Comments',
+          'Environment variables'
+        ],
+        correctIndex: 1,
+        explanation: 'CMD specifies the default command that runs when a container starts.'
+      }
+    ],
+
+    // React Quizzes
+    react_intro: [
+      {
+        id: 'react_intro_q1',
+        topicId: 'react_intro',
+        question: 'What is React primarily used for?',
+        options: [
+          'Backend development',
+          'Database management',
+          'Building user interfaces',
+          'Operating system development'
+        ],
+        correctIndex: 2,
+        explanation: 'React is a JavaScript library for building user interfaces (UIs).'
+      },
+      {
+        id: 'react_intro_q2',
+        topicId: 'react_intro',
+        question: 'What is the Virtual DOM in React?',
+        options: [
+          'A separate browser window',
+          'A lightweight copy of the actual DOM',
+          'A type of database',
+          'A CSS framework'
+        ],
+        correctIndex: 1,
+        explanation: 'React\'s Virtual DOM is a lightweight representation of the actual DOM for efficient updates.'
+      }
+    ],
+    react_components: [
+      {
+        id: 'react_comp_q1',
+        topicId: 'react_components',
+        question: 'What are React components?',
+        options: [
+          'HTML tags',
+          'Independent, reusable pieces of UI',
+          'CSS styles',
+          'Database queries'
+        ],
+        correctIndex: 1,
+        explanation: 'Components are independent, reusable pieces of UI that return JSX.'
+      },
+      {
+        id: 'react_comp_q2',
+        topicId: 'react_components',
+        question: 'What are props in React?',
+        options: [
+          'CSS properties',
+          'Inputs passed from parent to child components',
+          'State variables',
+          'Event handlers'
+        ],
+        correctIndex: 1,
+        explanation: 'Props (properties) are inputs passed from parent components to child components.'
+      }
+    ],
+    react_hooks: [
+      {
+        id: 'react_hooks_q1',
+        topicId: 'react_hooks',
+        question: 'What does useState do in React?',
+        options: [
+          'Creates a global variable',
+          'Adds state to functional components',
+          'Connects to a database',
+          'Defines CSS styles'
+        ],
+        correctIndex: 1,
+        explanation: 'useState is a hook that adds state management to functional components.'
+      },
+      {
+        id: 'react_hooks_q2',
+        topicId: 'react_hooks',
+        question: 'What does useEffect do in React?',
+        options: [
+          'Creates animations',
+          'Handles side effects in components',
+          'Manages routing',
+          'Styles components'
+        ],
+        correctIndex: 1,
+        explanation: 'useEffect handles side effects like data fetching, subscriptions, and DOM updates.'
+      }
+    ],
+
+    // Node.js Quizzes
+    nodejs_intro: [
+      {
+        id: 'nodejs_intro_q1',
+        topicId: 'nodejs_intro',
+        question: 'What is Node.js?',
+        options: [
+          'A frontend framework',
+          'A database',
+          'A JavaScript runtime that runs outside the browser',
+          'A CSS preprocessor'
+        ],
+        correctIndex: 2,
+        explanation: 'Node.js is a JavaScript runtime environment that executes JavaScript code outside a browser.'
+      },
+      {
+        id: 'nodejs_intro_q2',
+        topicId: 'nodejs_intro',
+        question: 'What makes Node.js good for server-side development?',
+        options: [
+          'It blocks I/O operations',
+          'Event-driven, non-blocking I/O',
+          'It only works with databases',
+          'It requires a browser'
+        ],
+        correctIndex: 1,
+        explanation: 'Node.js uses an event-driven, non-blocking I/O model, making it efficient for I/O-heavy tasks.'
+      }
+    ],
+    nodejs_modules: [
+      {
+        id: 'nodejs_mod_q1',
+        topicId: 'nodejs_modules',
+        question: 'How do you import a module named "fs" in Node.js?',
+        options: [
+          'import fs from "fs"',
+          'require("fs") or import { fs } from "fs"',
+          'include("fs")',
+          'load("fs")'
+        ],
+        correctIndex: 1,
+        explanation: 'CommonJS uses require(), ES6 modules use import. Both work depending on module type.'
+      },
+      {
+        id: 'nodejs_mod_q2',
+        topicId: 'nodejs_modules',
+        question: 'What does module.exports do?',
+        options: [
+          'Imports a module',
+          'Exports a module for use in other files',
+          'Creates a new module',
+          'Deletes a module'
+        ],
+        correctIndex: 1,
+        explanation: 'module.exports or export default specifies what a module exposes to other modules.'
+      }
+    ],
+    nodejs_http: [
+      {
+        id: 'nodejs_http_q1',
+        topicId: 'nodejs_http',
+        question: 'What does http.createServer() do?',
+        options: [
+          'Creates a database connection',
+          'Creates an HTTP server that listens for requests',
+          'Creates a file server',
+          'Creates a web page'
+        ],
+        correctIndex: 1,
+        explanation: 'http.createServer() creates an HTTP server that can listen for and respond to requests.'
+      },
+      {
+        id: 'nodejs_http_q2',
+        topicId: 'nodejs_http',
+        question: 'What does res.writeHead() do?',
+        options: [
+          'Reads request headers',
+          'Writes response headers',
+          'Creates a router',
+          'Logs HTTP requests'
+        ],
+        correctIndex: 1,
+        explanation: 'res.writeHead() writes HTTP response headers (status code, content type, etc.).'
+      }
+    ],
+
+    // PostgreSQL Quizzes
+    postgresql_intro: [
+      {
+        id: 'postgresql_intro_q1',
+        topicId: 'postgresql_intro',
+        question: 'What type of database is PostgreSQL?',
+        options: [
+          'NoSQL document database',
+          'Object-relational database',
+          'Key-value store',
+          'Graph database'
+        ],
+        correctIndex: 1,
+        explanation: 'PostgreSQL is an object-relational database system (ORDBMS) known for reliability.'
+      },
+      {
+        id: 'postgresql_intro_q2',
+        topicId: 'postgresql_intro',
+        question: 'What does SERIAL PRIMARY KEY typically create?',
+        options: [
+          'A text field',
+          'An auto-incrementing integer used as unique ID',
+          'A boolean field',
+          'A date field'
+        ],
+        correctIndex: 1,
+        explanation: 'SERIAL PRIMARY KEY creates an auto-incrementing integer that uniquely identifies rows.'
+      }
+    ],
+    postgresql_create_table: [
+      {
+        id: 'postgresql_ct_q1',
+        topicId: 'postgresql_create_table',
+        question: 'What does CREATE TABLE do?',
+        options: [
+          'Deletes a table',
+          'Creates a new table in the database',
+          'Updates a table',
+          'Selects from a table'
+        ],
+        correctIndex: 1,
+        explanation: 'CREATE TABLE creates a new table with specified columns and their data types.'
+      },
+      {
+        id: 'postgresql_ct_q2',
+        topicId: 'postgresql_create_table',
+        question: 'What does VARCHAR(100) specify?',
+        options: [
+          'A 100-character fixed-length string',
+          'A variable-length string up to 100 characters',
+          'A number with 100 decimals',
+          'A boolean with 100 values'
+        ],
+        correctIndex: 1,
+        explanation: 'VARCHAR(n) is variable-length character data with a maximum of n characters.'
+      }
+    ],
+
+    // MongoDB Quizzes
+    mongodb_intro: [
+      {
+        id: 'mongodb_intro_q1',
+        topicId: 'mongodb_intro',
+        question: 'What type of database is MongoDB?',
+        options: [
+          'Relational database',
+          'Document-oriented NoSQL database',
+          'Graph database',
+          'Key-value store'
+        ],
+        correctIndex: 1,
+        explanation: 'MongoDB is a document-oriented NoSQL database that stores data in JSON-like documents.'
+      },
+      {
+        id: 'mongodb_intro_q2',
+        topicId: 'mongodb_intro',
+        question: 'What format does MongoDB use for documents?',
+        options: [
+          'XML',
+          'JSON/BSON',
+          'CSV',
+          'SQL'
+        ],
+        correctIndex: 1,
+        explanation: 'MongoDB stores data in JSON-like documents (actually BSON - binary JSON).'
+      }
+    ],
+    mongodb_insert: [
+      {
+        id: 'mongodb_ins_q1',
+        topicId: 'mongodb_insert',
+        question: 'What method inserts a single document in MongoDB?',
+        options: ['insert()', 'insertOne()', 'addOne()', 'createOne()'],
+        correctIndex: 1,
+        explanation: 'insertOne() inserts a single document into a MongoDB collection.'
+      },
+      {
+        id: 'mongodb_ins_q2',
+        topicId: 'mongodb_insert',
+        question: 'What is a MongoDB collection?',
+        options: [
+          'A single data value',
+          'A group of MongoDB documents',
+          'A database connection',
+          'A query result'
+        ],
+        correctIndex: 1,
+        explanation: 'A collection is a group of documents in MongoDB, similar to a table in relational databases.'
+      }
+    ],
+
+    // AWS Quizzes
+    aws_intro: [
+      {
+        id: 'aws_intro_q1',
+        topicId: 'aws_intro',
+        question: 'What does AWS stand for?',
+        options: [
+          'Advanced Web Services',
+          'Amazon Web Services',
+          'Automated Web Solutions',
+          'Application Workload Services'
+        ],
+        correctIndex: 1,
+        explanation: 'AWS stands for Amazon Web Services - a comprehensive cloud computing platform.'
+      },
+      {
+        id: 'aws_intro_q2',
+        topicId: 'aws_intro',
+        question: 'Which AWS service provides virtual servers in the cloud?',
+        options: ['S3', 'EC2', 'RDS', 'Lambda'],
+        correctIndex: 1,
+        explanation: 'EC2 (Elastic Compute Cloud) provides resizable compute capacity - virtual servers.'
+      }
+    ],
+    aws_ec2: [
+      {
+        id: 'aws_ec2_q1',
+        topicId: 'aws_ec2',
+        question: 'What does EC2 stand for?',
+        options: [
+          'Elastic Compute Cloud',
+          'Essential Computing Center',
+          'Enterprise Cloud Core',
+          'E-Commerce 2.0'
+        ],
+        correctIndex: 0,
+        explanation: 'EC2 stands for Elastic Compute Cloud - AWS\'s resizable compute service.'
+      },
+      {
+        id: 'aws_ec2_q2',
+        topicId: 'aws_ec2',
+        question: 'What does "t2.micro" represent in AWS?',
+        options: [
+          'A storage type',
+          'An instance type (size and family)',
+          'A region',
+          'A security group'
+        ],
+        correctIndex: 1,
+        explanation: 'Instance types like t2.micro specify the size (vCPUs, memory) and family of the instance.'
+      }
+    ],
+    aws_s3: [
+      {
+        id: 'aws_s3_q1',
+        topicId: 'aws_s3',
+        question: 'What does S3 stand for?',
+        options: [
+          'Simple Storage Service',
+          'Server Storage System',
+          'Secure Software Service',
+          'Standard Storage Solution'
+        ],
+        correctIndex: 0,
+        explanation: 'S3 stands for Simple Storage Service - object storage in AWS.'
+      },
+      {
+        id: 'aws_s3_q2',
+        topicId: 'aws_s3',
+        question: 'What is an S3 bucket?',
+        options: [
+          'A compute resource',
+          'A container for storing objects',
+          'A database table',
+          'A networking feature'
+        ],
+        correctIndex: 1,
+        explanation: 'An S3 bucket is a container for storing objects (files) in Amazon S3.'
+      }
+    ],
+
+    // Kubernetes Quizzes
+    k8s_intro: [
+      {
+        id: 'k8s_intro_q1',
+        topicId: 'k8s_intro',
+        question: 'What is Kubernetes?',
+        options: [
+          'A programming language',
+          'An open-source container orchestration platform',
+          'A database',
+          'A web server'
+        ],
+        correctIndex: 1,
+        explanation: 'Kubernetes is an open-source platform for automating deployment, scaling, and management of containerized applications.'
+      },
+      {
+        id: 'k8s_intro_q2',
+        topicId: 'k8s_intro',
+        question: 'What company originally developed Kubernetes?',
+        options: ['AWS', 'Google', 'Microsoft', 'Docker'],
+        correctIndex: 1,
+        explanation: 'Google originally developed Kubernetes, which was then donated to the Cloud Native Computing Foundation.'
+      }
+    ],
+    k8s_pods: [
+      {
+        id: 'k8s_pods_q1',
+        topicId: 'k8s_pods',
+        question: 'What is a Kubernetes Pod?',
+        options: [
+          'A type of container',
+          'The smallest deployable unit in Kubernetes',
+          'A networking tool',
+          'A storage volume'
+        ],
+        correctIndex: 1,
+        explanation: 'Pods are the smallest deployable units in Kubernetes. A Pod represents a single instance of a running process.'
+      },
+      {
+        id: 'k8s_pods_q2',
+        topicId: 'k8s_pods',
+        question: 'How many containers can a Pod typically contain?',
+        options: ['Exactly one', 'One or more', 'Always two', 'At most three'],
+        correctIndex: 1,
+        explanation: 'A Pod can contain one or more containers (usually one), that share storage and network.'
+      }
+    ],
+    k8s_services: [
+      {
+        id: 'k8s_svc_q1',
+        topicId: 'k8s_services',
+        question: 'What does a Kubernetes Service provide?',
+        options: [
+          'Persistent storage',
+          'An abstract way to expose an application running on Pods',
+          'Container orchestration',
+          'Load balancing for databases only'
+        ],
+        correctIndex: 1,
+        explanation: 'A Service is an abstract way to expose an application running on a set of Pods as a network service.'
+      },
+      {
+        id: 'k8s_svc_q2',
+        topicId: 'k8s_services',
+        question: 'What type of Service exposes an application on each Node IP at a specific port?',
+        options: ['ClusterIP', 'NodePort', 'LoadBalancer', 'Ingress'],
+        correctIndex: 1,
+        explanation: 'NodePort exposes the Service on each Node\'s IP at a static port (the NodePort).'
+      }
+    ],
+
+    // Terraform Quizzes
+    tf_intro: [
+      {
+        id: 'tf_intro_q1',
+        topicId: 'tf_intro',
+        question: 'What is Terraform?',
+        options: [
+          'A programming language',
+          'An infrastructure as code tool',
+          'A container platform',
+          'A monitoring tool'
+        ],
+        correctIndex: 1,
+        explanation: 'Terraform is an infrastructure as code tool for building, changing, and versioning infrastructure safely.'
+      },
+      {
+        id: 'tf_intro_q2',
+        topicId: 'tf_intro',
+        question: 'What language does Terraform use for configuration?',
+        options: ['Python', 'YAML', 'HashiCorp Configuration Language (HCL)', 'JSON'],
+        correctIndex: 2,
+        explanation: 'Terraform uses HashiCorp Configuration Language (HCL) for its configuration files.'
+      }
+    ],
+    tf_resources: [
+      {
+        id: 'tf_res_q1',
+        topicId: 'tf_resources',
+        question: 'In Terraform, what does a "resource" block define?',
+        options: [
+          'A variable',
+          'An infrastructure object',
+          'An output value',
+          'A provider'
+        ],
+        correctIndex: 1,
+        explanation: 'Resource blocks define infrastructure objects like servers, databases, networks, etc.'
+      },
+      {
+        id: 'tf_res_q2',
+        topicId: 'tf_resources',
+        question: 'What does the resource type "aws_instance" specify?',
+        options: [
+          'An S3 bucket',
+          'A VPC',
+          'An EC2 instance',
+          'An RDS database'
+        ],
+        correctIndex: 2,
+        explanation: '"aws_instance" is the Terraform resource type for creating AWS EC2 instances.'
+      }
+    ],
+
+    // CI/CD Quizzes
+    cicd_intro: [
+      {
+        id: 'cicd_intro_q1',
+        topicId: 'cicd_intro',
+        question: 'What does CI/CD stand for?',
+        options: [
+          'Code Integration/Code Delivery',
+          'Continuous Integration/Continuous Deployment (or Delivery)',
+          'Centralized Integration/Centralized Deployment',
+          'Continuous Improvement/Continuous Development'
+        ],
+        correctIndex: 1,
+        explanation: 'CI/CD stands for Continuous Integration and Continuous Deployment/Delivery.'
+      },
+      {
+        id: 'cicd_intro_q2',
+        topicId: 'cicd_intro',
+        question: 'What is the main benefit of CI/CD?',
+        options: [
+          'Writing more code',
+          'Automating integration and deployment of code changes',
+          'Manual testing',
+          'Reducing developers'
+        ],
+        correctIndex: 1,
+        explanation: 'CI/CD automates integrating code changes and deploying them, reducing errors and speeding up delivery.'
+      }
+    ],
+    cicd_pipeline: [
+      {
+        id: 'cicd_pipe_q1',
+        topicId: 'cicd_pipeline',
+        question: 'What are typical CI/CD pipeline stages?',
+        options: [
+          'Code, Test, Deploy',
+          'Build, Test, Deploy',
+          'Plan, Code, Review',
+          'Commit, Push, Pull'
+        ],
+        correctIndex: 1,
+        explanation: 'Typical pipeline stages are: Build, Test, Deploy (sometimes with additional stages like Security Scan).'
+      },
+      {
+        id: 'cicd_pipe_q2',
+        topicId: 'cicd_pipeline',
+        question: 'What does the "build" stage typically do?',
+        options: [
+          'Runs unit tests',
+          'Compiles code and creates artifacts',
+          'Deploys to production',
+          'Creates database schemas'
+        ],
+        correctIndex: 1,
+        explanation: 'The build stage compiles code, resolves dependencies, and creates deployable artifacts.'
+      }
+    ],
+    cicd_github_actions: [
+      {
+        id: 'cicd_gh_q1',
+        topicId: 'cicd_github_actions',
+        question: 'What is GitHub Actions?',
+        options: [
+          'A code editor',
+          'A CI/CD platform that automates workflows from GitHub',
+          'A testing framework',
+          'A deployment tool only'
+        ],
+        correctIndex: 1,
+        explanation: 'GitHub Actions is a CI/CD platform that automates build, test, and deployment workflows directly from GitHub.'
+      },
+      {
+        id: 'cicd_gh_q2',
+        topicId: 'cicd_github_actions',
+        question: 'What file defines a GitHub Actions workflow?',
+        options: [
+          '.github/workflows/main.yml',
+          'dockerfile',
+          'package.json',
+          '.gitignore'
+        ],
+        correctIndex: 0,
+        explanation: 'GitHub Actions workflows are defined in YAML files in .github/workflows/.'
+      }
+    ],
+
+    // Prometheus Quizzes
+    prom_intro: [
+      {
+        id: 'prom_intro_q1',
+        topicId: 'prom_intro',
+        question: 'What is Prometheus primarily used for?',
+        options: [
+          'Code compilation',
+          'Systems monitoring and alerting',
+          'Container orchestration',
+          'Database management'
+        ],
+        correctIndex: 1,
+        explanation: 'Prometheus is an open-source systems monitoring and alerting toolkit.'
+      },
+      {
+        id: 'prom_intro_q2',
+        topicId: 'prom_intro',
+        question: 'What type of data does Prometheus collect?',
+        options: [
+          'Text documents',
+          'Time series metrics',
+          'Video files',
+          'Source code'
+        ],
+        correctIndex: 1,
+        explanation: 'Prometheus collects and stores metrics as time series data (with timestamps).'
+      }
+    ],
+    prom_metrics: [
+      {
+        id: 'prom_met_q1',
+        topicId: 'prom_metrics',
+        question: 'Which metric type represents a value that can go up and down?',
+        options: ['Counter', 'Gauge', 'Histogram', 'Summary'],
+        correctIndex: 1,
+        explanation: 'Gauge metrics represent values that can arbitrarily go up and down (like temperature or memory usage).'
+      },
+      {
+        id: 'prom_met_q2',
+        topicId: 'prom_metrics',
+        question: 'Which metric type always increases (never decreases)?',
+        options: ['Gauge', 'Counter', 'Histogram', 'Summary'],
+        correctIndex: 1,
+        explanation: 'Counter metrics only increase (or reset to zero), useful for counting requests or errors.'
+      }
+    ],
+
+    // Security Quizzes
+    sec_intro: [
+      {
+        id: 'sec_intro_q1',
+        topicId: 'sec_intro',
+        question: 'What does DevSecOps mean?',
+        options: [
+          'Development, Security, Operations integrated',
+          'Secure Development Operations',
+          'Development Security Only',
+          'Standard Security Operations'
+        ],
+        correctIndex: 0,
+        explanation: 'DevSecOps integrates security practices into the DevOps workflow, making security a shared responsibility.'
+      },
+      {
+        id: 'sec_intro_q2',
+        topicId: 'sec_intro',
+        question: 'What is the principle of least privilege?',
+        options: [
+          'Give users maximum permissions',
+          'Give users only the minimum permissions needed',
+          'Remove all privileges',
+          'Share privileges among all users'
+        ],
+        correctIndex: 1,
+        explanation: 'Least privilege means giving users only the minimum permissions needed to perform their tasks.'
+      }
+    ],
+    sec_best_practices: [
+      {
+        id: 'sec_best_q1',
+        topicId: 'sec_best_practices',
+        question: 'Where should secrets (passwords, API keys) be stored?',
+        options: [
+          'In source code',
+          'In environment variables or secret management tools',
+          'In plain text files',
+          'In comments'
+        ],
+        correctIndex: 1,
+        explanation: 'Secrets should never be in code. Use environment variables or tools like HashiCorp Vault.'
+      },
+      {
+        id: 'sec_best_q2',
+        topicId: 'sec_best_practices',
+        question: 'What is defense in depth?',
+        options: [
+          'A single security layer',
+          'Multiple layers of security controls',
+          'Aggressive security testing',
+          'Removing all defenses'
+        ],
+        correctIndex: 1,
+        explanation: 'Defense in depth uses multiple layers of security so that if one fails, others provide protection.'
+      }
+    ],
+    sec_secrets: [
+      {
+        id: 'sec_sec_q1',
+        topicId: 'sec_secrets',
+        question: 'What is a Kubernetes Secret used for?',
+        options: [
+          'Storing user passwords only',
+          'Storing sensitive data like passwords, tokens, and keys',
+          'Encrypting entire disks',
+          'Creating user accounts'
+        ],
+        correctIndex: 1,
+        explanation: 'Kubernetes Secrets store sensitive data like passwords, OAuth tokens, and SSH keys.'
+      },
+      {
+        id: 'sec_sec_q2',
+        topicId: 'sec_secrets',
+        question: 'Why should you avoid hardcoding secrets?',
+        options: [
+          'It makes code run slower',
+          'Secrets can be exposed in code repositories and version control',
+          'It increases performance',
+          'It is required by law'
+        ],
+        correctIndex: 1,
+        explanation: 'Hardcoded secrets end up in git history and can be exposed if the repo is public or compromised.'
+      }
+    ],
+  }
+
+  return quizzes
+}
+
+export const quizzes = generateQuizzes()
+
+// Get quiz for a specific topic
+export function getQuizForTopic(topicId: string): QuizQuestion[] {
+  return quizzes[topicId] || []
+}
+
+// Check if a quiz exists for a topic
+export function hasQuiz(topicId: string): boolean {
+  return !!quizzes[topicId] && quizzes[topicId].length > 0
+}

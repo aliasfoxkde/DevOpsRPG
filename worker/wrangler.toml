@@ -1,0 +1,19 @@
+name = "devopsquest-api"
+main = "src/index.ts"
+compatibility_date = "2024-06-13"
+
+[observability]
+enabled = true
+
+[triggers]
+crons = ["0 0 * * *"] # Daily at midnight for cleanup tasks
+
+[[kv_namespaces]]
+binding = "PROGRESS"
+id = "your-kv-namespace-id"
+
+# Uncomment when D1 database is set up
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "devopsquest-db"
+# database_id = "your-d1-database-id"

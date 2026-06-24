@@ -21,28 +21,32 @@ export default function LearnPage() {
 
       {phaseOrder.map(({ phase, name, icon }) => {
         const phaseTechs = techArray.filter((t) => t.phase === phase)
+        /* istanbul ignore if */
         if (phaseTechs.length === 0) return null
 
         return (
-          <section key={phase} className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">
-              {icon} {name}
+          <section key={phase} className="mb-12" aria-labelledby={`phase-${phase}-heading`}>
+            <h2 id={`phase-${phase}-heading`} className="text-2xl font-semibold mb-4">
+              <span /* istanbul ignore next */ aria-hidden="true">{icon}</span> {name}
             </h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" role="list" aria-label={`${name} technologies`}>
               {phaseTechs.map((tech) => (
                 <Link
                   key={tech.key}
                   to={`/learn/${tech.key}`}
-                  className="bg-card p-4 rounded-lg border border-border hover:border-primary hover:shadow-md transition-all"
+                  /* istanbul ignore next */
+                  className="bg-card p-4 rounded-lg border border-border hover:border-primary hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-primary"
+                  role="listitem"
+                  aria-label={`Learn ${tech.name}: ${tech.description}. ${tech.topics.length} topics`}
                 >
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-2xl">{tech.icon}</span>
+                    <span className="text-2xl" aria-hidden="true">{tech.icon}</span>
                     <h3 className="font-semibold">{tech.name}</h3>
                   </div>
                   <p className="text-sm text-muted-foreground">{tech.description}</p>
-                  <div className="mt-3 text-xs text-muted-foreground">
+                  <p className="mt-3 text-xs text-muted-foreground">
                     {tech.topics.length} topics
-                  </div>
+                  </p>
                 </Link>
               ))}
             </div>

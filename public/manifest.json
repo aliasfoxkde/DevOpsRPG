@@ -1,41 +1,46 @@
 {
-  "name": "DevOpsQuest",
-  "short_name": "DevOpsQuest",
-  "description": "Gamified DevOps Learning Platform - Master DevOps skills through an RPG-style experience",
+  "name": "DevOps Quest RPG",
+  "short_name": "DevOps Quest",
+  "description": "A gamified DevOps learning adventure - Learn DevOps through an RPG journey",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f0f23",
-  "theme_color": "#6366f1",
+  "background_color": "#0f172a",
+  "theme_color": "#f59e0b",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icons/icon-192.png",
+      "src": "/icons/icon-192.svg",
       "sizes": "192x192",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-512.png",
+      "src": "/icons/icon-512.svg",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ],
   "categories": ["education", "games"],
+  "screenshots": [],
   "shortcuts": [
     {
-      "name": "Start Learning",
-      "short_name": "Learn",
-      "url": "/learn",
-      "description": "Continue your learning journey"
+      "name": "Continue Quest",
+      "short_name": "Quest",
+      "url": "/",
+      "icons": [{ "src": "/icons/icon-192.svg", "sizes": "192x192" }]
     },
     {
-      "name": "Dashboard",
-      "short_name": "Dashboard",
-      "url": "/dashboard",
-      "description": "View your progress"
+      "name": "Quest Journal",
+      "short_name": "Journal",
+      "url": "/quests",
+      "icons": [{ "src": "/icons/icon-192.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Character Sheet",
+      "short_name": "Character",
+      "url": "/character",
+      "icons": [{ "src": "/icons/icon-192.svg", "sizes": "192x192" }]
     }
-  ],
-  "screenshots": [],
-  "prefer_related_applications": false
+  ]
 }
