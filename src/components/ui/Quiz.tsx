@@ -61,11 +61,19 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   const isTrueFalse = questionType === 'true_false'
   const isFillBlank = questionType === 'fill_blank'
 
-  // Handle 'n' key to auto-select correct answer and advance
+  // Handle 'n' key for unified navigation: auto-answer → next → complete
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === 'n' && !showExplanation && !quizComplete) {
-        e.preventDefault()
+      if (e.key.toLowerCase() !== 'n') return
+      e.preventDefault()
+
+      if (quizComplete) {
+        // On results screen, 'N' completes the quest
+        handleFinish()
+      } else if (showExplanation) {
+        // With explanation showing, 'N' goes to next question
+        handleNext()
+      } else {
         // Auto-select the correct answer
         if (current.correctIndex !== undefined) {
           handleSelect(current.correctIndex)
@@ -77,16 +85,11 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
           setCorrectCount(c => c + 1)
         }
       }
-      // 'm' key to skip to next question
-      if (e.key.toLowerCase() === 'm' && showExplanation) {
-        e.preventDefault()
-        handleNext()
-      }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [current, showExplanation, quizComplete])
+  }, [current, showExplanation, quizComplete, correctCount])
 
   const handleSelect = (index: number) => {
     if (showExplanation) return
@@ -206,7 +209,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
             <span className="text-green-400">✓ {correctCount}</span>
             <span className="text-red-400">✗ {wrongCount}</span>
             <span className="text-slate-400">{currentIndex + 1}/{allQuestions.length}</span>
-            <span className="text-xs text-slate-500">Press N for correct, M for next</span>
+            <span className="text-xs text-slate-500">Press N for all (answer/next/complete)</span>
           </div>
         </div>
       </div>

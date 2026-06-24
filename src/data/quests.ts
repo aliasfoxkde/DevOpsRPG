@@ -100,13 +100,16 @@ export function generateQuests(): Quest[] {
     const realmId = realmMap[tech.phase] || 'foundations'
 
     tech.topics.forEach((topic: Topic, index: number) => {
-      // Difficulty: intro topics are 1, scales up to 5 based on position in technology
-      // Simpler formula: early topics are easy, later topics are harder
+      // Difficulty: based on technology phase + position within tech
+      // Phase 1 techs: difficulty 1-2, Phase 6 techs: difficulty 4-5
       const positionInTech = index + 1
       const totalTopics = tech.topics.length
       const techProgress = positionInTech / totalTopics
-      // First 25% of topics = difficulty 1-2, middle = 3, last 25% = 4-5
-      const difficulty = Math.min(5, Math.max(1, Math.ceil(techProgress * 4))) as 1 | 2 | 3 | 4 | 5
+
+      // Phase-based base difficulty (1-5) + position modifier
+      const phaseBase = Math.min(5, tech.phase)
+      const positionBonus = Math.ceil(techProgress * 2) // 0-2 bonus based on position
+      const difficulty = Math.min(5, Math.max(1, phaseBase - 1 + positionBonus)) as 1 | 2 | 3 | 4 | 5
 
       // Time estimates: intro topics are short (~5 min), scale up based on complexity
       // Basic intros: 3-5 min, advanced topics: 10-20 min

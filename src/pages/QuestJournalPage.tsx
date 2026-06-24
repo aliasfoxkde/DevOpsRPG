@@ -57,9 +57,11 @@ export default function QuestJournalPage() {
           {Object.values(realms).map((realm, index) => {
             const progress = getRealmProgress(realm.id)
             const realmQuests = allQuests.filter(q => q.realmId === realm.id)
+            const prevRealm = index > 0 ? Object.values(realms)[index - 1] : null
+            const prevRealmComplete = prevRealm && getRealmProgress(prevRealm.id).completed === prevRealm.technologies.length * 5
             const isUnlocked = character.level >= realm.requiredLevel ||
               (index === 0) ||
-              (index > 0 && getRealmProgress(Object.values(realms)[index - 1].id).completed === Object.values(realms)[index - 1].technologies.length * 5)
+              (prevRealm && prevRealmComplete)
             const isCurrentRealm = currentRealm?.id === realm.id
 
             return (
