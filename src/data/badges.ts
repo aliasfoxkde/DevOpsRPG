@@ -77,6 +77,20 @@ export const BADGES: Badge[] = [
   { id: 'collector', name: 'Collector', description: 'Earn a badge from each category', icon: '🏅', category: 'secret', rarity: 'epic', requirement: { type: 'all_categories', value: 1 }, xpReward: 300, goldReward: 150 },
   { id: 'completionist', name: 'Completionist', description: 'Earn all other badges', icon: '💯', category: 'secret', rarity: 'legendary', requirement: { type: 'all_badges', value: 1 }, xpReward: 5000, goldReward: 2500 },
 
+  // More secret/hidden badges
+  { id: 'lucky_spin', name: 'Lucky!', description: 'Win the jackpot (500+ gold) on the bonus wheel', icon: '🎰', category: 'secret', rarity: 'rare', requirement: { type: 'jackpot_spin', value: 1 }, xpReward: 150, goldReward: 75 },
+  { id: 'first_mystery', name: 'Mystery Solved', description: 'Open your first mystery box', icon: '🎁', category: 'secret', rarity: 'common', requirement: { type: 'mystery_open', value: 1 }, xpReward: 50, goldReward: 25 },
+  { id: 'streak_7_secret', name: 'Unstoppable', description: 'Maintain a 7-day streak', icon: '🔥', category: 'secret', rarity: 'uncommon', requirement: { type: 'streak_days', value: 7 }, xpReward: 100, goldReward: 50 },
+  { id: 'centurion', name: 'Centurion', description: 'Complete 100 quests', icon: '💯', category: 'secret', rarity: 'epic', requirement: { type: 'quest_count', value: 100 }, xpReward: 1000, goldReward: 500 },
+  { id: 'all_realms', name: 'World Explorer', description: 'Complete all 5 realms', icon: '🗺️', category: 'secret', rarity: 'legendary', requirement: { type: 'all_realms', value: 5 }, xpReward: 2500, goldReward: 1250 },
+  { id: 'all_tech', name: 'Tech Master', description: 'Complete quests in all technologies', icon: '🛠️', category: 'secret', rarity: 'epic', requirement: { type: 'all_technologies', value: 1 }, xpReward: 750, goldReward: 375 },
+  { id: 'quiz_master', name: 'Quiz Master', description: 'Complete 50 quizzes with 80%+ score', icon: '🧠', category: 'secret', rarity: 'rare', requirement: { type: 'quiz_master', value: 50 }, xpReward: 400, goldReward: 200 },
+  { id: 'no_mistakes', name: 'Flawless', description: 'Complete 10 quests without any wrong answers', icon: '💎', category: 'secret', rarity: 'epic', requirement: { type: 'no_mistakes', value: 10 }, xpReward: 500, goldReward: 250 },
+  { id: 'marathon', name: 'Marathon', description: 'Complete 10 quests in a single session', icon: '🏃', category: 'secret', rarity: 'rare', requirement: { type: 'marathon', value: 10 }, xpReward: 300, goldReward: 150 },
+  { id: 'level_25', name: 'Max Level', description: 'Reach level 25 (max level)', icon: '⬆️', category: 'secret', rarity: 'legendary', requirement: { type: 'max_level', value: 25 }, xpReward: 5000, goldReward: 2500 },
+  { id: 'gold_hoarder', name: 'Gold Hoarder', description: 'Accumulate 10,000 gold', icon: '💰', category: 'secret', rarity: 'epic', requirement: { type: 'gold_hoard', value: 10000 }, xpReward: 500, goldReward: 0 },
+  { id: 'first_legendary', name: 'Legendary', description: 'Earn your first legendary item', icon: '⭐', category: 'secret', rarity: 'uncommon', requirement: { type: 'first_legendary', value: 1 }, xpReward: 200, goldReward: 100 },
+
   // Social badges (for future)
   { id: 'helper', name: 'Helper', description: 'Help others learn (future feature)', icon: '🤝', category: 'social', rarity: 'rare', requirement: { type: 'help_count', value: 1 }, xpReward: 200, goldReward: 100 },
 ]
