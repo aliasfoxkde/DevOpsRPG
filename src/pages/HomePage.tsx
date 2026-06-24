@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useGame } from '../contexts/GameContext'
+import { getRandomEncouragement } from '../data/milestones'
 import { MiniGameHub } from '../components/minigames/MiniGameHub'
 
 export default function HomePage() {
@@ -8,6 +9,7 @@ export default function HomePage() {
   const { character } = game
   const nextQuest = getNextQuest()
   const [showMiniGames, setShowMiniGames] = useState(false)
+  const encouragement = getRandomEncouragement()
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
@@ -66,6 +68,11 @@ export default function HomePage() {
               </span>
               <span className="text-slate-400 ml-1">/ {game.achievements.length} Achievements</span>
             </div>
+          </div>
+
+          {/* Encouragement */}
+          <div className="mt-8">
+            <p className="text-purple-300 italic text-lg">"{encouragement}"</p>
           </div>
         </div>
       </section>

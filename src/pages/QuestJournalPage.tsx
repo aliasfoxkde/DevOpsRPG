@@ -1,10 +1,12 @@
 import { useGame } from '../contexts/GameContext'
 import { realms, realmStories, allQuests } from '../data/quests'
+import { getRandomEncouragement } from '../data/milestones'
 import { Link } from 'react-router-dom'
 
 export default function QuestJournalPage() {
   const { game, isQuestCompleted, getNextQuest, getRealmProgress, completedCount, totalQuests } = useGame()
   const { character } = game
+  const encouragement = getRandomEncouragement()
 
   const nextQuest = getNextQuest()
   const currentRealm = nextQuest ? realms[nextQuest.realmId] : null
@@ -176,6 +178,12 @@ export default function QuestJournalPage() {
             <p className="mt-2 text-amber-400 font-medium">
               {Math.round((completedCount / totalQuests) * 100)}% Complete
             </p>
+          </div>
+
+          {/* Daily Encouragement */}
+          <div className="mt-8 p-4 bg-gradient-to-r from-purple-900/30 via-slate-800 to-blue-900/30 rounded-xl border border-purple-500/30 max-w-lg mx-auto">
+            <p className="text-purple-300 italic text-lg">"{encouragement}"</p>
+            <p className="text-slate-500 text-sm mt-2">Keep going, hero! ⚔️</p>
           </div>
         </div>
       </section>

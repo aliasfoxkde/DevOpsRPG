@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { getQuizForTopic } from '../../data/quizzes'
+import { getRandomEncouragement } from '../../data/milestones'
 
 export type QuestionType = 'multiple_choice' | 'true_false' | 'fill_blank'
 
@@ -180,6 +181,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
     const passThreshold = Math.ceil(allQuestions.length * 0.6)
     const passed = correctCount >= passThreshold
     const percentage = Math.round((correctCount / allQuestions.length) * 100)
+    const encouragement = getRandomEncouragement()
 
     return (
       <div className="bg-slate-800/80 rounded-xl border overflow-hidden">
@@ -197,11 +199,14 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
             You got {correctCount} out of {allQuestions.length} questions correct ({percentage}%)
           </p>
           {passed ? (
-            <p className="text-green-400 mb-6">Great job! You've demonstrated your knowledge.</p>
+            <p className="text-green-400 mb-4">Great job! You've demonstrated your knowledge.</p>
           ) : (
-            <p className="text-amber-400 mb-6">
-              Review the material and try again. You need {passThreshold} correct to pass.
-            </p>
+            <div className="mb-4">
+              <p className="text-amber-400 mb-2">
+                Review the material and try again. You need {passThreshold} correct to pass.
+              </p>
+              <p className="text-purple-300 text-sm italic">"{encouragement}"</p>
+            </div>
           )}
           <div className="flex items-center justify-center gap-4">
             <button
