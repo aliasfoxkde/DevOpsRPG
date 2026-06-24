@@ -288,33 +288,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         new Set([...prev.completedQuests.map(q => q.topicId), quest.topicId])
       )
 
-      // Check for new badges
-      const stats = {
-        questCount: completedCount,
-        streakDays: newStreak,
-        level: newLevel,
-        quizCount: 0,
-        minigameCount: 0,
-        perfectQuiz: false,
-        quizStreak: 0,
-        techCompleted: [] as string[],
-        realmCompleted: 0,
-        typerCount: 0,
-        memoryCount: 0,
-        mathCount: 0,
-      }
-
-      let newBadge: Badge | undefined
-      const updatedBadges = prev.badges.map(b => {
-        if (b.unlockedAt) return b
-        if (!newBadge && shouldUnlockBadge(b, stats)) {
-          newBadge = { ...b, unlockedAt: new Date().toISOString() }
-          return newBadge
-        }
-        return b
-      })
-
-      // Check for realm completion
+      // Check for realm completion first
       const completedRealmIds = [...prev.completedRealms]
       let newShowRealmCompletion: string | null = null
 
@@ -338,10 +312,34 @@ export function GameProvider({ children }: { children: ReactNode }) {
         const allTechComplete = techQuests.every(tq =>
           prev.completedQuests.some(cq => cq.questId === tq.id) || tq.id === questId
         )
-        if (allTechComplete) {
-          completedTechIds.push(quest.technologyId)
-        }
+        if (allTechComplete) completedTechIds.push(quest.technologyId)
       }
+
+      // Check for new badges with proper stats
+      const badgeStats = {
+        questCount: completedCount,
+        streakDays: newStreak,
+        level: newLevel,
+        quizCount: 0,
+        minigameCount: 0,
+        perfectQuiz: false,
+        quizStreak: 0,
+        techCompleted: completedTechIds,
+        realmCompleted: completedRealmIds.length,
+        typerCount: 0,
+        memoryCount: 0,
+        mathCount: 0,
+      }
+
+      let newBadge: Badge | undefined
+      const updatedBadges = prev.badges.map(b => {
+        if (b.unlockedAt) return b
+        if (!newBadge && shouldUnlockBadge(b, badgeStats)) {
+          newBadge = { ...b, unlockedAt: new Date().toISOString() }
+          return newBadge
+        }
+        return b
+      })
 
       // Check for new milestones with proper state
       const milestoneState = {

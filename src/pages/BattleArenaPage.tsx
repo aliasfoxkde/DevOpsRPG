@@ -28,6 +28,8 @@ export default function BattleArenaPage() {
   const [showConfetti, setShowConfetti] = useState(false)
   const [showMilestone, setShowMilestone] = useState(false)
   const [milestoneData, setMilestoneData] = useState<{ icon: string; title: string; message: string; xpBonus: number } | null>(null)
+  const [showBadge, setShowBadge] = useState(false)
+  const [badgeData, setBadgeData] = useState<{ icon: string; name: string; description: string } | null>(null)
 
   const quest = allQuests.find(q => q.id === questId)
 
@@ -95,12 +97,17 @@ export default function BattleArenaPage() {
     }
   }
 
-  // Watch for milestone unlocks from game state
+  // Watch for milestone and badge unlocks from game state
   useEffect(() => {
     if (game.lastVictory?.milestone) {
       const m = game.lastVictory.milestone
       setMilestoneData({ icon: m.icon, title: m.title, message: m.message, xpBonus: m.xpBonus })
       setTimeout(() => setShowMilestone(true), 2000)
+    }
+    if (game.lastVictory?.badge) {
+      const b = game.lastVictory.badge
+      setBadgeData({ icon: b.icon, name: b.name, description: b.description })
+      setTimeout(() => setShowBadge(true), 2500)
     }
   }, [game.lastVictory])
 
@@ -397,6 +404,26 @@ export default function BattleArenaPage() {
             xpBonus={milestoneData.xpBonus}
             onComplete={() => setShowMilestone(false)}
           />
+        )}
+
+        {/* Badge unlock celebration */}
+        {showBadge && badgeData && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <div className="text-center animate-bounce-in">
+              <div className="text-7xl mb-4">{badgeData.icon}</div>
+              <div className="inline-block px-4 py-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full text-blue-200 text-sm font-bold mb-3">
+                🎖️ BADGE EARNED!
+              </div>
+              <h2 className="text-3xl font-bold text-white mb-2">{badgeData.name}</h2>
+              <p className="text-slate-300 text-lg mb-4">{badgeData.description}</p>
+              <button
+                onClick={() => setShowBadge(false)}
+                className="mt-4 px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold rounded-lg shadow-lg"
+              >
+                Awesome!
+              </button>
+            </div>
+          </div>
         )}
 
         {/* Quest Navigation */}
