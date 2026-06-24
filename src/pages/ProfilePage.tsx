@@ -1,12 +1,14 @@
 import { useGame } from '../contexts/GameContext'
 import { BADGES, RARITY_COLORS, type Badge } from '../data/badges'
 import { MILESTONES } from '../data/milestones'
+import { useSoundEffects } from '../hooks/useSoundEffects'
 
 // Rarity display order
 const RARITY_ORDER: Badge['rarity'][] = ['legendary', 'epic', 'rare', 'uncommon', 'common']
 
 export default function ProfilePage() {
   const { game } = useGame()
+  const { isMuted, toggleMute, playSound } = useSoundEffects()
 
   // Calculate stats
   const totalBadges = BADGES.length
@@ -25,6 +27,32 @@ export default function ProfilePage() {
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-2">📜 Hero Profile</h1>
         <p className="text-slate-400">View your achievements, badges, and progress</p>
+      </div>
+
+      {/* Settings */}
+      <div className="bg-card rounded-xl border border-border p-4 mb-8 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">🔊</span>
+          <div>
+            <h3 className="font-medium">Sound Effects</h3>
+            <p className="text-xs text-slate-400">Play sounds for actions and achievements</p>
+          </div>
+        </div>
+        <button
+          onClick={() => {
+            if (!isMuted) playSound('click')
+            toggleMute()
+          }}
+          className={`relative w-14 h-7 rounded-full transition-colors ${
+            isMuted ? 'bg-slate-600' : 'bg-green-600'
+          }`}
+        >
+          <div
+            className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-transform ${
+              isMuted ? 'left-1' : 'translate-x-8'
+            }`}
+          />
+        </button>
       </div>
 
       {/* Character Summary */}
