@@ -1,5 +1,6 @@
 import { useGame } from '../contexts/GameContext'
 import { isQuestExpired } from '../data/sidequests'
+import CodePlayground from '../components/games/CodePlayground'
 
 export default function SideQuestsPage() {
   const { game, claimSideQuest } = useGame()
@@ -172,6 +173,14 @@ export default function SideQuestsPage() {
           <li>• Mystery boxes and collectibles can drop from quests</li>
           <li>• Some secret quests unlock based on your playing habits</li>
         </ul>
+      </div>
+
+      {/* Code Playground */}
+      <div className="mt-10">
+        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          <span>💻</span> Code Playground
+        </h2>
+        <CodePlayground />
       </div>
     </div>
   )

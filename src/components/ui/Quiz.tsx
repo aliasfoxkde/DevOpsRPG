@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { getQuizForTopic } from '../../data/quizzes'
 
 export type QuestionType = 'multiple_choice' | 'true_false' | 'fill_blank'
@@ -22,6 +22,9 @@ interface QuizProps {
 
 export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   const allQuestions = getQuizForTopic(topicId)
+  const hasQuestions = allQuestions.length > 0
+
+  // ALL hooks must be called unconditionally - React rules
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [textAnswer, setTextAnswer] = useState('')
@@ -31,8 +34,102 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   const [quizComplete, setQuizComplete] = useState(false)
   const [localCorrect, setLocalCorrect] = useState(false)
 
-  // If no quiz available, use a simplified check
-  if (allQuestions.length === 0) {
+  // Use ref to avoid stale closure in handleFinish
+  const correctCountRef = useRef(correctCount)
+  const allQuestionsLengthRef = useRef(allQuestions.length)
+  correctCountRef.current = correctCount
+  allQuestionsLengthRef.current = allQuestions.length
+
+  // currentQuestion is guaranteed non-null when hasQuestions is true
+  // because we return early in the render when !hasQuestions
+  const currentQuestion = allQuestions[currentIndex]
+  const questionType = currentQuestion?.type || 'multiple_choice'
+  const isMultipleChoice = questionType === 'multiple_choice'
+  const isTrueFalse = questionType === 'true_false'
+  const isFillBlank = questionType === 'fill_blank'
+
+  const handleSelect = useCallback((index: number) => {
+    if (showExplanation || !currentQuestion) return
+    setSelectedIndex(index)
+    setShowExplanation(true)
+    const isCorrect = index === currentQuestion.correctIndex
+    setLocalCorrect(isCorrect)
+    if (isCorrect) {
+      setCorrectCount(c => c + 1)
+    } else {
+      setWrongCount(c => c + 1)
+    }
+  }, [showExplanation, currentQuestion])
+
+  const handleTextSubmit = useCallback(() => {
+    if (showExplanation || !textAnswer.trim() || !currentQuestion) return
+    setShowExplanation(true)
+    const normalizedInput = textAnswer.trim().toLowerCase()
+    const normalizedCorrect = (currentQuestion.correctAnswer || '').toLowerCase()
+    const isCorrect = normalizedInput === normalizedCorrect ||
+      normalizedCorrect.includes(normalizedInput) ||
+      normalizedInput.includes(normalizedCorrect)
+    setLocalCorrect(isCorrect)
+    if (isCorrect) {
+      setCorrectCount(c => c + 1)
+    } else {
+      setWrongCount(c => c + 1)
+    }
+  }, [showExplanation, textAnswer, currentQuestion])
+
+  const handleNext = useCallback(() => {
+    if (currentIndex < allQuestions.length - 1) {
+      setCurrentIndex(i => i + 1)
+      setSelectedIndex(null)
+      setTextAnswer('')
+      setShowExplanation(false)
+      setLocalCorrect(false)
+    } else {
+      setQuizComplete(true)
+    }
+  }, [currentIndex, allQuestions.length])
+
+  const handleFinish = useCallback(() => {
+    if (!hasQuestions) {
+      onPass()
+      return
+    }
+    const passThreshold = Math.ceil(allQuestionsLengthRef.current * 0.6)
+    if (correctCountRef.current >= passThreshold) {
+      onPass()
+    } else {
+      onSkip()
+    }
+  }, [hasQuestions, onPass, onSkip])
+
+  // Handle 'n' key for unified navigation: auto-answer → next → complete
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() !== 'n') return
+      e.preventDefault()
+
+      if (quizComplete) {
+        handleFinish()
+      } else if (showExplanation) {
+        handleNext()
+      } else if (currentQuestion) {
+        if (currentQuestion.correctIndex !== undefined) {
+          handleSelect(currentQuestion.correctIndex)
+        } else if (currentQuestion.correctAnswer) {
+          setTextAnswer(currentQuestion.correctAnswer)
+          setShowExplanation(true)
+          setLocalCorrect(true)
+          setCorrectCount(c => c + 1)
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [currentQuestion, showExplanation, quizComplete, handleFinish, handleNext, handleSelect])
+
+  // Handle empty quiz case - AFTER all hooks
+  if (!hasQuestions) {
     return (
       <div className="bg-slate-800/80 rounded-xl border border-amber-600/50 overflow-hidden">
         <div className="bg-gradient-to-r from-amber-900/30 via-slate-800 to-amber-900/30 px-6 py-4 border-b border-slate-700">
@@ -53,92 +150,6 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
         </div>
       </div>
     )
-  }
-
-  const current = allQuestions[currentIndex]
-  const questionType = current.type || 'multiple_choice'
-  const isMultipleChoice = questionType === 'multiple_choice'
-  const isTrueFalse = questionType === 'true_false'
-  const isFillBlank = questionType === 'fill_blank'
-
-  // Handle 'n' key for unified navigation: auto-answer → next → complete
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() !== 'n') return
-      e.preventDefault()
-
-      if (quizComplete) {
-        // On results screen, 'N' completes the quest
-        handleFinish()
-      } else if (showExplanation) {
-        // With explanation showing, 'N' goes to next question
-        handleNext()
-      } else {
-        // Auto-select the correct answer
-        if (current.correctIndex !== undefined) {
-          handleSelect(current.correctIndex)
-        } else if (current.correctAnswer) {
-          // For fill blank, auto-fill the correct answer
-          setTextAnswer(current.correctAnswer)
-          setShowExplanation(true)
-          setLocalCorrect(true)
-          setCorrectCount(c => c + 1)
-        }
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [current, showExplanation, quizComplete, correctCount])
-
-  const handleSelect = (index: number) => {
-    if (showExplanation) return
-    setSelectedIndex(index)
-    setShowExplanation(true)
-    const isCorrect = index === current.correctIndex
-    setLocalCorrect(isCorrect)
-    if (isCorrect) {
-      setCorrectCount(c => c + 1)
-    } else {
-      setWrongCount(c => c + 1)
-    }
-  }
-
-  const handleTextSubmit = () => {
-    if (showExplanation || !textAnswer.trim()) return
-    setShowExplanation(true)
-    const normalizedInput = textAnswer.trim().toLowerCase()
-    const normalizedCorrect = (current.correctAnswer || '').toLowerCase()
-    const isCorrect = normalizedInput === normalizedCorrect ||
-      normalizedCorrect.includes(normalizedInput) ||
-      normalizedInput.includes(normalizedCorrect)
-    setLocalCorrect(isCorrect)
-    if (isCorrect) {
-      setCorrectCount(c => c + 1)
-    } else {
-      setWrongCount(c => c + 1)
-    }
-  }
-
-  const handleNext = () => {
-    if (currentIndex < allQuestions.length - 1) {
-      setCurrentIndex(i => i + 1)
-      setSelectedIndex(null)
-      setTextAnswer('')
-      setShowExplanation(false)
-      setLocalCorrect(false)
-    } else {
-      setQuizComplete(true)
-    }
-  }
-
-  const handleFinish = () => {
-    const passThreshold = Math.ceil(allQuestions.length * 0.6)
-    if (correctCount >= passThreshold) {
-      onPass()
-    } else {
-      onSkip()
-    }
   }
 
   const getQuestionTypeLabel = () => {
@@ -193,6 +204,9 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
     )
   }
 
+  // At this point, currentQuestion is guaranteed to exist
+  const q = currentQuestion!
+
   return (
     <div className="bg-slate-800/80 rounded-xl border border-amber-600/50 overflow-hidden">
       <div className="bg-gradient-to-r from-amber-900/30 via-slate-800 to-amber-900/30 px-6 py-4 border-b border-slate-700">
@@ -217,16 +231,16 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
       <div className="p-6">
         {/* Question */}
         <h3 className="text-xl font-bold text-white mb-6">
-          {isFillBlank ? current.question.replace('___', '________') : current.question}
+          {isFillBlank ? q.question.replace('___', '________') : q.question}
         </h3>
 
         {/* Multiple Choice */}
-        {isMultipleChoice && current.options && (
+        {isMultipleChoice && q.options && (
           <div className="space-y-3">
-            {current.options.map((option, index) => {
+            {q.options.map((option: string, index: number) => {
               let bgClass = 'bg-slate-700 hover:bg-slate-600 border-slate-600'
               if (showExplanation) {
-                if (index === current.correctIndex) {
+                if (index === q.correctIndex) {
                   bgClass = 'bg-green-900/50 border-green-500'
                 } else if (index === selectedIndex) {
                   bgClass = 'bg-red-900/50 border-red-500'
@@ -250,12 +264,12 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
         )}
 
         {/* True/False */}
-        {isTrueFalse && current.options && (
+        {isTrueFalse && q.options && (
           <div className="grid grid-cols-2 gap-4">
-            {current.options.map((option, index) => {
+            {q.options.map((option: string, index: number) => {
               let bgClass = 'bg-slate-700 hover:bg-slate-600 border-slate-600'
               if (showExplanation) {
-                if (index === current.correctIndex) {
+                if (index === q.correctIndex) {
                   bgClass = 'bg-green-900/50 border-green-500'
                 } else if (index === selectedIndex) {
                   bgClass = 'bg-red-900/50 border-red-500'
@@ -321,17 +335,17 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
             <p className={`font-bold mb-2 ${localCorrect ? 'text-green-400' : 'text-amber-400'}`}>
               {localCorrect ? '✓ Correct!' : '✗ Incorrect'}
             </p>
-            {!localCorrect && current.correctAnswer && (
+            {!localCorrect && q.correctAnswer && (
               <p className="text-slate-300 mb-2">
-                Correct answer: <span className="text-green-400 font-bold">{current.correctAnswer}</span>
+                Correct answer: <span className="text-green-400 font-bold">{q.correctAnswer}</span>
               </p>
             )}
-            {!localCorrect && current.correctIndex !== undefined && current.options && (
+            {!localCorrect && q.correctIndex !== undefined && q.options && (
               <p className="text-slate-300 mb-2">
-                Correct answer: <span className="text-green-400 font-bold">{current.options[current.correctIndex]}</span>
+                Correct answer: <span className="text-green-400 font-bold">{q.options[q.correctIndex]}</span>
               </p>
             )}
-            <p className="text-slate-300">{current.explanation}</p>
+            <p className="text-slate-300">{q.explanation}</p>
           </div>
         )}
 

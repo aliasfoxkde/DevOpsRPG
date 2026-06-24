@@ -138,8 +138,61 @@ export default function WorldMapPage() {
 
       {/* Map Container */}
       <div className="relative w-full h-[calc(100vh-180px)] overflow-hidden">
-        {/* Background */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTYsMjU2LDI1NiwxLjApIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30" />
+        {/* Background with terrain */}
+        <div className="absolute inset-0 bg-gradient-to-b from-sky-900 via-slate-800 to-slate-900" />
+
+        {/* Decorative terrain elements - Mountains in background */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
+          <defs>
+            <linearGradient id="mountainGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#64748b" />
+              <stop offset="100%" stopColor="#475569" />
+            </linearGradient>
+          </defs>
+          {/* Mountain range 1 */}
+          <polygon points="0,100% 15%,60% 30%,100%" fill="url(#mountainGrad)" />
+          <polygon points="20%,100% 35%,55% 50%,100%" fill="url(#mountainGrad)" />
+          <polygon points="40%,100% 55%,50% 70%,100%" fill="url(#mountainGrad)" />
+          {/* Mountain range 2 */}
+          <polygon points="60%,100% 75%,45% 90%,100%" fill="url(#mountainGrad)" />
+          <polygon points="80%,100% 92%,55% 100%,80% 100%,100%" fill="url(#mountainGrad)" />
+          {/* Snow caps */}
+          <polygon points="35%,55% 33%,60% 37%,60%" fill="white" opacity="0.5" />
+          <polygon points="55%,50% 53%,55% 57%,55%" fill="white" opacity="0.5" />
+          <polygon points="75%,45% 73%,50% 77%,50%" fill="white" opacity="0.5" />
+        </svg>
+
+        {/* Water/Ocean at bottom */}
+        <svg className="absolute bottom-0 left-0 w-full h-24 pointer-events-none">
+          <defs>
+            <linearGradient id="waterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#1e40af" stopOpacity="0.3" />
+              <stop offset="100%" stopColor="#1e3a8a" stopOpacity="0.6" />
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="100%" height="100%" fill="url(#waterGrad)" />
+          {/* Waves */}
+          <path d="M0,10 Q25,5 50,10 T100,10 T150,10 T200,10 T250,10 T300,10 T350,10 T400,10 T450,10 T500,10" stroke="#3b82f6" strokeWidth="1" fill="none" opacity="0.3" />
+          <path d="M0,20 Q25,15 50,20 T100,20 T150,20 T200,20 T250,20 T300,20 T350,20 T400,20 T450,20 T500,20" stroke="#3b82f6" strokeWidth="1" fill="none" opacity="0.2" />
+        </svg>
+
+        {/* Trees/Forest decorations */}
+        <div className="absolute bottom-20 left-10 text-4xl opacity-30 pointer-events-none">🌲</div>
+        <div className="absolute bottom-24 left-20 text-3xl opacity-20 pointer-events-none">🌲</div>
+        <div className="absolute bottom-18 right-20 text-4xl opacity-25 pointer-events-none">🌲</div>
+        <div className="absolute bottom-28 right-32 text-2xl opacity-20 pointer-events-none">🌴</div>
+
+        {/* Rocks decoration */}
+        <div className="absolute bottom-32 left-1/4 text-2xl opacity-20 pointer-events-none">🪨</div>
+        <div className="absolute bottom-24 right-1/3 text-xl opacity-15 pointer-events-none">🪨</div>
+
+        {/* Clouds */}
+        <div className="absolute top-10 left-20 text-4xl opacity-20 pointer-events-none animate-bounce" style={{animationDuration: '3s'}}>☁️</div>
+        <div className="absolute top-20 right-1/4 text-3xl opacity-15 pointer-events-none animate-bounce" style={{animationDuration: '4s', animationDelay: '1s'}}>☁️</div>
+        <div className="absolute top-5 right-1/3 text-2xl opacity-10 pointer-events-none animate-bounce" style={{animationDuration: '5s', animationDelay: '2s'}}>☁️</div>
+
+        {/* Grid overlay */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTYsMjU2LDI1NiwxLjApIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-10" />
 
         {/* SVG Connections */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none">
