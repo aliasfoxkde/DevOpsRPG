@@ -2,20 +2,50 @@ import { useState } from 'react'
 import { useGame } from '../contexts/GameContext'
 import { DAILY_REWARDS } from '../data/collectibles'
 import { COLLECTIBLES_POOL, openMysteryBox, type Collectible } from '../data/collectibles'
+import { REWARD_TIERS } from '../data/milestones'
 
 export default function RewardsPage() {
-  const { game, claimDailyReward, spinWheel, useCollectible, getActiveCollectibles } = useGame()
+  const { game, claimDailyReward, spinWheel, useCollectible, getActiveCollectibles, completedCount } = useGame()
   const [wheelSpinning, setWheelSpinning] = useState(false)
   const [wheelResult, setWheelResult] = useState<{ label: string; icon: string } | null>(null)
   const [mysteryBoxToOpen, setMysteryBoxToOpen] = useState<Collectible | null>(null)
   const [mysteryResult, setMysteryResult] = useState<{ type: string; value?: number; collectible?: Collectible } | null>(null)
   const [showMystery, setShowMystery] = useState(false)
+  const [claimedTiers, setClaimedTiers] = useState<string[]>([])
 
   const activeCollectibles = getActiveCollectibles()
 
   // Check which daily rewards are claimed
   const dayOfWeek = new Date().getDay()
   const adjustedDay = dayOfWeek === 0 ? 7 : dayOfWeek // Sunday = 7 instead of 0
+
+  const getTierProgress = (tier: typeof REWARD_TIERS[0]) => {
+    switch (tier.requirement.type) {
+      case 'quests': return completedCount / tier.requirement.value
+      case 'level': return game.character.level / tier.requirement.value
+      case 'xp': return game.character.xp / tier.requirement.value
+      default: return 0
+    }
+  }
+
+  const isTierComplete = (tier: typeof REWARD_TIERS[0]) => {
+    switch (tier.requirement.type) {
+      case 'quests': return completedCount >= tier.requirement.value
+      case 'level': return game.character.level >= tier.requirement.value
+      case 'xp': return game.character.xp >= tier.requirement.value
+      default: return false
+    }
+  }
+
+  const canClaimTier = (tier: typeof REWARD_TIERS[0]) => {
+    return isTierComplete(tier) && !claimedTiers.includes(tier.id) && !game.collectibles.some(c => c.id === `tier_claimed_${tier.id}`)
+  }
+
+  const handleClaimTier = (tier: typeof REWARD_TIERS[0]) => {
+    if (!canClaimTier(tier)) return
+    setClaimedTiers([...claimedTiers, tier.id])
+    // In a real implementation, this would call a function to grant the rewards
+  }
 
   const handleClaimDaily = (day: number) => {
     if (!game.dailyRewardsClaimed.includes(day)) {
@@ -214,6 +244,87 @@ export default function RewardsPage() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Reward Tiers / Milestone Packs */}
+      <div className="bg-card rounded-xl border border-border p-6 mb-8">
+        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          <span>🎖️</span> Milestone Packs
+          <span className="text-sm font-normal text-slate-400">(Complete to claim!)</span>
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {REWARD_TIERS.map((tier) => {
+            const progress = getTierProgress(tier)
+            const complete = isTierComplete(tier)
+            const canClaim = canClaimTier(tier)
+            const progressPercent = Math.min(100, Math.round(progress * 100))
+
+            return (
+              <div
+                key={tier.id}
+                className={`p-4 rounded-lg border ${
+                  complete && !canClaim
+                    ? 'bg-green-900/30 border-green-500/50'
+                    : complete
+                    ? 'bg-amber-900/30 border-amber-500 animate-pulse'
+                    : 'bg-slate-800/50 border-slate-700'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="text-4xl">{tier.icon}</div>
+                  <div className="flex-1">
+                    <h3 className={`font-bold ${complete ? 'text-amber-400' : 'text-white'}`}>
+                      {tier.name}
+                    </h3>
+                    <p className="text-xs text-slate-400 mb-2">{tier.description}</p>
+
+                    {/* Progress bar */}
+                    <div className="mb-2">
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-slate-400">Progress</span>
+                        <span className={complete ? 'text-green-400' : 'text-amber-400'}>
+                          {progressPercent}%
+                        </span>
+                      </div>
+                      <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full transition-all ${
+                            complete ? 'bg-green-500' : 'bg-amber-500'
+                          }`}
+                          style={{ width: `${progressPercent}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Rewards preview */}
+                    <div className="flex gap-3 text-xs mb-2">
+                      <span className="text-purple-400">+{tier.rewards.xp} XP</span>
+                      <span className="text-orange-400">+{tier.rewards.gold} Gold</span>
+                      {tier.rewards.badge && (
+                        <span className="text-blue-400">+ Badge</span>
+                      )}
+                    </div>
+
+                    {/* Claim button */}
+                    {canClaim && (
+                      <button
+                        onClick={() => handleClaimTier(tier)}
+                        className="w-full py-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 rounded-lg font-bold text-sm text-white"
+                      >
+                        🎁 CLAIM PACK!
+                      </button>
+                    )}
+                    {!canClaim && complete && (
+                      <div className="text-center py-2 text-green-400 text-sm font-bold">
+                        ✓ Claimed!
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
       </div>
 
       {/* Mystery Box Modal */}
