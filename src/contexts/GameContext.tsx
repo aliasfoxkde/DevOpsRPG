@@ -60,6 +60,7 @@ export interface GameState {
   lastDailyReset: string
   completedRealms: string[] // Track which realms have been completed
   showRealmCompletion: string | null // Realm ID if showing realm completion modal
+  hasSeenOnboarding: boolean // Track if user has completed onboarding
 }
 
 interface GameContextType {
@@ -92,6 +93,8 @@ interface GameContextType {
   getAvailableSkillPoints: () => number
   // Realm completion
   dismissRealmCompletion: () => void
+  // Onboarding
+  completeOnboarding: (name: string, charClass: CharacterClass) => void
   // Direct XP/Gold (for mini-games)
   addXP: (amount: number) => void
   addGold: (amount: number) => void
@@ -175,6 +178,7 @@ function createDefaultGame(): GameState {
     lastDailyReset: today,
     completedRealms: [],
     showRealmCompletion: null,
+    hasSeenOnboarding: false,
   }
 }
 
@@ -722,6 +726,19 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setGame(prev => ({ ...prev, showRealmCompletion: null }))
   }, [])
 
+  // Complete onboarding with character name and class
+  const completeOnboarding = useCallback((name: string, charClass: CharacterClass) => {
+    setGame(prev => ({
+      ...prev,
+      hasSeenOnboarding: true,
+      character: {
+        ...prev.character,
+        name,
+        class: charClass,
+      },
+    }))
+  }, [])
+
   // Add XP to character (used by mini-games)
   const addXP = useCallback((amount: number) => {
     setGame(prev => {
@@ -793,6 +810,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
         getAvailableSkillPoints,
         // Realm completion
         dismissRealmCompletion,
+        // Onboarding
+        completeOnboarding,
         // Direct XP/Gold for mini-games
         addXP,
         addGold,

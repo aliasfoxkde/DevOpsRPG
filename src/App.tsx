@@ -22,6 +22,7 @@ import WorldMapPage from './pages/WorldMapPage'
 import LeaderboardPage from './pages/LeaderboardPage'
 import BadgesPage from './pages/BadgesPage'
 import MilestonesPage from './pages/MilestonesPage'
+import OnboardingWizard from './components/ui/OnboardingWizard'
 
 // Toast types
 interface Toast {
@@ -35,6 +36,7 @@ interface Toast {
 function AppContent() {
   const { game, dismissRealmCompletion } = useGame()
   const [toasts, setToasts] = useState<Toast[]>([])
+  const [showOnboarding, setShowOnboarding] = useState(!game.hasSeenOnboarding)
   useKeyboardShortcuts()
 
   const removeToast = (id: string) => {
@@ -52,6 +54,9 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-white">
+      {showOnboarding && (
+        <OnboardingWizard onComplete={() => setShowOnboarding(false)} />
+      )}
       <HUD />
       <Routes>
         <Route path="/" element={<Layout />}>
