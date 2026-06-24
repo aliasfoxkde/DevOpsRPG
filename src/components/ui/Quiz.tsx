@@ -2,17 +2,20 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { getQuizForTopic } from '../../data/quizzes'
 import { getRandomEncouragement } from '../../data/milestones'
 
-export type QuestionType = 'multiple_choice' | 'true_false' | 'fill_blank'
+export type QuestionType = 'multiple_choice' | 'true_false' | 'fill_blank' | 'code_challenge'
 
 export interface QuizQuestion {
   id: string
   topicId: string
   question: string
-  type: QuestionType
+  type?: QuestionType
   options?: string[]
   correctIndex?: number
   correctAnswer?: string
   explanation: string
+  codeTemplate?: string
+  expectedOutput?: string
+  hint?: string
 }
 
 interface QuizProps {
@@ -29,12 +32,14 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [textAnswer, setTextAnswer] = useState('')
+  const [codeAnswer, setCodeAnswer] = useState('')
   const [showExplanation, setShowExplanation] = useState(false)
   const [correctCount, setCorrectCount] = useState(0)
   const [wrongCount, setWrongCount] = useState(0)
   const [quizComplete, setQuizComplete] = useState(false)
   const [localCorrect, setLocalCorrect] = useState(false)
   const [isFinishing, setIsFinishing] = useState(false)
+  const [showHint, setShowHint] = useState(false)
 
   // Use ref to avoid stale closure in handleFinish
   const correctCountRef = useRef(correctCount)
@@ -50,6 +55,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   const isMultipleChoice = questionType === 'multiple_choice'
   const isTrueFalse = questionType === 'true_false'
   const isFillBlank = questionType === 'fill_blank'
+  const isCodeChallenge = questionType === 'code_challenge'
 
   const handleSelect = useCallback((index: number) => {
     if (showExplanation || !currentQuestion) return
@@ -80,13 +86,32 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
     }
   }, [showExplanation, textAnswer, currentQuestion])
 
+  const handleCodeSubmit = useCallback(() => {
+    if (showExplanation || !currentQuestion) return
+    setShowExplanation(true)
+    // For code challenges, we check if the code produces expected output
+    // Simple check: see if key parts of expected output are present
+    const code = codeAnswer.toLowerCase()
+    const expected = (currentQuestion.expectedOutput || '').toLowerCase()
+    // Check if code contains the expected output or is close enough
+    const isCorrect = code.includes(expected) || expected.includes(code.trim())
+    setLocalCorrect(isCorrect)
+    if (isCorrect) {
+      setCorrectCount(c => c + 1)
+    } else {
+      setWrongCount(c => c + 1)
+    }
+  }, [showExplanation, codeAnswer, currentQuestion])
+
   const handleNext = useCallback(() => {
     if (currentIndex < allQuestions.length - 1) {
       setCurrentIndex(i => i + 1)
       setSelectedIndex(null)
       setTextAnswer('')
+      setCodeAnswer('')
       setShowExplanation(false)
       setLocalCorrect(false)
+      setShowHint(false)
     } else {
       setQuizComplete(true)
     }
@@ -348,6 +373,71 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
                 }`}
               >
                 Check Answer
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Code Challenge */}
+        {isCodeChallenge && q.codeTemplate && (
+          <div className="space-y-4">
+            {q.hint && !showExplanation && (
+              <button
+                onClick={() => setShowHint(true)}
+                className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1"
+              >
+                💡 Need a hint?
+              </button>
+            )}
+            {showHint && q.hint && (
+              <div className="p-3 bg-purple-900/30 border border-purple-700 rounded-lg">
+                <p className="text-purple-300 text-sm">💡 {q.hint}</p>
+              </div>
+            )}
+            <pre className="bg-slate-900 rounded-lg p-4 border border-slate-700 text-sm overflow-x-auto">
+              <code className="text-green-400 font-mono">{q.codeTemplate}</code>
+            </pre>
+            <textarea
+              value={codeAnswer}
+              onChange={(e) => setCodeAnswer(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Tab') {
+                  e.preventDefault()
+                  const start = e.currentTarget.selectionStart
+                  const end = e.currentTarget.selectionEnd
+                  const newValue = codeAnswer.substring(0, start) + '  ' + codeAnswer.substring(end)
+                  setCodeAnswer(newValue)
+                  setTimeout(() => {
+                    e.currentTarget.selectionStart = e.currentTarget.selectionEnd = start + 2
+                  }, 0)
+                }
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !showExplanation) handleCodeSubmit()
+              }}
+              disabled={showExplanation}
+              placeholder="// Type your code here..."
+              className={`w-full p-4 rounded-lg border text-sm font-mono text-green-400 placeholder-slate-600 focus:outline-none transition-all min-h-[120px] ${
+                showExplanation
+                  ? localCorrect
+                    ? 'bg-green-900/50 border-green-500'
+                    : 'bg-red-900/50 border-red-500'
+                  : 'bg-slate-900 border-slate-700 focus:border-amber-500'
+              }`}
+              style={{ fontFamily: 'monospace' }}
+            />
+            <p className="text-slate-500 text-xs">
+              Expected output: <span className="text-green-400">{q.expectedOutput}</span>
+            </p>
+            {!showExplanation && (
+              <button
+                onClick={handleCodeSubmit}
+                disabled={!codeAnswer.trim()}
+                className={`w-full py-3 font-bold rounded-lg transition-all ${
+                  codeAnswer.trim()
+                    ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white'
+                    : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                }`}
+              >
+                ▶️ Run Code (Ctrl+Enter)
               </button>
             )}
           </div>

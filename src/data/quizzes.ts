@@ -1,7 +1,7 @@
 // Quiz questions for each topic - these are auto-generated from W3Schools content
 // and serve as knowledge checks before completing quests
 
-export type QuestionType = 'multiple_choice' | 'true_false' | 'fill_blank'
+export type QuestionType = 'multiple_choice' | 'true_false' | 'fill_blank' | 'code_challenge'
 
 export interface QuizQuestion {
   id: string
@@ -12,6 +12,10 @@ export interface QuizQuestion {
   correctIndex?: number
   correctAnswer?: string
   explanation: string
+  // For code challenges
+  codeTemplate?: string
+  expectedOutput?: string
+  hint?: string
 }
 
 // Generate quiz questions from technologies data
@@ -342,6 +346,16 @@ export function generateQuizzes(): Record<string, QuizQuestion[]> {
         options: ['2name', 'my-var', 'my_var', 'my var'],
         correctIndex: 2,
         explanation: 'Variable names can contain letters, numbers, underscores, and dollar signs. Cannot start with a number.'
+      },
+      {
+        id: 'js_var_code1',
+        topicId: 'js_variables',
+        question: 'Code Challenge: Declare a constant "PI" with value 3.14159, then log it to the console.',
+        type: 'code_challenge',
+        codeTemplate: '// Declare a constant PI with value 3.14159\n// Then log it to the console\n',
+        expectedOutput: '3.14159',
+        hint: 'Use: const PI = 3.14159; then console.log(PI);',
+        explanation: 'Constants are declared with the "const" keyword and cannot be reassigned.'
       }
     ],
     js_functions: [
