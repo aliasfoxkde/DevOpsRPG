@@ -91,11 +91,12 @@ export function generateQuests(): Quest[] {
 
     tech.topics.forEach((topic: Topic, index: number) => {
       // Difficulty: intro topics are 1, scales up to 5 based on position in technology
-      // Each technology has ~15% of its topics at each difficulty level
+      // Simpler formula: early topics are easy, later topics are harder
       const positionInTech = index + 1
       const totalTopics = tech.topics.length
       const techProgress = positionInTech / totalTopics
-      const difficulty = Math.min(5, Math.max(1, Math.ceil(techProgress * 4 + (tech.phase - 1) * 0.5))) as 1 | 2 | 3 | 4 | 5
+      // First 25% of topics = difficulty 1-2, middle = 3, last 25% = 4-5
+      const difficulty = Math.min(5, Math.max(1, Math.ceil(techProgress * 4))) as 1 | 2 | 3 | 4 | 5
 
       // Time estimates: intro topics are short (~5 min), scale up based on complexity
       // Basic intros: 3-5 min, advanced topics: 10-20 min

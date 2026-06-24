@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { getQuizForTopic } from '../../data/quizzes'
 
 export type QuestionType = 'multiple_choice' | 'true_false' | 'fill_blank'
@@ -29,6 +29,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   const [correctCount, setCorrectCount] = useState(0)
   const [wrongCount, setWrongCount] = useState(0)
   const [quizComplete, setQuizComplete] = useState(false)
+  const [localCorrect, setLocalCorrect] = useState(false)
 
   // If no quiz available, use a simplified check
   if (allQuestions.length === 0) {
@@ -60,31 +61,40 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   const isTrueFalse = questionType === 'true_false'
   const isFillBlank = questionType === 'fill_blank'
 
-  const checkAnswer = () => {
-    if (showExplanation) return false
+  // Handle 'n' key to auto-select correct answer and advance
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === 'n' && !showExplanation && !quizComplete) {
+        e.preventDefault()
+        // Auto-select the correct answer
+        if (current.correctIndex !== undefined) {
+          handleSelect(current.correctIndex)
+        } else if (current.correctAnswer) {
+          // For fill blank, auto-fill the correct answer
+          setTextAnswer(current.correctAnswer)
+          setShowExplanation(true)
+          setLocalCorrect(true)
+          setCorrectCount(c => c + 1)
+        }
+      }
+      // 'm' key to skip to next question
+      if (e.key.toLowerCase() === 'm' && showExplanation) {
+        e.preventDefault()
+        handleNext()
+      }
+    }
 
-    if (isMultipleChoice && current.correctIndex !== undefined) {
-      return selectedIndex === current.correctIndex
-    }
-    if (isTrueFalse && current.correctIndex !== undefined) {
-      return selectedIndex === current.correctIndex
-    }
-    if (isFillBlank && current.correctAnswer) {
-      const normalizedInput = textAnswer.trim().toLowerCase()
-      const normalizedCorrect = current.correctAnswer.toLowerCase()
-      // Accept partial matches for short answers
-      return normalizedInput === normalizedCorrect ||
-        normalizedCorrect.includes(normalizedInput) ||
-        normalizedInput.includes(normalizedCorrect)
-    }
-    return false
-  }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [current, showExplanation, quizComplete])
 
   const handleSelect = (index: number) => {
     if (showExplanation) return
     setSelectedIndex(index)
     setShowExplanation(true)
-    if (index === current.correctIndex) {
+    const isCorrect = index === current.correctIndex
+    setLocalCorrect(isCorrect)
+    if (isCorrect) {
       setCorrectCount(c => c + 1)
     } else {
       setWrongCount(c => c + 1)
@@ -94,7 +104,12 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   const handleTextSubmit = () => {
     if (showExplanation || !textAnswer.trim()) return
     setShowExplanation(true)
-    const isCorrect = checkAnswer()
+    const normalizedInput = textAnswer.trim().toLowerCase()
+    const normalizedCorrect = (current.correctAnswer || '').toLowerCase()
+    const isCorrect = normalizedInput === normalizedCorrect ||
+      normalizedCorrect.includes(normalizedInput) ||
+      normalizedInput.includes(normalizedCorrect)
+    setLocalCorrect(isCorrect)
     if (isCorrect) {
       setCorrectCount(c => c + 1)
     } else {
@@ -108,6 +123,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
       setSelectedIndex(null)
       setTextAnswer('')
       setShowExplanation(false)
+      setLocalCorrect(false)
     } else {
       setQuizComplete(true)
     }
@@ -174,8 +190,6 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
     )
   }
 
-  const isCorrect = checkAnswer()
-
   return (
     <div className="bg-slate-800/80 rounded-xl border border-amber-600/50 overflow-hidden">
       <div className="bg-gradient-to-r from-amber-900/30 via-slate-800 to-amber-900/30 px-6 py-4 border-b border-slate-700">
@@ -192,6 +206,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
             <span className="text-green-400">✓ {correctCount}</span>
             <span className="text-red-400">✗ {wrongCount}</span>
             <span className="text-slate-400">{currentIndex + 1}/{allQuestions.length}</span>
+            <span className="text-xs text-slate-500">Press N for correct, M for next</span>
           </div>
         </div>
       </div>
@@ -210,7 +225,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
               if (showExplanation) {
                 if (index === current.correctIndex) {
                   bgClass = 'bg-green-900/50 border-green-500'
-                } else if (index === selectedIndex && !isCorrect) {
+                } else if (index === selectedIndex) {
                   bgClass = 'bg-red-900/50 border-red-500'
                 }
               } else if (selectedIndex === index) {
@@ -239,7 +254,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
               if (showExplanation) {
                 if (index === current.correctIndex) {
                   bgClass = 'bg-green-900/50 border-green-500'
-                } else if (index === selectedIndex && !isCorrect) {
+                } else if (index === selectedIndex) {
                   bgClass = 'bg-red-900/50 border-red-500'
                 }
               } else if (selectedIndex === index) {
@@ -267,12 +282,14 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
               type="text"
               value={textAnswer}
               onChange={(e) => setTextAnswer(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && !showExplanation && handleTextSubmit()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !showExplanation) handleTextSubmit()
+              }}
               disabled={showExplanation}
               placeholder="Type your answer..."
               className={`w-full p-4 rounded-lg border text-lg text-white placeholder-slate-500 focus:outline-none transition-all ${
                 showExplanation
-                  ? isCorrect
+                  ? localCorrect
                     ? 'bg-green-900/50 border-green-500'
                     : 'bg-red-900/50 border-red-500'
                   : 'bg-slate-700 border-slate-600 focus:border-amber-500'
@@ -297,13 +314,18 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
 
         {/* Explanation */}
         {showExplanation && (
-          <div className={`mt-6 p-4 rounded-lg ${isCorrect ? 'bg-green-900/30 border border-green-700' : 'bg-amber-900/30 border border-amber-700'}`}>
-            <p className={`font-bold mb-2 ${isCorrect ? 'text-green-400' : 'text-amber-400'}`}>
-              {isCorrect ? '✓ Correct!' : '✗ Incorrect'}
+          <div className={`mt-6 p-4 rounded-lg ${localCorrect ? 'bg-green-900/30 border border-green-700' : 'bg-amber-900/30 border border-amber-700'}`}>
+            <p className={`font-bold mb-2 ${localCorrect ? 'text-green-400' : 'text-amber-400'}`}>
+              {localCorrect ? '✓ Correct!' : '✗ Incorrect'}
             </p>
-            {!isCorrect && current.correctAnswer && (
+            {!localCorrect && current.correctAnswer && (
               <p className="text-slate-300 mb-2">
                 Correct answer: <span className="text-green-400 font-bold">{current.correctAnswer}</span>
+              </p>
+            )}
+            {!localCorrect && current.correctIndex !== undefined && current.options && (
+              <p className="text-slate-300 mb-2">
+                Correct answer: <span className="text-green-400 font-bold">{current.options[current.correctIndex]}</span>
               </p>
             )}
             <p className="text-slate-300">{current.explanation}</p>
@@ -317,7 +339,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
               onClick={handleNext}
               className="px-6 py-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-lg shadow-lg transform transition-all hover:scale-105"
             >
-              {currentIndex < allQuestions.length - 1 ? 'Next Question →' : 'See Results'}
+              {currentIndex < allQuestions.length - 1 ? 'Next Question →' : 'See Results'} (M)
             </button>
           </div>
         )}

@@ -77,10 +77,22 @@ export function HUD() {
               🏠 Tavern
             </Link>
             <Link
+              to="/worldmap"
+              className="px-3 py-1 text-sm text-slate-300 hover:text-amber-400 hover:bg-slate-700/50 rounded transition-all"
+            >
+              🗺️ Map
+            </Link>
+            <Link
               to="/quests"
               className="px-3 py-1 text-sm text-slate-300 hover:text-amber-400 hover:bg-slate-700/50 rounded transition-all"
             >
               📜 Quests
+            </Link>
+            <Link
+              to="/leaderboard"
+              className="px-3 py-1 text-sm text-slate-300 hover:text-amber-400 hover:bg-slate-700/50 rounded transition-all"
+            >
+              🏆 Rank
             </Link>
             <Link
               to="/character"

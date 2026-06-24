@@ -17,6 +17,8 @@ import ProfilePage from './pages/ProfilePage'
 import RewardsPage from './pages/RewardsPage'
 import SideQuestsPage from './pages/SideQuestsPage'
 import SkillsPage from './pages/SkillsPage'
+import WorldMapPage from './pages/WorldMapPage'
+import LeaderboardPage from './pages/LeaderboardPage'
 
 // Toast types
 interface Toast {
@@ -58,6 +60,8 @@ function AppContent() {
           <Route path="rewards" element={<RewardsPage />} />
           <Route path="sidequests" element={<SideQuestsPage />} />
           <Route path="skills" element={<SkillsPage />} />
+          <Route path="worldmap" element={<WorldMapPage />} />
+          <Route path="leaderboard" element={<LeaderboardPage />} />
         </Route>
       </Routes>
       <VictoryModal />

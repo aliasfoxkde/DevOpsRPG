@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useGame } from '../contexts/GameContext'
 import { allQuests, realms } from '../data/quests'
@@ -12,6 +12,7 @@ export default function BattleArenaPage() {
   const navigate = useNavigate()
   const { completeQuest, isQuestCompleted, getNextQuest } = useGame()
   const [viewMode, setViewMode] = useState<ViewMode>('study')
+  const [justCompleted, setJustCompleted] = useState(false)
 
   const quest = allQuests.find(q => q.id === questId)
 
@@ -36,7 +37,18 @@ export default function BattleArenaPage() {
 
   const handleComplete = () => {
     completeQuest(quest.id)
+    setJustCompleted(true)
   }
+
+  // Auto-navigate to next quest after completion
+  useEffect(() => {
+    if (justCompleted && nextQuest) {
+      const timer = setTimeout(() => {
+        navigate(`/quest/${nextQuest.id}`)
+      }, 1500)
+      return () => clearTimeout(timer)
+    }
+  }, [justCompleted, nextQuest, navigate])
 
   const handleContinue = () => {
     if (nextQuest) {
@@ -195,16 +207,23 @@ export default function BattleArenaPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               {isCompleted ? (
                 <>
-                  <div className="text-center p-4 bg-green-900/30 rounded-xl border border-green-700/50">
-                    <span className="text-3xl">✅</span>
-                    <p className="text-green-400 font-bold mt-2">Quest Completed!</p>
+                  <div className={`text-center p-4 rounded-xl border ${justCompleted ? 'bg-green-900/50 border-green-500/50 animate-pulse' : 'bg-green-900/30 border-green-700/50'}`}>
+                    <span className="text-3xl">{justCompleted ? '🎉' : '✅'}</span>
+                    <p className={`font-bold mt-2 ${justCompleted ? 'text-green-300' : 'text-green-400'}`}>
+                      {justCompleted ? 'Excellent! Moving to next quest...' : 'Quest Completed!'}
+                    </p>
+                    {justCompleted && nextQuest && (
+                      <p className="text-sm text-green-200 mt-1">⚔️ {nextQuest.title}</p>
+                    )}
                   </div>
-                  <button
-                    onClick={handleContinue}
-                    className="px-6 sm:px-8 py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-lg shadow-lg transform transition-all hover:scale-105 text-sm sm:text-base"
-                  >
-                    {nextQuest ? `⚔️ Next: ${nextQuest.title}` : '🏆 View All Quests'}
-                  </button>
+                  {!justCompleted && (
+                    <button
+                      onClick={handleContinue}
+                      className="px-6 sm:px-8 py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-lg shadow-lg transform transition-all hover:scale-105 text-sm sm:text-base"
+                    >
+                      {nextQuest ? `⚔️ Next: ${nextQuest.title}` : '🏆 View All Quests'}
+                    </button>
+                  )}
                 </>
               ) : (
                 <>
