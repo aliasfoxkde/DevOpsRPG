@@ -87,7 +87,7 @@ export const worldMapLocations: MapLocation[] = [
     connectedTo: ['castle_grounds', 'citadel_entrance'],
   },
 
-  // Citadel of DevOps (final area)
+  // Citadel of DevOps
   {
     id: 'citadel_entrance',
     name: 'Citadel of DevOps',
@@ -95,9 +95,22 @@ export const worldMapLocations: MapLocation[] = [
     type: 'realm',
     realmId: 'devops',
     description: 'The final bastion. Only true DevOps Masters may enter.',
-    position: { x: 50, y: 20 },
+    position: { x: 50, y: 25 },
     unlocksAtLevel: 20,
-    connectedTo: ['cloud_base_camp', 'summit'],
+    connectedTo: ['cloud_base_camp', 'ai_nexus'],
+  },
+
+  // AI Nexus (new - Machine Learning & AI)
+  {
+    id: 'ai_nexus',
+    name: 'AI Nexus',
+    icon: '🧠',
+    type: 'realm',
+    realmId: 'aiintelligence',
+    description: 'The realm of machine learning, neural networks, and artificial intelligence.',
+    position: { x: 50, y: 10 },
+    unlocksAtLevel: 25,
+    connectedTo: ['citadel_entrance', 'summit'],
   },
 
   // Summit of Mastery (endgame)
@@ -107,8 +120,8 @@ export const worldMapLocations: MapLocation[] = [
     icon: '🏔️',
     type: 'milestone',
     description: 'The peak of DevOps mastery. You have become legendary!',
-    position: { x: 50, y: 5 },
-    connectedTo: ['citadel_entrance'],
+    position: { x: 50, y: 2 },
+    connectedTo: ['ai_nexus'],
     isSecret: true,
   },
 

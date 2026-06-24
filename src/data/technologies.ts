@@ -23,7 +23,7 @@ export interface Technology {
   topics: Topic[]
 }
 
-type CategoryKey = 'Foundations' | 'Backend Basics' | 'Frameworks & Databases' | 'Advanced & Cloud' | 'Modern DevOps'
+type CategoryKey = 'Foundations' | 'Backend Basics' | 'Frameworks & Databases' | 'Advanced & Cloud' | 'Modern DevOps' | 'AI & Intelligence'
 
 interface CategoryInfo {
   name: CategoryKey
@@ -38,6 +38,7 @@ export const categories: Record<string, CategoryInfo> = {
   'frameworks-databases': { name: 'Frameworks & Databases', phase: 3, icon: '🗄️', color: '#22c55e' },
   'advanced-cloud': { name: 'Advanced & Cloud', phase: 4, icon: '☁️', color: '#f59e0b' },
   'modern-devops': { name: 'Modern DevOps', phase: 5, icon: '🚀', color: '#ef4444' },
+  'ai-intelligence': { name: 'AI & Intelligence', phase: 6, icon: '🤖', color: '#7c3aed' },
 }
 
 export const technologies: Record<string, Omit<Technology, 'category'>> = {
@@ -418,6 +419,95 @@ export const technologies: Record<string, Omit<Technology, 'category'>> = {
       { id: 'sec_best_practices', name: 'Security Best Practices', slug: 'sec-best-practices', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 2 },
       { id: 'sec_secrets', name: 'Managing Secrets', slug: 'sec-secrets', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 3 },
       { id: 'sec_scanning', name: 'Security Scanning', slug: 'sec-scanning', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 4 },
+    ],
+  },
+
+  // Phase 6: Machine Learning & AI (Level 25+)
+  machine_learning: {
+    id: 'machine_learning',
+    name: 'Machine Learning',
+    slug: 'machine-learning',
+    phase: 6,
+    description: 'AI and Machine Learning fundamentals for data-driven DevOps',
+    icon: '🤖',
+    color: '#7c3aed',
+    xpPerTopic: 150,
+    estimatedHours: 30,
+    prerequisites: ['python', 'sql'],
+    topics: [
+      { id: 'ml_intro', name: 'ML Introduction', slug: 'ml-intro', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 1 },
+      { id: 'ml_types', name: 'Types of Machine Learning', slug: 'ml-types', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 2 },
+      { id: 'ml_supervised', name: 'Supervised Learning', slug: 'ml-supervised', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 3 },
+      { id: 'ml_unsupervised', name: 'Unsupervised Learning', slug: 'ml-unsupervised', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 4 },
+      { id: 'ml_neural_nets', name: 'Neural Networks', slug: 'ml-neural-nets', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 5 },
+      { id: 'ml_tensorflow', name: 'TensorFlow Basics', slug: 'ml-tensorflow', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 6 },
+      { id: 'ml_sklearn', name: 'Scikit-Learn', slug: 'ml-sklearn', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 7 },
+      { id: 'ml_mlops', name: 'MLOps Practices', slug: 'ml-mlops', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 8 },
+    ],
+  },
+
+  // Phase 6: Networking
+  networking: {
+    id: 'networking',
+    name: 'Networking',
+    slug: 'networking',
+    phase: 6,
+    description: 'Network fundamentals for DevOps engineers',
+    icon: '🌐',
+    color: '#0891b2',
+    xpPerTopic: 125,
+    estimatedHours: 20,
+    prerequisites: ['bash'],
+    topics: [
+      { id: 'net_intro', name: 'Networking Introduction', slug: 'net-intro', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 1 },
+      { id: 'net_tcpip', name: 'TCP/IP Protocol', slug: 'net-tcpip', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 2 },
+      { id: 'net_dns', name: 'DNS Fundamentals', slug: 'net-dns', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 3 },
+      { id: 'net_http', name: 'HTTP/HTTPS Protocol', slug: 'net-http', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 4 },
+      { id: 'net_loadbalancers', name: 'Load Balancers', slug: 'net-loadbalancers', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 5 },
+      { id: 'net_firewall', name: 'Firewalls', slug: 'net-firewall', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 6 },
+    ],
+  },
+
+  // Phase 6: API Design
+  api_design: {
+    id: 'api_design',
+    name: 'API Design',
+    slug: 'api-design',
+    phase: 6,
+    description: 'RESTful API design and GraphQL fundamentals',
+    icon: '🔌',
+    color: '#22c55e',
+    xpPerTopic: 125,
+    estimatedHours: 15,
+    prerequisites: ['javascript', 'nodejs'],
+    topics: [
+      { id: 'api_intro', name: 'API Introduction', slug: 'api-intro', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 1 },
+      { id: 'api_rest', name: 'REST API Design', slug: 'api-rest', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 2 },
+      { id: 'api_graphql', name: 'GraphQL Basics', slug: 'api-graphql', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 3 },
+      { id: 'api_auth', name: 'API Authentication', slug: 'api-auth', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 4 },
+      { id: 'api_versioning', name: 'API Versioning', slug: 'api-versioning', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 5 },
+      { id: 'api_docs', name: 'API Documentation', slug: 'api-docs', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 6 },
+    ],
+  },
+
+  // Phase 6: Observability
+  observability: {
+    id: 'observability',
+    name: 'Observability',
+    slug: 'observability',
+    phase: 6,
+    description: 'Grafana, Loki, and distributed tracing',
+    icon: '📈',
+    color: '#f59e0b',
+    xpPerTopic: 150,
+    estimatedHours: 18,
+    prerequisites: ['prometheus', 'kubernetes'],
+    topics: [
+      { id: 'obs_intro', name: 'Observability Introduction', slug: 'obs-intro', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 1 },
+      { id: 'obs_grafana', name: 'Grafana Dashboards', slug: 'obs-grafana', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 2 },
+      { id: 'obs_loki', name: 'Loki Log Aggregation', slug: 'obs-loki', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 3 },
+      { id: 'obs_tracing', name: 'Distributed Tracing', slug: 'obs-tracing', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 4 },
+      { id: 'obs_alerting', name: 'Alerting Best Practices', slug: 'obs-alerting', url: 'https://www.w3schools.com/quiztest/quiztest.asp', order: 5 },
     ],
   },
 }

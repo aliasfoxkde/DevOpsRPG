@@ -73,6 +73,15 @@ export const realms: Record<string, Realm> = {
     requiredLevel: 20,
     technologies: ['cicd', 'prometheus', 'security'],
   },
+  aiintelligence: {
+    id: 'aiintelligence',
+    name: 'AI Nexus',
+    icon: '🧠',
+    color: '#7c3aed',
+    description: 'The realm of machine learning, neural networks, and artificial intelligence.',
+    requiredLevel: 25,
+    technologies: ['machine_learning', 'networking', 'api_design', 'observability'],
+  },
 }
 
 // Generate quests from technologies
@@ -84,6 +93,7 @@ export function generateQuests(): Quest[] {
     3: 'frameworks',
     4: 'cloud',
     5: 'devops',
+    6: 'aiintelligence',
   }
 
   Object.values(technologies).forEach((tech: Omit<Technology, 'category'>) => {

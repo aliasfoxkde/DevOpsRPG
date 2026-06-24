@@ -1584,6 +1584,412 @@ export function generateQuizzes(): Record<string, QuizQuestion[]> {
         explanation: 'Hardcoded secrets end up in git history and can be exposed if the repo is public or compromised.'
       }
     ],
+
+    // Machine Learning Quizzes
+    ml_intro: [
+      {
+        id: 'ml_intro_q1',
+        topicId: 'ml_intro',
+        question: 'What is Machine Learning?',
+        options: [
+          'A programming language',
+          'A type of hardware',
+          'A subset of AI that enables systems to learn from data',
+          'A database management system'
+        ],
+        correctIndex: 2,
+        explanation: 'Machine Learning is a subset of AI that enables computers to learn from data without being explicitly programmed.'
+      },
+      {
+        id: 'ml_intro_q2',
+        topicId: 'ml_intro',
+        question: 'Which company developed TensorFlow?',
+        options: ['Facebook', 'Microsoft', 'Google', 'Amazon'],
+        correctIndex: 2,
+        explanation: 'TensorFlow was developed by Google Brain team and released as open source in 2015.'
+      }
+    ],
+    ml_types: [
+      {
+        id: 'ml_types_q1',
+        topicId: 'ml_types',
+        question: 'What are the main types of Machine Learning?',
+        options: [
+          'Supervised, Unsupervised, and Reinforcement',
+          'Classification, Regression, and Clustering',
+          'Linear, Non-linear, and Decision Tree',
+          'Neural, Deep, and Shallow'
+        ],
+        correctIndex: 0,
+        explanation: 'The three main types of ML are Supervised, Unsupervised, and Reinforcement learning.'
+      },
+      {
+        id: 'ml_types_q2',
+        topicId: 'ml_types',
+        question: 'Which type of ML uses labeled data?',
+        options: ['Unsupervised Learning', 'Reinforcement Learning', 'Supervised Learning', 'All types'],
+        correctIndex: 2,
+        explanation: 'Supervised Learning uses labeled datasets to train algorithms to classify data or predict outcomes.'
+      }
+    ],
+    ml_supervised: [
+      {
+        id: 'ml_sup_q1',
+        topicId: 'ml_supervised',
+        question: 'What is a common algorithm for classification problems?',
+        options: ['Linear Regression', 'K-Means', 'Decision Tree', 'PCA'],
+        correctIndex: 2,
+        explanation: 'Decision Trees are commonly used for classification problems. Linear Regression is for regression (continuous values).'
+      },
+      {
+        id: 'ml_sup_q2',
+        topicId: 'ml_supervised',
+        question: 'What is overfitting in ML?',
+        options: [
+          'When the model is too simple',
+          'When the model performs poorly on training data',
+          'When the model performs well on training data but poorly on new data',
+          'When the model uses too little data'
+        ],
+        correctIndex: 2,
+        explanation: 'Overfitting occurs when a model learns the training data too well but cannot generalize to new data.'
+      }
+    ],
+    ml_unsupervised: [
+      {
+        id: 'ml_unsup_q1',
+        topicId: 'ml_unsupervised',
+        question: 'What is clustering used for in Unsupervised Learning?',
+        options: [
+          'Predicting continuous values',
+          'Grouping similar data points together',
+          'Classifying data with labels',
+          'Training with labeled data'
+        ],
+        correctIndex: 1,
+        explanation: 'Clustering groups similar data points together based on their features, without pre-existing labels.'
+      },
+      {
+        id: 'ml_unsup_q2',
+        topicId: 'ml_unsupervised',
+        question: 'Which algorithm is commonly used for clustering?',
+        options: ['Linear Regression', 'Decision Tree', 'K-Means', 'Naive Bayes'],
+        correctIndex: 2,
+        explanation: 'K-Means is a popular clustering algorithm that partitions data into K clusters.'
+      }
+    ],
+    ml_neural_nets: [
+      {
+        id: 'ml_nn_q1',
+        topicId: 'ml_neural_nets',
+        question: 'What is a neuron in a neural network?',
+        options: [
+          'A biological cell in the brain',
+          'A function that receives inputs and produces an output',
+          'A type of hardware',
+          'A programming language'
+        ],
+        correctIndex: 1,
+        explanation: 'In neural networks, a neuron (or node) receives inputs, applies weights, sums them, and passes through an activation function.'
+      },
+      {
+        id: 'ml_nn_q2',
+        topicId: 'ml_neural_nets',
+        question: 'What is deep learning?',
+        options: [
+          'Learning with deep thoughts',
+          'Neural networks with many layers',
+          'Learning at a slow pace',
+          'A type of hardware acceleration'
+        ],
+        correctIndex: 1,
+        explanation: 'Deep learning uses neural networks with multiple hidden layers to learn hierarchical representations of data.'
+      }
+    ],
+
+    // Networking Quizzes
+    net_intro: [
+      {
+        id: 'net_intro_q1',
+        topicId: 'net_intro',
+        question: 'What does HTTP stand for?',
+        options: [
+          'Hyper Text Transfer Protocol',
+          'High Tech Transfer Protocol',
+          'Hyperlink Text Transfer Protocol',
+          'Home Tool Transfer Protocol'
+        ],
+        correctIndex: 0,
+        explanation: 'HTTP stands for Hyper Text Transfer Protocol - the foundation of data communication on the web.'
+      },
+      {
+        id: 'net_intro_q2',
+        topicId: 'net_intro',
+        question: 'What is the default port for HTTPS?',
+        options: ['80', '443', '8080', '22'],
+        correctIndex: 1,
+        explanation: 'HTTPS defaults to port 443, while HTTP defaults to port 80.'
+      }
+    ],
+    net_tcpip: [
+      {
+        id: 'net_tcp_q1',
+        topicId: 'net_tcpip',
+        question: 'What does TCP stand for?',
+        options: [
+          'Transfer Control Protocol',
+          'Transmission Control Protocol',
+          'Technical Control Protocol',
+          'Text Control Protocol'
+        ],
+        correctIndex: 1,
+        explanation: 'TCP stands for Transmission Control Protocol - it ensures reliable, ordered delivery of data.'
+      },
+      {
+        id: 'net_tcp_q2',
+        topicId: 'net_tcpip',
+        question: 'What is the difference between TCP and UDP?',
+        options: [
+          'TCP is faster than UDP',
+          'UDP is more reliable than TCP',
+          'TCP provides reliable, ordered delivery; UDP is faster but unreliable',
+          'There is no difference'
+        ],
+        correctIndex: 2,
+        explanation: "TCP ensures reliability and order with handshake and acknowledgments. UDP is simpler and faster but doesn't guarantee delivery."
+      }
+    ],
+    net_dns: [
+      {
+        id: 'net_dns_q1',
+        topicId: 'net_dns',
+        question: 'What does DNS stand for?',
+        options: [
+          'Domain Name System',
+          'Dynamic Network Service',
+          'Domain Network Setup',
+          'Data Name Service'
+        ],
+        correctIndex: 0,
+        explanation: 'DNS (Domain Name System) translates human-readable domain names into IP addresses.'
+      },
+      {
+        id: 'net_dns_q2',
+        topicId: 'net_dns',
+        question: 'What type of DNS record points to an IP address?',
+        options: ['A record', 'CNAME record', 'MX record', 'TXT record'],
+        correctIndex: 0,
+        explanation: 'A (Address) records point a domain name directly to an IPv4 IP address.'
+      }
+    ],
+    net_http: [
+      {
+        id: 'net_http_q1',
+        topicId: 'net_http',
+        question: 'Which HTTP method is used to create a resource?',
+        options: ['GET', 'POST', 'PUT', 'DELETE'],
+        correctIndex: 1,
+        explanation: 'POST is typically used to create new resources. PUT is used to update or create at a specific URI.'
+      },
+      {
+        id: 'net_http_q2',
+        topicId: 'net_http',
+        question: 'What status code indicates "Not Found"?',
+        options: ['200', '201', '404', '500'],
+        correctIndex: 2,
+        explanation: '404 is the standard status code for "Not Found" - the resource does not exist.'
+      }
+    ],
+
+    // API Design Quizzes
+    api_intro: [
+      {
+        id: 'api_intro_q1',
+        topicId: 'api_intro',
+        question: 'What does API stand for?',
+        options: [
+          'Application Programming Interface',
+          'Advanced Programming Integration',
+          'Application Process Interface',
+          'Automated Programming Interface'
+        ],
+        correctIndex: 0,
+        explanation: 'API stands for Application Programming Interface - a set of rules that allows software to communicate.'
+      },
+      {
+        id: 'api_intro_q2',
+        topicId: 'api_intro',
+        question: 'What is the purpose of an API?',
+        options: [
+          'To store data in a database',
+          'To allow different software applications to communicate',
+          'To render HTML pages',
+          'To manage operating system resources'
+        ],
+        correctIndex: 1,
+        explanation: 'APIs enable different software systems to communicate and share data without exposing implementation details.'
+      }
+    ],
+    api_rest: [
+      {
+        id: 'api_rest_q1',
+        topicId: 'api_rest',
+        question: 'What does REST stand for?',
+        options: [
+          'Representational State Transfer',
+          'Remote Execution State Transfer',
+          'Replicated State Transaction',
+          'Reliable State Transport'
+        ],
+        correctIndex: 0,
+        explanation: 'REST (Representational State Transfer) is an architectural style for web services.'
+      },
+      {
+        id: 'api_rest_q2',
+        topicId: 'api_rest',
+        question: 'Which HTTP method is idempotent?',
+        options: ['POST', 'PATCH', 'PUT', 'DELETE'],
+        correctIndex: 2,
+        explanation: 'PUT is idempotent - calling it multiple times produces the same result. POST and PATCH are not necessarily idempotent.'
+      }
+    ],
+    api_auth: [
+      {
+        id: 'api_auth_q1',
+        topicId: 'api_auth',
+        question: 'What does JWT stand for?',
+        options: [
+          'Java Web Token',
+          'JSON Web Token',
+          'JavaScript Web Token',
+          'JavaScript Web Transfer'
+        ],
+        correctIndex: 1,
+        explanation: 'JWT (JSON Web Token) is a compact, self-contained way to securely transmit information as JSON.'
+      },
+      {
+        id: 'api_auth_q2',
+        topicId: 'api_auth',
+        question: 'What is OAuth used for?',
+        options: [
+          'Database authentication',
+          'Authorization - granting access without sharing passwords',
+          'Email transmission',
+          'File encryption'
+        ],
+        correctIndex: 1,
+        explanation: 'OAuth allows users to grant third-party applications access to their resources without sharing passwords.'
+      }
+    ],
+
+    // Observability Quizzes
+    obs_intro: [
+      {
+        id: 'obs_intro_q1',
+        topicId: 'obs_intro',
+        question: 'What are the three pillars of observability?',
+        options: [
+          'Metrics, Logs, Traces',
+          'CPU, Memory, Network',
+          'Applications, Databases, Servers',
+          'Monitoring, Logging, Alerting'
+        ],
+        correctIndex: 0,
+        explanation: 'The three pillars are Metrics (numerical data), Logs (event records), and Traces (request paths).'
+      },
+      {
+        id: 'obs_intro_q2',
+        topicId: 'obs_intro',
+        question: 'What is observability in DevOps?',
+        options: [
+          'The ability to see infrastructure',
+          'The ability to understand internal system state from external outputs',
+          'Monitoring only',
+          'Logging only'
+        ],
+        correctIndex: 1,
+        explanation: 'Observability is the ability to understand internal system state from external outputs like metrics, logs, and traces.'
+      }
+    ],
+    obs_grafana: [
+      {
+        id: 'obs_graf_q1',
+        topicId: 'obs_grafana',
+        question: 'What is Grafana primarily used for?',
+        options: [
+          'Log aggregation',
+          'Distributed tracing',
+          'Data visualization and monitoring dashboards',
+          'Container orchestration'
+        ],
+        correctIndex: 2,
+        explanation: 'Grafana is an open-source platform for data visualization, monitoring, and alerting with customizable dashboards.'
+      },
+      {
+        id: 'obs_graf_q2',
+        topicId: 'obs_grafana',
+        question: 'Which database is commonly used with Grafana for metrics storage?',
+        options: ['MySQL', 'MongoDB', 'Prometheus', 'Redis'],
+        correctIndex: 2,
+        explanation: 'Prometheus is commonly used as a data source for Grafana, often deployed together in the Prometheus/Grafana stack.'
+      }
+    ],
+    obs_loki: [
+      {
+        id: 'obs_loki_q1',
+        topicId: 'obs_loki',
+        question: 'What is Loki primarily designed for?',
+        options: [
+          'Metrics collection',
+          'Distributed tracing',
+          'Log aggregation',
+          'Alert management'
+        ],
+        correctIndex: 2,
+        explanation: 'Loki is a horizontally-scalable, highly-available log aggregation system, designed to work with Grafana.'
+      },
+      {
+        id: 'obs_loki_q2',
+        topicId: 'obs_loki',
+        question: 'How does Loki differ from Elasticsearch for logs?',
+        options: [
+          'Loki indexes only labels, not log content',
+          'Loki is faster than Elasticsearch',
+          'Loki is a database while Elasticsearch is not',
+          'There is no difference'
+        ],
+        correctIndex: 0,
+        explanation: 'Loki only indexes metadata (labels) rather than full log content, making it more cost-effective than Elasticsearch.'
+      }
+    ],
+    obs_tracing: [
+      {
+        id: 'obs_trace_q1',
+        topicId: 'obs_tracing',
+        question: 'What is distributed tracing?',
+        options: [
+          'Tracing network cables',
+          'Tracking a request across multiple services',
+          'Debugging a single application',
+          'Monitoring server hardware'
+        ],
+        correctIndex: 1,
+        explanation: 'Distributed tracing tracks a request as it flows through multiple services in a microservices architecture.'
+      },
+      {
+        id: 'obs_trace_q2',
+        topicId: 'obs_tracing',
+        question: 'What is a span in distributed tracing?',
+        options: [
+          'A unit of work in a single service',
+          'A type of database',
+          'A monitoring tool',
+          'A network protocol'
+        ],
+        correctIndex: 0,
+        explanation: 'A span represents a single unit of work (operation) in a trace, with timing and metadata about that operation.'
+      }
+    ],
   }
 
   return quizzes
