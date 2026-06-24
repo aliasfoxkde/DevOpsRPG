@@ -8,6 +8,7 @@ import QuickMiniGame from '../components/ui/QuickMiniGame'
 import TreasureChest from '../components/ui/TreasureChest'
 import { getRandomLoot } from '../components/ui/TreasureChest'
 import CelebrationOverlay, { StreakBonus, MilestonePopup } from '../components/ui/CelebrationOverlay'
+import { RealmCompletionModal } from '../components/ui/RealmCompletionModal'
 
 type ViewMode = 'study' | 'quiz'
 
@@ -30,6 +31,7 @@ export default function BattleArenaPage() {
   const [milestoneData, setMilestoneData] = useState<{ icon: string; title: string; message: string; xpBonus: number } | null>(null)
   const [showBadge, setShowBadge] = useState(false)
   const [badgeData, setBadgeData] = useState<{ icon: string; name: string; description: string } | null>(null)
+  const [showRealmComplete, setShowRealmComplete] = useState(false)
 
   const quest = allQuests.find(q => q.id === questId)
 
@@ -110,6 +112,13 @@ export default function BattleArenaPage() {
       setTimeout(() => setShowBadge(true), 2500)
     }
   }, [game.lastVictory])
+
+  // Watch for realm completion
+  useEffect(() => {
+    if (game.showRealmCompletion) {
+      setTimeout(() => setShowRealmComplete(true), 3000)
+    }
+  }, [game.showRealmCompletion])
 
   const handleMiniGameComplete = (success: boolean, xpWon: number) => {
     setShowMiniGame(false)
@@ -424,6 +433,14 @@ export default function BattleArenaPage() {
               </button>
             </div>
           </div>
+        )}
+
+        {/* Realm Completion Modal */}
+        {showRealmComplete && game.showRealmCompletion && (
+          <RealmCompletionModal
+            realmId={game.showRealmCompletion}
+            onClose={() => setShowRealmComplete(false)}
+          />
         )}
 
         {/* Quest Navigation */}
