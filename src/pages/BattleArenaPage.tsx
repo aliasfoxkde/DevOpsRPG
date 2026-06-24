@@ -7,19 +7,25 @@ import Quiz from '../components/ui/Quiz'
 import QuickMiniGame from '../components/ui/QuickMiniGame'
 import TreasureChest from '../components/ui/TreasureChest'
 import { getRandomLoot } from '../components/ui/TreasureChest'
+import CelebrationOverlay, { StreakBonus } from '../components/ui/CelebrationOverlay'
 
 type ViewMode = 'study' | 'quiz'
 
 export default function BattleArenaPage() {
   const { questId } = useParams<{ questId: string }>()
   const navigate = useNavigate()
-  const { completeQuest, isQuestCompleted, getNextQuest, addXP, addGold } = useGame()
+  const { game, completeQuest, isQuestCompleted, getNextQuest, addXP, addGold } = useGame()
   const [viewMode, setViewMode] = useState<ViewMode>('study')
   const [justCompleted, setJustCompleted] = useState(false)
   const [showMiniGame, setShowMiniGame] = useState(false)
   const [chestLoot, setChestLoot] = useState<{ type: string; value: number; name: string; rarity: string } | null>(null)
   const [showChest, setShowChest] = useState(false)
   const [bonusXP, setBonusXP] = useState(0)
+  const [showEncounter, setShowEncounter] = useState(false)
+  const [encounterXP, setEncounterXP] = useState(0)
+  const [encounterGold, setEncounterGold] = useState(0)
+  const [showStreak, setShowStreak] = useState(false)
+  const [showConfetti, setShowConfetti] = useState(false)
 
   const quest = allQuests.find(q => q.id === questId)
 
@@ -46,6 +52,17 @@ export default function BattleArenaPage() {
     completeQuest(quest.id)
     setJustCompleted(true)
 
+    // Show confetti on completion
+    setShowConfetti(true)
+    setTimeout(() => setShowConfetti(false), 3000)
+
+    // Check for streak milestone
+    const streak = game.character.streakDays
+    if (streak >= 3 && streak % 7 === 0) {
+      setTimeout(() => setShowStreak(true), 500)
+      setTimeout(() => setShowStreak(false), 2500)
+    }
+
     // 25% chance for bonus mini-game
     if (Math.random() < 0.25) {
       setTimeout(() => setShowMiniGame(true), 800)
@@ -61,6 +78,19 @@ export default function BattleArenaPage() {
         setShowChest(true)
       }, 1200)
     }
+
+    // 20% chance for random encounter
+    if (Math.random() < 0.20) {
+      const encounterXPAmount = Math.floor(Math.random() * 30) + 20
+      const encounterGoldAmount = Math.floor(Math.random() * 15) + 10
+      setEncounterXP(encounterXPAmount)
+      setEncounterGold(encounterGoldAmount)
+      setTimeout(() => {
+        addXP(encounterXPAmount)
+        addGold(encounterGoldAmount)
+        setShowEncounter(true)
+      }, 1500)
+    }
   }
 
   const handleMiniGameComplete = (success: boolean, xpWon: number) => {
@@ -69,6 +99,10 @@ export default function BattleArenaPage() {
       addXP(xpWon)
       setBonusXP(xpWon)
     }
+  }
+
+  const handleEncounterComplete = () => {
+    setShowEncounter(false)
   }
 
   // Auto-navigate to next quest after completion
@@ -315,6 +349,33 @@ export default function BattleArenaPage() {
             </div>
           </div>
         )}
+
+        {/* Random Encounter popup */}
+        {showEncounter && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div className="text-center">
+              <span className="text-6xl">⚡</span>
+              <p className="mt-4 text-2xl font-bold text-orange-400">Random Event!</p>
+              <p className="text-slate-300 mt-2">You discovered a bonus reward!</p>
+              <div className="mt-4 flex items-center justify-center gap-4">
+                <span className="px-4 py-2 bg-amber-900/50 rounded-full text-amber-400 font-bold">+{encounterXP} XP</span>
+                <span className="px-4 py-2 bg-yellow-900/50 rounded-full text-yellow-400 font-bold">+{encounterGold} Gold</span>
+              </div>
+              <button
+                onClick={handleEncounterComplete}
+                className="mt-4 px-6 py-2 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-bold rounded-lg"
+              >
+                Claim! 🎉
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Confetti celebration */}
+        {showConfetti && <CelebrationOverlay />}
+
+        {/* Streak milestone celebration */}
+        {showStreak && <StreakBonus streak={game.character.streakDays} />}
 
         {/* Quest Navigation */}
         <div className="mt-12 pt-8 border-t border-slate-800">
