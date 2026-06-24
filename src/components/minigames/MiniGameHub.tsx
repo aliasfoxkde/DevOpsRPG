@@ -31,7 +31,7 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
 
     // Check for badges
     if (score >= maxScore * 0.8) {
-      grantBadge('speed-demon') // TODO: create actual badge IDs
+      grantBadge('speed_demon')
     }
   }
 

@@ -61,6 +61,17 @@ export interface GameState {
   completedRealms: string[] // Track which realms have been completed
   showRealmCompletion: string | null // Realm ID if showing realm completion modal
   hasSeenOnboarding: boolean // Track if user has completed onboarding
+  // Stats for badge unlocking
+  stats: {
+    quizCount: number
+    quizPerfectCount: number // Number of perfect quizzes (100%)
+    quizStreak: number // Current quiz streak
+    minigameCount: number
+    typerCount: number
+    memoryCount: number
+    mathCount: number
+    perfectQuiz: boolean // Had at least one perfect quiz
+  }
 }
 
 interface GameContextType {
@@ -91,6 +102,9 @@ interface GameContextType {
   allocateSkillPoint: (skillId: string) => boolean
   getSkillLevel: (skillId: string) => number
   getAvailableSkillPoints: () => number
+  // Stats tracking for badges
+  incrementStat: (stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame', isPerfect?: boolean) => void
+  resetQuizStreak: () => void
   // Realm completion
   dismissRealmCompletion: () => void
   // Onboarding
@@ -179,6 +193,16 @@ function createDefaultGame(): GameState {
     completedRealms: [],
     showRealmCompletion: null,
     hasSeenOnboarding: false,
+    stats: {
+      quizCount: 0,
+      quizPerfectCount: 0,
+      quizStreak: 0,
+      minigameCount: 0,
+      typerCount: 0,
+      memoryCount: 0,
+      mathCount: 0,
+      perfectQuiz: false,
+    },
   }
 }
 
@@ -578,15 +602,15 @@ export function GameProvider({ children }: { children: ReactNode }) {
         questCount: prev.completedQuests.length,
         streakDays: prev.character.streakDays,
         level: prev.character.level,
-        quizCount: 0,
-        minigameCount: 0,
-        perfectQuiz: false,
-        quizStreak: 0,
+        quizCount: prev.stats.quizCount,
+        minigameCount: prev.stats.minigameCount,
+        perfectQuiz: prev.stats.perfectQuiz,
+        quizStreak: prev.stats.quizStreak,
         techCompleted: [] as string[],
-        realmCompleted: 0,
-        typerCount: 0,
-        memoryCount: 0,
-        mathCount: 0,
+        realmCompleted: prev.completedRealms.length,
+        typerCount: prev.stats.typerCount,
+        memoryCount: prev.stats.memoryCount,
+        mathCount: prev.stats.mathCount,
       }
       const updated = prev.badges.map(b => {
         if (b.unlockedAt) return b
@@ -600,6 +624,44 @@ export function GameProvider({ children }: { children: ReactNode }) {
       return { ...prev, badges: updated }
     })
     return newlyUnlocked
+  }, [])
+
+  const incrementStat = useCallback((stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame', isPerfect?: boolean) => {
+    setGame(prev => {
+      const updates: Partial<GameState['stats']> = {}
+      switch (stat) {
+        case 'quiz':
+          updates.quizCount = prev.stats.quizCount + 1
+          if (isPerfect) {
+            updates.quizPerfectCount = prev.stats.quizPerfectCount + 1
+            updates.quizStreak = prev.stats.quizStreak + 1
+            updates.perfectQuiz = true
+          } else {
+            updates.quizStreak = 0
+          }
+          break
+        case 'typer':
+          updates.typerCount = prev.stats.typerCount + 1
+          break
+        case 'memory':
+          updates.memoryCount = prev.stats.memoryCount + 1
+          break
+        case 'math':
+          updates.mathCount = prev.stats.mathCount + 1
+          break
+        case 'minigame':
+          updates.minigameCount = prev.stats.minigameCount + 1
+          break
+      }
+      return { ...prev, stats: { ...prev.stats, ...updates } }
+    })
+  }, [])
+
+  const resetQuizStreak = useCallback(() => {
+    setGame(prev => ({
+      ...prev,
+      stats: { ...prev.stats, quizStreak: 0 }
+    }))
   }, [])
 
   const checkAndUnlockMilestones = useCallback((): Milestone[] => {
@@ -817,6 +879,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
         addXP,
         addGold,
         grantBadge,
+        // Stats tracking
+        incrementStat,
+        resetQuizStreak,
       }}
     >
       {children}
