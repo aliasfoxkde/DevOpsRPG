@@ -5,8 +5,6 @@ import { w3schoolsContent } from '../data/w3schools-content'
 import { Button } from '@/components/ui'
 import { Check } from 'lucide-react'
 
-const XP_PER_TOPIC = 25
-
 export default function TechnologyPage() {
   const { technology } = useParams()
   const tech = technologies[technology as keyof typeof technologies]
@@ -27,7 +25,7 @@ export default function TechnologyPage() {
 
   const handleMarkComplete = (topicId: string) => {
     /* istanbul ignore next - technology is always defined when this is called */
-    completeLearningTopic(topicId, technology ?? '', XP_PER_TOPIC)
+    completeLearningTopic(topicId, technology ?? '', tech.xpPerTopic)
   }
 
   const completedTopics = game.completedTopics.map(t => t.topicId)
@@ -137,14 +135,14 @@ export default function TechnologyPage() {
                     {isCompleted ? (
                       <>
                         <Check className="w-4 h-4 mr-2" aria-hidden="true" />
-                        Completed (+{XP_PER_TOPIC} XP)
+                        Completed (+{tech.xpPerTopic} XP)
                       </>
                     ) : (
-                      `Mark as Complete (+${XP_PER_TOPIC} XP)`
+                      `Mark as Complete (+${tech.xpPerTopic} XP)`
                     )}
                   </Button>
                   <span id={`topic-${topic.id}-desc`} className="sr-only">
-                    Mark this topic as complete to earn {XP_PER_TOPIC} XP
+                    Mark this topic as complete to earn {tech.xpPerTopic} XP
                   </span>
                 </div>
               </article>
