@@ -94,6 +94,9 @@ export interface GameState {
     fastestQuestTime: number // Fastest quest completion in seconds
     jackpotSpins: number // Times won 500+ gold on wheel
     mysteryBoxesOpened: number // Mystery boxes opened
+    challengeComplete: number // Challenge participation count
+    sidequestComplete: number // Side quest completion count
+    milestoneTier: number // Highest milestone tier reached
   }
 }
 
@@ -242,6 +245,9 @@ function createDefaultGame(): GameState {
       fastestQuestTime: Infinity,
       jackpotSpins: 0,
       mysteryBoxesOpened: 0,
+      challengeComplete: 0,
+      sidequestComplete: 0,
+      milestoneTier: 0,
     },
   }
 }
@@ -409,12 +415,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
         typerCount: prev.stats.typerCount,
         memoryCount: prev.stats.memoryCount,
         mathCount: prev.stats.mathCount,
+        wrongAnswerCount: prev.stats.wrongAnswerCount,
         // Derived stats for new badge requirement types
         allRealms: completedRealmIds.length >= 5,
-        allTechnologies: completedTechIds.length >= 40,
+        allTechnologies: completedTechIds.length >= 26, // 26 technologies total
         goldHoard: prev.character.gold,
         badgesEarned: prev.badges.filter(b => b.unlockedAt).length,
         earnedCategories: Array.from(earnedCategories),
+        challengeComplete: prev.stats.challengeComplete,
+        sidequestComplete: prev.stats.sidequestComplete,
+        milestoneTier: prev.stats.milestoneTier,
       }
 
       let newBadge: Badge | undefined

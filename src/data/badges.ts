@@ -80,7 +80,7 @@ export const BADGES: Badge[] = [
   // More secret/hidden badges
   { id: 'lucky_spin', name: 'Lucky!', description: 'Win the jackpot (500+ gold) on the bonus wheel', icon: '🎰', category: 'secret', rarity: 'rare', requirement: { type: 'jackpot_spin', value: 1 }, xpReward: 150, goldReward: 75 },
   { id: 'first_mystery', name: 'Mystery Solved', description: 'Open your first mystery box', icon: '🎁', category: 'secret', rarity: 'common', requirement: { type: 'mystery_open', value: 1 }, xpReward: 50, goldReward: 25 },
-  { id: 'streak_7_secret', name: 'Unstoppable', description: 'Maintain a 7-day streak', icon: '🔥', category: 'secret', rarity: 'uncommon', requirement: { type: 'streak_days', value: 7 }, xpReward: 100, goldReward: 50 },
+  { id: 'streak_7_secret', name: 'Unstoppable', description: 'Maintain a 21-day streak', icon: '🔥', category: 'secret', rarity: 'uncommon', requirement: { type: 'streak_days', value: 21 }, xpReward: 100, goldReward: 50 },
   { id: 'centurion', name: 'Centurion', description: 'Complete 100 quests', icon: '💯', category: 'secret', rarity: 'epic', requirement: { type: 'quest_count', value: 100 }, xpReward: 1000, goldReward: 500 },
   { id: 'all_realms', name: 'World Explorer', description: 'Complete all 5 realms', icon: '🗺️', category: 'secret', rarity: 'legendary', requirement: { type: 'all_realms', value: 5 }, xpReward: 2500, goldReward: 1250 },
   { id: 'all_tech', name: 'Tech Master', description: 'Complete quests in all technologies', icon: '🛠️', category: 'secret', rarity: 'epic', requirement: { type: 'all_technologies', value: 1 }, xpReward: 750, goldReward: 375 },
