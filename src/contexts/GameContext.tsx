@@ -266,13 +266,21 @@ export function GameProvider({ children }: { children: ReactNode }) {
         const stored = localStorage.getItem(STORAGE_KEY)
         if (stored) {
           const parsed = JSON.parse(stored)
+          const defaults = createDefaultGame()
+          // Merge stored data with defaults to ensure all fields exist
+          const merged = { ...defaults, ...parsed }
           // Ensure achievements are properly restored
-          if (!parsed.achievements) parsed.achievements = []
-          parsed.achievements = ACHIEVEMENTS.map(a => {
-            const stored = parsed.achievements.find((ua: Achievement) => ua.id === a.id)
+          merged.achievements = ACHIEVEMENTS.map(a => {
+            const stored = parsed.achievements?.find((ua: Achievement) => ua.id === a.id)
             return stored?.unlockedAt ? { ...a, unlockedAt: stored.unlockedAt } : a
           })
-          return parsed
+          // Ensure arrays exist
+          if (!merged.recentBadgeUnlocks) merged.recentBadgeUnlocks = []
+          if (!merged.recentMilestoneUnlocks) merged.recentMilestoneUnlocks = []
+          if (!Array.isArray(merged.badges)) merged.badges = []
+          if (!Array.isArray(merged.collectibles)) merged.collectibles = []
+          if (!Array.isArray(merged.completedRealms)) merged.completedRealms = []
+          return merged
         }
       } catch {
         return createDefaultGame()
