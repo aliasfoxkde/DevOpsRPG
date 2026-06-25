@@ -710,19 +710,46 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const reward = DAILY_REWARDS[day - 1]
       if (!reward) return prev
       result = reward.reward as typeof result
+
+      // Calculate streak bonus (scales with streak length)
+      const streakBonus = Math.min(prev.character.streakDays, 30) // Cap at 30x bonus
+      const streakMultiplier = 1 + (streakBonus * 0.05) // 5% bonus per streak day
+
       const newCollectibles = [...prev.collectibles]
       if (reward.reward.collectibleId) {
         const collectible = COLLECTIBLES_POOL.find(c => c.id === reward.reward.collectibleId)
-        if (collectible) newCollectibles.push({ ...collectible, used: false })
+        if (collectible) {
+          // Higher streak = chance for better collectible
+          if (prev.character.streakDays >= 7 && Math.random() < 0.3) {
+            const upgradedCollectible = COLLECTIBLES_POOL.find(c => c.id === 'xp_medium' || c.id === 'gold_medium')
+            if (upgradedCollectible) newCollectibles.push({ ...upgradedCollectible, used: false })
+          } else {
+            newCollectibles.push({ ...collectible, used: false })
+          }
+        }
       }
+
+      // Calculate XP/Gold rewards with streak bonus
+      const baseXp = reward.reward.type === 'xp' ? reward.reward.value || 0 : 0
+      const baseGold = reward.reward.type === 'gold' ? reward.reward.value || 0 : 0
+      const bonusXp = Math.floor(baseXp * (streakMultiplier - 1))
+      const bonusGold = Math.floor(baseGold * (streakMultiplier - 1))
+
+      // Chance for bonus streak shield at high streaks
+      let newStreakShields = prev.character.streakShields
+      if (prev.character.streakDays >= 14 && Math.random() < 0.15) {
+        newStreakShields += 1
+      }
+
       return {
         ...prev,
         dailyRewardsClaimed: [...prev.dailyRewardsClaimed, day],
         collectibles: newCollectibles,
         character: {
           ...prev.character,
-          xp: prev.character.xp + (reward.reward.value || 0),
-          gold: prev.character.gold + (reward.reward.type === 'gold' ? reward.reward.value || 0 : 0),
+          xp: prev.character.xp + baseXp + bonusXp,
+          gold: prev.character.gold + baseGold + bonusGold,
+          streakShields: newStreakShields,
         },
       }
     })
