@@ -59,10 +59,11 @@ function getRandomLoot(questDifficulty: number = 1): LootDrop {
 
 interface TreasureChestProps {
   questDifficulty?: number
+  preGeneratedLoot?: LootDrop | null
   onChestOpen?: (loot: LootDrop) => void
 }
 
-export default function TreasureChest({ questDifficulty = 1, onChestOpen }: TreasureChestProps) {
+export default function TreasureChest({ questDifficulty = 1, preGeneratedLoot, onChestOpen }: TreasureChestProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [loot, setLoot] = useState<LootDrop | null>(null)
   const [isAnimating, setIsAnimating] = useState(false)
@@ -71,7 +72,8 @@ export default function TreasureChest({ questDifficulty = 1, onChestOpen }: Trea
     if (isOpen || isAnimating) return
 
     setIsAnimating(true)
-    const droppedLoot = getRandomLoot(questDifficulty)
+    // Use pre-generated loot if provided, otherwise generate random
+    const droppedLoot = preGeneratedLoot || getRandomLoot(questDifficulty)
 
     // Delay to show chest opening animation
     setTimeout(() => {

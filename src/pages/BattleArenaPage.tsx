@@ -3,10 +3,10 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useGame } from '../contexts/GameContext'
 import { allQuests, realms } from '../data/quests'
 import { w3schoolsContent } from '../data/w3schools-content'
+import { technologies } from '../data/technologies'
 import Quiz from '../components/ui/Quiz'
 import QuickMiniGame from '../components/ui/QuickMiniGame'
-import TreasureChest from '../components/ui/TreasureChest'
-import { getRandomLoot } from '../components/ui/TreasureChest'
+import TreasureChest, { getRandomLoot, type LootDrop } from '../components/ui/TreasureChest'
 import CelebrationOverlay, { StreakBonus, MilestonePopup } from '../components/ui/CelebrationOverlay'
 import { RealmCompletionModal } from '../components/ui/RealmCompletionModal'
 
@@ -19,7 +19,7 @@ export default function BattleArenaPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('study')
   const [justCompleted, setJustCompleted] = useState(false)
   const [showMiniGame, setShowMiniGame] = useState(false)
-  const [chestLoot, setChestLoot] = useState<{ type: string; value: number; name: string; rarity: string } | null>(null)
+  const [chestLoot, setChestLoot] = useState<LootDrop | null>(null)
   const [showChest, setShowChest] = useState(false)
   const [bonusXP, setBonusXP] = useState(0)
   const [showEncounter, setShowEncounter] = useState(false)
@@ -43,6 +43,8 @@ export default function BattleArenaPage() {
   const minigameTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const chestTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const encounterTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Lock to prevent handleComplete being called multiple times
+  const completionLockRef = useRef(false)
 
   const quest = allQuests.find(q => q.id === questId)
   const nextQuest = quest ? getNextQuest() : null
@@ -84,8 +86,9 @@ export default function BattleArenaPage() {
   // Auto-navigate to next quest after completion
   useEffect(() => {
     if (justCompleted && nextQuest) {
+      const nextQuestId = nextQuest.id  // Capture at effect time to avoid stale closure
       const timer = setTimeout(() => {
-        navigate(`/quest/${nextQuest.id}`)
+        navigate(`/quest/${nextQuestId}`)
       }, 1500)
       return () => clearTimeout(timer)
     }
@@ -95,6 +98,9 @@ export default function BattleArenaPage() {
   useEffect(() => {
     return () => {
       if (confettiTimerRef.current) clearTimeout(confettiTimerRef.current)
+      if (milestoneTimerRef.current) clearTimeout(milestoneTimerRef.current)
+      if (badgeTimerRef.current) clearTimeout(badgeTimerRef.current)
+      if (realmTimerRef.current) clearTimeout(realmTimerRef.current)
       if (streakShowTimerRef.current) clearTimeout(streakShowTimerRef.current)
       if (streakHideTimerRef.current) clearTimeout(streakHideTimerRef.current)
       if (minigameTimerRef.current) clearTimeout(minigameTimerRef.current)
@@ -119,9 +125,15 @@ export default function BattleArenaPage() {
   const realm = realms[quest.realmId]
   const techContent = w3schoolsContent.technologies[quest.technologyId]
   const topicContent = techContent?.topics.find(t => t.id === quest.topicId)
+  const techData = technologies[quest.technologyId]
+  const topicUrl = techData?.topics.find(t => t.id === quest.topicId)?.url
   const isCompleted = isQuestCompleted(quest.id)
 
   const handleComplete = (isPerfect: boolean, wrongAnswers: number = 0, passedWith80: boolean = false) => {
+    // Prevent multiple calls from rapid clicks
+    if (completionLockRef.current) return
+    completionLockRef.current = true
+
     // Track quiz stats before completing (includes wrong answers for no_mistakes badge)
     incrementStat('quiz', isPerfect, wrongAnswers, passedWith80)
     completeQuest(quest.id)
@@ -148,8 +160,6 @@ export default function BattleArenaPage() {
       const loot = getRandomLoot(quest.difficulty)
       setChestLoot(loot)
       chestTimerRef.current = setTimeout(() => {
-        if (loot.type === 'xp') addXP(loot.value)
-        if (loot.type === 'gold') addGold(loot.value)
         setShowChest(true)
       }, 1200)
     }
@@ -327,8 +337,25 @@ export default function BattleArenaPage() {
                 ) : (
                   <div className="text-center py-8">
                     <p className="text-slate-400 mb-2">📚 Study Material</p>
-                    <p className="text-amber-400">Content for this topic is being prepared.</p>
-                    <p className="text-slate-500 text-sm mt-2">You can still complete the quest by taking the quiz!</p>
+                    {topicUrl ? (
+                      <>
+                        <p className="text-amber-400 mb-4">Learn from external resources:</p>
+                        <a
+                          href={topicUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg shadow-lg transition-colors"
+                        >
+                          📖 Open Learning Resource
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </a>
+                      </>
+                    ) : (
+                      <p className="text-amber-400">Study material available via quiz.</p>
+                    )}
+                    <p className="text-slate-500 text-sm mt-4">Complete the quiz below to earn XP!</p>
                   </div>
                 )}
               </div>
@@ -403,7 +430,10 @@ export default function BattleArenaPage() {
         {showChest && chestLoot && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div className="text-center">
-              <TreasureChest questDifficulty={quest.difficulty} onChestOpen={() => {}} />
+              <TreasureChest questDifficulty={quest.difficulty} preGeneratedLoot={chestLoot} onChestOpen={(loot) => {
+                if (loot.type === 'xp') addXP(loot.value)
+                if (loot.type === 'gold') addGold(loot.value)
+              }} />
               <p className="mt-4 text-2xl font-bold text-amber-400">{chestLoot.name}!</p>
               <p className="text-slate-400 mt-2 capitalize">{chestLoot.rarity} loot acquired!</p>
               <button
