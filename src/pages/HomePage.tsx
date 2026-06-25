@@ -173,7 +173,7 @@ export default function HomePage() {
                     Begin Battle: {nextQuest.title}
                   </h3>
                   <p className="text-slate-400 text-sm">
-                    {nextQuest.xpReward} XP • Difficulty: {'💀'.repeat(nextQuest.difficulty)} • ~{nextQuest.estimatedMinutes} min
+                    {nextQuest.xpReward} XP • Difficulty: {[1, 2, 3, 4, 5].map(i => <span key={i} className={i <= nextQuest.difficulty ? 'text-red-400' : 'text-slate-700'}>💀</span>)} • ~{nextQuest.estimatedMinutes} min
                   </p>
                 </div>
               </div>
@@ -322,6 +322,8 @@ export default function HomePage() {
                 <li><Link to="/character" className="text-slate-400 hover:text-amber-400 transition-colors">Character</Link></li>
                 <li><Link to="/games" className="text-slate-400 hover:text-amber-400 transition-colors">Game Library</Link></li>
                 <li><Link to="/about" className="text-slate-400 hover:text-amber-400 transition-colors">About</Link></li>
+                <li><Link to="/faq" className="text-slate-400 hover:text-amber-400 transition-colors">FAQ</Link></li>
+                <li><Link to="/privacy-policy" className="text-slate-400 hover:text-amber-400 transition-colors">Privacy Policy</Link></li>
               </ul>
             </div>
 

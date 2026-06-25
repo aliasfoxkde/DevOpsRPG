@@ -85,14 +85,17 @@ export default function BattleArenaPage() {
 
   // Auto-navigate to next quest after completion
   useEffect(() => {
-    if (justCompleted && nextQuest) {
-      const nextQuestId = nextQuest.id  // Capture at effect time to avoid stale closure
-      const timer = setTimeout(() => {
-        navigate(`/quest/${nextQuestId}`)
-      }, 1500)
-      return () => clearTimeout(timer)
+    if (justCompleted) {
+      // Calculate next quest AFTER completion to avoid stale closure
+      const actualNextQuest = getNextQuest()
+      if (actualNextQuest) {
+        const timer = setTimeout(() => {
+          navigate(`/quest/${actualNextQuest.id}`)
+        }, 1500)
+        return () => clearTimeout(timer)
+      }
     }
-  }, [justCompleted, nextQuest, navigate])
+  }, [justCompleted, getNextQuest, navigate])
 
   // Cleanup all pending timers on unmount
   useEffect(() => {
@@ -527,8 +530,12 @@ export default function BattleArenaPage() {
             </div>
             <div className="p-3 bg-slate-800/50 rounded-lg">
               <div className="text-slate-500 mb-1">Difficulty</div>
-              <div className="text-slate-200 font-medium text-xs sm:text-base">
-                {'💀'.repeat(quest.difficulty)}
+              <div className="flex gap-0.5">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <span key={i} className={i <= quest.difficulty ? 'text-red-400' : 'text-slate-700'}>
+                    💀
+                  </span>
+                ))}
               </div>
             </div>
             <div className="p-3 bg-slate-800/50 rounded-lg">

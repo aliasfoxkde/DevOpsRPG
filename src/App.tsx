@@ -9,6 +9,7 @@ import { RealmCompletionModal } from './components/ui/RealmCompletionModal'
 import { ToastManager } from './components/ui/CelebrationToast'
 import MentorChat from './components/ui/MentorChat'
 import KeyboardShortcutsHelp from './components/ui/KeyboardShortcutsHelp'
+import { BackToTop } from './components/ui/BackToTop'
 import { useKeyboardShortcuts } from './hooks'
 import Layout from './components/layout/Layout'
 import OnboardingWizard from './components/ui/OnboardingWizard'
@@ -28,6 +29,8 @@ const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'))
 const BadgesPage = lazy(() => import('./pages/BadgesPage'))
 const MilestonesPage = lazy(() => import('./pages/MilestonesPage'))
 const AboutPage = lazy(() => import('./pages/AboutPage'))
+const FaqPage = lazy(() => import('./pages/FaqPage'))
+const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'))
 const GameLibraryPage = lazy(() => import('./pages/GameLibraryPage'))
 
 // Loading fallback component
@@ -126,6 +129,8 @@ function AppContent() {
             <Route path="badges" element={<BadgesPage />} />
             <Route path="milestones" element={<MilestonesPage />} />
             <Route path="about" element={<AboutPage />} />
+            <Route path="faq" element={<FaqPage />} />
+            <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
             <Route path="games" element={<GameLibraryPage />} />
           </Route>
         </Routes>
@@ -140,6 +145,7 @@ function AppContent() {
       <ToastManager toasts={toasts} onRemove={removeToast} />
       <MentorChat />
       <KeyboardShortcutsHelp />
+      <BackToTop />
     </div>
   )
 }

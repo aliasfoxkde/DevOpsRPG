@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useGame } from '../../contexts/GameContext'
+import { useTheme } from '../../contexts/ThemeContext'
 import { XPBar } from './XPBar'
 
 const NAV_ITEMS = [
@@ -19,8 +20,19 @@ const NAV_ITEMS = [
 export function HUD() {
   const { game, completedCount, totalQuests } = useGame()
   const { character } = game
+  const { theme, resolvedTheme, setTheme } = useTheme()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const location = useLocation()
+
+  const themeIcons = { light: '☀️', dark: '🌙', system: '💻' }
+  const themeLabels = { light: 'Light', dark: 'Dark', system: 'System' }
+
+  const cycleTheme = () => {
+    const themes: ('light' | 'dark' | 'system')[] = ['light', 'dark', 'system']
+    const currentIndex = themes.indexOf(theme)
+    const nextIndex = (currentIndex + 1) % themes.length
+    setTheme(themes[nextIndex])
+  }
 
   return (
     <header className="sticky top-0 z-40 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 shadow-xl">
@@ -57,6 +69,15 @@ export function HUD() {
               <span className="text-yellow-400">💰</span>
               <span className="text-sm font-medium text-slate-300 hidden sm:inline">{character.gold}</span>
             </div>
+
+            {/* Theme Toggle */}
+            <button
+              onClick={cycleTheme}
+              className="flex items-center gap-1 p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
+              title={`Theme: ${themeLabels[theme]} (${resolvedTheme})`}
+            >
+              <span className="text-lg">{themeIcons[theme]}</span>
+            </button>
 
             {/* Avatar - Desktop */}
             <Link

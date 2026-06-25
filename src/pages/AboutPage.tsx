@@ -26,6 +26,34 @@ export default function AboutPage() {
           </div>
         </section>
 
+        {/* How It Works */}
+        <section className="bg-gradient-to-br from-amber-900/20 to-slate-800/50 rounded-2xl border border-amber-600/30 p-8 mb-8">
+          <h2 className="text-2xl font-bold text-amber-400 mb-6">⚔️ How It Works</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-amber-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-3xl">1️⃣</span>
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2">Choose Your Quest</h3>
+              <p className="text-slate-400 text-sm">Browse available quests across different realms and topics. Each quest has a difficulty level and XP reward.</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-amber-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-3xl">2️⃣</span>
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2">Battle & Learn</h3>
+              <p className="text-slate-400 text-sm">Answer questions based on real documentation. Complete quests to earn XP, level up, and unlock new areas.</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-amber-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-3xl">3️⃣</span>
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2">Level Up</h3>
+              <p className="text-slate-400 text-sm">Track your progress, earn achievements, maintain streaks, and become a DevOps master!</p>
+            </div>
+          </div>
+        </section>
+
         {/* AI Pipeline Experiment */}
         <section className="bg-gradient-to-br from-purple-900/30 to-slate-800/50 rounded-2xl border border-purple-600/30 p-8 mb-8">
           <h2 className="text-2xl font-bold text-purple-400 mb-4">🧪 AI Pipeline Experiment</h2>
