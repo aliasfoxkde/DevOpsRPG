@@ -392,6 +392,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
       }
 
       // Check for new badges with proper stats (use actual game stats)
+      // Calculate earned categories from already-unlocked badges
+      const earnedCategories = new Set(
+        prev.badges.filter(b => b.unlockedAt).map(b => b.category)
+      )
       const badgeStats = {
         questCount: completedCount,
         streakDays: newStreak,
@@ -409,6 +413,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
         allRealms: completedRealmIds.length >= 5,
         allTechnologies: completedTechIds.length >= 40,
         goldHoard: prev.character.gold,
+        badgesEarned: prev.badges.filter(b => b.unlockedAt).length,
+        earnedCategories: Array.from(earnedCategories),
       }
 
       let newBadge: Badge | undefined

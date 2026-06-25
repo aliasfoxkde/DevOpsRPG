@@ -231,10 +231,10 @@ export function generateQuizzes(): Record<string, QuizQuestion[]> {
         explanation: 'Use #idname to select an element with a specific ID attribute.'
       }
     ],
-    css_boxmodel: [
+    css_box_model: [
       {
         id: 'css_box_q1',
-        topicId: 'css_boxmodel',
+        topicId: 'css_box_model',
         question: 'What does the CSS box model include?',
         options: [
           'Only content',
@@ -247,7 +247,7 @@ export function generateQuizzes(): Record<string, QuizQuestion[]> {
       },
       {
         id: 'css_box_q2',
-        topicId: 'css_boxmodel',
+        topicId: 'css_box_model',
         question: 'Which CSS property adds space between content and border?',
         options: ['margin', 'padding', 'spacing', 'gap'],
         correctIndex: 1,
@@ -1198,10 +1198,10 @@ export function generateQuizzes(): Record<string, QuizQuestion[]> {
         explanation: 'EC2 (Elastic Compute Cloud) provides resizable compute capacity - virtual servers.'
       }
     ],
-    aws_ec2: [
+    'aws-ec2': [
       {
-        id: 'aws_ec2_q1',
-        topicId: 'aws_ec2',
+        id: 'aws-ec2_q1',
+        topicId: 'aws-ec2',
         question: 'What does EC2 stand for?',
         options: [
           'Elastic Compute Cloud',
@@ -1213,8 +1213,8 @@ export function generateQuizzes(): Record<string, QuizQuestion[]> {
         explanation: 'EC2 stands for Elastic Compute Cloud - AWS\'s resizable compute service.'
       },
       {
-        id: 'aws_ec2_q2',
-        topicId: 'aws_ec2',
+        id: 'aws-ec2_q2',
+        topicId: 'aws-ec2',
         question: 'What does "t2.micro" represent in AWS?',
         options: [
           'A storage type',
@@ -1226,10 +1226,10 @@ export function generateQuizzes(): Record<string, QuizQuestion[]> {
         explanation: 'Instance types like t2.micro specify the size (vCPUs, memory) and family of the instance.'
       }
     ],
-    aws_s3: [
+    'aws-s3': [
       {
-        id: 'aws_s3_q1',
-        topicId: 'aws_s3',
+        id: 'aws-s3_q1',
+        topicId: 'aws-s3',
         question: 'What does S3 stand for?',
         options: [
           'Simple Storage Service',
@@ -1241,8 +1241,8 @@ export function generateQuizzes(): Record<string, QuizQuestion[]> {
         explanation: 'S3 stands for Simple Storage Service - object storage in AWS.'
       },
       {
-        id: 'aws_s3_q2',
-        topicId: 'aws_s3',
+        id: 'aws-s3_q2',
+        topicId: 'aws-s3',
         question: 'What is an S3 bucket?',
         options: [
           'A compute resource',

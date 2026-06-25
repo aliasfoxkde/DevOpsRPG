@@ -521,7 +521,7 @@ export const technologies: Record<string, Omit<Technology, 'category'>> = {
     color: '#ef4444',
     xpPerTopic: 150,
     estimatedHours: 18,
-    prerequisites: ['linux', 'docker'],
+    prerequisites: ['bash', 'docker'],
     topics: [
       { id: 'ans_intro', name: 'Ansible Introduction', slug: 'ans-intro', url: 'https://docs.ansible.com/ansible/latest/getting_started/introduction.html', order: 1 },
       { id: 'ans_inventory', name: 'Ansible Inventory', slug: 'ans-inventory', url: 'https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html', order: 2 },

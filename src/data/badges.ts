@@ -171,6 +171,8 @@ export function shouldUnlockBadge(badge: Badge, stats: {
   goldHoard?: number
   firstLegendary?: boolean
   quizMasterScore?: number
+  badgesEarned?: number
+  earnedCategories?: string[]
 }): boolean {
   switch (badge.requirement.type) {
     case 'quest_count':
@@ -204,11 +206,18 @@ export function shouldUnlockBadge(badge: Badge, stats: {
     case 'speed_quest':
       return stats.fastestQuestTime != null && stats.fastestQuestTime > 0 && stats.fastestQuestTime <= badge.requirement.value * 60
     case 'all_categories':
-      // Requires badges from quest, streak, skill, and secret categories - tracked separately
-      return false // Must be tracked via badge unlock events
+      // Requires badges from quest, streak, skill, and secret categories
+      {
+        const requiredCategories = ['quest', 'streak', 'skill', 'secret']
+        const earned = stats.earnedCategories || []
+        return requiredCategories.every(cat => earned.includes(cat))
+      }
     case 'all_badges':
-      // Requires all other badges to be earned - tracked via badge unlock events
-      return false
+      // Requires all other badges to be earned (total badges minus these 2 meta-badges)
+      {
+        const totalBadges = BADGES.length - 2 // Exclude collector and completionist themselves
+        return (stats.badgesEarned || 0) >= totalBadges
+      }
     case 'jackpot_spin':
       return (stats.jackpotSpins || 0) >= badge.requirement.value
     case 'mystery_open':

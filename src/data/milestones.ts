@@ -106,7 +106,7 @@ export const REWARD_TIERS: RewardTier[] = [
   { id: 'tier_2', name: 'Journeyman Pack', description: 'Complete 15 quests', icon: '🎁', requirement: { type: 'quests', value: 15 }, rewards: { xp: 250, gold: 150, badge: 'journeyman' } },
   { id: 'tier_3', name: 'Expert Pack', description: 'Reach Level 10', icon: '🏺', requirement: { type: 'level', value: 10 }, rewards: { xp: 500, gold: 300, badge: 'expert', feature: 'hint_mode' } },
   { id: 'tier_4', name: 'Master Pack', description: 'Reach Level 15', icon: '💎', requirement: { type: 'level', value: 15 }, rewards: { xp: 1000, gold: 500, badge: 'master' } },
-  { id: 'tier_5', name: 'Grandmaster Pack', description: 'Complete all quests', icon: '👑', requirement: { type: 'quests', value: 118 }, rewards: { xp: 5000, gold: 2500, badge: 'grandmaster', feature: 'mentor_mode' } },
+  { id: 'tier_5', name: 'Grandmaster Pack', description: 'Complete all quests', icon: '👑', requirement: { type: 'quests', value: 163 }, rewards: { xp: 5000, gold: 2500, badge: 'grandmaster', feature: 'mentor_mode' } },
 ]
 
 // Check if milestone should trigger
