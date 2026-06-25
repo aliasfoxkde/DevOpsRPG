@@ -2572,6 +2572,143 @@ export function generateQuizzes(): Record<string, QuizQuestion[]> {
         explanation: 'Istio integrates with Jaeger and Zipkin for distributed tracing across microservices.'
       }
     ],
+
+    // GraphQL Quiz
+    api_graphql: [
+      {
+        id: 'api_graphql_q1',
+        topicId: 'api_graphql',
+        question: 'What type of API does GraphQL use?',
+        options: ['REST', 'Query-based', 'SOAP', 'RPC'],
+        correctIndex: 1,
+        explanation: 'GraphQL uses a query-based approach where clients specify exactly what data they need.'
+      },
+      {
+        id: 'api_graphql_q2',
+        topicId: 'api_graphql',
+        question: 'What is a GraphQL schema?',
+        options: ['Database structure', 'Type definitions for API', 'API endpoint', 'Request format'],
+        correctIndex: 1,
+        explanation: 'A GraphQL schema defines types and relationships for your API using SDL (Schema Definition Language).'
+      }
+    ],
+
+    // GitOps Quizzes
+    gitops_intro: [
+      {
+        id: 'gitops_intro_q1',
+        topicId: 'gitops_intro',
+        question: 'What is the core principle of GitOps?',
+        options: ['Code is law', 'Git is the source of truth', 'Automation is key', 'Containers only'],
+        correctIndex: 1,
+        explanation: 'GitOps uses Git repositories as the single source of truth for declarative infrastructure and applications.'
+      },
+      {
+        id: 'gitops_intro_q2',
+        topicId: 'gitops_intro',
+        question: 'What tool is commonly used for GitOps with Kubernetes?',
+        options: ['Docker', 'Argo CD', 'Jenkins', 'Maven'],
+        correctIndex: 1,
+        explanation: 'Argo CD is a declarative, GitOps continuous delivery tool for Kubernetes.'
+      }
+    ],
+
+    gitops_argocd: [
+      {
+        id: 'gitops_argocd_q1',
+        topicId: 'gitops_argocd',
+        question: 'What does Argo CD sync?',
+        options: ['Only code', 'Application state to Kubernetes', 'Docker images', 'CI pipelines'],
+        correctIndex: 1,
+        explanation: 'Argo CD syncs the desired application state in Git with the actual state running in Kubernetes.'
+      },
+      {
+        id: 'gitops_argocd_q2',
+        topicId: 'gitops_argocd',
+        question: 'What is Argo CD\'s deployment strategy?',
+        options: ['Manual only', 'GitOps automated', 'Scheduled', 'Manual approval required'],
+        correctIndex: 1,
+        explanation: 'Argo CD automatically deploys changes when Git repository is updated, following GitOps principles.'
+      }
+    ],
+
+    // MLOps Quizzes
+    ml_mlops: [
+      {
+        id: 'ml_mlops_q1',
+        topicId: 'ml_mlops',
+        question: 'What does MLOps stand for?',
+        options: ['Machine Learning Operations', 'Model Lifecycle Operations', 'Machine Language Optimization', 'Model Learning Operations'],
+        correctIndex: 0,
+        explanation: 'MLOps (Machine Learning Operations) applies DevOps principles to machine learning systems.'
+      },
+      {
+        id: 'ml_mlops_q2',
+        topicId: 'ml_mlops',
+        question: 'What is a key benefit of MLOps?',
+        options: ['Faster training', 'Reproducible ML pipelines', 'Bigger models', 'More data'],
+        correctIndex: 1,
+        explanation: 'MLOps enables reproducible ML pipelines with automated testing and deployment.'
+      }
+    ],
+
+    ml_sklearn: [
+      {
+        id: 'ml_sklearn_q1',
+        topicId: 'ml_sklearn',
+        question: 'What is scikit-learn primarily used for?',
+        options: ['Web development', 'Machine learning', 'Database management', 'Network programming'],
+        correctIndex: 1,
+        explanation: 'scikit-learn is a popular Python library for machine learning algorithms and tools.'
+      },
+      {
+        id: 'ml_sklearn_q2',
+        topicId: 'ml_sklearn',
+        question: 'What type of algorithm is Linear Regression in sklearn?',
+        options: ['Classification', 'Regression', 'Clustering', 'Dimensionality reduction'],
+        correctIndex: 1,
+        explanation: 'Linear Regression is a regression algorithm used for predicting continuous values.'
+      }
+    ],
+
+    ml_tensorflow: [
+      {
+        id: 'ml_tensorflow_q1',
+        topicId: 'ml_tensorflow',
+        question: 'What is a Tensor in TensorFlow?',
+        options: ['A type of neural network', 'A multi-dimensional array', 'A training step', 'An activation function'],
+        correctIndex: 1,
+        explanation: 'Tensors are multi-dimensional arrays - the core data structure in TensorFlow.'
+      },
+      {
+        id: 'ml_tensorflow_q2',
+        topicId: 'ml_tensorflow',
+        question: 'What is Keras in relation to TensorFlow?',
+        options: ['A separate language', 'An API for building neural networks', 'A database', 'A deployment tool'],
+        correctIndex: 1,
+        explanation: 'Keras is a high-level API built on TensorFlow that makes building neural networks easier.'
+      }
+    ],
+
+    // Networking Quizzes
+    net_loadbalancers: [
+      {
+        id: 'net_loadbalancers_q1',
+        topicId: 'net_loadbalancers',
+        question: 'What is the main purpose of a load balancer?',
+        options: ['Increase security', 'Distribute traffic across servers', 'Store data', 'Cache content'],
+        correctIndex: 1,
+        explanation: 'Load balancers distribute incoming traffic across multiple servers to ensure reliability and performance.'
+      },
+      {
+        id: 'net_loadbalancers_q2',
+        topicId: 'net_loadbalancers',
+        question: 'What is a health check in load balancing?',
+        options: ['Security scan', 'Server availability test', 'Data backup', 'Cache validation'],
+        correctIndex: 1,
+        explanation: 'Health checks monitor server health and route traffic away from unhealthy servers.'
+      }
+    ],
   }
 
   return quizzes
@@ -2579,12 +2716,35 @@ export function generateQuizzes(): Record<string, QuizQuestion[]> {
 
 export const quizzes = generateQuizzes()
 
+// Quiz topic ID aliases for mismatched naming conventions
+const QUIZ_ALIASES: Record<string, string[]> = {
+  'python_intro': ['py_intro'],
+  'python_syntax': ['py_syntax'],
+  'python_variables': ['py_variables', 'py_var'],
+  'python_lists': ['py_lists', 'py_list'],
+  'python_functions': ['py_functions', 'py_func'],
+  'css_boxmodel': ['css_box_model'],
+}
+
 // Get quiz for a specific topic
 export function getQuizForTopic(topicId: string): QuizQuestion[] {
-  return quizzes[topicId] || []
+  // Direct lookup first
+  if (quizzes[topicId]?.length) {
+    return quizzes[topicId]
+  }
+  // Try aliases for known mismatches
+  const aliases = QUIZ_ALIASES[topicId]
+  if (aliases) {
+    for (const alias of aliases) {
+      if (quizzes[alias]?.length) {
+        return quizzes[alias]
+      }
+    }
+  }
+  return []
 }
 
 // Check if a quiz exists for a topic
 export function hasQuiz(topicId: string): boolean {
-  return !!quizzes[topicId] && quizzes[topicId].length > 0
+  return getQuizForTopic(topicId).length > 0
 }
