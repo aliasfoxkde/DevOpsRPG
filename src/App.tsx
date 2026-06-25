@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from './contexts'
 import { GameProvider, useGame } from './contexts/GameContext'
@@ -11,20 +11,34 @@ import MentorChat from './components/ui/MentorChat'
 import KeyboardShortcutsHelp from './components/ui/KeyboardShortcutsHelp'
 import { useKeyboardShortcuts } from './hooks'
 import Layout from './components/layout/Layout'
-import HomePage from './pages/HomePage'
-import QuestJournalPage from './pages/QuestJournalPage'
-import BattleArenaPage from './pages/BattleArenaPage'
-import CharacterSheetPage from './pages/CharacterSheetPage'
-import ProfilePage from './pages/ProfilePage'
-import RewardsPage from './pages/RewardsPage'
-import SideQuestsPage from './pages/SideQuestsPage'
-import ChallengesPage from './pages/ChallengesPage'
-import SkillsPage from './pages/SkillsPage'
-import WorldMapPage from './pages/WorldMapPage'
-import LeaderboardPage from './pages/LeaderboardPage'
-import BadgesPage from './pages/BadgesPage'
-import MilestonesPage from './pages/MilestonesPage'
 import OnboardingWizard from './components/ui/OnboardingWizard'
+
+// Lazy load pages for code splitting
+const HomePage = lazy(() => import('./pages/HomePage'))
+const QuestJournalPage = lazy(() => import('./pages/QuestJournalPage'))
+const BattleArenaPage = lazy(() => import('./pages/BattleArenaPage'))
+const CharacterSheetPage = lazy(() => import('./pages/CharacterSheetPage'))
+const ProfilePage = lazy(() => import('./pages/ProfilePage'))
+const RewardsPage = lazy(() => import('./pages/RewardsPage'))
+const SideQuestsPage = lazy(() => import('./pages/SideQuestsPage'))
+const ChallengesPage = lazy(() => import('./pages/ChallengesPage'))
+const SkillsPage = lazy(() => import('./pages/SkillsPage'))
+const WorldMapPage = lazy(() => import('./pages/WorldMapPage'))
+const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'))
+const BadgesPage = lazy(() => import('./pages/BadgesPage'))
+const MilestonesPage = lazy(() => import('./pages/MilestonesPage'))
+
+// Loading fallback component
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="text-center">
+        <div className="text-4xl mb-4 animate-bounce">⚔️</div>
+        <div className="text-amber-400 font-bold">Loading...</div>
+      </div>
+    </div>
+  )
+}
 
 // Toast types
 interface Toast {
@@ -93,23 +107,25 @@ function AppContent() {
         <OnboardingWizard onComplete={() => setShowOnboarding(false)} />
       )}
       <HUD />
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<HomePage />} />
-          <Route path="quests" element={<QuestJournalPage />} />
-          <Route path="quest/:questId" element={<BattleArenaPage />} />
-          <Route path="character" element={<CharacterSheetPage />} />
-          <Route path="profile" element={<ProfilePage />} />
-          <Route path="rewards" element={<RewardsPage />} />
-          <Route path="sidequests" element={<SideQuestsPage />} />
-          <Route path="challenges" element={<ChallengesPage />} />
-          <Route path="skills" element={<SkillsPage />} />
-          <Route path="worldmap" element={<WorldMapPage />} />
-          <Route path="leaderboard" element={<LeaderboardPage />} />
-          <Route path="badges" element={<BadgesPage />} />
-          <Route path="milestones" element={<MilestonesPage />} />
-        </Route>
-      </Routes>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<HomePage />} />
+            <Route path="quests" element={<QuestJournalPage />} />
+            <Route path="quest/:questId" element={<BattleArenaPage />} />
+            <Route path="character" element={<CharacterSheetPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="rewards" element={<RewardsPage />} />
+            <Route path="sidequests" element={<SideQuestsPage />} />
+            <Route path="challenges" element={<ChallengesPage />} />
+            <Route path="skills" element={<SkillsPage />} />
+            <Route path="worldmap" element={<WorldMapPage />} />
+            <Route path="leaderboard" element={<LeaderboardPage />} />
+            <Route path="badges" element={<BadgesPage />} />
+            <Route path="milestones" element={<MilestonesPage />} />
+          </Route>
+        </Routes>
+      </Suspense>
       <VictoryModal />
       {game.showRealmCompletion && (
         <RealmCompletionModal
