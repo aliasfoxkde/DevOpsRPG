@@ -8,6 +8,16 @@ import { technologies } from '../data/technologies'
 
 export type CharacterClass = 'Cloud Knight' | 'Script Warrior' | 'Data Mage' | 'DevOps Sage'
 
+// Companion interface
+export interface Companion {
+  id: string
+  name: string
+  icon: string
+  xpBonus: number
+  goldBonus: number
+  specialAbility?: string
+}
+
 export interface Character {
   name: string
   class: CharacterClass
@@ -101,6 +111,9 @@ export interface GameState {
     milestoneTier: number // Highest milestone tier reached
     quizMasterScore: number // Quizzes passed with 80%+ score
   }
+  // Companions
+  companions: Companion[]
+  activeCompanion: Companion | null
 }
 
 interface GameContextType {
@@ -150,6 +163,9 @@ interface GameContextType {
   // Streak shields
   useStreakShield: () => boolean
   addStreakShield: (count?: number) => void
+  // Store & Companions
+  purchaseItem: (itemId: string, price: number) => boolean
+  equipCompanion: (companionId: string) => void
 }
 
 const STORAGE_KEY = 'devopsquest_game'
@@ -258,6 +274,8 @@ function createDefaultGame(): GameState {
       milestoneTier: 0,
       quizMasterScore: 0,
     },
+    companions: [],
+    activeCompanion: null,
   }
 }
 
@@ -1178,6 +1196,58 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }))
   }, [])
 
+  // Purchase item from shop
+  const COMPANIONS_DATA: Record<string, Companion> = {
+    owl: { id: 'owl', name: 'Wise Owl', icon: '🦉', xpBonus: 0.05, goldBonus: 0 },
+    cat: { id: 'cat', name: 'Lucky Cat', icon: '🐱', xpBonus: 0, goldBonus: 0.05 },
+    dragon: { id: 'dragon', name: 'Baby Dragon', icon: '🐲', xpBonus: 0.10, goldBonus: 0.10 },
+    phoenix: { id: 'phoenix', name: 'Phoenix', icon: '🦅', xpBonus: 0.20, goldBonus: 0.10, specialAbility: 'Weekly Streak Shield' },
+  }
+
+  const purchaseItem = useCallback((itemId: string, price: number): boolean => {
+    if (game.character.gold < price) return false
+
+    // Check if it's a companion purchase
+    if (itemId.startsWith('buy_companion_')) {
+      const companionKey = itemId.replace('buy_companion_', '')
+      const companion = COMPANIONS_DATA[companionKey]
+      if (companion) {
+        // Check if already owned
+        if (game.companions.some(c => c.id === companion.id)) return false
+
+        setGame(prev => ({
+          ...prev,
+          character: { ...prev.character, gold: prev.character.gold - price },
+          companions: [...prev.companions, companion],
+          activeCompanion: companion, // Auto-equip
+        }))
+        return true
+      }
+    }
+
+    // Check if it's a collectible purchase
+    const collectibleId = itemId.replace('buy_', '')
+    const collectible = COLLECTIBLES_POOL.find(c => c.id === collectibleId)
+    if (collectible) {
+      setGame(prev => ({
+        ...prev,
+        character: { ...prev.character, gold: prev.character.gold - price },
+        collectibles: [...prev.collectibles, { ...collectible, used: false }],
+      }))
+      return true
+    }
+
+    return false
+  }, [game.character.gold, game.companions])
+
+  // Equip a companion
+  const equipCompanion = useCallback((companionId: string) => {
+    const companion = game.companions.find(c => c.id === companionId)
+    if (companion) {
+      setGame(prev => ({ ...prev, activeCompanion: companion }))
+    }
+  }, [game.companions])
+
   return (
     <GameContext.Provider
       value={{
@@ -1227,6 +1297,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
         // Streak shields
         useStreakShield,
         addStreakShield,
+        // Store & Companions
+        purchaseItem,
+        equipCompanion,
       }}
     >
       {children}
