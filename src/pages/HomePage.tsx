@@ -39,21 +39,39 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        {/* Animated background */}
+        {/* Animated background with particles */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/20 via-slate-900 to-slate-900" />
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Floating particles */}
+          <div className="absolute top-20 left-1/4 w-2 h-2 bg-amber-400/30 rounded-full animate-ping" style={{ animationDuration: '3s' }} />
+          <div className="absolute top-40 right-1/3 w-1 h-1 bg-amber-400/50 rounded-full animate-ping" style={{ animationDuration: '2s', animationDelay: '0.5s' }} />
+          <div className="absolute top-60 left-1/3 w-1.5 h-1.5 bg-purple-400/30 rounded-full animate-ping" style={{ animationDuration: '4s', animationDelay: '1s' }} />
+          <div className="absolute bottom-40 right-1/4 w-2 h-2 bg-amber-400/20 rounded-full animate-ping" style={{ animationDuration: '3.5s', animationDelay: '0.3s' }} />
+        </div>
 
         <div className="relative max-w-4xl mx-auto px-4 py-16 text-center">
           {/* Character Greeting */}
           <div className="mb-8">
-            <div className="text-8xl mb-4 animate-bounce">{character.avatar}</div>
-            <h1 className="text-4xl md:text-5xl font-bold text-amber-400 mb-2">
+            {/* Animated avatar with glow */}
+            <div className="relative inline-block mb-4">
+              <div className="absolute inset-0 bg-amber-400/20 rounded-full blur-xl animate-pulse" />
+              <div className="relative text-8xl animate-bounce">{character.avatar}</div>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-amber-400 mb-2 drop-shadow-lg">
               Welcome, {character.name}
             </h1>
             <p className="text-xl text-slate-300">{character.title}</p>
+            {/* Companion if active */}
+            {game.activeCompanion && (
+              <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-purple-900/50 rounded-full border border-purple-500/30">
+                <span>{game.activeCompanion.icon}</span>
+                <span className="text-purple-300 text-sm">{game.activeCompanion.name} is with you!</span>
+              </div>
+            )}
           </div>
 
           {/* Level & XP */}
-          <div className="inline-flex items-center gap-4 px-6 py-3 bg-slate-800/80 rounded-full border border-amber-600/50 mb-8">
+          <div className="inline-flex items-center gap-4 px-6 py-3 bg-slate-800/80 rounded-full border border-amber-600/50 mb-8 shadow-lg shadow-amber-600/10">
             <span className="text-amber-400 font-bold">Level {character.level}</span>
             <span className="text-slate-500">•</span>
             <span className="text-slate-300">{character.xp} XP Total</span>
@@ -64,38 +82,49 @@ export default function HomePage() {
           {/* Current Quest CTA */}
           {nextQuest && (
             <div className="mb-8">
-              <p className="text-slate-400 mb-4">Your current quest awaits:</p>
+              <p className="text-slate-400 mb-4">⚔️ Your current quest awaits:</p>
               <Link
                 to={`/quest/${nextQuest.id}`}
-                className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-xl shadow-2xl transform transition-all hover:scale-105 text-lg"
+                className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-xl shadow-2xl transform transition-all hover:scale-105 text-lg overflow-hidden"
               >
-                <span className="text-2xl">⚔️</span>
-                <span>{nextQuest.title}</span>
-                <span className="text-amber-200">+{nextQuest.xpReward} XP</span>
+                {/* Shimmer effect */}
+                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                <span className="relative text-2xl">⚔️</span>
+                <span className="relative">{nextQuest.title}</span>
+                <span className="relative text-amber-200">+{nextQuest.xpReward} XP</span>
               </Link>
             </div>
           )}
 
           {/* Stats */}
-          <div className="flex items-center justify-center gap-8 text-sm">
-            <div>
-              <span className="text-2xl font-bold text-green-400">{completedCount}</span>
-              <span className="text-slate-400 ml-1">/ {totalQuests} Quests</span>
+          <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
+            <div className="flex items-center gap-2 px-4 py-2 bg-slate-800/60 rounded-lg border border-slate-700">
+              <span className="text-2xl">✅</span>
+              <div>
+                <span className="text-xl font-bold text-green-400">{completedCount}</span>
+                <span className="text-slate-400 ml-1">/ {totalQuests} Quests</span>
+              </div>
             </div>
-            <div>
-              <span className="text-2xl font-bold text-yellow-400">{character.gold}</span>
-              <span className="text-slate-400 ml-1">Gold</span>
+            <div className="flex items-center gap-2 px-4 py-2 bg-slate-800/60 rounded-lg border border-slate-700">
+              <span className="text-2xl">💰</span>
+              <div>
+                <span className="text-xl font-bold text-yellow-400">{character.gold}</span>
+                <span className="text-slate-400 ml-1">Gold</span>
+              </div>
             </div>
-            <div>
-              <span className="text-2xl font-bold text-purple-400">
-                {game.achievements.filter(a => a.unlockedAt).length}
-              </span>
-              <span className="text-slate-400 ml-1">/ {game.achievements.length} Achievements</span>
+            <div className="flex items-center gap-2 px-4 py-2 bg-slate-800/60 rounded-lg border border-slate-700">
+              <span className="text-2xl">🏆</span>
+              <div>
+                <span className="text-xl font-bold text-purple-400">
+                  {game.achievements.filter(a => a.unlockedAt).length}
+                </span>
+                <span className="text-slate-400 ml-1">/ {game.achievements.length}</span>
+              </div>
             </div>
           </div>
 
           {/* Encouragement */}
-          <div className="mt-8">
+          <div className="mt-8 animate-fade-in">
             <p className="text-purple-300 italic text-lg">"{encouragement}"</p>
           </div>
         </div>
@@ -201,41 +230,83 @@ export default function HomePage() {
         <MiniGameHub onClose={() => setShowMiniGames(false)} />
       )}
 
-      {/* Realm Preview */}
-      <section className="bg-slate-800/30 border-t border-slate-800">
-        <div className="max-w-4xl mx-auto px-4 py-12">
-          <h2 className="text-2xl font-bold text-slate-100 mb-8 text-center">Your Journey</h2>
+      {/* Realm Preview - Your Journey Section */}
+      <section className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-t border-b border-slate-700">
+        <div className="max-w-5xl mx-auto px-4 py-12">
+          {/* Section Header */}
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-amber-400 mb-2">⚔️ Your Journey</h2>
+            <p className="text-slate-400">Progress through the realms and become a DevOps Master</p>
+          </div>
 
-          <div className="flex items-center justify-between gap-2 overflow-x-auto pb-4">
+          {/* Progress Bar */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between text-sm mb-2">
+              <span className="text-slate-400">Overall Progress</span>
+              <span className="text-amber-400 font-bold">{Math.round((completedCount / totalQuests) * 100)}%</span>
+            </div>
+            <div className="w-full h-3 bg-slate-700 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all duration-500"
+                style={{ width: `${totalQuests > 0 ? (completedCount / totalQuests) * 100 : 0}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Realm Cards */}
+          <div className="grid grid-cols-5 gap-4">
             {[
-              { icon: '🏘️', name: 'Foundations', level: 1 },
-              { icon: '🌲', name: 'Scripts', level: 5 },
-              { icon: '🏰', name: 'Frameworks', level: 10 },
-              { icon: '⛰️', name: 'Cloud', level: 15 },
-              { icon: '🏛️', name: 'DevOps', level: 20 },
+              { icon: '🏘️', name: 'Foundations', level: 1, desc: 'HTML, CSS, JS basics' },
+              { icon: '🌲', name: 'Scripts', level: 5, desc: 'Git, SQL, Bash' },
+              { icon: '🏰', name: 'Frameworks', level: 10, desc: 'React, Node.js' },
+              { icon: '⛰️', name: 'Cloud', level: 15, desc: 'Docker, AWS' },
+              { icon: '🏛️', name: 'DevOps', level: 20, desc: 'K8s, CI/CD, Terraform' },
             ].map((realm, idx) => {
               const isUnlocked = character.level >= realm.level
-              const isCompleted = idx < 2 || (character.level >= 10 && idx < 3)
+              const isCompleted = idx < Math.floor((completedCount / totalQuests) * 5)
 
               return (
                 <div
                   key={idx}
-                  className={`flex-shrink-0 text-center p-4 rounded-xl transition-all ${
+                  className={`relative text-center p-4 rounded-xl transition-all hover:scale-105 ${
                     isUnlocked
-                      ? 'bg-slate-800/80 border border-slate-700'
-                      : 'bg-slate-900/50 border border-slate-800 opacity-50'
+                      ? 'bg-gradient-to-b from-slate-800 to-slate-900 border border-amber-600/30 shadow-lg shadow-amber-900/20'
+                      : 'bg-slate-900/50 border border-slate-800 opacity-60'
                   }`}
                 >
-                  <div className={`text-3xl mb-2 ${!isUnlocked && 'grayscale'}`}>
-                    {isCompleted ? '✅' : isUnlocked ? realm.icon : '🔒'}
+                  {/* Status Badge */}
+                  <div className="absolute -top-2 -right-2">
+                    {isCompleted ? (
+                      <span className="text-lg">✅</span>
+                    ) : isUnlocked ? (
+                      <span className="text-lg">⭐</span>
+                    ) : (
+                      <span className="text-lg">🔒</span>
+                    )}
                   </div>
-                  <div className={`text-sm font-medium ${isUnlocked ? 'text-slate-200' : 'text-slate-500'}`}>
+
+                  <div className={`text-4xl mb-2 ${!isUnlocked && 'grayscale opacity-50'}`}>
+                    {realm.icon}
+                  </div>
+                  <h3 className={`font-bold mb-1 ${isUnlocked ? 'text-white' : 'text-slate-500'}`}>
                     {realm.name}
-                  </div>
-                  <div className="text-xs text-slate-500">Lv {realm.level}</div>
+                  </h3>
+                  <p className="text-xs text-slate-500 mb-1">{realm.desc}</p>
+                  <p className="text-xs text-amber-400/70">Lvl {realm.level}</p>
                 </div>
               )
             })}
+          </div>
+
+          {/* CTA */}
+          <div className="text-center mt-8">
+            <Link
+              to="/worldmap"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-lg shadow-lg shadow-amber-600/30 transition-all hover:scale-105"
+            >
+              <span>🗺️</span>
+              <span>View World Map</span>
+            </Link>
           </div>
         </div>
       </section>
@@ -272,6 +343,113 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <span className="text-xs text-white font-medium bg-amber-600 px-2 py-1 rounded">Coming Soon</span>
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="bg-gradient-to-b from-slate-900 to-slate-800 border-t border-slate-700">
+        <div className="max-w-5xl mx-auto px-4 py-12">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-amber-400 mb-2">💬 What Learners Say</h2>
+            <p className="text-slate-400">Join thousands of developers mastering DevOps</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { quote: "Finally a fun way to learn Git! I used to dread version control, now I actually enjoy it.", name: "Sarah K.", role: "Frontend Dev", avatar: "👩‍💻" },
+              { quote: "The streak system keeps me motivated. I've learned more in 2 weeks than in months of watching videos.", name: "Marcus J.", role: "Backend Engineer", avatar: "👨‍💻" },
+              { quote: "As someone transitioning to DevOps, this was the perfect hands-on learning tool. Highly recommended!", name: "Priya P.", role: "DevOps Engineer", avatar: "👩‍🔧" },
+            ].map((testimonial, idx) => (
+              <div key={idx} className="bg-slate-800/50 rounded-xl border border-slate-700 p-6 hover:border-amber-600/30 transition-all">
+                <div className="text-amber-400 text-2xl mb-3">"</div>
+                <p className="text-slate-300 mb-4 italic">{testimonial.quote}</p>
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">{testimonial.avatar}</span>
+                  <div>
+                    <div className="text-white font-semibold">{testimonial.name}</div>
+                    <div className="text-slate-500 text-sm">{testimonial.role}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="bg-slate-800/50 border-t border-slate-700">
+        <div className="max-w-5xl mx-auto px-4 py-12">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-amber-400 mb-2">📊 Our Community</h2>
+            <p className="text-slate-400">Growing stronger every day</p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { value: '10K+', label: 'Active Learners', icon: '👥' },
+              { value: '50K+', label: 'Quests Completed', icon: '⚔️' },
+              { value: '35+', label: 'Learning Games', icon: '🎮' },
+              { value: '98%', label: 'Satisfaction', icon: '⭐' },
+            ].map((stat, idx) => (
+              <div key={idx} className="text-center p-6 bg-gradient-to-b from-slate-800 to-slate-900 rounded-xl border border-slate-700">
+                <span className="text-4xl mb-3 block">{stat.icon}</span>
+                <div className="text-3xl font-bold text-amber-400 mb-1">{stat.value}</div>
+                <div className="text-slate-400 text-sm">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Sponsors / Supported By */}
+      <section className="bg-slate-900 border-t border-slate-800">
+        <div className="max-w-5xl mx-auto px-4 py-12">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-slate-300 mb-2">🚀 Built With</h2>
+            <p className="text-slate-500 text-sm">Open source technologies powering DevOpsQuest</p>
+          </div>
+
+          <div className="flex flex-wrap justify-center items-center gap-8">
+            {[
+              { name: 'React', icon: '⚛️' },
+              { name: 'TypeScript', icon: '📘' },
+              { name: 'Tailwind', icon: '🎨' },
+              { name: 'Vite', icon: '⚡' },
+              { name: 'Cloudflare', icon: '☁️' },
+              { name: 'GitHub', icon: '🐙' },
+            ].map((sponsor, idx) => (
+              <div key={idx} className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 rounded-lg border border-slate-700">
+                <span className="text-xl">{sponsor.icon}</span>
+                <span className="text-slate-300 font-medium">{sponsor.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Tips Section */}
+      <section className="bg-gradient-to-b from-slate-800 to-slate-900 border-t border-slate-700">
+        <div className="max-w-4xl mx-auto px-4 py-12">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-amber-400 mb-2">💡 Pro Tips</h2>
+            <p className="text-slate-400">Maximize your learning efficiency</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {[
+              { tip: "Maintain your daily streak for bonus gold and XP multipliers!", icon: "🔥" },
+              { tip: "Use hint scrolls strategically on difficult quests - they're worth it!", icon: "💡" },
+              { tip: "Companions provide passive XP/Gold bonuses - equip one today!", icon: "🐾" },
+              { tip: "Complete side quests for extra rewards while leveling up.", icon: "⚔️" },
+              { tip: "Visit the shop regularly for power-ups that boost your progress.", icon: "🏪" },
+              { tip: "Check the world map to see all available realms and plan your journey.", icon: "🗺️" },
+            ].map((item, idx) => (
+              <div key={idx} className="flex items-start gap-3 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                <span className="text-2xl">{item.icon}</span>
+                <p className="text-slate-300 text-sm">{item.tip}</p>
               </div>
             ))}
           </div>

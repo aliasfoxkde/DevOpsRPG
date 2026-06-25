@@ -58,24 +58,55 @@ export function HUD() {
           {/* Right - Stats */}
           <div className="flex items-center gap-3">
             {/* Streak */}
-            <div className="flex items-center gap-1" title="Day Streak">
+            <div
+              className="flex items-center gap-1 relative group cursor-help"
+              title={`🔥 ${character.streakDays} day streak! ${character.streakDays >= 7 ? 'Amazing!' : character.streakDays >= 3 ? 'Keep it up!' : 'Build your streak!'}`}
+            >
               <span className={character.streakDays > 0 ? 'text-orange-400' : 'text-slate-500'}>
                 {character.streakDays > 3 ? '🔥' : '📅'}
               </span>
               <span className="text-sm font-medium text-slate-300 hidden sm:inline">{character.streakDays}</span>
+              {/* Tooltip */}
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 hidden group-hover:block">
+                🔥 {character.streakDays} day streak
+                <div className="text-xs text-slate-500">{character.streakDays >= 7 ? 'Legendary!' : character.streakDays >= 3 ? 'Great progress!' : 'Keep going!'}</div>
+              </div>
             </div>
 
             {/* Gold */}
-            <div className="flex items-center gap-1" title="Gold">
+            <div
+              className="flex items-center gap-1 relative group cursor-help"
+              title={`💰 ${character.gold} gold - Spend it in the Shop!`}
+            >
               <span className="text-yellow-400">💰</span>
               <span className="text-sm font-medium text-slate-300 hidden sm:inline">{character.gold}</span>
+              {/* Tooltip */}
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 hidden group-hover:block">
+                💰 {character.gold} gold
+                <div className="text-xs text-slate-500">Visit the Shop to buy items!</div>
+              </div>
             </div>
+
+            {/* XP Multiplier */}
+            {character.xpMultiplier > 1 && (
+              <div
+                className="flex items-center gap-1 relative group cursor-help"
+                title={`✨ ${character.xpMultiplier}x XP boost active!`}
+              >
+                <span className="text-green-400">✨</span>
+                <span className="text-sm font-medium text-green-400 hidden sm:inline">{character.xpMultiplier}x</span>
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 hidden group-hover:block">
+                  ✨ {character.xpMultiplier}x XP boost
+                  <div className="text-xs text-slate-500">Active until next quest!</div>
+                </div>
+              </div>
+            )}
 
             {/* Theme Toggle */}
             <button
               onClick={cycleTheme}
               className="flex items-center gap-1 p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
-              title={`Theme: ${themeLabels[theme]} (${resolvedTheme})`}
+              title={`Theme: ${themeLabels[theme]} (${resolvedTheme}) - Click to change`}
             >
               <span className="text-lg">{themeIcons[theme]}</span>
             </button>
@@ -84,6 +115,7 @@ export function HUD() {
             <Link
               to="/character"
               className="hidden md:flex items-center gap-2 px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
+              title="View your Character Sheet"
             >
               <span className="text-xl">{character.avatar}</span>
               <div className="text-left">
