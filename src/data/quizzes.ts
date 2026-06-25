@@ -2709,6 +2709,7 @@ export function generateQuizzes(): Record<string, QuizQuestion[]> {
         explanation: 'Health checks monitor server health and route traffic away from unhealthy servers.'
       }
     ],
+
   }
 
   return quizzes
