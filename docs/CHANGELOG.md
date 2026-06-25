@@ -42,13 +42,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - streak_7_secret fixed: 7-day → 21-day streak (was duplicate of streak_7)
 - Added challengeComplete, sidequestComplete, milestoneTier to GameState stats
 - Added missing max_level badge handler (badge would never unlock without it)
-- Quiz/topic ID mismatches fixed: css_boxmodel→css_box_model, aws_ec2→aws-ec2, aws_s3→aws-s3
-- tier_5 milestone requirement value fixed: 118 → 163 quests
-- all_categories badge now properly checks earnedCategories for quest/streak/skill/secret
-- all_badges badge now properly checks total badges earned
-- QuestJournalPage realm unlock now uses actual quest count instead of fixed *5 assumption
 - Python quiz IDs fixed: python_* → py_* to match topic IDs in technologies.ts
-- TechnologyPage now uses tech.xpPerTopic for correct XP rewards (25 → 75-200 based on technology)
+- Added quizMasterScore tracking for quiz_master badge (80%+ scores)
+- Added fastestQuestTime tracking for speed_demon badge
+- Added currentQuestStartTime to GameState
 
 ## [0.1.0] - 2026-06-22
 
