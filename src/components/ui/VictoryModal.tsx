@@ -81,15 +81,24 @@ export function VictoryModal() {
     }
   }, [game.showVictory, game.lastVictory, playSound])
 
-  // Handle 'n' key for continue
+  // Handle 'n' key for continue and Escape to close
   useEffect(() => {
     const handleNext = () => {
       if (game.showVictory) {
         dismissVictory()
       }
     }
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && game.showVictory) {
+        dismissVictory()
+      }
+    }
     window.addEventListener('game:next', handleNext)
-    return () => window.removeEventListener('game:next', handleNext)
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('game:next', handleNext)
+      window.removeEventListener('keydown', handleKeyDown)
+    }
   }, [game.showVictory, dismissVictory])
 
   if (!game.showVictory || !game.lastVictory) return null
@@ -97,13 +106,19 @@ export function VictoryModal() {
   const { xp, levelUp, newLevel, milestone, badge } = game.lastVictory
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+      onClick={dismissVictory}
+    >
       {/* Particles background */}
       <div className="absolute inset-0 overflow-hidden">
         <Particles show={showParticles} />
       </div>
 
-      <div className="relative w-full max-w-md bg-gradient-to-b from-amber-900/95 to-amber-950/95 border-2 border-amber-500 rounded-xl shadow-2xl overflow-hidden animate-[victory-scale_0.5s_ease-out]">
+      <div
+        className="relative w-full max-w-md bg-gradient-to-b from-amber-900/95 to-amber-950/95 border-2 border-amber-500 rounded-xl shadow-2xl overflow-hidden animate-[victory-scale_0.5s_ease-out]"
+        onClick={e => e.stopPropagation()}
+      >
         {/* Victory Header */}
         <div className="relative bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 py-8 text-center">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2IiBoZWlnaHQ9IjYiPgo8cmVjdCB3aWR0aD0iNiIgaGVpZ2h0PSI2IiBmaWxsPSIjZmZmIj8+CjwhLSkgPCEtLSBzaGFwZXN0eWxlczovIGJhc2gta2V5ZnJhbWVzK3N2ZyosIDpzdmcgKi8gdmlld0JveD0iMCAwIDYgNiIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSIgZGlzcGxheT0iaW5saW5lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8bGluZSB4MT0iMCIgeTE9IjAiIHgyPSI2IiB5Mj0iNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEiPgo8bGluZSB4MT0iNiIgeTE9IjAiIHgyPSIwLjc1IiB5Mj0iNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEiPgo8bGluZSB4MT0iMyIgeTE9IjAiIHgyPSIzLjI1IiB5Mj0iNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEiPgo8L3N2Zz4jKSkgZmlsdGVyPSJ1cmwoI2Jhc2gta2V5ZnJhbWVzK3N2ZyopIiBvcGFjaXR5PSIwLjM1IiBzdHlsZT0iZGlzcGxheTppbmxpbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjwhLS0+CjxnIGZvcm1hdD0idmlzaWJsZSIgaWQ9ImEiIHN0eWxlPSJkaXNwbGF5OmlubGluZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGxpbmUgeDE9IjAiIHkxPSIwIiB4Mj0iNiIgeTI9IjYiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMSI+PC9saW5lPgo8bGluZSB4MT0iNiIgeTE9IjAiIHgyPSIwLjc1IiB5Mj0iNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIxIj48L2xpbmU+CjxsaW5lIHgxPSIzIiB5MT0iMCIgeDI9IjMuMjUiIHkyPSI2IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjEiPjwvbGluZT4KPC9nPgo8IS0tPjwvc3ZnPg==')] opacity-30" />
