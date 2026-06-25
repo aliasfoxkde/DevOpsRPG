@@ -17,10 +17,10 @@ export function CommandTyper({ category, rounds = 5, onComplete, onSkip }: Comma
   const [correctCount, setCorrectCount] = useState(0)
   const [wrongCount, setWrongCount] = useState(0)
   const [gameState, setGameState] = useState<'playing' | 'finished'>('playing')
-  const [charStates, setCharStates] = useState<('correct' | 'wrong' | 'pending')[]>(() => {
-    const cmds = getRandomCommands(rounds, category)
-    return new Array(cmds[0]?.command.length || 0).fill('pending')
-  })
+  // Initialize charStates based on first command - must stay in sync with gameCommands
+  const [charStates, setCharStates] = useState<('correct' | 'wrong' | 'pending')[]>(() =>
+    new Array(gameCommands[0]?.command.length || 0).fill('pending')
+  )
   const inputRef = useRef<HTMLInputElement>(null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
