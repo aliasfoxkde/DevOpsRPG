@@ -46,6 +46,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added quizMasterScore tracking for quiz_master badge (80%+ scores)
 - Added fastestQuestTime tracking for speed_demon badge
 - Added currentQuestStartTime to GameState
+- allRealms/allTechnologies now derived from data (Object.keys)
+- XP_PER_LEVEL consolidated: exported from GameContext, removed from ProfilePage/XPBar/DashboardPage
+- Added 'challenge' to incrementStat type; ChallengesPage tracks challengeComplete on claim
 
 ## [0.1.0] - 2026-06-22
 
