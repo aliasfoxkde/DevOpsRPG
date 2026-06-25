@@ -31,6 +31,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Wrong answer tracking added for no_mistakes badge support
 - grantBadge now properly triggers recentBadgeUnlocks for celebration UI
 - Removed deprecated helper badge (help_count requirement not implemented)
+- Ansible prerequisite fixed: 'linux' → 'bash' (linux technology doesn't exist)
+- Quiz/topic ID mismatches fixed: css_boxmodel→css_box_model, aws_ec2→aws-ec2, aws_s3→aws-s3
+- tier_5 milestone requirement value fixed: 118 → 163 quests
+- all_categories badge now properly checks earnedCategories for quest/streak/skill/secret
+- all_badges badge now properly checks total badges earned
+- QuestJournalPage realm unlock now uses actual quest count instead of fixed *5 assumption
 
 ## [0.1.0] - 2026-06-22
 
