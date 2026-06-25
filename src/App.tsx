@@ -8,6 +8,7 @@ import { VictoryModal } from './components/ui/VictoryModal'
 import { RealmCompletionModal } from './components/ui/RealmCompletionModal'
 import { ToastManager } from './components/ui/CelebrationToast'
 import MentorChat from './components/ui/MentorChat'
+import KeyboardShortcutsHelp from './components/ui/KeyboardShortcutsHelp'
 import { useKeyboardShortcuts } from './hooks'
 import Layout from './components/layout/Layout'
 import HomePage from './pages/HomePage'
@@ -118,6 +119,7 @@ function AppContent() {
       )}
       <ToastManager toasts={toasts} onRemove={removeToast} />
       <MentorChat />
+      <KeyboardShortcutsHelp />
     </div>
   )
 }
