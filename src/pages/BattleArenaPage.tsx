@@ -325,9 +325,10 @@ export default function BattleArenaPage() {
                     )}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-slate-500">
-                    <p>Content coming soon for this topic.</p>
-                    <p className="text-sm mt-2">Check back after The Great Rebuild!</p>
+                  <div className="text-center py-8">
+                    <p className="text-slate-400 mb-2">📚 Study Material</p>
+                    <p className="text-amber-400">Content for this topic is being prepared.</p>
+                    <p className="text-slate-500 text-sm mt-2">You can still complete the quest by taking the quiz!</p>
                   </div>
                 )}
               </div>

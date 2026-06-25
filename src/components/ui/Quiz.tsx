@@ -196,18 +196,18 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
           </h2>
         </div>
         <div className="p-6 text-center">
-          <div className="text-4xl mb-4">📚</div>
-          <p className="text-slate-300 mb-4">No quiz available for this topic yet.</p>
+          <div className="text-4xl mb-4">📝</div>
+          <p className="text-amber-400 mb-4">Knowledge Check</p>
           <p className="text-slate-400 text-sm mb-6">
-            Prove you've learned something! Type what you learned in this topic:
+            Demonstrate your learning! Type one key takeaway from this topic:
           </p>
           <textarea
-            placeholder="I learned that..."
+            placeholder="The main thing I learned was..."
             className="w-full p-4 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 resize-none mb-4"
             rows={3}
           />
-          <p className="text-amber-400 text-sm mb-4">
-            ⭐ +50 XP bonus for completing without a quiz!
+          <p className="text-purple-400 text-sm mb-4">
+            ✨ Complete this quest to earn XP!
           </p>
           <button
             onClick={() => onPass(false, 0, false)}
