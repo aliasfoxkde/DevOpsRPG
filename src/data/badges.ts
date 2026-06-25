@@ -243,6 +243,8 @@ export function shouldUnlockBadge(badge: Badge, stats: {
     case 'quiz_master':
       // Requires 50 quizzes with 80%+ score - tracked via quizMasterScore
       return (stats.quizMasterScore || 0) >= badge.requirement.value
+    case 'max_level':
+      return stats.level >= badge.requirement.value
     default:
       return false
   }
