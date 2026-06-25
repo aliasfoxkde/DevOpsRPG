@@ -32,6 +32,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - grantBadge now properly triggers recentBadgeUnlocks for celebration UI
 - Removed deprecated helper badge (help_count requirement not implemented)
 - Ansible prerequisite fixed: 'linux' → 'bash' (linux technology doesn't exist)
+- Quiz/topic ID mismatches fixed: css_boxmodel→css_box_model, aws_ec2→aws-ec2, aws_s3→aws-s3, python_*→py_*
+- tier_5 milestone requirement value fixed: 118 → 163 quests
+- all_categories badge now properly checks earnedCategories for quest/streak/skill/secret
+- all_badges badge now properly checks total badges earned
+- QuestJournalPage realm unlock now uses actual quest count instead of fixed *5 assumption
+- TechnologyPage now uses tech.xpPerTopic for correct XP rewards (25 → 75-200 based on technology)
+- all_technologies badge threshold fixed: 40 → 26 (actual tech count)
+- streak_7_secret fixed: 7-day → 21-day streak (was duplicate of streak_7)
+- Added challengeComplete, sidequestComplete, milestoneTier to GameState stats
 - Quiz/topic ID mismatches fixed: css_boxmodel→css_box_model, aws_ec2→aws-ec2, aws_s3→aws-s3
 - tier_5 milestone requirement value fixed: 118 → 163 quests
 - all_categories badge now properly checks earnedCategories for quest/streak/skill/secret
