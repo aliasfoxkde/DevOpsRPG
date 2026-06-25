@@ -41,6 +41,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - all_technologies badge threshold fixed: 40 → 26 (actual tech count)
 - streak_7_secret fixed: 7-day → 21-day streak (was duplicate of streak_7)
 - Added challengeComplete, sidequestComplete, milestoneTier to GameState stats
+- Added missing max_level badge handler (badge would never unlock without it)
 - Quiz/topic ID mismatches fixed: css_boxmodel→css_box_model, aws_ec2→aws-ec2, aws_s3→aws-s3
 - tier_5 milestone requirement value fixed: 118 → 163 quests
 - all_categories badge now properly checks earnedCategories for quest/streak/skill/secret
