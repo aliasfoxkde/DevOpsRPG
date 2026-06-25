@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface TriviaQuestion {
   question: string
@@ -94,6 +94,23 @@ function TriviaGame({ onComplete, onSkip, xpBonus }: { onComplete: (s: boolean, 
   const [selected, setSelected] = useState<number | null>(null)
   const [showResult, setShowResult] = useState(false)
 
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onSkip()
+        return
+      }
+      if (e.key.toLowerCase() === 'n' && !showResult) {
+        // Auto-select correct answer for testing
+        setSelected(question.correctIndex)
+        setShowResult(true)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [onSkip, showResult, question.correctIndex])
+
   const handleAnswer = (index: number) => {
     setSelected(index)
     setShowResult(true)
@@ -111,9 +128,18 @@ function TriviaGame({ onComplete, onSkip, xpBonus }: { onComplete: (s: boolean, 
             <h3 className="text-xl font-bold text-white flex items-center gap-2">
               🎯 Quick Trivia!
             </h3>
-            <span className="text-amber-400 font-bold">+{xpBonus} XP</span>
+            <div className="flex items-center gap-3">
+              <span className="text-amber-400 font-bold">+{xpBonus} XP</span>
+              <button
+                onClick={onSkip}
+                className="text-slate-400 hover:text-white text-xl leading-none"
+                title="Close (Esc)"
+              >
+                ×
+              </button>
+            </div>
           </div>
-          <p className="text-purple-300 text-sm mt-1">Answer correctly for bonus XP!</p>
+          <p className="text-purple-300 text-sm mt-1">Answer correctly for bonus XP! (N=auto solve, Esc=skip)</p>
         </div>
 
         <div className="p-6">
@@ -172,13 +198,36 @@ function TriviaGame({ onComplete, onSkip, xpBonus }: { onComplete: (s: boolean, 
   )
 }
 
-function MatchingGame({ onComplete, xpBonus }: { onComplete: (s: boolean, x: number) => void; onSkip: () => void; xpBonus: number }) {
+function MatchingGame({ onComplete, onSkip, xpBonus }: { onComplete: (s: boolean, x: number) => void; onSkip: () => void; xpBonus: number }) {
   const [pairs] = useState(() => MATCHING_GAMES[Math.floor(Math.random() * MATCHING_GAMES.length)])
   const [termOrder] = useState(() => [...pairs].sort(() => Math.random() - 0.5))
   const [defOrder] = useState(() => [...pairs].sort(() => Math.random() - 0.5))
   const [selectedTermIdx, setSelectedTermIdx] = useState<number | null>(null)
   const [matchedPairs, setMatchedPairs] = useState<Set<number>>(new Set())
   const [wrongDefIdx, setWrongDefIdx] = useState<number | null>(null)
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onSkip()
+        return
+      }
+      if (e.key.toLowerCase() === 'n') {
+        // Auto-complete all matches for testing
+        const allMatched = new Set<number>()
+        for (let i = 0; i < pairs.length; i++) {
+          allMatched.add(i) // term indices 0 to n-1
+          allMatched.add(pairs.length + i) // def indices n to 2n-1 (assuming same order)
+        }
+        setMatchedPairs(allMatched)
+        setSelectedTermIdx(null)
+        setTimeout(() => onComplete(true, xpBonus), 300)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [onSkip, onComplete, xpBonus, pairs.length])
 
   const handleTermClick = (termIdx: number) => {
     if (matchedPairs.has(termIdx)) return
@@ -221,9 +270,18 @@ function MatchingGame({ onComplete, xpBonus }: { onComplete: (s: boolean, x: num
             <h3 className="text-xl font-bold text-white flex items-center gap-2">
               🔗 Match the Terms!
             </h3>
-            <span className="text-amber-400 font-bold">+{xpBonus} XP</span>
+            <div className="flex items-center gap-3">
+              <span className="text-amber-400 font-bold">+{xpBonus} XP</span>
+              <button
+                onClick={onSkip}
+                className="text-slate-400 hover:text-white text-xl leading-none"
+                title="Close (Esc)"
+              >
+                ×
+              </button>
+            </div>
           </div>
-          <p className="text-blue-300 text-sm mt-1">Match all pairs to earn bonus XP!</p>
+          <p className="text-blue-300 text-sm mt-1">Match all pairs to earn bonus XP! (N=auto solve, Esc=skip)</p>
         </div>
 
         <div className="p-6">

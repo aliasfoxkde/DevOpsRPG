@@ -141,18 +141,22 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
     if (finishHandledRef.current) return
     finishHandledRef.current = true
     setIsFinishing(true)
-    if (!hasQuestions) {
-      onPass(false, 0, false) // No quiz = not perfect, no wrong answers, not 80+
-      return
-    }
-    const passThreshold = Math.ceil(allQuestionsLengthRef.current * 0.6)
-    const isPerfect = correctCountRef.current === allQuestionsLengthRef.current
-    const passedWith80 = correctCountRef.current >= Math.ceil(allQuestionsLengthRef.current * 0.8)
-    if (correctCountRef.current >= passThreshold) {
-      onPass(isPerfect, wrongCountRef.current, passedWith80)
-    } else {
-      onSkip()
-    }
+
+    // Use setTimeout to ensure UI updates before parent state changes
+    setTimeout(() => {
+      if (!hasQuestions) {
+        onPass(false, 0, false)
+        return
+      }
+      const passThreshold = Math.ceil(allQuestionsLengthRef.current * 0.6)
+      const isPerfect = correctCountRef.current === allQuestionsLengthRef.current
+      const passedWith80 = correctCountRef.current >= Math.ceil(allQuestionsLengthRef.current * 0.8)
+      if (correctCountRef.current >= passThreshold) {
+        onPass(isPerfect, wrongCountRef.current, passedWith80)
+      } else {
+        onSkip()
+      }
+    }, 50)
   }, [hasQuestions, onPass, onSkip])
 
   // Handle 'n' key for unified navigation: auto-answer → next → complete

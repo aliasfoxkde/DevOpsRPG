@@ -101,36 +101,54 @@ export function generateQuests(): Quest[] {
 
     tech.topics.forEach((topic: Topic, index: number) => {
       // Difficulty: based on technology phase + position within tech
-      // First topics are EASY (intro), complexity increases with position
+      // Phase 1-2 = beginner realms, Phase 3-4 = intermediate, Phase 5-6 = advanced
       const positionInTech = index + 1
       const totalTopics = tech.topics.length
+      const positionRatio = positionInTech / totalTopics // 0 to 1
 
-      // Realistic difficulty: intro topics are always easy (1-2), hard topics come later
-      // Intro = 1, basics = 2, intermediate = 3, advanced = 4, expert = 5
+      // Calculate difficulty: 1-5 scale
+      // Base difficulty from phase (1-6), adjusted by position in topic list
+      // Phase 1-2 topics start at difficulty 1-2, phase 3-4 at 2-3, phase 5-6 at 4-5
+      let baseDifficulty: number
+      if (tech.phase <= 2) {
+        baseDifficulty = 1 + (tech.phase - 1) * 0.5 // Phase 1→1, Phase 2→1.5
+      } else if (tech.phase <= 4) {
+        baseDifficulty = 2 + (tech.phase - 3) * 0.5 // Phase 3→2, Phase 4→2.5
+      } else {
+        baseDifficulty = 3.5 + (tech.phase - 5) * 0.75 // Phase 5→3.5, Phase 6→4.25
+      }
+
+      // Position multiplier: first 30% of topics are easier, last 20% are harder
+      let positionBonus = 0
+      if (positionRatio > 0.8) {
+        positionBonus = 1 // Last 20% = hardest
+      } else if (positionRatio > 0.6) {
+        positionBonus = 0.5 // Next 20% = medium-hard
+      } else if (positionRatio > 0.3) {
+        positionBonus = 0 // Middle 30% = baseline
+      } else if (positionInTech > 1) {
+        positionBonus = -0.5 // First 30% (except first) = easier
+      }
+      // First topic always difficulty 1
+
       let difficulty: 1 | 2 | 3 | 4 | 5
       if (positionInTech === 1) {
-        difficulty = 1 // First topic is always easy intro
-      } else if (positionInTech <= 3) {
-        difficulty = Math.min(2, Math.max(1, tech.phase - 1)) as 1 | 2
-      } else if (positionInTech <= totalTopics * 0.6) {
-        difficulty = Math.min(3, Math.max(2, tech.phase - 1)) as 1 | 2 | 3
-      } else if (positionInTech <= totalTopics * 0.8) {
-        difficulty = Math.min(4, Math.max(3, tech.phase)) as 1 | 2 | 3 | 4
+        difficulty = 1
       } else {
-        difficulty = Math.min(5, Math.max(4, tech.phase)) as 1 | 2 | 3 | 4 | 5
+        difficulty = Math.round(Math.min(5, Math.max(1, baseDifficulty + positionBonus))) as 1 | 2 | 3 | 4 | 5
       }
 
       // Time estimates: intro topics are quick (~3-5 min), scale up realistically
-      // First topic: 3 min, middle: 5-10 min, advanced: 10-15 min
+      // Scale from 3 min (easy/intro) to 15 min (hard/expert)
       let estimatedMinutes: number
       if (positionInTech === 1) {
         estimatedMinutes = 3 // Quick intro
-      } else if (positionInTech <= 3) {
-        estimatedMinutes = 5 // Basics
-      } else if (positionInTech <= totalTopics * 0.6) {
-        estimatedMinutes = 8 // Intermediate
-      } else if (positionInTech <= totalTopics * 0.8) {
-        estimatedMinutes = 12 // Advanced
+      } else if (positionRatio <= 0.3) {
+        estimatedMinutes = 5 // Early topics
+      } else if (positionRatio <= 0.6) {
+        estimatedMinutes = 8 // Middle topics
+      } else if (positionRatio <= 0.8) {
+        estimatedMinutes = 12 // Advanced topics
       } else {
         estimatedMinutes = 15 // Expert topics
       }

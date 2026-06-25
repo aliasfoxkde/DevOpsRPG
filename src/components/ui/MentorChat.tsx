@@ -186,9 +186,69 @@ export const encouragementMessages = {
   ]
 }
 
-function getRandomResponse(_keywords: string[], userMessage: string): string {
+function getContextualResponse(userMessage: string, game: {
+  character: { level: number; xp: number; streakDays: number }
+  completedQuests: { questId: string }[]
+  stats: { quizCount: number; minigameCount: number }
+}): string {
   const lowerMessage = userMessage.toLowerCase()
 
+  // Context-aware responses based on game state
+  if (lowerMessage.includes('progress') || lowerMessage.includes('stat') || lowerMessage.includes('how am i')) {
+    const completed = game.completedQuests.length
+    const level = game.character.level
+    const streak = game.character.streakDays
+    const quizzes = game.stats.quizCount
+    const games = game.stats.minigameCount
+
+    if (completed === 0) {
+      return "You're just starting your journey! Head to the Quest Journal to begin your first quest. Every legendary hero starts with a single step!"
+    } else if (completed < 5) {
+      return `You've completed ${completed} quests so far! Keep up the momentum - you're building great habits. Your ${streak}-day streak shows real dedication!`
+    } else if (completed < 20) {
+      return `Impressive progress! ${completed} quests conquered, Level ${level}, and ${streak}-day streak! You're developing real DevOps skills. Ready for a harder challenge?`
+    } else {
+      return `Champion status! ${completed} quests, ${quizzes} quizzes passed, ${games} mini-games played. Your ${streak}-day streak is legendary! What realm shall we conquer next?`
+    }
+  }
+
+  if (lowerMessage.includes('next') || lowerMessage.includes('where') || lowerMessage.includes('should i go')) {
+    const completed = game.completedQuests.length
+    if (completed === 0) {
+      return "Start your adventure in the Village of Foundations! Look for quests with 💀 difficulty 1 - they're perfect for beginners. You can do this!"
+    } else if (completed < 10) {
+      return "You've got the basics down! Try exploring different realms on the World Map. Each realm unlocks at higher levels - keep grinding XP!"
+    } else {
+      return "You're ready for intermediate challenges! Check out the Cloud Native realm for Kubernetes and Docker content. The harder quests give more XP!"
+    }
+  }
+
+  if (lowerMessage.includes('xp') || lowerMessage.includes('points') || lowerMessage.includes('level up')) {
+    return `You currently have ${game.character.xp} XP at Level ${game.character.level}! Complete quests, pass quizzes, and play mini-games to earn more. The formula is simple: more action = more XP!`
+  }
+
+  if (lowerMessage.includes('streak') || lowerMessage.includes('daily')) {
+    const streak = game.character.streakDays
+    if (streak === 0) {
+      return "No active streak yet! Complete a quest today to start your streak. Once you hit 7 days, you'll unlock the Week Warrior badge!"
+    } else if (streak < 7) {
+      return `Amazing! ${streak}-day streak! Just ${7 - streak} more days to become a Week Warrior! Keep that daily habit going - consistency is the DevOps way!`
+    } else if (streak < 30) {
+      return `Incredible ${streak}-day streak! You're in the champion tier. ${30 - streak} days until Monthly Master awaits - can you make it?`
+    } else {
+      return `LEGENDARY ${streak}-day streak! Your dedication is unmatched. You embody the true spirit of continuous learning that DevOps represents!`
+    }
+  }
+
+  if (lowerMessage.includes('quiz') || lowerMessage.includes('study')) {
+    return "Quizzes test your knowledge and award bonus XP when you pass! Score 80%+ to earn the Quiz Master badge. Study the topic material first for best results!"
+  }
+
+  if (lowerMessage.includes('help') || lowerMessage.includes('stuck') || lowerMessage.includes('confused')) {
+    return "Every expert was once a beginner! If you're stuck: 1) Check the Quest Journal for available quests, 2) Review topic content before taking quizzes, 3) Don't skip the study material! Need specific help? Just ask!"
+  }
+
+  // Default keyword-based responses
   for (const responseGroup of mentorResponses) {
     for (const keyword of responseGroup.keywords) {
       if (lowerMessage.includes(keyword)) {
@@ -235,7 +295,11 @@ export default function MentorChat() {
 
     // Simulate mentor thinking and response
     setTimeout(() => {
-      const response = getRandomResponse([], userMessage.text)
+      const response = getContextualResponse(userMessage.text, {
+        character: game.character,
+        completedQuests: game.completedQuests,
+        stats: game.stats
+      })
       const mentorMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: response,

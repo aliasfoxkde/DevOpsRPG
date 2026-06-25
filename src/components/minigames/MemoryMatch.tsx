@@ -50,18 +50,24 @@ export function MemoryMatch({ pairs = 6, onComplete }: MemoryMatchProps) {
       const [first, second] = newFlipped
       if (cards[first].id.replace(/-[^-]+$/, '') === cards[second].id.replace(/-[^-]+$/, '')) {
         // Match!
-        setMatchedIndices(prev => [...prev, first, second])
+        setMatchedIndices(prev => {
+          const newMatched = [...prev, first, second]
+          if (newMatched.length === cards.length) {
+            // Use functional update for moves to get latest value
+            setMoves(currentMoves => {
+              const elapsed = Math.floor((Date.now() - startTime) / 1000)
+              const timeBonus = Math.max(0, 300 - elapsed)
+              const movesBonus = Math.max(0, (pairs * 3 - currentMoves) * 10)
+              const score = 500 + timeBonus + movesBonus
+              const stars = currentMoves <= pairs * 1.5 ? 3 : currentMoves <= pairs * 2.5 ? 2 : 1
+              setWonStats({ elapsed, score, stars })
+              setGameState('won')
+              return currentMoves
+            })
+          }
+          return newMatched
+        })
         setFlippedIndices([])
-
-        if (matchedIndices.length + 2 === cards.length) {
-          const elapsed = Math.floor((Date.now() - startTime) / 1000)
-          const timeBonus = Math.max(0, 300 - elapsed)
-          const movesBonus = Math.max(0, (pairs * 3 - moves) * 10)
-          const score = 500 + timeBonus + movesBonus
-          const stars = moves <= pairs * 1.5 ? 3 : moves <= pairs * 2.5 ? 2 : 1
-          setWonStats({ elapsed, score, stars })
-          setGameState('won')
-        }
       } else {
         // No match - flip back after delay
         setTimeout(() => {
