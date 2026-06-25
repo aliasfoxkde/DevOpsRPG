@@ -28,6 +28,7 @@ export interface Character {
   skillAllocations: Record<string, number> // skillId -> level
   xpMultiplier: number // Active XP multiplier (1 = no multiplier)
   goldMultiplier: number // Active gold multiplier (1 = no multiplier)
+  streakShields: number // Number of streak shields available
 }
 
 export interface TopicProgress {
@@ -146,6 +147,9 @@ interface GameContextType {
   addGold: (amount: number) => void
   grantBadge: (badgeId: string) => void
   dismissRecentUnlocks: () => void
+  // Streak shields
+  useStreakShield: () => boolean
+  addStreakShield: (count?: number) => void
 }
 
 const STORAGE_KEY = 'devopsquest_game'
@@ -206,6 +210,7 @@ function createDefaultCharacter(): Character {
     skillAllocations: {},
     xpMultiplier: 1,
     goldMultiplier: 1,
+    streakShields: 0,
   }
 }
 
@@ -280,6 +285,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
           if (!Array.isArray(merged.badges)) merged.badges = []
           if (!Array.isArray(merged.collectibles)) merged.collectibles = []
           if (!Array.isArray(merged.completedRealms)) merged.completedRealms = []
+          // Ensure character fields
+          if (typeof merged.character.streakShields !== 'number') {
+            merged.character.streakShields = 0
+          }
           return merged
         }
       } catch {
@@ -342,7 +351,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
       if (prev.character.lastActive === yesterday) {
         newStreak += 1
       } else if (prev.character.lastActive !== today) {
-        newStreak = 1
+        // Streak was broken - use shield if available
+        if (prev.character.streakShields > 0 && newStreak > 0) {
+          // Shield protects the streak - don't reset
+          // Shield is consumed but streak is preserved
+          newStreak = prev.character.streakDays // Keep current streak
+        } else {
+          newStreak = 1
+        }
       }
 
       // Check for new achievements
@@ -1111,6 +1127,30 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }))
   }, [])
 
+  // Use a streak shield to protect the current streak
+  const useStreakShield = useCallback(() => {
+    if (game.character.streakShields <= 0) return false
+    setGame(prev => ({
+      ...prev,
+      character: {
+        ...prev.character,
+        streakShields: prev.character.streakShields - 1,
+      },
+    }))
+    return true
+  }, [game.character.streakShields])
+
+  // Add streak shields (e.g., from collectibles or rewards)
+  const addStreakShield = useCallback((count = 1) => {
+    setGame(prev => ({
+      ...prev,
+      character: {
+        ...prev.character,
+        streakShields: prev.character.streakShields + count,
+      },
+    }))
+  }, [])
+
   return (
     <GameContext.Provider
       value={{
@@ -1157,6 +1197,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
         // Stats tracking
         incrementStat,
         resetQuizStreak,
+        // Streak shields
+        useStreakShield,
+        addStreakShield,
       }}
     >
       {children}
