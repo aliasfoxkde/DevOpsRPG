@@ -54,12 +54,13 @@ export function VictoryModal() {
 
   // Use ref to track if we've already shown particles for this victory
   const victoryShownRef = useRef(false)
+  const particleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     if (game.showVictory && game.lastVictory && !victoryShownRef.current) {
       victoryShownRef.current = true
       setShowParticles(true)
-      setTimeout(() => setShowParticles(false), 3000)
+      particleTimerRef.current = setTimeout(() => setShowParticles(false), 3000)
 
       // Play appropriate sound effects
       if (game.lastVictory.levelUp) {
@@ -73,6 +74,10 @@ export function VictoryModal() {
       if (game.lastVictory.badge) {
         playSound('badge')
       }
+    }
+
+    return () => {
+      if (particleTimerRef.current) clearTimeout(particleTimerRef.current)
     }
   }, [game.showVictory, game.lastVictory, playSound])
 

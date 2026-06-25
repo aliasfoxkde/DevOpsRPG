@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { getRandomEncouragement } from '../../data/milestones'
 
 interface CelebrationToastProps {
@@ -11,19 +11,24 @@ interface CelebrationToastProps {
 
 export function CelebrationToast({ message, type, icon, xpGained, onDismiss }: CelebrationToastProps) {
   const [exiting, setExiting] = useState(false)
+  const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setExiting(true)
-      setTimeout(onDismiss, 300)
+      dismissTimerRef.current = setTimeout(onDismiss, 300)
     }, 5000)
 
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+      if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current)
+    }
   }, [onDismiss])
 
   const handleDismiss = () => {
     setExiting(true)
-    setTimeout(onDismiss, 300)
+    if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current)
+    dismissTimerRef.current = setTimeout(onDismiss, 300)
   }
 
   const bgClass = {

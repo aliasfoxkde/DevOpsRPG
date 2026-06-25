@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useGame } from '../contexts/GameContext'
 import { allQuests, realms } from '../data/quests'
@@ -33,6 +33,17 @@ export default function BattleArenaPage() {
   const [badgeData, setBadgeData] = useState<{ icon: string; name: string; description: string } | null>(null)
   const [showRealmComplete, setShowRealmComplete] = useState(false)
 
+  // Timer refs for cleanup
+  const milestoneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const badgeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const realmTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const confettiTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const streakShowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const streakHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const minigameTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const chestTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const encounterTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   const quest = allQuests.find(q => q.id === questId)
   const nextQuest = quest ? getNextQuest() : null
 
@@ -44,21 +55,29 @@ export default function BattleArenaPage() {
       requestAnimationFrame(() => {
         setMilestoneData({ icon: m.icon, title: m.title, message: m.message, xpBonus: m.xpBonus })
       })
-      setTimeout(() => setShowMilestone(true), 2000)
+      milestoneTimerRef.current = setTimeout(() => setShowMilestone(true), 2000)
     }
     if (game.lastVictory?.badge) {
       const b = game.lastVictory.badge
       requestAnimationFrame(() => {
         setBadgeData({ icon: b.icon, name: b.name, description: b.description })
       })
-      setTimeout(() => setShowBadge(true), 2500)
+      badgeTimerRef.current = setTimeout(() => setShowBadge(true), 2500)
+    }
+
+    return () => {
+      if (milestoneTimerRef.current) clearTimeout(milestoneTimerRef.current)
+      if (badgeTimerRef.current) clearTimeout(badgeTimerRef.current)
     }
   }, [game.lastVictory])
 
   // Watch for realm completion
   useEffect(() => {
     if (game.showRealmCompletion) {
-      setTimeout(() => setShowRealmComplete(true), 3000)
+      realmTimerRef.current = setTimeout(() => setShowRealmComplete(true), 3000)
+    }
+    return () => {
+      if (realmTimerRef.current) clearTimeout(realmTimerRef.current)
     }
   }, [game.showRealmCompletion])
 
@@ -71,6 +90,18 @@ export default function BattleArenaPage() {
       return () => clearTimeout(timer)
     }
   }, [justCompleted, nextQuest, navigate])
+
+  // Cleanup all pending timers on unmount
+  useEffect(() => {
+    return () => {
+      if (confettiTimerRef.current) clearTimeout(confettiTimerRef.current)
+      if (streakShowTimerRef.current) clearTimeout(streakShowTimerRef.current)
+      if (streakHideTimerRef.current) clearTimeout(streakHideTimerRef.current)
+      if (minigameTimerRef.current) clearTimeout(minigameTimerRef.current)
+      if (chestTimerRef.current) clearTimeout(chestTimerRef.current)
+      if (encounterTimerRef.current) clearTimeout(encounterTimerRef.current)
+    }
+  }, [])
 
   if (!quest) {
     return (
@@ -98,25 +129,25 @@ export default function BattleArenaPage() {
 
     // Show confetti on completion
     setShowConfetti(true)
-    setTimeout(() => setShowConfetti(false), 3000)
+    confettiTimerRef.current = setTimeout(() => setShowConfetti(false), 3000)
 
     // Check for streak milestone
     const streak = game.character.streakDays
     if (streak >= 3 && streak % 7 === 0) {
-      setTimeout(() => setShowStreak(true), 500)
-      setTimeout(() => setShowStreak(false), 2500)
+      streakShowTimerRef.current = setTimeout(() => setShowStreak(true), 500)
+      streakHideTimerRef.current = setTimeout(() => setShowStreak(false), 2500)
     }
 
     // 25% chance for bonus mini-game
     if (Math.random() < 0.25) {
-      setTimeout(() => setShowMiniGame(true), 800)
+      minigameTimerRef.current = setTimeout(() => setShowMiniGame(true), 800)
     }
 
     // 30% chance for treasure chest
     if (Math.random() < 0.30) {
       const loot = getRandomLoot(quest.difficulty)
       setChestLoot(loot)
-      setTimeout(() => {
+      chestTimerRef.current = setTimeout(() => {
         if (loot.type === 'xp') addXP(loot.value)
         if (loot.type === 'gold') addGold(loot.value)
         setShowChest(true)
@@ -129,7 +160,7 @@ export default function BattleArenaPage() {
       const encounterGoldAmount = Math.floor(Math.random() * 15) + 10
       setEncounterXP(encounterXPAmount)
       setEncounterGold(encounterGoldAmount)
-      setTimeout(() => {
+      encounterTimerRef.current = setTimeout(() => {
         addXP(encounterXPAmount)
         addGold(encounterGoldAmount)
         setShowEncounter(true)
