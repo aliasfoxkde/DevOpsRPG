@@ -1,15 +1,35 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useGame } from '../contexts/GameContext'
 import { realms, allQuests } from '../data/quests'
 import { worldMapLocations, sdlcPhases, type MapLocation } from '../data/worldmap'
 
+// Realm theme colors
+const REALM_COLORS: Record<string, { primary: string; secondary: string; glow: string }> = {
+  foundations: { primary: '#22c55e', secondary: '#16a34a', glow: 'rgba(34, 197, 94, 0.5)' },
+  scripts: { primary: '#f59e0b', secondary: '#d97706', glow: 'rgba(245, 158, 11, 0.5)' },
+  frameworks: { primary: '#8b5cf6', secondary: '#7c3aed', glow: 'rgba(139, 92, 246, 0.5)' },
+  cloud: { primary: '#06b6d4', secondary: '#0891b2', glow: 'rgba(6, 182, 212, 0.5)' },
+  devops: { primary: '#ef4444', secondary: '#dc2626', glow: 'rgba(239, 68, 68, 0.5)' },
+  aiintelligence: { primary: '#ec4899', secondary: '#db2777', glow: 'rgba(236, 72, 153, 0.5)' },
+}
+
+// Pre-generated star positions for atmosphere (generated once)
+const STARS = [...Array(50)].map(() => ({
+  left: Math.random() * 100,
+  top: Math.random() * 60,
+  delay: Math.random() * 3,
+  opacity: Math.random() * 0.5 + 0.2
+}))
+
 export default function WorldMapPage() {
   const { game } = useGame()
   const navigate = useNavigate()
   const [selectedLocation, setSelectedLocation] = useState<MapLocation | null>(null)
+  const [hoveredLocation, setHoveredLocation] = useState<string | null>(null)
   const [animatedLocations, setAnimatedLocations] = useState<Set<string>>(new Set())
   const [showSDLC, setShowSDLC] = useState(true)
+  const [pathAnimKey, setPathAnimKey] = useState(0)
 
   const { character, completedQuests } = game
 
@@ -28,13 +48,20 @@ export default function WorldMapPage() {
         if (isLocationUnlocked(loc)) {
           setTimeout(() => {
             setAnimatedLocations(prev => new Set([...prev, loc.id]))
-          }, index * 100)
+          }, index * 80)
         }
       })
-    }, 300)
-
+    }, 200)
     return () => clearTimeout(timer)
-  }, [character.level, isLocationUnlocked])
+  }, [character.level, isLocationUnlocked, showSDLC])
+
+  // Animate paths periodically
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPathAnimKey(k => k + 1)
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [])
 
   const getLocationStatus = (location: MapLocation) => {
     if (location.type === 'realm' && location.realmId) {
@@ -72,137 +99,164 @@ export default function WorldMapPage() {
     ? Math.round((completedCount / allQuests.length) * 100)
     : 0
 
+  // Get realm color
+  const getRealmColor = (realmId?: string) => {
+    if (!realmId) return { primary: '#6366f1', secondary: '#4f46e5', glow: 'rgba(99, 102, 241, 0.5)' }
+    return REALM_COLORS[realmId] || { primary: '#6366f1', secondary: '#4f46e5', glow: 'rgba(99, 102, 241, 0.5)' }
+  }
+
+  // Animated path component
+  const AnimatedPath = ({ x1, y1, x2, y2, color, isHighlighted }: {
+    x1: number; y1: number; x2: number; y2: number
+    color: string; isHighlighted: boolean
+  }) => {
+    const dashOffset = useMemo(() => Math.random() * 20, [pathAnimKey])
+    return (
+      <g>
+        {/* Glow effect */}
+        <line
+          x1={x1} y1={y1} x2={x2} y2={y2}
+          stroke={color} strokeWidth={isHighlighted ? 6 : 4}
+          strokeOpacity={isHighlighted ? 0.4 : 0.2}
+          strokeDasharray="8,8"
+          strokeLinecap="round"
+          className="transition-all duration-500"
+        />
+        {/* Main path */}
+        <line
+          x1={x1} y1={y1} x2={x2} y2={y2}
+          stroke={color} strokeWidth={isHighlighted ? 3 : 2}
+          strokeOpacity={isHighlighted ? 0.8 : 0.5}
+          strokeDasharray="8,8"
+          strokeDashoffset={dashOffset}
+          strokeLinecap="round"
+          className="transition-all duration-300"
+        />
+      </g>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
-      {/* Header */}
-      <header className="bg-slate-800/80 border-b border-slate-700 sticky top-0 z-20">
+    <div className="min-h-screen bg-slate-950">
+      {/* Header - Improved */}
+      <header className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700/50 sticky top-0 z-20 backdrop-blur-lg">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <Link
               to="/"
-              className="text-slate-400 hover:text-amber-400 transition-colors flex items-center gap-1"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/50 text-slate-300 hover:text-amber-400 hover:bg-slate-700/50 transition-all"
             >
-              ← Home
+              <span>←</span>
+              <span>Home</span>
             </Link>
-            <h1 className="text-xl font-bold text-white">🗺️ World Map</h1>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setShowSDLC(!showSDLC)}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                  showSDLC
-                    ? 'bg-amber-600 text-white'
-                    : 'bg-slate-700 text-slate-400'
-                }`}
-              >
-                SDLC Path {showSDLC ? 'ON' : 'OFF'}
-              </button>
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+                🗺️ World Map
+              </h1>
             </div>
+            <button
+              onClick={() => setShowSDLC(!showSDLC)}
+              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${
+                showSDLC
+                  ? 'bg-gradient-to-r from-green-600 to-emerald-500 text-white shadow-lg shadow-green-600/30'
+                  : 'bg-slate-700 text-slate-400'
+              }`}
+            >
+              SDLC {showSDLC ? '✓' : ''}
+            </button>
           </div>
         </div>
       </header>
 
-      {/* Progress Bar */}
-      <div className="bg-slate-800/50 border-b border-slate-700/50">
-        <div className="max-w-7xl mx-auto px-4 py-2">
-          <div className="flex items-center justify-between text-sm mb-1">
-            <span className="text-slate-400">Overall Journey Progress</span>
-            <span className="text-amber-400 font-bold">{totalProgress}%</span>
+      {/* Progress Bar - More prominent */}
+      <div className="bg-slate-900/80 border-b border-slate-700/50 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-slate-400 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              Overall Journey Progress
+            </span>
+            <span className="text-lg font-bold text-amber-400">{totalProgress}%</span>
           </div>
-          <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+          <div className="h-3 bg-slate-800 rounded-full overflow-hidden border border-slate-700/50">
             <div
-              className="h-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all duration-500"
+              className="h-full bg-gradient-to-r from-green-600 via-emerald-500 to-amber-500 transition-all duration-700 ease-out relative"
               style={{ width: `${totalProgress}%` }}
-            />
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+            </div>
+          </div>
+          <div className="flex justify-between text-xs text-slate-500 mt-1">
+            <span>{completedCount} quests completed</span>
+            <span>{allQuests.length - completedCount} remaining</span>
           </div>
         </div>
       </div>
 
-      {/* SDLC Phase Legend */}
-      <div className="bg-slate-800/30 border-b border-slate-700/30">
-        <div className="max-w-7xl mx-auto px-4 py-2 overflow-x-auto">
-          <div className="flex items-center gap-3 text-xs">
-            <span className="text-slate-500 whitespace-nowrap">SDLC Phases:</span>
+      {/* SDLC Phase Legend - Cleaner pills */}
+      <div className="bg-slate-900/50 border-b border-slate-800/50">
+        <div className="max-w-7xl mx-auto px-4 py-2.5">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+            <span className="text-xs text-slate-500 font-medium whitespace-nowrap">SDLC:</span>
             {sdlcPhases.map(phase => (
-              <div
+              <button
                 key={phase.id}
-                className="flex items-center gap-1 px-2 py-1 rounded-full whitespace-nowrap"
-                style={{ backgroundColor: `${phase.color}20`, color: phase.color }}
+                onClick={() => setShowSDLC(!showSDLC)}
+                className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all hover:scale-105"
+                style={{
+                  backgroundColor: `${phase.color}25`,
+                  color: phase.color,
+                  border: `1px solid ${phase.color}40`
+                }}
               >
-                <span>{phase.icon}</span>
+                <span className="text-sm">{phase.icon}</span>
                 <span>{phase.name}</span>
-              </div>
+              </button>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Map Container */}
-      <div className="relative w-full h-[calc(100vh-180px)] overflow-hidden">
-        {/* Background with terrain */}
-        <div className="absolute inset-0 bg-gradient-to-b from-sky-900 via-slate-800 to-slate-900" />
+      {/* Map Container - Full visual redesign */}
+      <div className="relative w-full h-[calc(100vh-220px)] overflow-hidden">
+        {/* Rich gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-sky-950 via-slate-900 to-slate-950" />
 
-        {/* Decorative terrain elements - Mountains in background */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
-          <defs>
-            <linearGradient id="mountainGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#64748b" />
-              <stop offset="100%" stopColor="#475569" />
-            </linearGradient>
-          </defs>
-          {/* Mountain range 1 */}
-          <polygon points="0,100% 15%,60% 30%,100%" fill="url(#mountainGrad)" />
-          <polygon points="20%,100% 35%,55% 50%,100%" fill="url(#mountainGrad)" />
-          <polygon points="40%,100% 55%,50% 70%,100%" fill="url(#mountainGrad)" />
-          {/* Mountain range 2 */}
-          <polygon points="60%,100% 75%,45% 90%,100%" fill="url(#mountainGrad)" />
-          <polygon points="80%,100% 92%,55% 100%,80% 100%,100%" fill="url(#mountainGrad)" />
-          {/* Snow caps */}
-          <polygon points="35%,55% 33%,60% 37%,60%" fill="white" opacity="0.5" />
-          <polygon points="55%,50% 53%,55% 57%,55%" fill="white" opacity="0.5" />
-          <polygon points="75%,45% 73%,50% 77%,50%" fill="white" opacity="0.5" />
-        </svg>
+        {/* Animated star field for atmosphere */}
+        <div className="absolute inset-0 overflow-hidden">
+          {STARS.map((star, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-white rounded-full animate-twinkle"
+              style={{
+                left: `${star.left}%`,
+                top: `${star.top}%`,
+                animationDelay: `${star.delay}s`,
+                opacity: star.opacity
+              }}
+            />
+          ))}
+        </div>
 
-        {/* Water/Ocean at bottom */}
-        <svg className="absolute bottom-0 left-0 w-full h-24 pointer-events-none">
-          <defs>
-            <linearGradient id="waterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#1e40af" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="#1e3a8a" stopOpacity="0.6" />
-            </linearGradient>
-          </defs>
-          <rect x="0" y="0" width="100%" height="100%" fill="url(#waterGrad)" />
-          {/* Waves */}
-          <path d="M0,10 Q25,5 50,10 T100,10 T150,10 T200,10 T250,10 T300,10 T350,10 T400,10 T450,10 T500,10" stroke="#3b82f6" strokeWidth="1" fill="none" opacity="0.3" />
-          <path d="M0,20 Q25,15 50,20 T100,20 T150,20 T200,20 T250,20 T300,20 T350,20 T400,20 T450,20 T500,20" stroke="#3b82f6" strokeWidth="1" fill="none" opacity="0.2" />
-        </svg>
+        {/* Horizon glow */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-amber-900/10 to-transparent" />
 
-        {/* Trees/Forest decorations */}
-        <div className="absolute bottom-20 left-10 text-4xl opacity-30 pointer-events-none">🌲</div>
-        <div className="absolute bottom-24 left-20 text-3xl opacity-20 pointer-events-none">🌲</div>
-        <div className="absolute bottom-16 right-20 text-4xl opacity-25 pointer-events-none">🌲</div>
-        <div className="absolute bottom-28 right-32 text-2xl opacity-20 pointer-events-none">🌴</div>
-
-        {/* Rocks decoration */}
-        <div className="absolute bottom-32 left-1/4 text-2xl opacity-20 pointer-events-none">🪨</div>
-        <div className="absolute bottom-24 right-1/3 text-xl opacity-15 pointer-events-none">🪨</div>
-
-        {/* Clouds */}
-        <div className="absolute top-10 left-20 text-4xl opacity-20 pointer-events-none animate-bounce" style={{animationDuration: '3s'}}>☁️</div>
-        <div className="absolute top-20 right-1/4 text-3xl opacity-15 pointer-events-none animate-bounce" style={{animationDuration: '4s', animationDelay: '1s'}}>☁️</div>
-        <div className="absolute top-5 right-1/3 text-2xl opacity-10 pointer-events-none animate-bounce" style={{animationDuration: '5s', animationDelay: '2s'}}>☁️</div>
-
-        {/* Grid overlay */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTYsMjU2LDI1NiwxLjApIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-10" />
-
-        {/* SVG Connections */}
+        {/* SVG Connections Layer */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none">
           <defs>
-            <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.5" />
-              <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.2" />
+            {/* Gradients for different path types */}
+            <linearGradient id="realmPathGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.6" />
+              <stop offset="100%" stopColor="#fbbf24" stopOpacity="0.3" />
             </linearGradient>
-            <filter id="glow">
-              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <linearGradient id="sdlcPathGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#22c55e" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#4ade80" stopOpacity="0.3" />
+            </linearGradient>
+
+            {/* Glow filter */}
+            <filter id="pathGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
               <feMerge>
                 <feMergeNode in="coloredBlur"/>
                 <feMergeNode in="SourceGraphic"/>
@@ -220,34 +274,35 @@ export default function WorldMapPage() {
               const isSDLCPath = location.type === 'sdlc' || target.type === 'sdlc'
               if (!showSDLC && isSDLCPath) return null
 
-              const x1 = `${location.position.x}%`
-              const y1 = `${location.position.y}%`
-              const x2 = `${target.position.x}%`
-              const y2 = `${target.position.y}%`
+              const x1 = location.position.x
+              const y1 = location.position.y
+              const x2 = target.position.x
+              const y2 = target.position.y
+
+              const isHighlighted = hoveredLocation === location.id || hoveredLocation === targetId
+              const pathColor = isSDLCPath ? '#22c55e' : '#f59e0b'
 
               return (
-                <line
+                <AnimatedPath
                   key={`${location.id}-${targetId}`}
-                  x1={x1}
-                  y1={y1}
-                  x2={x2}
-                  y2={y2}
-                  stroke={isSDLCPath ? '#22c55e' : '#6366f1'}
-                  strokeWidth="2"
-                  strokeOpacity="0.4"
-                  strokeDasharray="5,5"
-                  className="transition-all duration-1000"
+                  x1={x1} y1={y1} x2={x2} y2={y2}
+                  color={pathColor}
+                  isHighlighted={isHighlighted}
                 />
               )
             })
           })}
         </svg>
 
-        {/* Map Locations */}
+        {/* Map Locations - Significantly improved */}
         {worldMapLocations.map((location, index) => {
           const unlocked = isLocationUnlocked(location)
           const animated = animatedLocations.has(location.id)
           const status = getLocationStatus(location)
+          const isHighlighted = hoveredLocation === location.id || selectedLocation?.id === location.id
+          const realmColor = getRealmColor(location.realmId)
+          const isRealm = location.type === 'realm'
+          const isMilestone = location.type === 'milestone'
 
           return (
             <div
@@ -259,86 +314,136 @@ export default function WorldMapPage() {
                 left: `${location.position.x}%`,
                 top: `${location.position.y}%`,
                 transitionDelay: `${index * 50}ms`,
+                zIndex: isHighlighted ? 30 : 10
               }}
+              onMouseEnter={() => setHoveredLocation(location.id)}
+              onMouseLeave={() => setHoveredLocation(null)}
             >
+              {/* Location container */}
               <button
                 onClick={() => handleLocationClick(location)}
-                className={`relative group ${
-                  !unlocked ? 'filter grayscale opacity-50' : ''
-                }`}
+                className={`relative group transition-transform duration-300 ${
+                  !unlocked ? 'filter grayscale opacity-40' : ''
+                } ${isHighlighted ? 'scale-125' : 'hover:scale-110'}`}
                 disabled={!unlocked}
               >
-                {/* Glow effect for unlocked locations */}
+                {/* Outer glow ring */}
                 {unlocked && (
-                  <div className="absolute inset-0 bg-amber-500/20 rounded-full blur-xl animate-pulse" />
+                  <div
+                    className="absolute inset-0 rounded-full animate-pulse"
+                    style={{
+                      background: `radial-gradient(circle, ${realmColor.glow} 0%, transparent 70%)`,
+                      transform: 'scale(1.8)',
+                    }}
+                  />
                 )}
 
-                {/* Location marker */}
+                {/* Main marker */}
                 <div
-                  className={`relative w-16 h-16 rounded-full flex flex-col items-center justify-center border-2 transition-all cursor-pointer ${
+                  className={`relative w-16 h-16 rounded-full flex flex-col items-center justify-center border-2 transition-all shadow-xl ${
                     selectedLocation?.id === location.id
-                      ? 'bg-amber-600 border-amber-400 scale-110 ring-4 ring-amber-400/50'
-                      : unlocked
-                        ? 'bg-slate-800 border-slate-600 hover:border-amber-500 hover:bg-slate-700'
-                        : 'bg-slate-900 border-slate-700 cursor-not-allowed'
+                      ? 'bg-amber-600 border-amber-400 shadow-amber-500/50 shadow-2xl'
+                      : isMilestone
+                        ? 'bg-gradient-to-br from-purple-600 to-purple-800 border-purple-400'
+                        : isRealm
+                          ? 'bg-gradient-to-br from-slate-800 to-slate-900 border-slate-600 hover:border-amber-500'
+                          : 'bg-gradient-to-br from-green-800/80 to-green-900/80 border-green-600/50'
                   }`}
+                  style={{
+                    boxShadow: isHighlighted
+                      ? `0 0 30px ${realmColor.glow}, 0 0 60px ${realmColor.glow}`
+                      : `0 4px 20px rgba(0,0,0,0.5)`,
+                    borderColor: isRealm && unlocked ? realmColor.primary : undefined
+                  }}
                 >
-                  <span className="text-2xl">{location.icon}</span>
+                  {/* Icon */}
+                  <span className="text-2xl drop-shadow-lg">{location.icon}</span>
+
+                  {/* Status badge - redesigned */}
                   {status && status.total > 0 && (
-                    <div className="absolute -bottom-1 -right-1 bg-green-600 text-white text-xs px-1.5 rounded-full font-bold">
-                      {Math.round(status.total > 0 ? (status.completed / status.total) * 100 : 0)}%
+                    <div
+                      className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold shadow-lg"
+                      style={{ backgroundColor: realmColor.primary }}
+                    >
+                      <span className="text-white">{Math.round((status.completed / status.total) * 100)}%</span>
                     </div>
                   )}
+
+                  {/* Lock badge */}
                   {location.unlocksAtLevel && character.level < location.unlocksAtLevel && (
-                    <div className="absolute -bottom-1 -right-1 bg-slate-600 text-white text-xs px-1.5 rounded-full font-bold">
+                    <div className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-600 text-white shadow-lg">
                       Lv{location.unlocksAtLevel}
                     </div>
                   )}
                 </div>
 
-                {/* Tooltip on hover */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                  <div className="bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-center whitespace-nowrap">
-                    <p className="text-white font-bold text-sm">{location.name}</p>
+                {/* Location name - visible on hover/highlight */}
+                <div
+                  className={`absolute top-full mt-2 left-1/2 transform -translate-x-1/2 whitespace-nowrap transition-all duration-300 ${
+                    isHighlighted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+                  }`}
+                >
+                  <div className="bg-slate-900/95 backdrop-blur-sm border border-slate-700 rounded-lg px-3 py-1.5 shadow-xl">
+                    <p className="text-white font-semibold text-sm">{location.name}</p>
                     {status && status.total > 0 && (
-                      <p className="text-green-400 text-xs">
+                      <p className="text-center text-xs" style={{ color: realmColor.primary }}>
                         {status.completed}/{status.total} quests
                       </p>
                     )}
+                    {location.unlocksAtLevel && character.level < location.unlocksAtLevel && (
+                      <p className="text-xs text-slate-400">Unlocks at Level {location.unlocksAtLevel}</p>
+                    )}
                   </div>
                 </div>
+
+                {/* Connection indicator dots */}
+                {unlocked && isHighlighted && (
+                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                )}
               </button>
             </div>
           )
         })}
 
-        {/* Current Position Indicator */}
-        <div className="absolute bottom-4 left-4 bg-slate-800/90 backdrop-blur rounded-lg px-4 py-3 border border-slate-600">
+        {/* Character Position Card - Redesigned */}
+        <div className="absolute bottom-4 left-4 bg-slate-900/95 backdrop-blur-lg rounded-xl px-4 py-3 border border-amber-600/30 shadow-2xl shadow-amber-900/20">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-amber-600 flex items-center justify-center text-xl">
-              ⚔️
+            <div className="relative">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center text-2xl shadow-lg shadow-amber-600/30">
+                {character.avatar}
+              </div>
+              <div className="absolute -bottom-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-slate-900 animate-pulse" />
             </div>
             <div>
               <p className="text-white font-bold">{character.name}</p>
-              <p className="text-amber-400 text-sm">Level {character.level} {character.class}</p>
+              <p className="text-amber-400 text-sm font-medium">{character.title}</p>
+              <p className="text-slate-400 text-xs">Level {character.level}</p>
             </div>
           </div>
         </div>
 
-        {/* Minimap / Legend */}
-        <div className="absolute bottom-4 right-4 bg-slate-800/90 backdrop-blur rounded-lg p-3 border border-slate-600">
-          <p className="text-slate-400 text-xs mb-2 font-bold">REALMS</p>
-          <div className="space-y-1">
+        {/* Realm Legend - Redesigned */}
+        <div className="absolute bottom-4 right-4 bg-slate-900/95 backdrop-blur-lg rounded-xl p-4 border border-slate-700/50 shadow-2xl max-w-xs">
+          <p className="text-slate-400 text-xs mb-3 font-semibold uppercase tracking-wider">Realms</p>
+          <div className="space-y-2">
             {Object.values(realms).map(realm => {
               const isUnlocked = character.level >= realm.requiredLevel
+              const color = getRealmColor(realm.id)
               return (
                 <div
                   key={realm.id}
-                  className={`flex items-center gap-2 text-xs ${!isUnlocked ? 'text-slate-600' : 'text-slate-300'}`}
+                  className={`flex items-center gap-2 text-sm ${!isUnlocked ? 'opacity-40' : ''}`}
                 >
-                  <span>{realm.icon}</span>
-                  <span>{realm.name}</span>
-                  <span className="text-slate-500 ml-auto">Lv{realm.requiredLevel}</span>
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: isUnlocked ? color.primary : '#4b5563' }}
+                  />
+                  <span className={`${isUnlocked ? 'text-slate-200' : 'text-slate-500'}`}>{realm.name}</span>
+                  <span className="text-slate-500 text-xs ml-auto">Lv{realm.requiredLevel}</span>
                 </div>
               )
             })}
@@ -346,92 +451,140 @@ export default function WorldMapPage() {
         </div>
       </div>
 
-      {/* Location Detail Modal */}
+      {/* Location Detail Modal - Significantly improved */}
       {selectedLocation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="bg-slate-800 rounded-2xl border border-amber-600/50 shadow-2xl max-w-md w-full overflow-hidden">
-            <div className="bg-gradient-to-r from-amber-900/30 via-slate-800 to-amber-900/30 px-6 py-4 border-b border-slate-700 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-4xl">{selectedLocation.icon}</span>
-                <div>
-                  <h2 className="text-xl font-bold text-white">{selectedLocation.name}</h2>
-                  <p className="text-amber-400 text-sm capitalize">{selectedLocation.type}</p>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn"
+          onClick={() => setSelectedLocation(null)}
+        >
+          <div
+            className="bg-slate-900 rounded-2xl border border-slate-700 shadow-2xl max-w-md w-full overflow-hidden animate-scaleIn"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header with gradient */}
+            <div
+              className="px-6 py-5 border-b border-slate-800"
+              style={{
+                background: `linear-gradient(135deg, ${getRealmColor(selectedLocation.realmId).primary}20 0%, transparent 50%)`
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div
+                    className="w-16 h-16 rounded-xl flex items-center justify-center text-4xl shadow-lg"
+                    style={{
+                      background: `linear-gradient(135deg, ${getRealmColor(selectedLocation.realmId).primary}30 0%, ${getRealmColor(selectedLocation.realmId).secondary}30 100%)`,
+                      border: `2px solid ${getRealmColor(selectedLocation.realmId).primary}50`
+                    }}
+                  >
+                    {selectedLocation.icon}
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-white">{selectedLocation.name}</h2>
+                    <p
+                      className="text-sm font-medium capitalize"
+                      style={{ color: getRealmColor(selectedLocation.realmId).primary }}
+                    >
+                      {selectedLocation.type} {selectedLocation.sdlcPhase && `• Phase ${selectedLocation.sdlcPhase}`}
+                    </p>
+                  </div>
                 </div>
+                <button
+                  onClick={() => setSelectedLocation(null)}
+                  className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors flex items-center justify-center"
+                >
+                  ✕
+                </button>
               </div>
-              <button
-                onClick={() => setSelectedLocation(null)}
-                className="text-slate-400 hover:text-white text-2xl leading-none"
-              >
-                ×
-              </button>
             </div>
 
             <div className="p-6">
-              <p className="text-slate-300 mb-4">{selectedLocation.description}</p>
+              <p className="text-slate-300 mb-6 leading-relaxed">{selectedLocation.description}</p>
 
+              {/* Progress section */}
               {selectedLocation.type === 'realm' && (
-                <div className="mb-4">
-                  <p className="text-slate-400 text-sm mb-2">Quest Completion</p>
-                  {(() => {
-                    const status = getLocationStatus(selectedLocation)
-                    if (!status) return null
-                    return (
-                      <>
-                        <div className="flex items-center justify-between text-sm mb-1">
-                          <span className="text-slate-400">Progress</span>
-                          <span className="text-green-400 font-bold">
-                            {status.completed}/{status.total}
-                          </span>
-                        </div>
-                        <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-gradient-to-r from-green-600 to-green-400"
-                            style={{ width: `${status.total > 0 ? (status.completed / status.total) * 100 : 0}%` }}
-                          />
-                        </div>
-                      </>
-                    )
-                  })()}
-                </div>
-              )}
-
-              {selectedLocation.type === 'sdlc' && selectedLocation.sdlcPhase && (
-                <div className="mb-4">
-                  <p className="text-slate-400 text-sm mb-2">SDLC Phase {selectedLocation.sdlcPhase}</p>
-                  <div className="flex items-center gap-2">
-                    {sdlcPhases.map(phase => {
-                      const currentPhase = selectedLocation.sdlcPhase!
-                      return (
-                        <div
-                          key={phase.id}
-                          className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${
-                            phase.id === currentPhase
-                              ? 'ring-2 ring-white'
-                              : phase.id < currentPhase
-                                ? 'opacity-50'
-                                : 'opacity-30'
-                          }`}
-                          style={{ backgroundColor: phase.color }}
-                        >
-                          {phase.id}
-                        </div>
-                      )
-                    })}
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-slate-400 text-sm font-medium">Quest Progress</span>
+                    <span
+                      className="text-sm font-bold"
+                      style={{ color: getRealmColor(selectedLocation.realmId).primary }}
+                    >
+                      {getLocationStatus(selectedLocation)?.completed || 0}/{getLocationStatus(selectedLocation)?.total || 0}
+                    </span>
+                  </div>
+                  <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-700"
+                      style={{
+                        width: `${getLocationStatus(selectedLocation)?.total ?
+                          (getLocationStatus(selectedLocation)!.completed / getLocationStatus(selectedLocation)!.total) * 100 : 0}%`,
+                        background: `linear-gradient(90deg, ${getRealmColor(selectedLocation.realmId).primary} 0%, ${getRealmColor(selectedLocation.realmId).secondary} 100%)`
+                      }}
+                    />
                   </div>
                 </div>
               )}
 
-              <div className="flex gap-3 mt-6">
+              {/* SDLC Phase indicator */}
+              {selectedLocation.type === 'sdlc' && selectedLocation.sdlcPhase && (
+                <div className="mb-6">
+                  <span className="text-slate-400 text-sm font-medium block mb-3">SDLC Pipeline</span>
+                  <div className="flex items-center gap-2">
+                    {sdlcPhases.map((phase, idx) => (
+                      <div key={phase.id} className="flex items-center">
+                        <div
+                          className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg transition-all ${
+                            phase.id === selectedLocation.sdlcPhase
+                              ? 'ring-2 ring-white shadow-lg scale-110'
+                              : phase.id < selectedLocation.sdlcPhase!
+                                ? 'opacity-100'
+                                : 'opacity-30 grayscale'
+                          }`}
+                          style={{ backgroundColor: `${phase.color}40` }}
+                          title={phase.name}
+                        >
+                          {phase.icon}
+                        </div>
+                        {idx < sdlcPhases.length - 1 && (
+                          <div
+                            className={`w-8 h-0.5 ${
+                              phase.id < selectedLocation.sdlcPhase! ? '' : 'opacity-30'
+                            }`}
+                            style={{ backgroundColor: phase.color }}
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Unlock level */}
+              {selectedLocation.unlocksAtLevel && (
+                <div className="flex items-center gap-2 mb-6 p-3 bg-slate-800/50 rounded-lg">
+                  <span className="text-amber-400">🔒</span>
+                  <span className="text-slate-300 text-sm">
+                    Unlocks at Level {selectedLocation.unlocksAtLevel}
+                  </span>
+                  {character.level >= selectedLocation.unlocksAtLevel && (
+                    <span className="ml-auto text-green-400 text-sm font-medium">✓ Unlocked</span>
+                  )}
+                </div>
+              )}
+
+              {/* Action buttons */}
+              <div className="flex gap-3">
                 <button
                   onClick={() => setSelectedLocation(null)}
-                  className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors"
+                  className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl transition-colors"
                 >
                   Close
                 </button>
-                {selectedLocation.type === 'realm' && (
+                {selectedLocation.type === 'realm' && character.level >= (selectedLocation.unlocksAtLevel || 1) && (
                   <button
                     onClick={handleTravel}
-                    className="flex-1 py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-lg transition-colors"
+                    className="flex-1 py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-xl transition-all shadow-lg shadow-amber-600/30 hover:shadow-amber-500/50"
                   >
                     ⚔️ Enter Realm
                   </button>
@@ -439,7 +592,7 @@ export default function WorldMapPage() {
                 {selectedLocation.type === 'milestone' && (
                   <button
                     onClick={handleTravel}
-                    className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-bold rounded-lg transition-colors"
+                    className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-bold rounded-xl transition-all shadow-lg shadow-purple-600/30"
                   >
                     🏆 View Rewards
                   </button>
@@ -449,6 +602,30 @@ export default function WorldMapPage() {
           </div>
         </div>
       )}
+
+      {/* Custom CSS for animations */}
+      <style>{`
+        @keyframes twinkle {
+          0%, 100% { opacity: 0.2; transform: scale(1); }
+          50% { opacity: 0.8; transform: scale(1.2); }
+        }
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(200%); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes scaleIn {
+          from { opacity: 0; transform: scale(0.9); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        .animate-twinkle { animation: twinkle 3s ease-in-out infinite; }
+        .animate-shimmer { animation: shimmer 2s ease-in-out infinite; }
+        .animate-fadeIn { animation: fadeIn 0.2s ease-out; }
+        .animate-scaleIn { animation: scaleIn 0.3s ease-out; }
+      `}</style>
     </div>
   )
 }
