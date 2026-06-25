@@ -119,7 +119,7 @@ export default function ChallengesPage() {
         claimed: isClaimed,
       }
     })
-  }, [activeTab, activeChallenges, game, challengeStates])
+  }, [activeTab, activeChallenges, game, challengeStates, expiresAt])
 
   // Calculate overall progress
   const overallProgress = useMemo(() => {

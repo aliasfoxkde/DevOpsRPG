@@ -262,9 +262,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [game, setGame] = useState<GameState>(() => {
     /* istanbul ignore if */
     if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(STORAGE_KEY)
-      if (stored) {
-        try {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY)
+        if (stored) {
           const parsed = JSON.parse(stored)
           // Ensure achievements are properly restored
           if (!parsed.achievements) parsed.achievements = []
@@ -273,9 +273,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
             return stored?.unlockedAt ? { ...a, unlockedAt: stored.unlockedAt } : a
           })
           return parsed
-        } catch {
-          return createDefaultGame()
         }
+      } catch {
+        return createDefaultGame()
       }
     }
     return createDefaultGame()
