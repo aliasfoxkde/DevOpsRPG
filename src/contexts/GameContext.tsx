@@ -61,6 +61,7 @@ export interface GameState {
   completedQuests: TopicProgress[]
   completedTopics: LearningTopicProgress[] // Learning content topic completions
   currentQuestId: string | null
+  currentQuestStartTime: number | null // Timestamp when current quest started
   achievements: Achievement[]
   showVictory: boolean
   lastVictory: { xp: number; levelUp: boolean; newLevel: number; milestone?: Milestone; badge?: Badge } | null
@@ -97,6 +98,7 @@ export interface GameState {
     challengeComplete: number // Challenge participation count
     sidequestComplete: number // Side quest completion count
     milestoneTier: number // Highest milestone tier reached
+    quizMasterScore: number // Quizzes passed with 80%+ score
   }
 }
 
@@ -133,7 +135,7 @@ interface GameContextType {
   getSkillLevel: (skillId: string) => number
   getAvailableSkillPoints: () => number
   // Stats tracking for badges
-  incrementStat: (stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame', isPerfect?: boolean, wrongAnswers?: number) => void
+  incrementStat: (stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame', isPerfect?: boolean, wrongAnswers?: number, passedWith80?: boolean) => void
   resetQuizStreak: () => void
   // Realm completion
   dismissRealmCompletion: () => void
@@ -214,6 +216,7 @@ function createDefaultGame(): GameState {
     completedQuests: [],
     completedTopics: [], // Learning content topic completions
     currentQuestId: null,
+    currentQuestStartTime: null,
     achievements: ACHIEVEMENTS.map(a => ({ ...a })),
     showVictory: false,
     lastVictory: null,
@@ -248,6 +251,7 @@ function createDefaultGame(): GameState {
       challengeComplete: 0,
       sidequestComplete: 0,
       milestoneTier: 0,
+      quizMasterScore: 0,
     },
   }
 }
@@ -425,6 +429,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         challengeComplete: prev.stats.challengeComplete,
         sidequestComplete: prev.stats.sidequestComplete,
         milestoneTier: prev.stats.milestoneTier,
+        quizMasterScore: prev.stats.quizMasterScore,
       }
 
       let newBadge: Badge | undefined
@@ -536,13 +541,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
           sessionQuestCount: prev.stats.sessionQuestCount + 1,
           earlyQuests: new Date().getHours() < 8 ? prev.stats.earlyQuests + 1 : prev.stats.earlyQuests,
           nightQuests: new Date().getHours() >= 22 ? prev.stats.nightQuests + 1 : prev.stats.nightQuests,
+          // Track fastest quest time for speed_demon badge
+          fastestQuestTime: prev.currentQuestStartTime
+            ? Math.min(prev.stats.fastestQuestTime, (Date.now() - prev.currentQuestStartTime) / 1000)
+            : prev.stats.fastestQuestTime,
         },
       }
     })
   }, [])
 
   const setCurrentQuest = useCallback((questId: string | null) => {
-    setGame(prev => ({ ...prev, currentQuestId: questId }))
+    setGame(prev => ({ ...prev, currentQuestId: questId, currentQuestStartTime: questId ? Date.now() : null }))
   }, [])
 
   const dismissVictory = useCallback(() => {
@@ -810,7 +819,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     return newlyUnlocked
   }, [])
 
-  const incrementStat = useCallback((stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame', isPerfect?: boolean, wrongAnswers?: number) => {
+  const incrementStat = useCallback((stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame', isPerfect?: boolean, wrongAnswers?: number, passedWith80?: boolean) => {
     setGame(prev => {
       const updates: Partial<GameState['stats']> = {}
       switch (stat) {
@@ -826,6 +835,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
           // Track wrong answers for no_mistakes badge
           if (wrongAnswers !== undefined) {
             updates.wrongAnswerCount = (prev.stats.wrongAnswerCount || 0) + wrongAnswers
+          }
+          // Track 80%+ scores for quiz_master badge
+          if (passedWith80) {
+            updates.quizMasterScore = (prev.stats.quizMasterScore || 0) + 1
           }
           break
         case 'typer':

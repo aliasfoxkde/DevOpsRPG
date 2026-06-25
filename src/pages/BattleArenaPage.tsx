@@ -90,9 +90,9 @@ export default function BattleArenaPage() {
   const topicContent = techContent?.topics.find(t => t.id === quest.topicId)
   const isCompleted = isQuestCompleted(quest.id)
 
-  const handleComplete = (isPerfect: boolean, wrongAnswers: number = 0) => {
+  const handleComplete = (isPerfect: boolean, wrongAnswers: number = 0, passedWith80: boolean = false) => {
     // Track quiz stats before completing (includes wrong answers for no_mistakes badge)
-    incrementStat('quiz', isPerfect, wrongAnswers)
+    incrementStat('quiz', isPerfect, wrongAnswers, passedWith80)
     completeQuest(quest.id)
     setJustCompleted(true)
 

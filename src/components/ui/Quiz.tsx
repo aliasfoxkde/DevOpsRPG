@@ -21,7 +21,7 @@ export interface QuizQuestion {
 
 interface QuizProps {
   topicId: string
-  onPass: (isPerfect: boolean, wrongAnswers: number) => void
+  onPass: (isPerfect: boolean, wrongAnswers: number, passedWith80: boolean) => void
   onSkip: () => void
 }
 
@@ -142,13 +142,14 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
     finishHandledRef.current = true
     setIsFinishing(true)
     if (!hasQuestions) {
-      onPass(false, 0) // No quiz = not perfect, no wrong answers
+      onPass(false, 0, false) // No quiz = not perfect, no wrong answers, not 80+
       return
     }
     const passThreshold = Math.ceil(allQuestionsLengthRef.current * 0.6)
     const isPerfect = correctCountRef.current === allQuestionsLengthRef.current
+    const passedWith80 = correctCountRef.current >= Math.ceil(allQuestionsLengthRef.current * 0.8)
     if (correctCountRef.current >= passThreshold) {
-      onPass(isPerfect, wrongCountRef.current)
+      onPass(isPerfect, wrongCountRef.current, passedWith80)
     } else {
       onSkip()
     }
@@ -205,7 +206,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
             ⭐ +50 XP bonus for completing without a quiz!
           </p>
           <button
-            onClick={() => onPass(false, 0)}
+            onClick={() => onPass(false, 0, false)}
             className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-bold rounded-lg shadow-lg transform transition-all hover:scale-105"
           >
             ✨ Complete Quest
