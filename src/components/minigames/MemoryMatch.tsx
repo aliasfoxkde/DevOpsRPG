@@ -174,10 +174,10 @@ export function MemoryMatch({ pairs = 6, onComplete }: MemoryMatchProps) {
                 key={card.id}
                 onClick={() => handleCardClick(index)}
                 disabled={isMatched || gameState !== 'playing'}
-                className={`aspect-square rounded-lg transition-all duration-300 transform ${
+                className={`aspect-square rounded-lg transition-all duration-300 transform touch-manipulation ${
                   isRevealed
                     ? 'bg-slate-700 scale-100'
-                    : 'bg-gradient-to-br from-amber-700 to-amber-900 hover:scale-105'
+                    : 'bg-gradient-to-br from-amber-700 to-amber-900 hover:scale-105 active:scale-95'
                 } ${isMatched ? 'ring-2 ring-green-500' : ''}`}
               >
                 {isRevealed ? (

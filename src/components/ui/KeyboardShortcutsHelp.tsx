@@ -37,8 +37,9 @@ export default function KeyboardShortcutsHelp() {
   if (!isOpen) return (
     <button
       onClick={() => setIsOpen(true)}
-      className="fixed bottom-4 left-4 z-40 w-10 h-10 rounded-full bg-slate-700 hover:bg-slate-600 text-slate-300 text-lg flex items-center justify-center shadow-lg transition-colors"
+      className="fixed bottom-16 sm:bottom-4 left-4 z-40 w-12 h-12 rounded-full bg-slate-700 hover:bg-slate-600 text-slate-300 text-lg flex items-center justify-center shadow-lg transition-colors active:scale-95 touch-manipulation"
       title="Keyboard Shortcuts (?)"
+      aria-label="Show keyboard shortcuts"
     >
       ⌨️
     </button>
