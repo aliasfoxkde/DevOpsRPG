@@ -294,6 +294,28 @@ export function GameProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(game))
   }, [game])
 
+  // Cross-tab synchronization
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue)
+          // Merge with defaults to ensure all fields exist
+          const defaults = createDefaultGame()
+          const merged = { ...defaults, ...parsed }
+          if (!merged.achievements) merged.achievements = defaults.achievements
+          if (!merged.recentBadgeUnlocks) merged.recentBadgeUnlocks = []
+          if (!merged.recentMilestoneUnlocks) merged.recentMilestoneUnlocks = []
+          setGame(merged)
+        } catch {
+          // Ignore parse errors
+        }
+      }
+    }
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
+
   const completeQuest = useCallback((questId: string) => {
     setGame(prev => {
       // Find the quest
