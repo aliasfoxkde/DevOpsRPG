@@ -38,7 +38,11 @@ export function StreakTracker() {
   const activityDays = useMemo(() => getActivityFromQuests(game.completedQuests), [game.completedQuests])
 
   const today = useMemo(() => new Date().toISOString().split('T')[0], [])
-  const yesterday = useMemo(() => new Date(Date.now() - 86400000).toISOString().split('T')[0], [])
+  const yesterday = useMemo(() => {
+    const d = new Date()
+    d.setDate(d.getDate() - 1)
+    return d.toISOString().split('T')[0]
+  }, [])
 
   const isStreakAtRisk = character.lastActive !== today && character.lastActive !== yesterday && character.streakDays > 0
   const hasActiveToday = character.lastActive === today

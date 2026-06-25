@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useGame } from '../../contexts/GameContext'
 import { XPBar } from './XPBar'
 
@@ -13,12 +13,14 @@ const NAV_ITEMS = [
   { to: '/leaderboard', icon: '🏆', label: 'Rank' },
   { to: '/character', icon: '👤', label: 'Hero' },
   { to: '/rewards', icon: '🎁', label: 'Rewards' },
+  { to: '/about', icon: 'ℹ️', label: 'About' },
 ]
 
 export function HUD() {
   const { game, completedCount, totalQuests } = useGame()
   const { character } = game
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const location = useLocation()
 
   return (
     <header className="sticky top-0 z-40 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 shadow-xl">
@@ -97,16 +99,23 @@ export function HUD() {
 
           {/* Nav Links */}
           <nav className="flex items-center gap-1">
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                className="px-3 py-1 text-sm text-slate-300 hover:text-amber-400 hover:bg-slate-700/50 rounded transition-all"
-              >
-                <span className="hidden lg:inline">{item.icon} {item.label}</span>
-                <span className="lg:hidden">{item.icon}</span>
-              </Link>
-            ))}
+            {NAV_ITEMS.map((item) => {
+              const isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to))
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={`px-3 py-1 text-sm rounded transition-all ${
+                    isActive
+                      ? 'bg-amber-600 text-white font-semibold shadow-lg shadow-amber-600/30'
+                      : 'text-slate-300 hover:text-amber-400 hover:bg-slate-700/50'
+                  }`}
+                >
+                  <span className="hidden lg:inline">{item.icon} {item.label}</span>
+                  <span className="lg:hidden">{item.icon}</span>
+                </Link>
+              )
+            })}
           </nav>
         </div>
 
@@ -128,17 +137,24 @@ export function HUD() {
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-slate-700/50 animate-slide-down">
             <nav className="grid grid-cols-3 gap-2">
-              {NAV_ITEMS.map((item) => (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex flex-col items-center gap-1 p-3 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
-                >
-                  <span className="text-2xl">{item.icon}</span>
-                  <span className="text-xs text-slate-300">{item.label}</span>
-                </Link>
-              ))}
+              {NAV_ITEMS.map((item) => {
+                const isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to))
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex flex-col items-center gap-1 p-3 rounded-lg transition-colors ${
+                      isActive
+                        ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/30'
+                        : 'bg-slate-800 hover:bg-slate-700'
+                    }`}
+                  >
+                    <span className="text-2xl">{item.icon}</span>
+                    <span className="text-xs">{item.label}</span>
+                  </Link>
+                )
+              })}
             </nav>
 
             {/* Character quick view on mobile */}

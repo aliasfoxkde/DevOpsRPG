@@ -27,6 +27,8 @@ const WorldMapPage = lazy(() => import('./pages/WorldMapPage'))
 const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'))
 const BadgesPage = lazy(() => import('./pages/BadgesPage'))
 const MilestonesPage = lazy(() => import('./pages/MilestonesPage'))
+const AboutPage = lazy(() => import('./pages/AboutPage'))
+const GameLibraryPage = lazy(() => import('./pages/GameLibraryPage'))
 
 // Loading fallback component
 function PageLoader() {
@@ -123,6 +125,8 @@ function AppContent() {
             <Route path="leaderboard" element={<LeaderboardPage />} />
             <Route path="badges" element={<BadgesPage />} />
             <Route path="milestones" element={<MilestonesPage />} />
+            <Route path="about" element={<AboutPage />} />
+            <Route path="games" element={<GameLibraryPage />} />
           </Route>
         </Routes>
       </Suspense>
