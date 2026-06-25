@@ -44,6 +44,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   const [showHint, setShowHint] = useState(false)
 
   // Use ref to avoid stale closure in handleFinish
+  const isMountedRef = useRef(true)
   const correctCountRef = useRef(correctCount)
   const wrongCountRef = useRef(wrongCount)
   const allQuestionsLengthRef = useRef(allQuestions.length)
@@ -61,6 +62,24 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   useEffect(() => {
     allQuestionsLengthRef.current = allQuestions.length
   }, [allQuestions.length])
+
+  // Track component mount state to prevent state updates after unmount
+  useEffect(() => {
+    isMountedRef.current = true
+    return () => { isMountedRef.current = false }
+  }, [])
+
+  // Safety timeout: if isFinishing gets stuck for >2s, auto-complete anyway
+  useEffect(() => {
+    if (!isFinishing) return
+    const safetyTimeout = setTimeout(() => {
+      if (isFinishing) {
+        console.warn('Quiz completion timed out, forcing completion')
+        onSkip()
+      }
+    }, 2000)
+    return () => clearTimeout(safetyTimeout)
+  }, [isFinishing, onSkip])
 
   // currentQuestion is guaranteed non-null when hasQuestions is true
   // because we return early in the render when !hasQuestions
@@ -144,6 +163,8 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
 
     // Use setTimeout to ensure UI updates before parent state changes
     setTimeout(() => {
+      // Guard against calling callbacks after unmount
+      if (!isMountedRef.current) return
       if (!hasQuestions) {
         onPass(false, 0, false)
         return
