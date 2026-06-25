@@ -37,6 +37,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - all_categories badge now properly checks earnedCategories for quest/streak/skill/secret
 - all_badges badge now properly checks total badges earned
 - QuestJournalPage realm unlock now uses actual quest count instead of fixed *5 assumption
+- Python quiz IDs fixed: python_* → py_* to match topic IDs in technologies.ts
+- TechnologyPage now uses tech.xpPerTopic for correct XP rewards (25 → 75-200 based on technology)
 
 ## [0.1.0] - 2026-06-22
 
