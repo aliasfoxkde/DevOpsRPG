@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 interface Confetti {
   id: number
@@ -11,26 +11,36 @@ interface Confetti {
 
 const CONFETTI_COLORS = ['#f59e0b', '#22c55e', '#3b82f6', '#ec4899', '#8b5cf6', '#ef4444']
 
+// Seeded random for deterministic confetti
+function seededRandom(seed: number) {
+  const x = Math.sin(seed * 9999) * 10000
+  return x - Math.floor(x)
+}
+
+// Generate confetti pieces deterministically
+function generateConfetti(): Confetti[] {
+  return Array.from({ length: 50 }, (_, i) => ({
+    id: i,
+    x: seededRandom(i * 5 + 1) * 100,
+    delay: seededRandom(i * 5 + 2) * 2,
+    color: CONFETTI_COLORS[Math.floor(seededRandom(i * 5 + 3) * CONFETTI_COLORS.length)],
+    rotation: seededRandom(i * 5 + 4) * 360,
+    size: seededRandom(i * 5 + 5) * 10 + 5,
+  }))
+}
+
 export default function CelebrationOverlay() {
-  const [confetti, setConfetti] = useState<Confetti[]>([])
+  const [confetti, setConfetti] = useState<Confetti[]>(() => generateConfetti())
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    const pieces: Confetti[] = []
-    for (let i = 0; i < 50; i++) {
-      pieces.push({
-        id: i,
-        x: Math.random() * 100,
-        delay: Math.random() * 2,
-        color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
-        rotation: Math.random() * 360,
-        size: Math.random() * 10 + 5
-      })
-    }
-    setConfetti(pieces)
-
     // Clear after animation
-    const timer = setTimeout(() => setConfetti([]), 4000)
-    return () => clearTimeout(timer)
+    timerRef.current = setTimeout(() => {
+      requestAnimationFrame(() => setConfetti([]))
+    }, 4000)
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
   }, [])
 
   if (confetti.length === 0) return null

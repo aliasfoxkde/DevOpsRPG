@@ -141,6 +141,7 @@ const defaultResponses = [
   "The answer lies in practice and persistence. Which quest calls to you?"
 ]
 
+/* eslint-disable react-refresh/only-export-components */
 // Encouragement messages based on game events
 export const encouragementMessages = {
   questComplete: [
@@ -203,22 +204,15 @@ function getRandomResponse(_keywords: string[], userMessage: string): string {
 export default function MentorChat() {
   const { game } = useGame()
   const [isOpen, setIsOpen] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<Message[]>(() => [{
+    id: '1',
+    text: `Welcome, brave adventurer! I'm your DevOps mentor. Currently at Level ${game.character.level} with ${game.character.xp} XP. How can I guide you today?`,
+    isUser: false,
+    timestamp: new Date()
+  }])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-
-  // Initial greeting
-  useEffect(() => {
-    if (messages.length === 0) {
-      setMessages([{
-        id: '1',
-        text: `Welcome, brave adventurer! I'm your DevOps mentor. Currently at Level ${game.character.level} with ${game.character.xp} XP. How can I guide you today?`,
-        isUser: false,
-        timestamp: new Date()
-      }])
-    }
-  }, [game.character.level, game.character.xp, messages.length])
 
   // Auto-scroll to bottom
   useEffect(() => {

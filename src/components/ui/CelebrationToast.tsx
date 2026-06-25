@@ -102,6 +102,7 @@ export function ToastManager({ toasts, onRemove }: ToastManagerProps) {
   )
 }
 
+/* eslint-disable react-refresh/only-export-components */
 // Hook for managing encouragement messages
 export function useEncouragement() {
   const [lastEncouragement, setLastEncouragement] = useState<string | null>(null)

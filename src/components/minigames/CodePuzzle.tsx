@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { codePuzzles, type CodePuzzle } from '../../data/minigames'
 
 interface CodePuzzleGameProps {
@@ -17,7 +17,7 @@ function shuffle<T>(array: T[]): T[] {
 }
 
 export function CodePuzzleGame({ rounds = 5, onComplete, onSkip }: CodePuzzleGameProps) {
-  const [gamePuzzles, setGamePuzzles] = useState<CodePuzzle[]>([])
+  const [gamePuzzles] = useState<CodePuzzle[]>(() => shuffle(codePuzzles).slice(0, rounds))
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
   const [showResult, setShowResult] = useState(false)
@@ -28,12 +28,6 @@ export function CodePuzzleGame({ rounds = 5, onComplete, onSkip }: CodePuzzleGam
 
   const currentPuzzle = gamePuzzles[currentIndex]
   const maxScore = rounds * 100
-
-  // Initialize game
-  useEffect(() => {
-    const puzzles = shuffle(codePuzzles).slice(0, rounds)
-    setGamePuzzles(puzzles)
-  }, [rounds])
 
   const handleSelectAnswer = (answer: string) => {
     if (showResult || !currentPuzzle) return

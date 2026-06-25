@@ -76,12 +76,12 @@ export default function CharacterSheetPage() {
             <div className="w-full h-4 bg-slate-700 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all duration-700"
-                style={{ width: `${(completedCount / totalQuests) * 100}%` }}
+                style={{ width: `${totalQuests > 0 ? (completedCount / totalQuests) * 100 : 0}%` }}
               />
             </div>
             <div className="text-right mt-1">
               <span className="text-amber-400 font-medium">
-                {Math.round((completedCount / totalQuests) * 100)}% Complete
+                {Math.round(totalQuests > 0 ? (completedCount / totalQuests) * 100 : 0)}% Complete
               </span>
             </div>
           </div>

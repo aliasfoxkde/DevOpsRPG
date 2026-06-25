@@ -2004,6 +2004,574 @@ export function generateQuizzes(): Record<string, QuizQuestion[]> {
         explanation: 'A span represents a single unit of work (operation) in a trace, with timing and metadata about that operation.'
       }
     ],
+
+    // Ansible Quizzes
+    ans_intro: [
+      {
+        id: 'ans_intro_q1',
+        topicId: 'ans_intro',
+        question: 'What is Ansible primarily used for?',
+        options: [
+          'Container orchestration',
+          'Configuration management and automation',
+          'Database management',
+          'Network routing'
+        ],
+        correctIndex: 1,
+        explanation: 'Ansible is an open-source automation tool for configuration management, application deployment, and task automation.'
+      },
+      {
+        id: 'ans_intro_q2',
+        topicId: 'ans_intro',
+        question: 'What communication method does Ansible use to connect to servers??',
+        options: [
+          'SSH only',
+          'WinRM only',
+          'SSH and WinRM',
+          'Docker API'
+        ],
+        correctIndex: 2,
+        explanation: 'Ansible uses SSH for Linux/Unix servers and WinRM (Windows Remote Management) for Windows servers.'
+      }
+    ],
+    ans_inventory: [
+      {
+        id: 'ans_inv_q1',
+        topicId: 'ans_inventory',
+        question: 'What is an Ansible inventory file?',
+        options: [
+          'A list of Ansible modules',
+          'A file that defines managed hosts and groups',
+          'A backup of playbooks',
+          'A log file for Ansible runs'
+        ],
+        correctIndex: 1,
+        explanation: 'The inventory file defines hosts and groups of hosts that Ansible manages and automation tasks target.'
+      },
+      {
+        id: 'ans_inv_q2',
+        topicId: 'ans_inventory',
+        question: 'What is the default location for the Ansible inventory file?',
+        options: [
+          '/etc/ansible/hosts',
+          '~/.ansible/hosts',
+          '/opt/inventory.ini',
+          '~/inventory.yml'
+        ],
+        correctIndex: 0,
+        explanation: 'By default, Ansible looks for the inventory file at /etc/ansible/hosts, but this can be customized.'
+      }
+    ],
+    ans_playbooks: [
+      {
+        id: 'ans_play_q1',
+        topicId: 'ans_playbooks',
+        question: 'What language are Ansible playbooks written in?',
+        options: [
+          'Python',
+          'YAML',
+          'JSON',
+          'XML'
+        ],
+        correctIndex: 1,
+        explanation: 'Ansible playbooks are written in YAML (YAML Ain\'t Markup Language), making them human-readable.'
+      },
+      {
+        id: 'ans_play_q2',
+        topicId: 'ans_playbooks',
+        question: 'What is a "play" in an Ansible playbook?',
+        options: [
+          'A single task to execute',
+          'A mapping between hosts and tasks',
+          'A configuration file',
+          'An inventory group'
+        ],
+        correctIndex: 1,
+        explanation: 'A play defines which hosts to target and what tasks to run on those hosts.'
+      }
+    ],
+    ans_roles: [
+      {
+        id: 'ans_role_q1',
+        topicId: 'ans_roles',
+        question: 'What is the purpose of Ansible roles?',
+        options: [
+          'To define user permissions',
+          'To organize and reuse playbook components',
+          'To manage server hardware',
+          'To monitor server performance'
+        ],
+        correctIndex: 1,
+        explanation: 'Roles allow you to package tasks, handlers, variables, and other files into a reusable structure.'
+      },
+      {
+        id: 'ans_role_q2',
+        topicId: 'ans_roles',
+        question: 'Which directory structure is used by Ansible roles?',
+        options: [
+          'bin/, lib/, doc/',
+          'tasks/, handlers/, vars/, templates/, files/',
+          'src/, include/, module/',
+          'play/, run/, config/'
+        ],
+        correctIndex: 1,
+        explanation: 'Standard Ansible role directories include tasks/, handlers/, vars/, defaults/, templates/, files/, and more.'
+      }
+    ],
+    ans_modules: [
+      {
+        id: 'ans_mod_q1',
+        topicId: 'ans_modules',
+        question: 'What are Ansible modules?',
+        options: [
+          'Physical server components',
+          'Units of code that Ansible executes on targets',
+          'Network protocols',
+          'Database schemas'
+        ],
+        correctIndex: 1,
+        explanation: 'Modules are standalone scripts that Ansible executes on target hosts to perform specific tasks.'
+      },
+      {
+        id: 'ans_mod_q2',
+        topicId: 'ans_modules',
+        question: 'Which module would you use to manage packages on Debian/Ubuntu?',
+        options: [
+          'yum_package',
+          'apt_package',
+          'brew_package',
+          'chocolatey'
+        ],
+        correctIndex: 1,
+        explanation: 'The apt_package module is used for managing packages on Debian-based systems like Ubuntu.'
+      }
+    ],
+
+    // Kafka Quizzes
+    kafka_intro: [
+      {
+        id: 'kafka_intro_q1',
+        topicId: 'kafka_intro',
+        question: 'What type of system is Apache Kafka?',
+        options: [
+          'Relational database',
+          'Distributed event streaming platform',
+          'Message queue only',
+          'File storage system'
+        ],
+        correctIndex: 1,
+        explanation: 'Apache Kafka is a distributed event streaming platform used for building real-time data pipelines and streaming apps.'
+      },
+      {
+        id: 'kafka_intro_q2',
+        topicId: 'kafka_intro',
+        question: 'What is the primary programming language Kafka is written in?',
+        options: [
+          'Python',
+          'Java and Scala',
+          'Go',
+          'Ruby'
+        ],
+        correctIndex: 1,
+        explanation: 'Kafka is primarily written in Java and Scala, which gives it high performance and scalability.'
+      }
+    ],
+    kafka_topics: [
+      {
+        id: 'kafka_topic_q1',
+        topicId: 'kafka_topics',
+        question: 'What is a Kafka topic?',
+        options: [
+          'A database table',
+          'A category/feed name for messages',
+          'A network protocol',
+          'A user account'
+        ],
+        correctIndex: 1,
+        explanation: 'A topic is a logical channel or category to which producers send messages and consumers read from.'
+      },
+      {
+        id: 'kafka_topic_q2',
+        topicId: 'kafka_topics',
+        question: 'What is topic partitioning in Kafka?',
+        options: [
+          'Compressing topic messages',
+          'Dividing a topic into multiple segments',
+          'Encrypting topic data',
+          'Backing up topic data'
+        ],
+        correctIndex: 1,
+        explanation: 'Partitioning divides a topic into multiple segments called partitions, enabling parallel processing and scalability.'
+      }
+    ],
+    kafka_producers: [
+      {
+        id: 'kafka_prod_q1',
+        topicId: 'kafka_producers',
+        question: 'What is the role of a Kafka producer?',
+        options: [
+          'To consume messages from topics',
+          'To publish/send messages to Kafka topics',
+          'To manage Kafka broker storage',
+          'To authenticate Kafka users'
+        ],
+        correctIndex: 1,
+        explanation: 'Producers are applications that publish/send records (messages) to Kafka topics.'
+      },
+      {
+        id: 'kafka_prod_q2',
+        topicId: 'kafka_producers',
+        question: 'What determines which partition a message is sent to?',
+        options: [
+          'Random selection only',
+          'Message key or round-robin',
+          'Consumer preference only',
+          'Broker availability'
+        ],
+        correctIndex: 1,
+        explanation: 'If a message has a key, Kafka hashes it to determine the partition. Otherwise, it uses round-robin.'
+      }
+    ],
+    kafka_consumers: [
+      {
+        id: 'kafka_cons_q1',
+        topicId: 'kafka_consumers',
+        question: 'What is a Kafka consumer group?',
+        options: [
+          'A group of Kafka administrators',
+          'A set of consumers that jointly consume topics',
+          'A collection of related topics',
+          'A security group for Kafka access'
+        ],
+        correctIndex: 1,
+        explanation: 'A consumer group is a set of consumers cooperating to consume messages from topics, with each partition assigned to one consumer.'
+      },
+      {
+        id: 'kafka_cons_q2',
+        topicId: 'kafka_consumers',
+        question: 'What is offset in Kafka consumer context?',
+        options: [
+          'The timestamp of a message',
+          'The sequential position of a message in a partition',
+          'The size of the message queue',
+          'The network latency measurement'
+        ],
+        correctIndex: 1,
+        explanation: 'An offset is a sequential index number that uniquely identifies each message within a partition.'
+      }
+    ],
+    kafka_streams: [
+      {
+        id: 'kafka_str_q1',
+        topicId: 'kafka_streams',
+        question: 'What is Kafka Streams used for?',
+        options: [
+          'Storing persistent data',
+          'Processing streaming data in real-time',
+          'Managing Kafka clusters',
+          'Creating Kafka topics'
+        ],
+        correctIndex: 1,
+        explanation: 'Kafka Streams is a client library for building real-time streaming applications that process data from Kafka.'
+      },
+      {
+        id: 'kafka_str_q2',
+        topicId: 'kafka_streams',
+        question: 'What is a "stream" in Kafka Streams?',
+        options: [
+          'A network connection',
+          'An immutable sequence of data records',
+          'A Kafka broker',
+          'A consumer group'
+        ],
+        correctIndex: 1,
+        explanation: 'In Kafka Streams, a stream is an immutable, ordered sequence of data records that can be processed.'
+      }
+    ],
+    kafka_connect: [
+      {
+        id: 'kafka_conn_q1',
+        topicId: 'kafka_connect',
+        question: 'What is Kafka Connect?',
+        options: [
+          'A Kafka client library',
+          'A framework for connecting Kafka with external systems',
+          'A network configuration tool',
+          'A monitoring dashboard'
+        ],
+        correctIndex: 1,
+        explanation: 'Kafka Connect is a framework for scalably and reliably streaming data between Kafka and other systems.'
+      },
+      {
+        id: 'kafka_conn_q2',
+        topicId: 'kafka_connect',
+        question: 'What are connectors in Kafka Connect?',
+        options: [
+          'Network cables for Kafka brokers',
+          'Plugins that define how to integrate with external systems',
+          'Consumer group configurations',
+          'Topic replication settings'
+        ],
+        correctIndex: 1,
+        explanation: 'Connectors are plugins that implement the integration logic for connecting Kafka to specific external systems.'
+      }
+    ],
+
+    // RabbitMQ Quizzes
+    rmq_intro: [
+      {
+        id: 'rmq_intro_q1',
+        topicId: 'rmq_intro',
+        question: 'What is RabbitMQ?',
+        options: [
+          'A database management system',
+          'An open-source message broker',
+          'A web server',
+          'A container runtime'
+        ],
+        correctIndex: 1,
+        explanation: 'RabbitMQ is an open-source message broker that implements the AMQP protocol for asynchronous messaging.'
+      },
+      {
+        id: 'rmq_intro_q2',
+        topicId: 'rmq_intro',
+        question: 'What protocol does RabbitMQ primarily implement?',
+        options: [
+          'HTTP',
+          'AMQP (Advanced Message Queuing Protocol)',
+          'FTP',
+          'SSH'
+        ],
+        correctIndex: 1,
+        explanation: 'RabbitMQ primarily implements the AMQP protocol, though it also supports other protocols like MQTT and STOMP.'
+      }
+    ],
+    rmq_exchanges: [
+      {
+        id: 'rmq_exch_q1',
+        topicId: 'rmq_exchanges',
+        question: 'What is a RabbitMQ exchange?',
+        options: [
+          'A message storage location',
+          'A routing entity that receives and routes messages',
+          'A user authentication service',
+          'A network gateway'
+        ],
+        correctIndex: 1,
+        explanation: 'An exchange receives messages from producers and routes them to queues based on routing rules and bindings.'
+      },
+      {
+        id: 'rmq_exch_q2',
+        topicId: 'rmq_exchanges',
+        question: 'Which exchange type routes messages to all bound queues?',
+        options: [
+          'direct',
+          'fanout',
+          'topic',
+          'headers'
+        ],
+        correctIndex: 1,
+        explanation: 'Fanout exchange routes messages to ALL queues bound to it, regardless of routing key.'
+      }
+    ],
+    rmq_queues: [
+      {
+        id: 'rmq_queue_q1',
+        topicId: 'rmq_queues',
+        question: 'What is a queue in RabbitMQ?',
+        options: [
+          'A type of exchange',
+          'A FIFO buffer that stores messages',
+          'A network connection',
+          'A user permission set'
+        ],
+        correctIndex: 1,
+        explanation: 'A queue is a FIFO (first-in-first-out) buffer that stores messages until they are consumed.'
+      },
+      {
+        id: 'rmq_queue_q2',
+        topicId: 'rmq_queues',
+        question: 'What happens when a queue is durable?',
+        options: [
+          'It can only be accessed by durable connections',
+          'It survives broker restarts',
+          'It encrypts all messages',
+          'It has unlimited storage'
+        ],
+        correctIndex: 1,
+        explanation: 'A durable queue is persisted to disk and survives broker restarts, unlike transient queues.'
+      }
+    ],
+    rmq_bindings: [
+      {
+        id: 'rmq_bind_q1',
+        topicId: 'rmq_bindings',
+        question: 'What is a binding in RabbitMQ?',
+        options: [
+          'A network connection between brokers',
+          'A link between an exchange and a queue',
+          'A user authentication mechanism',
+          'A message encryption key'
+        ],
+        correctIndex: 1,
+        explanation: 'A binding defines the relationship between an exchange and a queue, often with a routing key pattern.'
+      },
+      {
+        id: 'rmq_bind_q2',
+        topicId: 'rmq_bindings',
+        question: 'What is a binding key?',
+        options: [
+          'A password for accessing queues',
+          'A pattern used to match routing keys',
+          'A certificate for TLS connections',
+          'A message priority level'
+        ],
+        correctIndex: 1,
+        explanation: 'A binding key is a pattern (like "*.stock.*") that the exchange uses to determine which queues should receive messages.'
+      }
+    ],
+    rmq_publish: [
+      {
+        id: 'rmq_pub_q1',
+        topicId: 'rmq_publish',
+        question: 'What is the difference between direct and persistent message delivery?',
+        options: [
+          'Direct uses TCP, persistent uses UDP',
+          'Direct is fire-and-forget, persistent is saved to disk',
+          'Direct is encrypted, persistent is not',
+          'There is no difference'
+        ],
+        correctIndex: 1,
+        explanation: 'Persistent messages are saved to disk before acknowledgment, surviving broker restarts. Direct messages are not.'
+      },
+      {
+        id: 'rmq_pub_q2',
+        topicId: 'rmq_publish',
+        question: 'What does it mean when publishing with mandatory=true?',
+        options: [
+          'The message is encrypted',
+          'The message is guaranteed to be routed to a queue',
+          'The message has highest priority',
+          'The message is compressed'
+        ],
+        correctIndex: 1,
+        explanation: 'With mandatory=true, if a message cannot be routed to any queue, it is returned to the producer.'
+      }
+    ],
+
+    // Istio Quizzes
+    istio_intro: [
+      {
+        id: 'istio_intro_q1',
+        topicId: 'istio_intro',
+        question: 'What is Istio?',
+        options: [
+          'A container orchestration platform',
+          'A service mesh solution for microservices',
+          'A programming language',
+          'A database system'
+        ],
+        correctIndex: 1,
+        explanation: 'Istio is a service mesh that provides traffic management, security, and observability for microservices.'
+      },
+      {
+        id: 'istio_intro_q2',
+        topicId: 'istio_intro',
+        question: 'What programming language is Istio primarily written in?',
+        options: [
+          'Python',
+          'Go',
+          'Java',
+          'Rust'
+        ],
+        correctIndex: 1,
+        explanation: 'Istio is primarily written in Go, which is common for cloud-native infrastructure projects.'
+      }
+    ],
+    istio_traffic: [
+      {
+        id: 'istio_traffic_q1',
+        topicId: 'istio_traffic',
+        question: 'What is traffic splitting in Istio used for?',
+        options: [
+          'Dividing network bandwidth',
+          'Routing a percentage of traffic to different versions',
+          'Load balancing only',
+          'Firewall configuration'
+        ],
+        correctIndex: 1,
+        explanation: 'Traffic splitting allows you to route percentages of traffic to different service versions for canary deployments.'
+      },
+      {
+        id: 'istio_traffic_q2',
+        topicId: 'istio_traffic',
+        question: 'What is a VirtualService in Istio?',
+        options: [
+          'A Kubernetes virtual machine',
+          'A resource that defines routing rules for traffic',
+          'A network cable',
+          'A database connection'
+        ],
+        correctIndex: 1,
+        explanation: 'VirtualService configures how requests are routed to a service within the mesh.'
+      }
+    ],
+    istio_security: [
+      {
+        id: 'istio_sec_q1',
+        topicId: 'istio_security',
+        question: 'What does Istio\'s mTLS (mutual TLS) provide?',
+        options: [
+          'Single-direction authentication',
+          'Bidirectional authentication between services',
+          'Message encryption only',
+          'User authentication only'
+        ],
+        correctIndex: 1,
+        explanation: 'mTLS ensures both the client and server authenticate each other and encrypt traffic between them.'
+      },
+      {
+        id: 'istio_sec_q2',
+        topicId: 'istio_security',
+        question: 'What is a PeerAuthentication policy in Istio?',
+        options: [
+          'A policy for user login',
+          'A policy that defines how services authenticate with each other',
+          'A policy for database connections',
+          'A policy for API access'
+        ],
+        correctIndex: 1,
+        explanation: 'PeerAuthentication defines how mutual TLS is enforced between services in the mesh.'
+      }
+    ],
+    istio_observability: [
+      {
+        id: 'istio_obs_q1',
+        topicId: 'istio_observability',
+        question: 'What is telemetry collection in Istio?',
+        options: [
+          'Manual logging by developers',
+          'Automatic collection of metrics, logs, and traces',
+          'Database backup',
+          'Network configuration'
+        ],
+        correctIndex: 1,
+        explanation: 'Istio automatically collects telemetry data (metrics, traces, logs) without requiring changes to application code.'
+      },
+      {
+        id: 'istio_obs_q2',
+        topicId: 'istio_observability',
+        question: 'Which tool does Istio use for distributed tracing?',
+        options: [
+          'CloudWatch',
+          'Jaeger or Zipkin',
+          'Datadog',
+          'New Relic'
+        ],
+        correctIndex: 1,
+        explanation: 'Istio integrates with Jaeger and Zipkin for distributed tracing across microservices.'
+      }
+    ],
   }
 
   return quizzes

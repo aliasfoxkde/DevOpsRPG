@@ -167,5 +167,6 @@ export default function TreasureChest({ questDifficulty = 1, onChestOpen }: Trea
   )
 }
 
+/* eslint-disable react-refresh/only-export-components */
 // Export helper for random loot
 export { getRandomLoot, type LootDrop }

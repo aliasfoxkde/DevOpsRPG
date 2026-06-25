@@ -15,7 +15,7 @@ type ViewMode = 'study' | 'quiz'
 export default function BattleArenaPage() {
   const { questId } = useParams<{ questId: string }>()
   const navigate = useNavigate()
-  const { game, completeQuest, isQuestCompleted, getNextQuest, addXP, addGold } = useGame()
+  const { game, completeQuest, isQuestCompleted, getNextQuest, addXP, addGold, incrementStat } = useGame()
   const [viewMode, setViewMode] = useState<ViewMode>('study')
   const [justCompleted, setJustCompleted] = useState(false)
   const [showMiniGame, setShowMiniGame] = useState(false)
@@ -41,12 +41,16 @@ export default function BattleArenaPage() {
   useEffect(() => {
     if (game.lastVictory?.milestone) {
       const m = game.lastVictory.milestone
-      setMilestoneData({ icon: m.icon, title: m.title, message: m.message, xpBonus: m.xpBonus })
+      requestAnimationFrame(() => {
+        setMilestoneData({ icon: m.icon, title: m.title, message: m.message, xpBonus: m.xpBonus })
+      })
       setTimeout(() => setShowMilestone(true), 2000)
     }
     if (game.lastVictory?.badge) {
       const b = game.lastVictory.badge
-      setBadgeData({ icon: b.icon, name: b.name, description: b.description })
+      requestAnimationFrame(() => {
+        setBadgeData({ icon: b.icon, name: b.name, description: b.description })
+      })
       setTimeout(() => setShowBadge(true), 2500)
     }
   }, [game.lastVictory])
@@ -86,7 +90,9 @@ export default function BattleArenaPage() {
   const topicContent = techContent?.topics.find(t => t.id === quest.topicId)
   const isCompleted = isQuestCompleted(quest.id)
 
-  const handleComplete = () => {
+  const handleComplete = (isPerfect: boolean, wrongAnswers: number = 0) => {
+    // Track quiz stats before completing (includes wrong answers for no_mistakes badge)
+    incrementStat('quiz', isPerfect, wrongAnswers)
     completeQuest(quest.id)
     setJustCompleted(true)
 

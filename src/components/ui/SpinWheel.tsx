@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 interface SpinWheelProps {
   onSpinComplete: (prize: { type: string; value: number; name: string }) => void
@@ -30,6 +30,8 @@ function getRandomPrize() {
 export default function SpinWheel({ onSpinComplete, isSpinning }: SpinWheelProps) {
   const [rotation, setRotation] = useState(0)
   const [spinning, setSpinning] = useState(false)
+  const isSpinningRef = useRef(false)
+  const rotationRef = useRef(0)
 
   const spin = useCallback(() => {
     setSpinning(true)
@@ -40,21 +42,28 @@ export default function SpinWheel({ onSpinComplete, isSpinning }: SpinWheelProps
     const baseRotation = (prizeIndex * segmentAngle) + (segmentAngle / 2)
     // Add multiple full rotations plus randomness within segment
     const spins = 5 + Math.random() * 3
-    const targetRotation = rotation + (spins * 360) + (360 - baseRotation) + (Math.random() * segmentAngle - segmentAngle / 2)
+    const currentRotation = rotationRef.current
+    const targetRotation = currentRotation + (spins * 360) + (360 - baseRotation) + (Math.random() * segmentAngle - segmentAngle / 2)
+    rotationRef.current = targetRotation
 
     setRotation(targetRotation)
 
     setTimeout(() => {
       setSpinning(false)
+      isSpinningRef.current = false
       onSpinComplete(prize)
     }, 4000)
-  }, [onSpinComplete, rotation])
+  }, [onSpinComplete])
 
   useEffect(() => {
-    if (isSpinning && !spinning) {
-      spin()
+    if (isSpinning && !isSpinningRef.current) {
+      isSpinningRef.current = true
+      // Use requestAnimationFrame to defer the spin call
+      requestAnimationFrame(() => {
+        spin()
+      })
     }
-  }, [isSpinning, spinning, spin])
+  }, [isSpinning, spin])
 
   const segmentAngle = 360 / prizes.length
 

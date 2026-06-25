@@ -7,6 +7,8 @@ const phaseOrder = [
   { phase: 3, name: 'Frameworks & Databases', icon: '🗄️' },
   { phase: 4, name: 'Advanced & Cloud', icon: '☁️' },
   { phase: 5, name: 'Modern DevOps', icon: '🚀' },
+  { phase: 6, name: 'AI & Intelligence', icon: '🤖' },
+  { phase: 7, name: 'Service Mesh', icon: '🔗' },
 ]
 
 export default function LearnPage() {

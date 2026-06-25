@@ -8,7 +8,8 @@ const NAV_ITEMS = [
   { to: '/worldmap', icon: '🗺️', label: 'Map' },
   { to: '/quests', icon: '📜', label: 'Quests' },
   { to: '/sidequests', icon: '⚔️', label: 'Side Quests' },
-  { to: '/skills', icon: '🎯', label: 'Skills' },
+  { to: '/challenges', icon: '🎯', label: 'Challenges' },
+  { to: '/skills', icon: '⚡', label: 'Skills' },
   { to: '/leaderboard', icon: '🏆', label: 'Rank' },
   { to: '/character', icon: '👤', label: 'Hero' },
   { to: '/rewards', icon: '🎁', label: 'Rewards' },
@@ -87,7 +88,7 @@ export function HUD() {
               <div className="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-green-500 to-emerald-400 transition-all duration-500"
-                  style={{ width: `${(completedCount / totalQuests) * 100}%` }}
+                  style={{ width: `${totalQuests > 0 ? (completedCount / totalQuests) * 100 : 0}%` }}
                 />
               </div>
               <span className="text-slate-300">{completedCount}/{totalQuests}</span>
@@ -118,7 +119,7 @@ export function HUD() {
           <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-green-500 to-emerald-400 transition-all duration-500"
-              style={{ width: `${(completedCount / totalQuests) * 100}%` }}
+              style={{ width: `${totalQuests > 0 ? (completedCount / totalQuests) * 100 : 0}%` }}
             />
           </div>
         </div>

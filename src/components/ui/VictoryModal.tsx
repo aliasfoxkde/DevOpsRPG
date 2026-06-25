@@ -1,20 +1,31 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { useGame } from '../../contexts/GameContext'
+import { useSoundEffects } from '../../hooks/useSoundEffects'
 import { XPBar } from './XPBar'
 import { RARITY_COLORS } from '../../data/badges'
 
-// Particle component defined outside render to avoid "Cannot create components during render"
-function Particles({ show }: { show: boolean }) {
-  if (!show) return null
+// Seeded random number generator for deterministic particle positions
+function seededRandom(seed: number) {
+  const x = Math.sin(seed * 9999) * 10000
+  return x - Math.floor(x)
+}
 
-  const particles = Array.from({ length: 50 }, (_, i) => ({
-    id: i,
-    x: Math.random() * 100,
-    delay: Math.random() * 2,
-    duration: 2 + Math.random() * 2,
-    size: 4 + Math.random() * 8,
-    color: ['✨', '⭐', '💫', '🌟', '🎉'][Math.floor(Math.random() * 5)],
-  }))
+// Particle component with memoized deterministic particles
+function Particles({ show }: { show: boolean }) {
+  // Use deterministic particle generation based on fixed seed
+  const particles = useMemo(() => {
+    const EMOJIS = ['✨', '⭐', '💫', '🌟', '🎉']
+    return Array.from({ length: 50 }, (_, i) => ({
+      id: i,
+      x: seededRandom(i * 3 + 1) * 100,
+      delay: seededRandom(i * 3 + 2) * 2,
+      duration: 2 + seededRandom(i * 3 + 3) * 2,
+      size: 4 + seededRandom(i * 3 + 4) * 8,
+      color: EMOJIS[Math.floor(seededRandom(i * 3 + 5) * 5)],
+    }))
+  }, []) // Empty deps = generate once with fixed seed
+
+  if (!show) return null
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -38,14 +49,32 @@ function Particles({ show }: { show: boolean }) {
 
 export function VictoryModal() {
   const { game, dismissVictory } = useGame()
+  const { playSound } = useSoundEffects()
   const [showParticles, setShowParticles] = useState(false)
 
+  // Use ref to track if we've already shown particles for this victory
+  const victoryShownRef = useRef(false)
+
   useEffect(() => {
-    if (game.showVictory && game.lastVictory) {
+    if (game.showVictory && game.lastVictory && !victoryShownRef.current) {
+      victoryShownRef.current = true
       setShowParticles(true)
       setTimeout(() => setShowParticles(false), 3000)
+
+      // Play appropriate sound effects
+      if (game.lastVictory.levelUp) {
+        playSound('levelUp')
+      } else {
+        playSound('questComplete')
+      }
+      if (game.lastVictory.milestone) {
+        playSound('milestone')
+      }
+      if (game.lastVictory.badge) {
+        playSound('badge')
+      }
     }
-  }, [game.showVictory, game.lastVictory])
+  }, [game.showVictory, game.lastVictory, playSound])
 
   // Handle 'n' key for continue
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { mathChallenges, type MathChallenge } from '../../data/minigames'
 
 interface MathChallengeGameProps {
@@ -7,7 +7,10 @@ interface MathChallengeGameProps {
 }
 
 export default function MathChallengeGame({ onComplete, onSkip }: MathChallengeGameProps) {
-  const [challenges, setChallenges] = useState<MathChallenge[]>([])
+  const [challenges] = useState<MathChallenge[]>(() => {
+    const shuffled = [...mathChallenges].sort(() => Math.random() - 0.5)
+    return shuffled.slice(0, 8)
+  })
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answer, setAnswer] = useState('')
   const [correct, setCorrect] = useState(0)
@@ -16,11 +19,6 @@ export default function MathChallengeGame({ onComplete, onSkip }: MathChallengeG
   const [finished, setFinished] = useState(false)
   const [showHint, setShowHint] = useState(false)
   const [inputError, setInputError] = useState(false)
-
-  useEffect(() => {
-    const shuffled = [...mathChallenges].sort(() => Math.random() - 0.5)
-    setChallenges(shuffled.slice(0, 8))
-  }, [])
 
   const current = challenges[currentIndex]
 
@@ -38,14 +36,15 @@ export default function MathChallengeGame({ onComplete, onSkip }: MathChallengeG
     }
 
     if (numAnswer === current.answer) {
-      setCorrect(c => c + 1)
+      const newCorrect = correct + 1
+      setCorrect(newCorrect)
       setShowHint(false)
       setAnswer('')
 
       if (currentIndex < challenges.length - 1) {
         setCurrentIndex(i => i + 1)
       } else {
-        const baseXP = correct * 15 + challenges.length * 5
+        const baseXP = newCorrect * 15 + challenges.length * 5
         const accuracyBonus = correct / (correct + wrong + 1) > 0.7 ? 25 : 0
         setFinished(true)
         setTimeout(() => onComplete(baseXP, baseXP + accuracyBonus), 1000)

@@ -34,7 +34,7 @@ export const TRAITS: PersonalityTrait[] = [
   { id: 'collaborative', name: 'Collaborative', description: 'Values team success', icon: '🤝', value: 0 },
   { id: 'risk_taker', name: 'Risk Taker', description: 'Dives into difficult problems', icon: '🎲', value: 0 },
   { id: 'cautious', name: 'Cautious', description: 'Thinks before acting', icon: '🛡️', value: 0 },
-  { id: ' impatient', name: 'Impatient', description: 'Wants quick results', icon: '⚡', value: 0 },
+  { id: 'impatient', name: 'Impatient', description: 'Wants quick results', icon: '⚡', value: 0 },
   { id: 'patient', name: 'Patient', description: 'Takes time to understand', icon: '🧘', value: 0 },
   { id: 'perfectionist', name: 'Perfectionist', description: 'Details matter', icon: '🔬', value: 0 },
   { id: 'pragmatic', name: 'Pragmatic', description: 'Results over perfection', icon: '🛠️', value: 0 },

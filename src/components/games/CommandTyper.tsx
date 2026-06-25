@@ -8,7 +8,13 @@ interface CommandTyperProps {
 }
 
 export default function CommandTyper({ onComplete, onSkip, category }: CommandTyperProps) {
-  const [pool, setPool] = useState<Command[]>([])
+  const [pool] = useState<Command[]>(() => {
+    const filtered = category
+      ? commands.filter(c => c.category === category)
+      : commands
+    const shuffled = [...filtered].sort(() => Math.random() - 0.5)
+    return shuffled.slice(0, 10)
+  })
   const [currentIndex, setCurrentIndex] = useState(0)
   const [input, setInput] = useState('')
   const [started, setStarted] = useState(false)
@@ -18,14 +24,6 @@ export default function CommandTyper({ onComplete, onSkip, category }: CommandTy
   const [showHint, setShowHint] = useState(false)
   const [finished, setFinished] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    const filtered = category
-      ? commands.filter(c => c.category === category)
-      : commands
-    const shuffled = [...filtered].sort(() => Math.random() - 0.5)
-    setPool(shuffled.slice(0, 10))
-  }, [category])
 
   useEffect(() => {
     if (started && inputRef.current) {

@@ -104,7 +104,7 @@ export default function QuestJournalPage() {
                 <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden mb-4">
                   <div
                     className="h-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all duration-500"
-                    style={{ width: `${(progress.completed / progress.total) * 100}%` }}
+                    style={{ width: `${progress.total > 0 ? (progress.completed / progress.total) * 100 : 0}%` }}
                   />
                 </div>
 
@@ -172,11 +172,11 @@ export default function QuestJournalPage() {
             <div className="w-full h-4 bg-slate-800 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400 transition-all duration-700"
-                style={{ width: `${(completedCount / totalQuests) * 100}%` }}
+                style={{ width: `${totalQuests > 0 ? (completedCount / totalQuests) * 100 : 0}%` }}
               />
             </div>
             <p className="mt-2 text-amber-400 font-medium">
-              {Math.round((completedCount / totalQuests) * 100)}% Complete
+              {Math.round(totalQuests > 0 ? (completedCount / totalQuests) * 100 : 0)}% Complete
             </p>
           </div>
 

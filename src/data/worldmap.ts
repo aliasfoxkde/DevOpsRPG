@@ -203,13 +203,3 @@ export function calculateMapProgress(completedQuests: Set<string>, totalQuests: 
   if (totalQuests === 0) return 0
   return Math.round((completedQuests.size / totalQuests) * 100)
 }
-
-// Get realm completion status
-export function getRealmCompletionStatus(
-  _realmId: string,
-  _completedQuests: Set<string>,
-  _realmTechnologies: string[]
-): { completed: number; total: number; percentage: number } {
-  // This would need quest data to calculate properly
-  return { completed: 0, total: 0, percentage: 0 }
-}

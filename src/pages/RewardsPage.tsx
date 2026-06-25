@@ -21,9 +21,9 @@ export default function RewardsPage() {
 
   const getTierProgress = (tier: typeof REWARD_TIERS[0]) => {
     switch (tier.requirement.type) {
-      case 'quests': return completedCount / tier.requirement.value
-      case 'level': return game.character.level / tier.requirement.value
-      case 'xp': return game.character.xp / tier.requirement.value
+      case 'quests': return tier.requirement.value > 0 ? completedCount / tier.requirement.value : 0
+      case 'level': return tier.requirement.value > 0 ? game.character.level / tier.requirement.value : 0
+      case 'xp': return tier.requirement.value > 0 ? game.character.xp / tier.requirement.value : 0
       default: return 0
     }
   }
@@ -79,10 +79,21 @@ export default function RewardsPage() {
       useCollectible(collectible.id)
       return
     }
-    setMysteryBoxToOpen(collectible)
-    const result = openMysteryBox(collectible)
-    setMysteryResult(result)
-    setShowMystery(true)
+    try {
+      setMysteryBoxToOpen(collectible)
+      const result = openMysteryBox(collectible)
+      setMysteryResult(result)
+      setShowMystery(true)
+    } catch (err) {
+      console.error('Failed to open mystery box:', err)
+      // Show a friendly error message to the user
+      setMysteryResult({
+        type: 'gold',
+        value: 10,
+        collectible: undefined,
+      })
+      setShowMystery(true)
+    }
   }
 
   const handleCloseMystery = () => {

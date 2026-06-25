@@ -4,12 +4,15 @@ interface XPBarProps {
   compact?: boolean
 }
 
+const XP_PER_LEVEL = 100
+
 export function XPBar({ compact = false }: XPBarProps) {
   const { game } = useGame()
   const { character } = game
 
-  const xpInCurrentLevel = character.xp % 100
-  const progressPercent = (xpInCurrentLevel / 100) * 100
+  // Calculate XP within current level (XP above the threshold for previous levels)
+  const xpInCurrentLevel = character.xp - (character.level - 1) * XP_PER_LEVEL
+  const progressPercent = Math.min(100, (xpInCurrentLevel / XP_PER_LEVEL) * 100)
 
   if (compact) {
     return (
@@ -21,7 +24,7 @@ export function XPBar({ compact = false }: XPBarProps) {
             style={{ width: `${progressPercent}%` }}
           />
         </div>
-        <span className="text-xs text-gray-400">{xpInCurrentLevel}/100</span>
+        <span className="text-xs text-gray-400">{xpInCurrentLevel}/{XP_PER_LEVEL}</span>
       </div>
     )
   }
@@ -33,7 +36,7 @@ export function XPBar({ compact = false }: XPBarProps) {
           {character.title}
         </span>
         <span className="text-xs text-gray-400">
-          {xpInCurrentLevel} / 100 XP
+          {xpInCurrentLevel} / {XP_PER_LEVEL} XP
         </span>
       </div>
       <div className="w-full h-3 bg-gray-800 rounded-full overflow-hidden border border-gray-700">
@@ -44,7 +47,7 @@ export function XPBar({ compact = false }: XPBarProps) {
       </div>
       <div className="flex items-center justify-between text-xs">
         <span className="text-gray-500">Level {character.level}</span>
-        <span className="text-amber-400 font-medium">+{100 - xpInCurrentLevel} XP to Level Up</span>
+        <span className="text-amber-400 font-medium">+{XP_PER_LEVEL - xpInCurrentLevel} XP to Level Up</span>
       </div>
     </div>
   )

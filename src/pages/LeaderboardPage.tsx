@@ -22,39 +22,34 @@ function generateMockLeaderboard(playerName: string, playerLevel: number, player
   const realms = ['Village of Foundations', 'Forest of Scripts', 'Castle of Frameworks', 'Mountains of Cloud', 'Citadel of DevOps']
   const names = [
     'ShadowCoder', 'ByteRunner', 'CloudNinja', 'DataWizard', 'GitGuru',
-    'DockMaster', 'K8sCommander', 'PipelineKing', ' InfraSage', 'ScriptWizard',
+    'DockMaster', 'K8sCommander', 'PipelineKing', 'InfraSage', 'ScriptWizard',
     'CodeNinja', 'TerminalHero', 'DeployDemon', 'MonitorMaven', 'LogLegend',
     'BugSlayer', 'StackOverflow', 'APIPhantom', 'ContainerCaptain', 'VaultVictor'
   ]
 
   const entries: LeaderboardEntry[] = []
 
-  // Add player entry (positioned based on level)
-  const playerPosition = Math.max(1, Math.floor(Math.random() * 15))
+  // Create player entry
+  const playerEntry: LeaderboardEntry = {
+    id: 'player',
+    name: playerName + ' (You)',
+    class: classes[Math.min(Math.floor(playerLevel / 5), classes.length - 1)],
+    level: playerLevel,
+    xp: playerXP,
+    completedQuests: Math.floor(playerLevel * 3.5),
+    badges: playerBadges,
+    streak: Math.floor(Math.random() * 7),
+    lastActive: 'Just now',
+    realm: realms[Math.min(Math.floor(playerLevel / 5), realms.length - 1)]
+  }
 
-  // Generate top players
+  // Generate mock entries
   for (let i = 0; i < 20; i++) {
     const level = 25 - Math.floor(i / 3)
     const xp = level * 1000 + Math.floor(Math.random() * 500)
-    const position = i + 1
-
-    if (position === playerPosition) {
-      entries.push({
-        id: 'player',
-        name: playerName + ' (You)',
-        class: classes[Math.min(Math.floor(level / 5), classes.length - 1)],
-        level: playerLevel,
-        xp: playerXP,
-        completedQuests: Math.floor(playerLevel * 3.5),
-        badges: playerBadges,
-        streak: Math.floor(Math.random() * 7),
-        lastActive: 'Just now',
-        realm: realms[Math.min(Math.floor(playerLevel / 5), realms.length - 1)]
-      })
-    }
 
     entries.push({
-      id: `player_${i}`,
+      id: `mock_${i}`,
       name: names[i] || `Hero${i}`,
       class: classes[Math.min(Math.floor(level / 5), classes.length - 1)],
       level,
@@ -67,11 +62,13 @@ function generateMockLeaderboard(playerName: string, playerLevel: number, player
     })
   }
 
-  // Sort by XP
+  // Add player entry
+  entries.push(playerEntry)
+
+  // Sort by XP descending and assign final positions
   entries.sort((a, b) => b.xp - a.xp)
 
-  // Re-index positions
-  return entries.map((e, i) => ({ ...e, id: i === playerPosition - 1 ? 'player' : `mock_${i}` }))
+  return entries.map((e, i) => ({ ...e, id: e.id === 'player' ? 'player' : `mock_${i}` }))
 }
 
 type SortKey = 'rank' | 'name' | 'level' | 'xp' | 'completedQuests' | 'badges' | 'streak'

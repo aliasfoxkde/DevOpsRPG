@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { memoryIcons } from '../../data/minigames'
 
 interface MemoryMatchProps {
@@ -15,15 +15,7 @@ interface Card {
 }
 
 export default function MemoryMatch({ onComplete, onSkip }: MemoryMatchProps) {
-  const [cards, setCards] = useState<Card[]>([])
-  const [flippedIndices, setFlippedIndices] = useState<number[]>([])
-  const [moves, setMoves] = useState(0)
-  const [matches, setMatches] = useState(0)
-  const [started, setStarted] = useState(false)
-  const [finished, setFinished] = useState(false)
-  const [startTime, setStartTime] = useState<number | null>(null)
-
-  const initializeGame = useCallback(() => {
+  const [cards, setCards] = useState<Card[]>(() => {
     const selected = memoryIcons.slice(0, 6)
     const pairs = [...selected, ...selected]
       .sort(() => Math.random() - 0.5)
@@ -34,15 +26,14 @@ export default function MemoryMatch({ onComplete, onSkip }: MemoryMatchProps) {
         flipped: false,
         matched: false,
       }))
-    setCards(pairs)
-    setFlippedIndices([])
-    setMoves(0)
-    setMatches(0)
-  }, [])
-
-  useEffect(() => {
-    initializeGame()
-  }, [initializeGame])
+    return pairs
+  })
+  const [flippedIndices, setFlippedIndices] = useState<number[]>([])
+  const [moves, setMoves] = useState(0)
+  const [matches, setMatches] = useState(0)
+  const [started, setStarted] = useState(false)
+  const [finished, setFinished] = useState(false)
+  const [startTime, setStartTime] = useState<number | null>(null)
 
   const handleCardClick = (index: number) => {
     if (!started) setStarted(true)
@@ -92,7 +83,11 @@ export default function MemoryMatch({ onComplete, onSkip }: MemoryMatchProps) {
 
   useEffect(() => {
     if (started && !finished) {
-      if (!startTime) setStartTime(Date.now())
+      if (!startTime) {
+        requestAnimationFrame(() => {
+          setStartTime(Date.now())
+        })
+      }
     }
   }, [started, startTime, finished])
 

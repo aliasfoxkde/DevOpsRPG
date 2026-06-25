@@ -4,6 +4,7 @@ import { BADGES, shouldUnlockBadge, type Badge } from '../data/badges'
 import { MILESTONES, checkMilestone, type Milestone } from '../data/milestones'
 import { generateDailyQuests, generateWeeklyQuests, generateSecretQuests, type SideQuest } from '../data/sidequests'
 import { getRandomCollectible, COLLECTIBLES_POOL, DAILY_REWARDS, spinWheel as doSpin, type Collectible } from '../data/collectibles'
+import { technologies } from '../data/technologies'
 
 export type CharacterClass = 'Cloud Knight' | 'Script Warrior' | 'Data Mage' | 'DevOps Sage'
 
@@ -38,6 +39,15 @@ export interface TopicProgress {
   completedAt?: string
 }
 
+// Learning topic progress (for w3schools content) - separate from quest completion
+export interface LearningTopicProgress {
+  topicId: string
+  technologyId: string
+  completed: boolean
+  xpEarned: number
+  completedAt?: string
+}
+
 export interface Achievement {
   id: string
   name: string
@@ -49,6 +59,7 @@ export interface Achievement {
 export interface GameState {
   character: Character
   completedQuests: TopicProgress[]
+  completedTopics: LearningTopicProgress[] // Learning content topic completions
   currentQuestId: string | null
   achievements: Achievement[]
   showVictory: boolean
@@ -63,6 +74,9 @@ export interface GameState {
   completedRealms: string[] // Track which realms have been completed
   showRealmCompletion: string | null // Realm ID if showing realm completion modal
   hasSeenOnboarding: boolean // Track if user has completed onboarding
+  // Notification system for recent unlocks
+  recentBadgeUnlocks: Badge[] // Badges unlocked since last dismiss
+  recentMilestoneUnlocks: Milestone[] // Milestones unlocked since last dismiss
   // Stats for badge unlocking
   stats: {
     quizCount: number
@@ -96,6 +110,10 @@ interface GameContextType {
   getCompletedTopicIds: () => Set<string>
   totalQuests: number
   completedCount: number
+  // Learning topic methods (for w3schools content)
+  completeLearningTopic: (topicId: string, technologyId: string, xpEarned: number) => void
+  isLearningTopicCompleted: (topicId: string) => boolean
+  getCompletedLearningTopicIds: () => Set<string>
   // Badge/Sidequest/Milestone/Collectible methods
   claimDailyReward: (day: number) => { type: string; value?: number; collectible?: Collectible }
   spinWheel: () => { segment: { id: string; label: string; icon: string; reward: { type: string; value?: number; collectibleId?: string } } }
@@ -112,7 +130,7 @@ interface GameContextType {
   getSkillLevel: (skillId: string) => number
   getAvailableSkillPoints: () => number
   // Stats tracking for badges
-  incrementStat: (stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame', isPerfect?: boolean) => void
+  incrementStat: (stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame', isPerfect?: boolean, wrongAnswers?: number) => void
   resetQuizStreak: () => void
   // Realm completion
   dismissRealmCompletion: () => void
@@ -122,6 +140,7 @@ interface GameContextType {
   addXP: (amount: number) => void
   addGold: (amount: number) => void
   grantBadge: (badgeId: string) => void
+  dismissRecentUnlocks: () => void
 }
 
 const STORAGE_KEY = 'devopsquest_game'
@@ -190,6 +209,7 @@ function createDefaultGame(): GameState {
   return {
     character: createDefaultCharacter(),
     completedQuests: [],
+    completedTopics: [], // Learning content topic completions
     currentQuestId: null,
     achievements: ACHIEVEMENTS.map(a => ({ ...a })),
     showVictory: false,
@@ -204,6 +224,8 @@ function createDefaultGame(): GameState {
     completedRealms: [],
     showRealmCompletion: null,
     hasSeenOnboarding: false,
+    recentBadgeUnlocks: [],
+    recentMilestoneUnlocks: [],
     stats: {
       quizCount: 0,
       quizPerfectCount: 0,
@@ -235,6 +257,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         try {
           const parsed = JSON.parse(stored)
           // Ensure achievements are properly restored
+          if (!parsed.achievements) parsed.achievements = []
           parsed.achievements = ACHIEVEMENTS.map(a => {
             const stored = parsed.achievements.find((ua: Achievement) => ua.id === a.id)
             return stored?.unlockedAt ? { ...a, unlockedAt: stored.unlockedAt } : a
@@ -351,8 +374,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
         )
         if (allComplete) {
           completedRealmIds.push(realm.id)
-          newShowRealmCompletion = realm.id
-          break
+          // Only show modal for first newly completed realm
+          if (!newShowRealmCompletion) {
+            newShowRealmCompletion = realm.id
+          }
         }
       }
 
@@ -380,6 +405,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
         typerCount: prev.stats.typerCount,
         memoryCount: prev.stats.memoryCount,
         mathCount: prev.stats.mathCount,
+        // Derived stats for new badge requirement types
+        allRealms: completedRealmIds.length >= 5,
+        allTechnologies: completedTechIds.length >= 40,
+        goldHoard: prev.character.gold,
       }
 
       let newBadge: Badge | undefined
@@ -522,6 +551,44 @@ export function GameProvider({ children }: { children: ReactNode }) {
     return new Set(game.completedQuests.map(q => q.topicId))
   }, [game.completedQuests])
 
+  // Learning topic methods (for w3schools content)
+  const completeLearningTopic = useCallback((topicId: string, technologyId: string, xpEarned: number) => {
+    setGame(prev => {
+      // Check if already completed
+      if (prev.completedTopics.some(t => t.topicId === topicId)) return prev
+
+      const newXp = prev.character.xp + xpEarned
+      const newLevel = calculateLevel(newXp)
+
+      return {
+        ...prev,
+        completedTopics: [
+          ...prev.completedTopics,
+          {
+            topicId,
+            technologyId,
+            completed: true,
+            xpEarned,
+            completedAt: new Date().toISOString(),
+          },
+        ],
+        character: {
+          ...prev.character,
+          xp: newXp,
+          level: newLevel,
+        },
+      }
+    })
+  }, [])
+
+  const isLearningTopicCompleted = useCallback((topicId: string) => {
+    return game.completedTopics.some(t => t.topicId === topicId)
+  }, [game.completedTopics])
+
+  const getCompletedLearningTopicIds = useCallback(() => {
+    return new Set(game.completedTopics.map(t => t.topicId))
+  }, [game.completedTopics])
+
   const isRealmUnlockedInternal = useCallback((realm: Realm) => {
     const completedIds = getCompletedTopicIds()
     return isRealmUnlocked(realm, game.character.level, completedIds)
@@ -540,22 +607,27 @@ export function GameProvider({ children }: { children: ReactNode }) {
     if (!game.currentQuestId) {
       const next = getNextQuestInternal()
       if (next) {
-        setGame(prev => ({ ...prev, currentQuestId: next.id }))
+        requestAnimationFrame(() => {
+          setGame(prev => ({ ...prev, currentQuestId: next.id }))
+        })
       }
     }
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Intentional: run once on mount to set initial quest
 
   // Check for daily reset
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0]
     if (game.lastDailyReset !== today) {
       // Reset daily quests and daily rewards for new day
-      setGame(prev => ({
-        ...prev,
-        sideQuests: [...generateDailyQuests(), ...generateWeeklyQuests(), ...generateSecretQuests()],
-        dailyRewardsClaimed: [], // Reset daily rewards on new day
-        lastDailyReset: today,
-      }))
+      requestAnimationFrame(() => {
+        setGame(prev => ({
+          ...prev,
+          sideQuests: [...generateDailyQuests(), ...generateWeeklyQuests(), ...generateSecretQuests()],
+          dailyRewardsClaimed: [], // Reset daily rewards on new day
+          lastDailyReset: today,
+        }))
+      })
     }
   }, [game.lastDailyReset])
 
@@ -678,6 +750,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const checkAndUnlockBadges = useCallback((): Badge[] => {
     const newlyUnlocked: Badge[] = []
     setGame(prev => {
+      // Compute completed technologies from completed quests
+      const completedTopicIds = new Set(prev.completedQuests.map(q => q.topicId))
+      const techCompleted: string[] = []
+      for (const tech of Object.values(technologies)) {
+        const techQuests = allQuests.filter(q => q.technologyId === tech.id)
+        if (techQuests.length > 0 && techQuests.every(q => completedTopicIds.has(q.topicId))) {
+          techCompleted.push(tech.id)
+        }
+      }
+
       const stats = {
         questCount: prev.completedQuests.length,
         streakDays: prev.character.streakDays,
@@ -686,27 +768,33 @@ export function GameProvider({ children }: { children: ReactNode }) {
         minigameCount: prev.stats.minigameCount,
         perfectQuiz: prev.stats.perfectQuiz,
         quizStreak: prev.stats.quizStreak,
-        techCompleted: [] as string[],
+        techCompleted,
         realmCompleted: prev.completedRealms.length,
         typerCount: prev.stats.typerCount,
         memoryCount: prev.stats.memoryCount,
         mathCount: prev.stats.mathCount,
       }
+      const newRecentBadges: Badge[] = []
       const updated = prev.badges.map(b => {
         if (b.unlockedAt) return b
         if (shouldUnlockBadge(b, stats)) {
           const unlocked = { ...b, unlockedAt: new Date().toISOString() }
           newlyUnlocked.push(unlocked)
+          newRecentBadges.push(unlocked)
           return unlocked
         }
         return b
       })
-      return { ...prev, badges: updated }
+      return {
+        ...prev,
+        badges: updated,
+        recentBadgeUnlocks: [...prev.recentBadgeUnlocks, ...newRecentBadges],
+      }
     })
     return newlyUnlocked
   }, [])
 
-  const incrementStat = useCallback((stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame', isPerfect?: boolean) => {
+  const incrementStat = useCallback((stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame', isPerfect?: boolean, wrongAnswers?: number) => {
     setGame(prev => {
       const updates: Partial<GameState['stats']> = {}
       switch (stat) {
@@ -718,6 +806,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
             updates.perfectQuiz = true
           } else {
             updates.quizStreak = 0
+          }
+          // Track wrong answers for no_mistakes badge
+          if (wrongAnswers !== undefined) {
+            updates.wrongAnswerCount = (prev.stats.wrongAnswerCount || 0) + wrongAnswers
           }
           break
         case 'typer':
@@ -747,36 +839,61 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const checkAndUnlockMilestones = useCallback((): Milestone[] => {
     const newlyUnlocked: Milestone[] = []
     setGame(prev => {
+      // Compute completed technologies from completed quests
+      const completedTopicIds = new Set(prev.completedQuests.map(q => q.topicId))
+      const completedTechnologies: string[] = []
+      for (const tech of Object.values(technologies)) {
+        const techQuests = allQuests.filter(q => q.technologyId === tech.id)
+        if (techQuests.length > 0 && techQuests.every(q => completedTopicIds.has(q.topicId))) {
+          completedTechnologies.push(tech.id)
+        }
+      }
+
       const state = {
         completedQuests: prev.completedQuests.length,
         streakDays: prev.character.streakDays,
         level: prev.character.level,
-        completedRealms: [],
-        completedTechnologies: [],
-        quizStreak: 0,
-        minigamesCompleted: 0,
-        hasDefeatedBoss: false,
-        hasPerfectQuiz: false,
+        completedRealms: prev.completedRealms,
+        completedTechnologies,
+        quizStreak: prev.stats.quizStreak,
+        minigamesCompleted: prev.stats.minigameCount,
+        hasDefeatedBoss: prev.completedQuests.some(q => {
+          const quest = allQuests.find(aq => aq.id === q.questId)
+          return quest?.type === 'boss'
+        }),
+        hasPerfectQuiz: prev.stats.perfectQuiz,
       }
+      const newRecentMilestones: Milestone[] = []
       const updated = prev.milestones.map(m => {
         if (m.unlocked) return m
         if (checkMilestone(m, state)) {
           const unlocked = { ...m, unlocked: true, unlockedAt: new Date().toISOString() }
           newlyUnlocked.push(unlocked)
+          newRecentMilestones.push(unlocked)
           return unlocked
         }
         return m
       })
-      return { ...prev, milestones: updated }
+      return {
+        ...prev,
+        milestones: updated,
+        recentMilestoneUnlocks: [...prev.recentMilestoneUnlocks, ...newRecentMilestones],
+      }
     })
     return newlyUnlocked
   }, [])
 
   const refreshSideQuests = useCallback(() => {
-    setGame(prev => ({
-      ...prev,
-      sideQuests: [...generateDailyQuests(), ...generateWeeklyQuests(), ...generateSecretQuests()],
-    }))
+    setGame(prev => {
+      const newQuests = [...generateDailyQuests(), ...generateWeeklyQuests(), ...generateSecretQuests()]
+      const existingInProgress = prev.sideQuests.filter(q => !q.completed)
+      const existingCompletedIds = new Set(prev.sideQuests.filter(q => q.completed).map(q => q.id))
+      const freshQuests = newQuests.filter(q => !existingCompletedIds.has(q.id))
+      return {
+        ...prev,
+        sideQuests: [...existingInProgress, ...freshQuests],
+      }
+    })
   }, [])
 
   const claimSideQuest = useCallback((questId: string): { xp: number; gold: number } => {
@@ -914,11 +1031,22 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setGame(prev => {
       const badge = BADGES.find(b => b.id === badgeId)
       if (!badge || prev.badges.some(b => b.id === badgeId)) return prev
+      const newlyUnlocked = { ...badge, unlockedAt: new Date().toISOString() }
       return {
         ...prev,
-        badges: [...prev.badges, { ...badge, unlockedAt: new Date().toISOString() }],
+        badges: [...prev.badges, newlyUnlocked],
+        recentBadgeUnlocks: [...prev.recentBadgeUnlocks, newlyUnlocked],
       }
     })
+  }, [])
+
+  // Dismiss recent unlocks (clear the notification queue)
+  const dismissRecentUnlocks = useCallback(() => {
+    setGame(prev => ({
+      ...prev,
+      recentBadgeUnlocks: [],
+      recentMilestoneUnlocks: [],
+    }))
   }, [])
 
   return (
@@ -936,6 +1064,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
         getCompletedTopicIds,
         totalQuests: allQuests.length,
         completedCount: game.completedQuests.length,
+        // Learning topic methods (for w3schools content)
+        completeLearningTopic,
+        isLearningTopicCompleted,
+        getCompletedLearningTopicIds,
         // New engagement systems
         claimDailyReward,
         spinWheel,
@@ -959,6 +1091,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         addXP,
         addGold,
         grantBadge,
+        dismissRecentUnlocks,
         // Stats tracking
         incrementStat,
         resetQuizStreak,
@@ -969,6 +1102,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   )
 }
 
+/* eslint-disable react-refresh/only-export-components */
 export function useGame() {
   const context = useContext(GameContext)
   if (!context) {

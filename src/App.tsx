@@ -17,6 +17,7 @@ import CharacterSheetPage from './pages/CharacterSheetPage'
 import ProfilePage from './pages/ProfilePage'
 import RewardsPage from './pages/RewardsPage'
 import SideQuestsPage from './pages/SideQuestsPage'
+import ChallengesPage from './pages/ChallengesPage'
 import SkillsPage from './pages/SkillsPage'
 import WorldMapPage from './pages/WorldMapPage'
 import LeaderboardPage from './pages/LeaderboardPage'
@@ -34,7 +35,7 @@ interface Toast {
 }
 
 function AppContent() {
-  const { game, dismissRealmCompletion } = useGame()
+  const { game, dismissRealmCompletion, dismissRecentUnlocks } = useGame()
   const [toasts, setToasts] = useState<Toast[]>([])
   const [showOnboarding, setShowOnboarding] = useState(!game.hasSeenOnboarding)
   useKeyboardShortcuts()
@@ -46,6 +47,39 @@ function AppContent() {
   const addToast = (toast: Toast) => {
     setToasts(prev => [...prev, toast])
   }
+
+  // Show toasts for recent badge unlocks
+  useEffect(() => {
+    game.recentBadgeUnlocks.forEach((badge) => {
+      const toast: Toast = {
+        id: `badge-${badge.id}-${Date.now()}`,
+        message: `🏅 Badge Unlocked: ${badge.name}!`,
+        type: 'achievement',
+        icon: badge.icon,
+      }
+      addToast(toast)
+    })
+    if (game.recentBadgeUnlocks.length > 0) {
+      dismissRecentUnlocks()
+    }
+  }, [game.recentBadgeUnlocks, dismissRecentUnlocks])
+
+  // Show toasts for recent milestone unlocks
+  useEffect(() => {
+    game.recentMilestoneUnlocks.forEach((milestone) => {
+      const toast: Toast = {
+        id: `milestone-${milestone.id}-${Date.now()}`,
+        message: `🏆 Milestone Reached: ${milestone.title}!`,
+        type: 'milestone',
+        icon: '🏆',
+        xpGained: milestone.xpBonus,
+      }
+      addToast(toast)
+    })
+    if (game.recentMilestoneUnlocks.length > 0) {
+      dismissRecentUnlocks()
+    }
+  }, [game.recentMilestoneUnlocks, dismissRecentUnlocks])
 
   // Expose toast function globally for other components
   useEffect(() => {
@@ -67,6 +101,7 @@ function AppContent() {
           <Route path="profile" element={<ProfilePage />} />
           <Route path="rewards" element={<RewardsPage />} />
           <Route path="sidequests" element={<SideQuestsPage />} />
+          <Route path="challenges" element={<ChallengesPage />} />
           <Route path="skills" element={<SkillsPage />} />
           <Route path="worldmap" element={<WorldMapPage />} />
           <Route path="leaderboard" element={<LeaderboardPage />} />

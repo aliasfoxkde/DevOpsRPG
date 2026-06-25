@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 interface Encounter {
   id: string
@@ -64,15 +64,21 @@ interface EncounterEventProps {
 export default function EncounterEvent({ onComplete }: EncounterEventProps) {
   const [encounter, setEncounter] = useState<Encounter | null>(null)
   const [showEncounter, setShowEncounter] = useState(false)
+  const hasRolledRef = useRef(false)
 
   useEffect(() => {
-    // 20% chance of encounter every time component mounts (quest change)
-    if (!showEncounter && !encounter) {
+    // 20% chance of encounter - only roll once on mount
+    if (!hasRolledRef.current) {
+      hasRolledRef.current = true
       const roll = Math.random()
       if (roll < 0.20) {
         const encounterData = ENCOUNTERS[Math.floor(Math.random() * ENCOUNTERS.length)]
-        setEncounter({ ...encounterData, id: Date.now().toString() })
-        setTimeout(() => setShowEncounter(true), 500)
+        const encounterWithId = { ...encounterData, id: Date.now().toString() }
+        // Use requestAnimationFrame to defer state update
+        requestAnimationFrame(() => {
+          setEncounter(encounterWithId)
+          setTimeout(() => setShowEncounter(true), 500)
+        })
       }
     }
   }, [])

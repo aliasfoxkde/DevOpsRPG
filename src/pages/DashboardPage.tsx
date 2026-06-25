@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useGame } from '@/contexts'
-import { ProgressBar } from '@/components/ui'
+import { ProgressBar, StreakTracker } from '@/components/ui'
 
 const ACHIEVEMENTS = [
   { key: 'first_steps', name: 'First Steps', description: 'Complete your first topic', check: (p: number) => p >= 1 },
@@ -43,7 +43,8 @@ export default function DashboardPage() {
     return checkAchievement(a.key, { xp: character.xp, level: character.level, streakDays: character.streakDays, completedTopics })
   })
 
-  const xpProgress = character.xp % 100
+  const XP_PER_LEVEL = 100
+  const xpProgress = character.xp - (character.level - 1) * XP_PER_LEVEL
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -61,13 +62,11 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Streak Card */}
+        {/* Enhanced Streak Tracker */}
         <div className="bg-card rounded-lg border border-border p-6" role="region" aria-labelledby="streak-heading">
           <h3 id="streak-heading" className="text-muted-foreground mb-2">Current Streak</h3>
-          <p className="text-4xl font-bold text-accent" aria-live="polite">
-            <span aria-hidden="true">🔥</span> {character.streakDays} days
-          </p>
-          <p className="text-sm text-muted-foreground mt-1">Keep it going!</p>
+          <span aria-hidden="true" className="text-2xl">🔥</span>
+          <StreakTracker />
         </div>
 
         {/* Progress Card */}

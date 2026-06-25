@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useGame } from '../contexts/GameContext'
 import { MILESTONES, type Milestone } from '../data/milestones'
@@ -146,9 +146,9 @@ export default function MilestonesPage() {
   }), [completedQuests, character.streakDays, character.level, game.completedRealms])
 
   // Check if milestone is unlocked
-  const isUnlocked = (milestone: Milestone) => {
+  const isUnlocked = useCallback((milestone: Milestone) => {
     return milestone.unlocked || milestones.some(m => m.id === milestone.id && m.unlocked)
-  }
+  }, [milestones])
 
   // Filter milestones
   const filteredMilestones = useMemo(() => {
@@ -167,7 +167,7 @@ export default function MilestonesPage() {
       const bProgress = getMilestoneProgress(b, playerStats).percent
       return bProgress - aProgress
     })
-  }, [filterStatus, filterType, milestones, playerStats])
+  }, [filterStatus, filterType, playerStats, isUnlocked])
 
   const unlockedCount = milestones.filter(m => m.unlocked).length
   const totalCount = MILESTONES.length

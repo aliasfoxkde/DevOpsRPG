@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { useGame } from '../../contexts/GameContext'
 import { realms, realmStories, allQuests } from '../../data/quests'
 import { BADGES } from '../../data/badges'
@@ -8,23 +8,28 @@ interface RealmCompletionModalProps {
   onClose: () => void
 }
 
-// Particle component defined outside render to avoid "Cannot create components during render"
-function Particles() {
-  const [showParticles, setShowParticles] = useState(false)
+// Seeded random for deterministic particles
+function seededRandom(seed: number) {
+  const x = Math.sin(seed * 9999) * 10000
+  return x - Math.floor(x)
+}
 
-  useEffect(() => {
-    setShowParticles(true)
+// Particle component with memoized deterministic particles
+function Particles() {
+  const [showParticles] = useState(true)
+
+  const particles = useMemo(() => {
+    const EMOJIS = ['🎉', '⭐', '✨', '🏆', '💫', '🎊', '🌟']
+    return Array.from({ length: 100 }, (_, i) => ({
+      id: i,
+      x: seededRandom(i * 4 + 1) * 100,
+      delay: seededRandom(i * 4 + 2) * 3,
+      duration: 3 + seededRandom(i * 4 + 3) * 2,
+      color: EMOJIS[Math.floor(seededRandom(i * 4 + 4) * 7)],
+    }))
   }, [])
 
   if (!showParticles) return null
-
-  const particles = Array.from({ length: 100 }, (_, i) => ({
-    id: i,
-    x: Math.random() * 100,
-    delay: Math.random() * 3,
-    duration: 3 + Math.random() * 2,
-    color: ['🎉', '⭐', '✨', '🏆', '💫', '🎊', '🌟'][Math.floor(Math.random() * 7)],
-  }))
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -48,7 +53,8 @@ function Particles() {
 
 export function RealmCompletionModal({ realmId, onClose }: RealmCompletionModalProps) {
   const { game } = useGame()
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(5)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   const realm = realms[realmId]
   const realmStory = realmStories[realmId]
@@ -63,12 +69,11 @@ export function RealmCompletionModal({ realmId, onClose }: RealmCompletionModalP
   const realmBadges = BADGES.filter(b => b.requirement.type === 'realm_complete' && b.requirement.value === Object.keys(realms).indexOf(realmId) + 1)
 
   useEffect(() => {
-    setCount(5) // Start countdown
-
-    const timer = setInterval(() => {
+    // Start countdown
+    timerRef.current = setInterval(() => {
       setCount(prev => {
         if (prev <= 1) {
-          clearInterval(timer)
+          if (timerRef.current) clearInterval(timerRef.current)
           onClose()
           return 0
         }
@@ -76,7 +81,9 @@ export function RealmCompletionModal({ realmId, onClose }: RealmCompletionModalP
       })
     }, 1000)
 
-    return () => clearInterval(timer)
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current)
+    }
   }, [onClose])
 
   // Handle 'n' key for skip

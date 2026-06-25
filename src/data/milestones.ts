@@ -120,6 +120,7 @@ export function checkMilestone(milestone: Milestone, gameState: {
   minigamesCompleted: number
   hasDefeatedBoss: boolean
   hasPerfectQuiz: boolean
+  fastestQuestTime?: number // in seconds
 }): boolean {
   switch (milestone.trigger.type) {
     case 'quest_count':
@@ -140,6 +141,11 @@ export function checkMilestone(milestone: Milestone, gameState: {
       return gameState.hasDefeatedBoss
     case 'perfect_quiz':
       return gameState.hasPerfectQuiz
+    case 'speed_quest':
+      // milestone.trigger.minutes is the threshold in minutes
+      return gameState.fastestQuestTime != null &&
+        gameState.fastestQuestTime > 0 &&
+        gameState.fastestQuestTime <= milestone.trigger.minutes * 60
     default:
       return false
   }

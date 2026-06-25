@@ -128,8 +128,8 @@ export function useKeyboardShortcuts(enabled = true) {
 
       // If we have a pending key, check for sequence
       if (pendingKeyRef.current) {
-        clearPendingKey()
         const sequence = `${pendingKeyRef.current} ${key}`
+        clearPendingKey()
 
         const shortcut = SHORTCUTS.find((s: KeyboardShortcut) => s.key === sequence)
         /* istanbul ignore if */
@@ -138,11 +138,6 @@ export function useKeyboardShortcuts(enabled = true) {
           shortcut.action()
           return
         }
-
-        // Check if first key alone is a shortcut (like 'g')
-        const singleShortcut = SHORTCUTS.find((s: KeyboardShortcut) => s.key === key)
-        /* istanbul ignore if */
-        if (singleShortcut && key === pendingKeyRef.current) { return }
 
       }
 
@@ -168,7 +163,8 @@ export function useKeyboardShortcuts(enabled = true) {
       window.removeEventListener('keydown', handleKeyDown)
       clearPendingKey()
     }
-  }, [enabled, navigate, clearPendingKey, handleNKey])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled, navigate, clearPendingKey, handleNKey]) // SHORTCUTS is constant, defined outside component
 
   return { shortcuts: SHORTCUTS }
 }

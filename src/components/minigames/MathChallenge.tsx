@@ -17,7 +17,7 @@ function shuffle<T>(array: T[]): T[] {
 }
 
 export function MathChallengeGame({ rounds = 5, onComplete, onSkip }: MathChallengeGameProps) {
-  const [gameProblems, setGameProblems] = useState<MathChallenge[]>([])
+  const [gameProblems] = useState<MathChallenge[]>(() => shuffle(mathChallenges).slice(0, rounds))
   const [currentIndex, setCurrentIndex] = useState(0)
   const [input, setInput] = useState('')
   const [timeLeft, setTimeLeft] = useState(45)
@@ -82,12 +82,10 @@ export function MathChallengeGame({ rounds = 5, onComplete, onSkip }: MathChalle
     }
   }
 
-  // Initialize game
+  // Focus input on mount
   useEffect(() => {
-    const problems = shuffle(mathChallenges).slice(0, rounds)
-    setGameProblems(problems)
     inputRef.current?.focus()
-  }, [rounds])
+  }, [])
 
   // Timer
   useEffect(() => {

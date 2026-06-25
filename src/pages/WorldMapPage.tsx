@@ -179,7 +179,7 @@ export default function WorldMapPage() {
         {/* Trees/Forest decorations */}
         <div className="absolute bottom-20 left-10 text-4xl opacity-30 pointer-events-none">🌲</div>
         <div className="absolute bottom-24 left-20 text-3xl opacity-20 pointer-events-none">🌲</div>
-        <div className="absolute bottom-18 right-20 text-4xl opacity-25 pointer-events-none">🌲</div>
+        <div className="absolute bottom-16 right-20 text-4xl opacity-25 pointer-events-none">🌲</div>
         <div className="absolute bottom-28 right-32 text-2xl opacity-20 pointer-events-none">🌴</div>
 
         {/* Rocks decoration */}
@@ -286,7 +286,7 @@ export default function WorldMapPage() {
                   <span className="text-2xl">{location.icon}</span>
                   {status && status.total > 0 && (
                     <div className="absolute -bottom-1 -right-1 bg-green-600 text-white text-xs px-1.5 rounded-full font-bold">
-                      {Math.round((status.completed / status.total) * 100)}%
+                      {Math.round(status.total > 0 ? (status.completed / status.total) * 100 : 0)}%
                     </div>
                   )}
                   {location.unlocksAtLevel && character.level < location.unlocksAtLevel && (

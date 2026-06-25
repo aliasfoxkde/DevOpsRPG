@@ -9,7 +9,7 @@ interface CommandTyperProps {
 }
 
 export function CommandTyper({ category, rounds = 5, onComplete, onSkip }: CommandTyperProps) {
-  const [gameCommands, setGameCommands] = useState<Command[]>([])
+  const [gameCommands] = useState<Command[]>(() => getRandomCommands(rounds, category))
   const [currentIndex, setCurrentIndex] = useState(0)
   const [input, setInput] = useState('')
   const [timeLeft, setTimeLeft] = useState(30)
@@ -17,7 +17,10 @@ export function CommandTyper({ category, rounds = 5, onComplete, onSkip }: Comma
   const [correctCount, setCorrectCount] = useState(0)
   const [wrongCount, setWrongCount] = useState(0)
   const [gameState, setGameState] = useState<'playing' | 'finished'>('playing')
-  const [charStates, setCharStates] = useState<('correct' | 'wrong' | 'pending')[]>([])
+  const [charStates, setCharStates] = useState<('correct' | 'wrong' | 'pending')[]>(() => {
+    const cmds = getRandomCommands(rounds, category)
+    return new Array(cmds[0]?.command.length || 0).fill('pending')
+  })
   const inputRef = useRef<HTMLInputElement>(null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -58,13 +61,10 @@ export function CommandTyper({ category, rounds = 5, onComplete, onSkip }: Comma
     }
   }, [currentCommand, input, currentIndex, gameCommands.length, timeLeft, handleFinish])
 
-  // Initialize game
+  // Focus input on mount
   useEffect(() => {
-    const cmds = getRandomCommands(rounds, category)
-    setGameCommands(cmds)
-    setCharStates(new Array(cmds[0]?.command.length || 0).fill('pending'))
     inputRef.current?.focus()
-  }, [rounds, category])
+  }, [])
 
   // Timer
   useEffect(() => {
@@ -101,7 +101,9 @@ export function CommandTyper({ category, rounds = 5, onComplete, onSkip }: Comma
       }
     }
 
-    setCharStates(newCharStates)
+    requestAnimationFrame(() => {
+      setCharStates(newCharStates)
+    })
   }, [input, currentCommand])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

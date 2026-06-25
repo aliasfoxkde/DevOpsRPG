@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useGame } from '../contexts/GameContext'
 import { BADGES, RARITY_COLORS, type Badge, type BadgeCategory } from '../data/badges'
@@ -57,7 +57,7 @@ function getRequirementText(badge: Badge, stats: PlayerStats): string {
 
 export default function BadgesPage() {
   const { game } = useGame()
-  const { character, completedQuests, badges } = game
+  const { character, completedQuests, badges, completedRealms } = game
 
   const [filterCategory, setFilterCategory] = useState<FilterCategory>('all')
   const [filterRarity, setFilterRarity] = useState<FilterRarity>('all')
@@ -79,8 +79,8 @@ export default function BadgesPage() {
 
     // Calculate realm completed
     const realmCompleted = completedQuests.filter(q =>
-      q.topicId.includes('realm') || game.completedRealms.length
-    ).length > 0 ? game.completedRealms.length : 0
+      q.topicId.includes('realm') || completedRealms.length
+    ).length > 0 ? completedRealms.length : 0
 
     return {
       questCount: completedQuests.length,
@@ -96,12 +96,12 @@ export default function BadgesPage() {
       memoryCount: 0,
       mathCount: 0,
     }
-  }, [completedQuests, character.streakDays, character.level, game.completedRealms])
+  }, [completedQuests, character.streakDays, character.level, completedRealms])
 
   // Check if badge is unlocked
-  const isUnlocked = (badge: Badge) => {
+  const isUnlocked = useCallback((badge: Badge) => {
     return badges.some(b => b.id === badge.id && b.unlockedAt)
-  }
+  }, [badges])
 
   // Get unlock progress for a badge (0-100)
   const getProgress = (badge: Badge) => {
@@ -144,7 +144,7 @@ export default function BadgesPage() {
       const bUnlocked = isUnlocked(b) ? 0 : 1
       return aUnlocked - bUnlocked
     })
-  }, [filterCategory, filterRarity, filterStatus, badges])
+  }, [filterCategory, filterRarity, filterStatus, isUnlocked])
 
   const unlockedCount = badges.length
   const totalCount = BADGES.length

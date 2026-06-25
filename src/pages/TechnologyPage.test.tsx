@@ -1,17 +1,17 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen, act } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { ProgressProvider } from '@/contexts/ProgressContext'
+import { GameProvider } from '@/contexts/GameContext'
 import TechnologyPage from './TechnologyPage'
 
 function renderWithRouter(entries = ['/learn/html']) {
   return render(
     <MemoryRouter initialEntries={entries}>
-      <ProgressProvider totalTopics={100}>
+      <GameProvider>
         <Routes>
           <Route path="/learn/:technology" element={<TechnologyPage />} />
         </Routes>
-      </ProgressProvider>
+      </GameProvider>
     </MemoryRouter>
   )
 }

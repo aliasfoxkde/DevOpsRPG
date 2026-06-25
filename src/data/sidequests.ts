@@ -73,7 +73,12 @@ export function generateWeeklyQuests(): SideQuest[] {
   const selected = shuffled.slice(0, 2)
 
   const nextMonday = new Date()
-  nextMonday.setDate(nextMonday.getDate() + ((1 + 7 - nextMonday.getDay()) % 7 || 7))
+  // Calculate days until next Monday
+  // If today is Monday (day 1), we want next Monday = 7 days from now, not 0
+  // Formula: days = (8 - dayOfWeek) % 7, then add 7 if result is 0
+  let daysUntilMonday = (8 - nextMonday.getDay()) % 7
+  if (daysUntilMonday === 0) daysUntilMonday = 7
+  nextMonday.setDate(nextMonday.getDate() + daysUntilMonday)
   nextMonday.setHours(0, 0, 0, 0)
 
   return selected.map(q => ({

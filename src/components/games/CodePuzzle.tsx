@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { codePuzzles, type CodePuzzle } from '../../data/minigames'
 
 interface CodePuzzleGameProps {
@@ -7,7 +7,10 @@ interface CodePuzzleGameProps {
 }
 
 export default function CodePuzzleGame({ onComplete, onSkip }: CodePuzzleGameProps) {
-  const [puzzles, setPuzzles] = useState<CodePuzzle[]>([])
+  const [puzzles] = useState<CodePuzzle[]>(() => {
+    const shuffled = [...codePuzzles].sort(() => Math.random() - 0.5)
+    return shuffled.slice(0, 8)
+  })
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<string>('')
   const [correct, setCorrect] = useState(0)
@@ -15,11 +18,6 @@ export default function CodePuzzleGame({ onComplete, onSkip }: CodePuzzleGamePro
   const [started, setStarted] = useState(false)
   const [finished, setFinished] = useState(false)
   const [showFeedback, setShowFeedback] = useState(false)
-
-  useEffect(() => {
-    const shuffled = [...codePuzzles].sort(() => Math.random() - 0.5)
-    setPuzzles(shuffled.slice(0, 8))
-  }, [])
 
   const current = puzzles[currentIndex]
 
@@ -33,7 +31,8 @@ export default function CodePuzzleGame({ onComplete, onSkip }: CodePuzzleGamePro
     setSelectedAnswer(answer)
     setShowFeedback(true)
 
-    if (answer === current.answer) {
+    const isCorrect = answer === current.answer
+    if (isCorrect) {
       setCorrect(c => c + 1)
     } else {
       setWrong(w => w + 1)
@@ -45,8 +44,10 @@ export default function CodePuzzleGame({ onComplete, onSkip }: CodePuzzleGamePro
         setSelectedAnswer('')
         setShowFeedback(false)
       } else {
-        const baseXP = correct * 20 + (selectedAnswer === current.answer ? 20 : 0) + puzzles.length * 5
-        const accuracyBonus = (correct + (selectedAnswer === current.answer ? 1 : 0)) / (correct + wrong + 1) > 0.7 ? 30 : 0
+        const newCorrect = isCorrect ? correct + 1 : correct
+        const newWrong = isCorrect ? wrong : wrong + 1
+        const baseXP = newCorrect * 20 + (isCorrect ? 20 : 0) + puzzles.length * 5
+        const accuracyBonus = newCorrect / (newCorrect + newWrong + 1) > 0.7 ? 30 : 0
         setFinished(true)
         setTimeout(() => onComplete(baseXP, baseXP + accuracyBonus), 1000)
       }

@@ -25,7 +25,7 @@ export const BADGES: Badge[] = [
   { id: 'quest_25', name: 'Knowledge Seeker', description: 'Complete 25 quests', icon: '📚', category: 'quest', rarity: 'uncommon', requirement: { type: 'quest_count', value: 25 }, xpReward: 200, goldReward: 100 },
   { id: 'quest_50', name: 'Dedicated Learner', description: 'Complete 50 quests', icon: '🎓', category: 'quest', rarity: 'rare', requirement: { type: 'quest_count', value: 50 }, xpReward: 400, goldReward: 200 },
   { id: 'quest_100', name: 'Halfway Hero', description: 'Complete 100 quests', icon: '⭐', category: 'quest', rarity: 'epic', requirement: { type: 'quest_count', value: 100 }, xpReward: 800, goldReward: 400 },
-  { id: 'quest_all', name: 'DevOps Grandmaster', description: 'Complete all 118 quests', icon: '👑', category: 'quest', rarity: 'legendary', requirement: { type: 'quest_count', value: 118 }, xpReward: 5000, goldReward: 2500 },
+  { id: 'quest_all', name: 'DevOps Grandmaster', description: 'Complete all 163 quests', icon: '👑', category: 'quest', rarity: 'legendary', requirement: { type: 'quest_count', value: 163 }, xpReward: 5000, goldReward: 2500 },
 
   // Streak badges
   { id: 'streak_3', name: 'On Fire', description: 'Maintain a 3-day streak', icon: '🔥', category: 'streak', rarity: 'common', requirement: { type: 'streak_days', value: 3 }, xpReward: 30, goldReward: 15 },
@@ -91,8 +91,31 @@ export const BADGES: Badge[] = [
   { id: 'gold_hoarder', name: 'Gold Hoarder', description: 'Accumulate 10,000 gold', icon: '💰', category: 'secret', rarity: 'epic', requirement: { type: 'gold_hoard', value: 10000 }, xpReward: 500, goldReward: 0 },
   { id: 'first_legendary', name: 'Legendary', description: 'Earn your first legendary item', icon: '⭐', category: 'secret', rarity: 'uncommon', requirement: { type: 'first_legendary', value: 1 }, xpReward: 200, goldReward: 100 },
 
-  // Social badges (for future)
-  { id: 'helper', name: 'Helper', description: 'Help others learn (future feature)', icon: '🤝', category: 'social', rarity: 'rare', requirement: { type: 'help_count', value: 1 }, xpReward: 200, goldReward: 100 },
+  // Social badges (for future implementation - social features not yet available)
+  // NOTE: 'helper' badge removed - help_count requirement type not implemented
+
+  // Challenge completion badges (weekly)
+  { id: 'weekly_crusader', name: 'Quest Crusader', description: 'Complete 20 quests in a week', icon: '⚔️', category: 'quest', rarity: 'uncommon', requirement: { type: 'challenge_complete', value: 1 }, xpReward: 600, goldReward: 250 },
+  { id: 'streak_sentinel', name: 'Streak Sentinel', description: 'Maintain a 7-day streak through the week', icon: '🔥', category: 'streak', rarity: 'uncommon', requirement: { type: 'challenge_complete', value: 1 }, xpReward: 500, goldReward: 200 },
+  { id: 'quiz_wizard', name: 'Quiz Wizard', description: 'Pass 15 quizzes in a week', icon: '🧙', category: 'quest', rarity: 'uncommon', requirement: { type: 'challenge_complete', value: 1 }, xpReward: 450, goldReward: 225 },
+
+  // Challenge completion badges (monthly)
+  { id: 'devops_champion', name: 'DevOps Champion', description: 'Complete 100 quests in a month', icon: '🏆', category: 'quest', rarity: 'epic', requirement: { type: 'challenge_complete', value: 1 }, xpReward: 2500, goldReward: 1000 },
+  { id: 'monthly_master', name: 'Monthly Master', description: 'Maintain a 30-day streak through the month', icon: '🔥', category: 'streak', rarity: 'epic', requirement: { type: 'challenge_complete', value: 1 }, xpReward: 2000, goldReward: 1000 },
+  { id: 'quiz_oracle', name: 'Quiz Oracle', description: 'Pass 75 quizzes in a month', icon: '🔮', category: 'quest', rarity: 'epic', requirement: { type: 'challenge_complete', value: 1 }, xpReward: 1800, goldReward: 900 },
+
+  // Side quest badges
+  { id: 'weekly_warrior', name: 'Weekly Warrior', description: 'Complete the weekly warrior quest', icon: '💪', category: 'quest', rarity: 'uncommon', requirement: { type: 'sidequest_complete', value: 1 }, xpReward: 200, goldReward: 100 },
+  { id: 'xp_champion', name: 'XP Champion', description: 'Earn the XP champion title', icon: '💎', category: 'quest', rarity: 'uncommon', requirement: { type: 'sidequest_complete', value: 1 }, xpReward: 200, goldReward: 100 },
+  { id: 'streak_master', name: 'Streak Master', description: 'Achieve streak mastery', icon: '🔥', category: 'streak', rarity: 'rare', requirement: { type: 'sidequest_complete', value: 1 }, xpReward: 300, goldReward: 150 },
+  { id: 'quiz_legend', name: 'Quiz Legend', description: 'Become a quiz legend', icon: '🏅', category: 'quest', rarity: 'rare', requirement: { type: 'sidequest_complete', value: 1 }, xpReward: 300, goldReward: 150 },
+  { id: 'world_traveler', name: 'World Traveler', description: 'Explore all realms of DevOps', icon: '🌍', category: 'quest', rarity: 'epic', requirement: { type: 'sidequest_complete', value: 1 }, xpReward: 500, goldReward: 250 },
+
+  // Milestone reward tier badges
+  { id: 'journeyman', name: 'Journeyman', description: 'Reach journeyman rank', icon: '⚔️', category: 'quest', rarity: 'uncommon', requirement: { type: 'milestone_tier', value: 1 }, xpReward: 150, goldReward: 75 },
+  { id: 'expert', name: 'Expert', description: 'Reach expert rank', icon: '🎖️', category: 'quest', rarity: 'rare', requirement: { type: 'milestone_tier', value: 2 }, xpReward: 300, goldReward: 150 },
+  { id: 'master', name: 'Master', description: 'Reach master rank', icon: '🏅', category: 'quest', rarity: 'epic', requirement: { type: 'milestone_tier', value: 3 }, xpReward: 600, goldReward: 300 },
+  { id: 'grandmaster', name: 'Grandmaster', description: 'Reach grandmaster rank', icon: '👑', category: 'quest', rarity: 'legendary', requirement: { type: 'milestone_tier', value: 4 }, xpReward: 1200, goldReward: 600 },
 ]
 
 // Get badge by ID
@@ -140,6 +163,14 @@ export function shouldUnlockBadge(badge: Badge, stats: {
   fastestQuestTime?: number
   jackpotSpins?: number
   mysteryBoxesOpened?: number
+  challengeComplete?: number
+  sidequestComplete?: number
+  milestoneTier?: number
+  allRealms?: boolean
+  allTechnologies?: boolean
+  goldHoard?: number
+  firstLegendary?: boolean
+  quizMasterScore?: number
 }): boolean {
   switch (badge.requirement.type) {
     case 'quest_count':
@@ -171,7 +202,7 @@ export function shouldUnlockBadge(badge: Badge, stats: {
     case 'night_quest':
       return (stats.nightQuests || 0) >= badge.requirement.value
     case 'speed_quest':
-      return (stats.fastestQuestTime || Infinity) > 0 && (stats.fastestQuestTime || Infinity) <= badge.requirement.value * 60
+      return stats.fastestQuestTime != null && stats.fastestQuestTime > 0 && stats.fastestQuestTime <= badge.requirement.value * 60
     case 'all_categories':
       // Requires badges from quest, streak, skill, and secret categories - tracked separately
       return false // Must be tracked via badge unlock events
@@ -186,6 +217,23 @@ export function shouldUnlockBadge(badge: Badge, stats: {
       return (stats.wrongAnswerCount || 0) === 0 && stats.questCount >= badge.requirement.value
     case 'marathon':
       return (stats.sessionQuestCount || 0) >= badge.requirement.value
+    case 'challenge_complete':
+      return (stats.challengeComplete || 0) >= badge.requirement.value
+    case 'sidequest_complete':
+      return (stats.sidequestComplete || 0) >= badge.requirement.value
+    case 'milestone_tier':
+      return (stats.milestoneTier || 0) >= badge.requirement.value
+    case 'all_realms':
+      return stats.allRealms === true
+    case 'all_technologies':
+      return stats.allTechnologies === true
+    case 'gold_hoard':
+      return (stats.goldHoard || 0) >= badge.requirement.value
+    case 'first_legendary':
+      return stats.firstLegendary === true
+    case 'quiz_master':
+      // Requires 50 quizzes with 80%+ score - tracked via quizMasterScore
+      return (stats.quizMasterScore || 0) >= badge.requirement.value
     default:
       return false
   }

@@ -1,4 +1,9 @@
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react'
+// DEPRECATED: This context is deprecated. Use GameContext instead.
+// @deprecated since 2026-06-24 - Use useGame() hook and GameProvider instead
+// This file re-exports from GameContext for backward compatibility during migration
+
+import { type ReactNode } from 'react'
+import { useGame } from './GameContext'
 
 export interface TopicProgress {
   topicId: string
@@ -20,113 +25,34 @@ interface ProgressContextType {
   progress: UserProgress
   completedCount: number
   totalTopics: number
-  completeTopic: (topicId: string, technologyId: string, xp: number) => void
+  completeTopic: (topicId: string, technologyId: string, xpEarned: number) => void
   isTopicCompleted: (topicId: string) => boolean
 }
 
-const STORAGE_KEY = 'devopsquest_progress'
+// @deprecated - use useGame() from GameContext instead
+/* eslint-disable react-refresh/only-export-components */
+export function useProgress(): ProgressContextType {
+  const { game, completeLearningTopic, isLearningTopicCompleted } = useGame()
 
-const XP_PER_LEVEL = 100
-
-function calculateLevel(xp: number): number {
-  return Math.floor(xp / XP_PER_LEVEL) + 1
-}
-
-const defaultProgress: UserProgress = {
-  xp: 0,
-  level: 1,
-  streakDays: 0,
-  lastActive: new Date().toISOString().split('T')[0],
-  completedTopics: [],
-}
-
-const ProgressContext = createContext<ProgressContextType | undefined>(undefined)
-
-export function ProgressProvider({ children, totalTopics = 500 }: { children: ReactNode; totalTopics?: number }) {
-  const [progress, setProgress] = useState<UserProgress>(() => {
-    /* istanbul ignore if */
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(STORAGE_KEY)
-      if (stored) {
-        try {
-          return JSON.parse(stored)
-        } catch {
-          return defaultProgress
-        }
-      }
-    }
-    return defaultProgress
-  })
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress))
-  }, [progress])
-
-  const completeTopic = useCallback((topicId: string, technologyId: string, xpEarned: number) => {
-    setProgress((prev) => {
-      const alreadyCompleted = prev.completedTopics.some(
-        (t) => t.topicId === topicId
-      )
-      if (alreadyCompleted) return prev
-
-      const newXp = prev.xp + xpEarned
-      const newLevel = calculateLevel(newXp)
-      const today = new Date().toISOString().split('T')[0]
-      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
-
-      let newStreak = prev.streakDays
-      if (prev.lastActive === yesterday) {
-        newStreak += 1
-      } else if (prev.lastActive !== today) {
-        newStreak = 1
-      }
-
-      return {
-        ...prev,
-        xp: newXp,
-        level: newLevel,
-        streakDays: newStreak,
-        lastActive: today,
-        completedTopics: [
-          ...prev.completedTopics,
-          {
-            topicId,
-            technologyId,
-            completed: true,
-            xpEarned,
-            completedAt: new Date().toISOString(),
-          },
-        ],
-      }
-    })
-  }, [])
-
-  const isTopicCompleted = useCallback(
-    (topicId: string) => {
-      return progress.completedTopics.some((t) => t.topicId === topicId)
+  return {
+    progress: {
+      xp: game.character.xp,
+      level: game.character.level,
+      streakDays: game.character.streakDays,
+      lastActive: game.character.lastActive,
+      completedTopics: game.completedTopics,
     },
-    [progress.completedTopics]
-  )
-
-  return (
-    <ProgressContext.Provider
-      value={{
-        progress,
-        completedCount: progress.completedTopics.length,
-        totalTopics,
-        completeTopic,
-        isTopicCompleted,
-      }}
-    >
-      {children}
-    </ProgressContext.Provider>
-  )
+    completedCount: game.completedTopics.length,
+    totalTopics: 500,
+    completeTopic: completeLearningTopic,
+    isTopicCompleted: isLearningTopicCompleted,
+  }
 }
 
-export function useProgress() {
-  const context = useContext(ProgressContext)
-  if (!context) {
-    throw new Error('useProgress must be used within a ProgressProvider')
-  }
-  return context
+// @deprecated - use GameProvider from GameContext instead
+export function ProgressProvider({ children }: { children: ReactNode }) {
+  // DEPRECATED: This provider is deprecated. Use GameProvider from GameContext instead.
+  // It still works because useProgress() now delegates to useGame() internally.
+  // This is only here to prevent breaking changes during the migration period.
+  return <>{children}</>
 }

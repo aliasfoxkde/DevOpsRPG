@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom'
-import { useProgress } from '@/contexts'
+import { useGame } from '@/contexts'
 import { technologies } from '../data/technologies'
 import { w3schoolsContent } from '../data/w3schools-content'
 import { Button } from '@/components/ui'
@@ -10,7 +10,7 @@ const XP_PER_TOPIC = 25
 export default function TechnologyPage() {
   const { technology } = useParams()
   const tech = technologies[technology as keyof typeof technologies]
-  const { completeTopic, isTopicCompleted, progress } = useProgress()
+  const { completeLearningTopic, isLearningTopicCompleted, game } = useGame()
 
   if (!tech) {
     return (
@@ -27,10 +27,10 @@ export default function TechnologyPage() {
 
   const handleMarkComplete = (topicId: string) => {
     /* istanbul ignore next - technology is always defined when this is called */
-    completeTopic(topicId, technology ?? '', XP_PER_TOPIC)
+    completeLearningTopic(topicId, technology ?? '', XP_PER_TOPIC)
   }
 
-  const completedTopics = progress.completedTopics.map(t => t.topicId)
+  const completedTopics = game.completedTopics.map(t => t.topicId)
 
   /* istanbul ignore next - content always exists for valid technologies */
   const completedCount = content?.topics.filter(t => completedTopics.includes(t.id)).length ?? 0
@@ -86,7 +86,7 @@ export default function TechnologyPage() {
         <h2 className="sr-only">{tech.name} Topics</h2>
         <div className="grid gap-6">
           {content?.topics.map((topic) => {
-            const isCompleted = isTopicCompleted(topic.id)
+            const isCompleted = isLearningTopicCompleted(topic.id)
 
             return (
               <article

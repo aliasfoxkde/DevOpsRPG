@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { getQuizForTopic } from '../../data/quizzes'
 import { getRandomEncouragement } from '../../data/milestones'
+import { useSoundEffects } from '../../hooks/useSoundEffects'
 
 export type QuestionType = 'multiple_choice' | 'true_false' | 'fill_blank' | 'code_challenge'
 
@@ -20,13 +21,14 @@ export interface QuizQuestion {
 
 interface QuizProps {
   topicId: string
-  onPass: () => void
+  onPass: (isPerfect: boolean, wrongAnswers: number) => void
   onSkip: () => void
 }
 
 export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   const allQuestions = getQuizForTopic(topicId)
   const hasQuestions = allQuestions.length > 0
+  const { playSound } = useSoundEffects()
 
   // ALL hooks must be called unconditionally - React rules
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -43,6 +45,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
 
   // Use ref to avoid stale closure in handleFinish
   const correctCountRef = useRef(correctCount)
+  const wrongCountRef = useRef(wrongCount)
   const allQuestionsLengthRef = useRef(allQuestions.length)
   const finishHandledRef = useRef(false)
 
@@ -50,6 +53,10 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   useEffect(() => {
     correctCountRef.current = correctCount
   }, [correctCount])
+
+  useEffect(() => {
+    wrongCountRef.current = wrongCount
+  }, [wrongCount])
 
   useEffect(() => {
     allQuestionsLengthRef.current = allQuestions.length
@@ -72,10 +79,12 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
     setLocalCorrect(isCorrect)
     if (isCorrect) {
       setCorrectCount(c => c + 1)
+      playSound('correct')
     } else {
       setWrongCount(c => c + 1)
+      playSound('incorrect')
     }
-  }, [showExplanation, currentQuestion])
+  }, [showExplanation, currentQuestion, playSound])
 
   const handleTextSubmit = useCallback(() => {
     if (showExplanation || !textAnswer.trim() || !currentQuestion) return
@@ -88,10 +97,12 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
     setLocalCorrect(isCorrect)
     if (isCorrect) {
       setCorrectCount(c => c + 1)
+      playSound('correct')
     } else {
       setWrongCount(c => c + 1)
+      playSound('incorrect')
     }
-  }, [showExplanation, textAnswer, currentQuestion])
+  }, [showExplanation, textAnswer, currentQuestion, playSound])
 
   const handleCodeSubmit = useCallback(() => {
     if (showExplanation || !currentQuestion) return
@@ -105,10 +116,12 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
     setLocalCorrect(isCorrect)
     if (isCorrect) {
       setCorrectCount(c => c + 1)
+      playSound('correct')
     } else {
       setWrongCount(c => c + 1)
+      playSound('incorrect')
     }
-  }, [showExplanation, codeAnswer, currentQuestion])
+  }, [showExplanation, codeAnswer, currentQuestion, playSound])
 
   const handleNext = useCallback(() => {
     if (currentIndex < allQuestions.length - 1) {
@@ -129,12 +142,13 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
     finishHandledRef.current = true
     setIsFinishing(true)
     if (!hasQuestions) {
-      onPass()
+      onPass(false, 0) // No quiz = not perfect, no wrong answers
       return
     }
     const passThreshold = Math.ceil(allQuestionsLengthRef.current * 0.6)
+    const isPerfect = correctCountRef.current === allQuestionsLengthRef.current
     if (correctCountRef.current >= passThreshold) {
-      onPass()
+      onPass(isPerfect, wrongCountRef.current)
     } else {
       onSkip()
     }
@@ -191,7 +205,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
             ⭐ +50 XP bonus for completing without a quiz!
           </p>
           <button
-            onClick={onPass}
+            onClick={() => onPass(false, 0)}
             className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-bold rounded-lg shadow-lg transform transition-all hover:scale-105"
           >
             ✨ Complete Quest
@@ -477,7 +491,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
               onClick={handleNext}
               className="px-6 py-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-lg shadow-lg transform transition-all hover:scale-105"
             >
-              {currentIndex < allQuestions.length - 1 ? 'Next Question →' : 'See Results'} (M)
+              {currentIndex < allQuestions.length - 1 ? 'Next Question →' : 'See Results'} (N)
             </button>
           </div>
         )}

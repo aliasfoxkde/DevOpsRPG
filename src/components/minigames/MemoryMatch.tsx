@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { memoryIcons, type MemoryCard } from '../../data/minigames'
 
 interface MemoryMatchProps {
@@ -17,24 +17,23 @@ function shuffle<T>(array: T[]): T[] {
 }
 
 export function MemoryMatch({ pairs = 6, onComplete }: MemoryMatchProps) {
-  const [cards, setCards] = useState<MemoryCard[]>([])
-  const [flippedIndices, setFlippedIndices] = useState<number[]>([])
-  const [matchedIndices, setMatchedIndices] = useState<number[]>([])
-  const [moves, setMoves] = useState(0)
-  const [gameState, setGameState] = useState<'playing' | 'won' | 'lost'>('playing')
-  const [startTime, setStartTime] = useState<number>(Date.now())
-
-  // Initialize game
-  useEffect(() => {
+  const [cards] = useState<MemoryCard[]>(() => {
     const selectedIcons = shuffle(memoryIcons).slice(0, pairs)
     const cardPairs = shuffle([...selectedIcons, ...selectedIcons].map((icon, idx) => ({
       ...icon,
       id: `${icon.id}-${idx}`,
       matched: false,
     })))
-    setCards(cardPairs)
-    setStartTime(Date.now())
-  }, [pairs])
+    return cardPairs
+  })
+  const [flippedIndices, setFlippedIndices] = useState<number[]>([])
+  const [matchedIndices, setMatchedIndices] = useState<number[]>([])
+  const [moves, setMoves] = useState(0)
+  const [gameState, setGameState] = useState<'playing' | 'won' | 'lost'>('playing')
+  const [startTime] = useState<number>(() => Date.now())
+
+  // Store elapsed time when game is won to avoid impure Date.now() in render
+  const [wonStats, setWonStats] = useState<{ elapsed: number; score: number; stars: number } | null>(null)
 
   const handleCardClick = useCallback((index: number) => {
     if (gameState !== 'playing') return
@@ -55,6 +54,12 @@ export function MemoryMatch({ pairs = 6, onComplete }: MemoryMatchProps) {
         setFlippedIndices([])
 
         if (matchedIndices.length + 2 === cards.length) {
+          const elapsed = Math.floor((Date.now() - startTime) / 1000)
+          const timeBonus = Math.max(0, 300 - elapsed)
+          const movesBonus = Math.max(0, (pairs * 3 - moves) * 10)
+          const score = 500 + timeBonus + movesBonus
+          const stars = moves <= pairs * 1.5 ? 3 : moves <= pairs * 2.5 ? 2 : 1
+          setWonStats({ elapsed, score, stars })
           setGameState('won')
         }
       } else {
@@ -64,14 +69,11 @@ export function MemoryMatch({ pairs = 6, onComplete }: MemoryMatchProps) {
         }, 1000)
       }
     }
-  }, [flippedIndices, matchedIndices, cards, gameState])
+  }, [flippedIndices, matchedIndices, cards, gameState, startTime, moves, pairs])
 
   const handleComplete = () => {
-    const elapsed = Math.floor((Date.now() - startTime) / 1000)
-    const timeBonus = Math.max(0, 300 - elapsed) // Max 5 min, bonus decreases over time
-    const movesBonus = Math.max(0, (pairs * 3 - moves) * 10) // Ideal is 1.5x pairs moves
-    const score = 500 + timeBonus + movesBonus
-    onComplete(score, pairs * 200)
+    if (!wonStats) return
+    onComplete(wonStats.score, pairs * 200)
   }
 
   if (cards.length === 0) {
@@ -82,12 +84,8 @@ export function MemoryMatch({ pairs = 6, onComplete }: MemoryMatchProps) {
     )
   }
 
-  if (gameState === 'won') {
-    const elapsed = Math.floor((Date.now() - startTime) / 1000)
-    const timeBonus = Math.max(0, 300 - elapsed)
-    const movesBonus = Math.max(0, (pairs * 3 - moves) * 10)
-    const score = 500 + timeBonus + movesBonus
-    const stars = moves <= pairs * 1.5 ? 3 : moves <= pairs * 2.5 ? 2 : 1
+  if (gameState === 'won' && wonStats) {
+    const { elapsed, score, stars } = wonStats
 
     return (
       <div className="bg-slate-800/80 rounded-xl border border-amber-600/50 overflow-hidden">

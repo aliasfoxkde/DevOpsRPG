@@ -6,6 +6,9 @@ import { useSoundEffects } from '../hooks/useSoundEffects'
 // Rarity display order
 const RARITY_ORDER: Badge['rarity'][] = ['legendary', 'epic', 'rare', 'uncommon', 'common']
 
+// XP per level constant
+const XP_PER_LEVEL = 100
+
 export default function ProfilePage() {
   const { game } = useGame()
   const { isMuted, toggleMute, playSound } = useSoundEffects()
@@ -84,12 +87,12 @@ export default function ProfilePage() {
         <div className="mt-6">
           <div className="flex justify-between text-sm mb-1">
             <span>Level {game.character.level}</span>
-            <span>{game.character.xp} / {game.character.xpToNextLevel} XP</span>
+            <span>{game.character.xp - (game.character.level - 1) * XP_PER_LEVEL} / {XP_PER_LEVEL} XP</span>
           </div>
           <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all"
-              style={{ width: `${(game.character.xp % game.character.xpToNextLevel) / game.character.xpToNextLevel * 100}%` }}
+              style={{ width: `${Math.min(100, ((game.character.xp - (game.character.level - 1) * XP_PER_LEVEL) / XP_PER_LEVEL) * 100)}%` }}
             />
           </div>
         </div>

@@ -14,7 +14,7 @@ interface MiniGameHubProps {
 const UNLOCK_LEVEL = 3
 
 export function MiniGameHub({ onClose }: MiniGameHubProps) {
-  const { game, addXP, addGold, grantBadge } = useGame()
+  const { game, addXP, addGold, grantBadge, incrementStat } = useGame()
   const { character } = game
   const [currentGame, setCurrentGame] = useState<GameType>('menu')
   const [gameResult, setGameResult] = useState<{ score: number; maxScore: number } | null>(null)
@@ -33,6 +33,14 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
     if (score >= maxScore * 0.8) {
       grantBadge('speed_demon')
     }
+
+    // Track minigame completion stats
+    const statType: 'typer' | 'memory' | 'math' | 'minigame' =
+      currentGame === 'command' ? 'typer' :
+      currentGame === 'memory' ? 'memory' :
+      currentGame === 'math' ? 'math' :
+      'minigame'
+    incrementStat(statType)
   }
 
   const handleSkip = () => {
