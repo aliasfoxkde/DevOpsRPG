@@ -72,7 +72,7 @@ interface ChallengeState {
 }
 
 export default function ChallengesPage() {
-  const { game, addXP, addGold, grantBadge } = useGame()
+  const { game, addXP, addGold, grantBadge, incrementStat } = useGame()
   const [activeTab, setActiveTab] = useState<'weekly' | 'monthly'>('weekly')
   const [challengeStates, setChallengeStates] = useState<Record<string, ChallengeState>>({})
 
@@ -143,6 +143,9 @@ export default function ChallengesPage() {
     if (challenge.rewards.badge) {
       grantBadge(challenge.rewards.badge)
     }
+
+    // Track challenge completion for badges
+    incrementStat('challenge')
 
     // Mark as claimed
     const stateKey = `${activeTab}_${challenge.id}`

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useGame } from '@/contexts'
+import { useGame, XP_PER_LEVEL } from '@/contexts'
 import { ProgressBar, StreakTracker } from '@/components/ui'
 
 const ACHIEVEMENTS = [
@@ -43,7 +43,6 @@ export default function DashboardPage() {
     return checkAchievement(a.key, { xp: character.xp, level: character.level, streakDays: character.streakDays, completedTopics })
   })
 
-  const XP_PER_LEVEL = 100
   const xpProgress = character.xp - (character.level - 1) * XP_PER_LEVEL
 
   return (

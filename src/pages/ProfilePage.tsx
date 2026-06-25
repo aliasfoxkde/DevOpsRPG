@@ -1,13 +1,10 @@
-import { useGame } from '../contexts/GameContext'
+import { useGame, XP_PER_LEVEL } from '../contexts/GameContext'
 import { BADGES, RARITY_COLORS, type Badge } from '../data/badges'
 import { MILESTONES } from '../data/milestones'
 import { useSoundEffects } from '../hooks/useSoundEffects'
 
 // Rarity display order
 const RARITY_ORDER: Badge['rarity'][] = ['legendary', 'epic', 'rare', 'uncommon', 'common']
-
-// XP per level constant
-const XP_PER_LEVEL = 100
 
 export default function ProfilePage() {
   const { game } = useGame()

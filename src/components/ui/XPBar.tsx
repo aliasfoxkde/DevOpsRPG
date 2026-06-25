@@ -1,10 +1,8 @@
-import { useGame } from '../../contexts/GameContext'
+import { useGame, XP_PER_LEVEL } from '../../contexts/GameContext'
 
 interface XPBarProps {
   compact?: boolean
 }
-
-const XP_PER_LEVEL = 100
 
 export function XPBar({ compact = false }: XPBarProps) {
   const { game } = useGame()

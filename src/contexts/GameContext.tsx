@@ -135,7 +135,7 @@ interface GameContextType {
   getSkillLevel: (skillId: string) => number
   getAvailableSkillPoints: () => number
   // Stats tracking for badges
-  incrementStat: (stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame', isPerfect?: boolean, wrongAnswers?: number, passedWith80?: boolean) => void
+  incrementStat: (stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame' | 'challenge', isPerfect?: boolean, wrongAnswers?: number, passedWith80?: boolean) => void
   resetQuizStreak: () => void
   // Realm completion
   dismissRealmCompletion: () => void
@@ -150,9 +150,9 @@ interface GameContextType {
 
 const STORAGE_KEY = 'devopsquest_game'
 
-const XP_PER_LEVEL = 100
-const MAX_HP = 100
-const MAX_MP = 100
+export const XP_PER_LEVEL = 100
+export const MAX_HP = 100
+export const MAX_MP = 100
 
 function calculateLevel(xp: number): number {
   return Math.floor(xp / XP_PER_LEVEL) + 1
@@ -421,8 +421,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
         mathCount: prev.stats.mathCount,
         wrongAnswerCount: prev.stats.wrongAnswerCount,
         // Derived stats for new badge requirement types
-        allRealms: completedRealmIds.length >= 5,
-        allTechnologies: completedTechIds.length >= 26, // 26 technologies total
+        allRealms: completedRealmIds.length >= Object.keys(realms).length,
+        allTechnologies: completedTechIds.length >= Object.keys(technologies).length,
         goldHoard: prev.character.gold,
         badgesEarned: prev.badges.filter(b => b.unlockedAt).length,
         earnedCategories: Array.from(earnedCategories),
@@ -819,7 +819,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     return newlyUnlocked
   }, [])
 
-  const incrementStat = useCallback((stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame', isPerfect?: boolean, wrongAnswers?: number, passedWith80?: boolean) => {
+  const incrementStat = useCallback((stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame' | 'challenge', isPerfect?: boolean, wrongAnswers?: number, passedWith80?: boolean) => {
     setGame(prev => {
       const updates: Partial<GameState['stats']> = {}
       switch (stat) {
@@ -852,6 +852,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
           break
         case 'minigame':
           updates.minigameCount = prev.stats.minigameCount + 1
+          break
+        case 'challenge':
+          updates.challengeComplete = (prev.stats.challengeComplete || 0) + 1
           break
       }
       return { ...prev, stats: { ...prev.stats, ...updates } }
