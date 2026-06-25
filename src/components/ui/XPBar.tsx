@@ -23,6 +23,7 @@ export function XPBar({ compact = false }: XPBarProps) {
           />
         </div>
         <span className="text-xs text-gray-400">{xpInCurrentLevel}/{XP_PER_LEVEL}</span>
+        <span className="text-xs text-slate-500 ml-2" title="Total XP Earned">⚡{character.xp}</span>
       </div>
     )
   }
@@ -34,7 +35,7 @@ export function XPBar({ compact = false }: XPBarProps) {
           {character.title}
         </span>
         <span className="text-xs text-gray-400">
-          {xpInCurrentLevel} / {XP_PER_LEVEL} XP
+          {xpInCurrentLevel} / {XP_PER_LEVEL} XP to next level
         </span>
       </div>
       <div className="w-full h-3 bg-gray-800 rounded-full overflow-hidden border border-gray-700">
@@ -44,7 +45,7 @@ export function XPBar({ compact = false }: XPBarProps) {
         />
       </div>
       <div className="flex items-center justify-between text-xs">
-        <span className="text-gray-500">Level {character.level}</span>
+        <span className="text-gray-500">Level {character.level} • Total XP: {character.xp}</span>
         <span className="text-amber-400 font-medium">+{XP_PER_LEVEL - xpInCurrentLevel} XP to Level Up</span>
       </div>
     </div>
