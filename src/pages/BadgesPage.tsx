@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useGame } from '../contexts/GameContext'
 import { BADGES, RARITY_COLORS, type Badge, type BadgeCategory } from '../data/badges'
+import { generateBadgeCard } from '../utils/achievementCardGenerator'
 
 type FilterCategory = 'all' | BadgeCategory
 type FilterRarity = 'all' | Badge['rarity']
@@ -385,6 +386,18 @@ export default function BadgesPage() {
                   {isUnlocked(selectedBadge) ? 'Unlocked!' : 'Locked'}
                 </span>
               </div>
+
+              {/* Share button for unlocked badges */}
+              {isUnlocked(selectedBadge) && (
+                <button
+                  onClick={() => {
+                    generateBadgeCard(selectedBadge, game.character.name)
+                  }}
+                  className="w-full py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+                >
+                  📤 Share Achievement
+                </button>
+              )}
             </div>
 
             <div className="px-6 py-4 bg-slate-900/50 border-t border-slate-700">
