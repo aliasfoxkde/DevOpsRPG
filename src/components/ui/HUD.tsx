@@ -172,14 +172,14 @@ export function HUD() {
           </div>
 
           {/* Nav Links */}
-          <nav className="flex items-center gap-1">
+          <nav className="flex items-center gap-0.5 overflow-x-auto scrollbar-thin">
             {NAV_ITEMS.map((item) => {
               const isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to))
               return (
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`px-3 py-1 text-sm rounded transition-all ${
+                  className={`px-2 py-1 text-xs rounded whitespace-nowrap transition-all flex-shrink-0 ${
                     isActive
                       ? 'bg-amber-600 text-white font-semibold shadow-lg shadow-amber-600/30'
                       : 'text-slate-300 hover:text-amber-400 hover:bg-slate-700/50'

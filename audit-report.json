@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-06-26T15:59:40.884Z",
+  "issues": [
+    "[Home] Horizontal scrollbar detected",
+    "[Quests] Horizontal scrollbar detected",
+    "[WorldMap] Horizontal scrollbar detected",
+    "[Character] Horizontal scrollbar detected",
+    "[Badges] Horizontal scrollbar detected",
+    "[Leaderboard] Navigation error: page.goto: net::ERR_ABORTED at http://localhost:5173/leaderboard\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/leaderboard\", waiting until \"networkidle\"\u001b[22m\n",
+    "[Social] Horizontal scrollbar detected",
+    "[Guild] Horizontal scrollbar detected",
+    "[Storylines] Navigation error: page.goto: net::ERR_ABORTED at http://localhost:5173/storylines\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/storylines\", waiting until \"networkidle\"\u001b[22m\n",
+    "[BattleArena] Horizontal scrollbar detected"
+  ],
+  "summary": {
+    "totalIssues": 10,
+    "categories": {
+      "Home": 1,
+      "Quests": 1,
+      "WorldMap": 1,
+      "Character": 1,
+      "Badges": 1,
+      "Leaderboard": 1,
+      "Social": 1,
+      "Guild": 1,
+      "Storylines": 1,
+      "BattleArena": 1
+    }
+  }
+}
