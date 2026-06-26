@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { to: '/character', icon: '👤', label: 'Hero' },
   { to: '/rewards', icon: '🎁', label: 'Rewards' },
   { to: '/settings', icon: '⚙️', label: 'Settings' },
+  { to: '/analytics', icon: '📊', label: 'Analytics' },
   { to: '/about', icon: 'ℹ️', label: 'About' },
 ]
 
