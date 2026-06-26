@@ -39,6 +39,7 @@ const StorePage = lazy(() => import('./pages/StorePage'))
 const SettingsPage = lazy(() => import('./pages/SettingsPage'))
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'))
 const TitlesFramesPage = lazy(() => import('./pages/TitlesFramesPage'))
+const SeasonalEventsPage = lazy(() => import('./pages/SeasonalEventsPage'))
 
 // Loading fallback component
 function PageLoader() {
@@ -161,6 +162,7 @@ function AppContent() {
             <Route path="settings" element={<SettingsPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="titles-frames" element={<TitlesFramesPage />} />
+            <Route path="seasonal-events" element={<SeasonalEventsPage />} />
           </Route>
         </Routes>
       </Suspense>

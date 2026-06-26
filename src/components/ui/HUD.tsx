@@ -19,6 +19,7 @@ const NAV_ITEMS = [
   { to: '/settings', icon: '⚙️', label: 'Settings' },
   { to: '/analytics', icon: '📊', label: 'Analytics' },
   { to: '/titles-frames', icon: '🏅', label: 'Titles' },
+  { to: '/seasonal-events', icon: '🎭', label: 'Events' },
   { to: '/about', icon: 'ℹ️', label: 'About' },
 ]
 
