@@ -16,6 +16,7 @@ const NAV_ITEMS = [
   { to: '/social', icon: '👥', label: 'Social' },
   { to: '/guild', icon: '🏰', label: 'Guild' },
   { to: '/career-path', icon: '🗺️', label: 'Career' },
+  { to: '/storylines', icon: '📖', label: 'Story' },
   { to: '/leaderboard', icon: '🏆', label: 'Rank' },
   { to: '/store', icon: '🏪', label: 'Shop' },
   { to: '/character', icon: '👤', label: 'Hero' },

@@ -44,6 +44,7 @@ const PVPArenaPage = lazy(() => import('./pages/PVPArenaPage'))
 const SocialPage = lazy(() => import('./pages/SocialPage'))
 const GuildPage = lazy(() => import('./pages/GuildPage'))
 const CareerPathPage = lazy(() => import('./pages/CareerPathPage'))
+const StorylinesPage = lazy(() => import('./pages/StorylinesPage'))
 
 // Loading fallback component
 function PageLoader() {
@@ -171,6 +172,7 @@ function AppContent() {
             <Route path="social" element={<SocialPage />} />
             <Route path="guild" element={<GuildPage />} />
             <Route path="career-path" element={<CareerPathPage />} />
+            <Route path="storylines" element={<StorylinesPage />} />
           </Route>
         </Routes>
       </Suspense>
