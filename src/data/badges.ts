@@ -157,6 +157,7 @@ export function shouldUnlockBadge(badge: Badge, stats: {
   memoryCount: number
   mathCount: number
   wrongAnswerCount?: number
+  perfectQuestCount?: number
   sessionQuestCount?: number
   earlyQuests?: number
   nightQuests?: number
@@ -223,7 +224,7 @@ export function shouldUnlockBadge(badge: Badge, stats: {
     case 'mystery_open':
       return (stats.mysteryBoxesOpened || 0) >= badge.requirement.value
     case 'no_mistakes':
-      return (stats.wrongAnswerCount || 0) === 0 && stats.questCount >= badge.requirement.value
+      return (stats.perfectQuestCount || 0) >= badge.requirement.value
     case 'marathon':
       return (stats.sessionQuestCount || 0) >= badge.requirement.value
     case 'challenge_complete':

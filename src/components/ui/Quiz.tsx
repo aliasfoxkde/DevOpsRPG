@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { getQuizForTopic } from '../../data/quizzes'
 import { getRandomEncouragement } from '../../data/milestones'
 import { useSoundEffects } from '../../hooks/useSoundEffects'
+import { useGame } from '../../contexts/GameContext'
 
 export type QuestionType = 'multiple_choice' | 'true_false' | 'fill_blank' | 'code_challenge'
 
@@ -29,6 +30,10 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   const allQuestions = getQuizForTopic(topicId)
   const hasQuestions = allQuestions.length > 0
   const { playSound } = useSoundEffects()
+  const { game, useCollectible } = useGame()
+
+  // Check if player has unused hint scroll
+  const hasHintScroll = game.collectibles.some(c => c.id === 'hint_scroll' && !c.used)
 
   // ALL hooks must be called unconditionally - React rules
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -42,6 +47,8 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   const [localCorrect, setLocalCorrect] = useState(false)
   const [isFinishing, setIsFinishing] = useState(false)
   const [showHint, setShowHint] = useState(false)
+  const [takeawayText, setTakeawayText] = useState('')
+  const [takeawayError, setTakeawayError] = useState('')
 
   // Use ref to avoid stale closure in handleFinish
   const isMountedRef = useRef(true)
@@ -221,14 +228,28 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
           </p>
           <textarea
             placeholder="The main thing I learned was..."
-            className="w-full p-4 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 resize-none mb-4"
+            className="w-full p-4 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 resize-none mb-2"
             rows={3}
+            value={takeawayText}
+            onChange={(e) => {
+              setTakeawayText(e.target.value)
+              if (takeawayError) setTakeawayError('')
+            }}
           />
+          {takeawayError && (
+            <p className="text-red-400 text-sm mb-4">{takeawayError}</p>
+          )}
           <p className="text-purple-400 text-sm mb-4">
             ✨ Complete this quest to earn XP!
           </p>
           <button
-            onClick={() => onPass(false, 0, false)}
+            onClick={() => {
+              if (takeawayText.trim().length < 10) {
+                setTakeawayError('Please write at least 10 characters about what you learned')
+                return
+              }
+              onPass(false, 0, false)
+            }}
             className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-bold rounded-lg shadow-lg transform transition-all hover:scale-105"
           >
             ✨ Complete Quest
@@ -329,7 +350,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
 
         {/* Multiple Choice */}
         {isMultipleChoice && q.options && (
-          <div className="space-y-3">
+          <div className="space-y-3" role="radiogroup" aria-label="Answer options">
             {q.options.map((option: string, index: number) => {
               let bgClass = 'bg-slate-700 hover:bg-slate-600 border-slate-600'
               if (showExplanation) {
@@ -348,6 +369,9 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
                   onClick={() => handleSelect(index)}
                   disabled={showExplanation}
                   className={`w-full text-left p-4 rounded-lg border transition-all ${bgClass}`}
+                  role="radio"
+                  aria-checked={selectedIndex === index}
+                  aria-label={`Option ${index + 1}: ${option}`}
                 >
                   <span className="text-slate-300">{option}</span>
                 </button>
@@ -358,7 +382,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
 
         {/* True/False */}
         {isTrueFalse && q.options && (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4" role="radiogroup" aria-label="True or False">
             {q.options.map((option: string, index: number) => {
               let bgClass = 'bg-slate-700 hover:bg-slate-600 border-slate-600'
               if (showExplanation) {
@@ -377,6 +401,9 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
                   onClick={() => handleSelect(index)}
                   disabled={showExplanation}
                   className={`p-6 rounded-lg border transition-all text-center text-lg font-bold ${bgClass}`}
+                  role="radio"
+                  aria-checked={selectedIndex === index}
+                  aria-label={option}
                 >
                   <span className="text-slate-300">{option}</span>
                 </button>
@@ -405,6 +432,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
                   : 'bg-slate-700 border-slate-600 focus:border-amber-500'
               }`}
               autoFocus
+              aria-label="Fill in the blank answer"
             />
             {!showExplanation && (
               <button
@@ -415,6 +443,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
                     ? 'bg-amber-600 hover:bg-amber-500 text-white'
                     : 'bg-slate-700 text-slate-500 cursor-not-allowed'
                 }`}
+                aria-label="Submit your answer"
               >
                 Check Answer
               </button>
@@ -427,10 +456,18 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
           <div className="space-y-4">
             {q.hint && !showExplanation && (
               <button
-                onClick={() => setShowHint(true)}
+                onClick={() => {
+                  if (hasHintScroll) {
+                    useCollectible('hint_scroll')
+                    setShowHint(true)
+                  } else {
+                    // Show message that hint scroll is needed
+                    alert('You need a Hint Scroll to reveal the hint! Visit the Shop to buy one.')
+                  }
+                }}
                 className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1"
               >
-                💡 Need a hint?
+                💡 {hasHintScroll ? 'Use hint scroll' : 'Need a hint?'}
               </button>
             )}
             {showHint && q.hint && (
@@ -467,6 +504,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
                   : 'bg-slate-900 border-slate-700 focus:border-amber-500'
               }`}
               style={{ fontFamily: 'monospace' }}
+              aria-label="Code challenge answer"
             />
             <p className="text-slate-500 text-xs">
               Expected output: <span className="text-green-400">{q.expectedOutput}</span>
@@ -487,9 +525,12 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
           </div>
         )}
 
-        {/* Explanation */}
+        {/* Explanation with aria-live for screen readers */}
         {showExplanation && (
-          <div className={`mt-6 p-4 rounded-lg ${localCorrect ? 'bg-green-900/30 border border-green-700' : 'bg-amber-900/30 border border-amber-700'}`}>
+          <div
+            className={`mt-6 p-4 rounded-lg ${localCorrect ? 'bg-green-900/30 border border-green-700' : 'bg-amber-900/30 border border-amber-700'}`}
+            aria-live="polite"
+          >
             <p className={`font-bold mb-2 ${localCorrect ? 'text-green-400' : 'text-amber-400'}`}>
               {localCorrect ? '✓ Correct!' : '✗ Incorrect'}
             </p>
@@ -513,6 +554,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
             <button
               onClick={handleNext}
               className="px-6 py-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-lg shadow-lg transform transition-all hover:scale-105"
+              aria-label={currentIndex < allQuestions.length - 1 ? 'Go to next question' : 'See quiz results'}
             >
               {currentIndex < allQuestions.length - 1 ? 'Next Question →' : 'See Results'} (N)
             </button>

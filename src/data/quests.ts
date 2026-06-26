@@ -94,6 +94,7 @@ export function generateQuests(): Quest[] {
     4: 'cloud',
     5: 'devops',
     6: 'aiintelligence',
+    7: 'aiintelligence', // Phase 7 tech (kafka, rabbitmq, istio) belongs to AI Nexus
   }
 
   Object.values(technologies).forEach((tech: Omit<Technology, 'category'>) => {

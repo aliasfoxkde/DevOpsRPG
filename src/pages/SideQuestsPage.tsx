@@ -1,6 +1,7 @@
 import { useGame } from '../contexts/GameContext'
 import { isQuestExpired } from '../data/sidequests'
 import CodePlayground from '../components/games/CodePlayground'
+import EmptyState from '../components/ui/EmptyState'
 
 export default function SideQuestsPage() {
   const { game, claimSideQuest } = useGame()
@@ -113,7 +114,11 @@ export default function SideQuestsPage() {
             ))}
           </div>
         ) : (
-          <p className="text-slate-400">No daily quests available. Check back tomorrow!</p>
+          <EmptyState
+            icon="📅"
+            title="No Daily Quests"
+            description="Daily quests reset at midnight. Complete regular quests to make progress and check back tomorrow!"
+          />
         )}
         <p className="text-xs text-slate-500 mt-2">
           Resets at midnight
@@ -135,7 +140,11 @@ export default function SideQuestsPage() {
             ))}
           </div>
         ) : (
-          <p className="text-slate-400">No weekly quests available. Check back next week!</p>
+          <EmptyState
+            icon="📆"
+            title="No Weekly Quests"
+            description="Weekly quests reset every Monday. Keep playing and completing daily quests to unlock more challenges!"
+          />
         )}
         <p className="text-xs text-slate-500 mt-2">
           Resets every Monday
@@ -157,7 +166,11 @@ export default function SideQuestsPage() {
             ))}
           </div>
         ) : (
-          <p className="text-slate-400">No secret quests discovered yet!</p>
+          <EmptyState
+            icon="🔮"
+            title="No Secret Quests Discovered"
+            description="Secret quests unlock based on your gameplay. Keep exploring, completing challenges, and achieving milestones to discover hidden quests!"
+          />
         )}
         <p className="text-xs text-slate-500 mt-2">
           Secret quests are always available but require specific actions to complete

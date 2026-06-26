@@ -66,8 +66,8 @@ export function HUD() {
                 {character.streakDays > 3 ? '🔥' : '📅'}
               </span>
               <span className="text-sm font-medium text-slate-300 hidden sm:inline">{character.streakDays}</span>
-              {/* Tooltip */}
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 hidden group-hover:block">
+              {/* Tooltip - desktop only (mobile uses title attribute) */}
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 hidden md:block">
                 🔥 {character.streakDays} day streak
                 <div className="text-xs text-slate-500">{character.streakDays >= 7 ? 'Legendary!' : character.streakDays >= 3 ? 'Great progress!' : 'Keep going!'}</div>
               </div>
@@ -80,8 +80,8 @@ export function HUD() {
             >
               <span className="text-yellow-400">💰</span>
               <span className="text-sm font-medium text-slate-300 hidden sm:inline">{character.gold}</span>
-              {/* Tooltip */}
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 hidden group-hover:block">
+              {/* Tooltip - desktop only (mobile uses title attribute) */}
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 hidden md:block">
                 💰 {character.gold} gold
                 <div className="text-xs text-slate-500">Visit the Shop to buy items!</div>
               </div>
@@ -95,7 +95,7 @@ export function HUD() {
               >
                 <span className="text-green-400">✨</span>
                 <span className="text-sm font-medium text-green-400 hidden sm:inline">{character.xpMultiplier}x</span>
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 hidden group-hover:block">
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 hidden md:block">
                   ✨ {character.xpMultiplier}x XP boost
                   <div className="text-xs text-slate-500">Active until next quest!</div>
                 </div>

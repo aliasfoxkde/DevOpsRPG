@@ -39,8 +39,12 @@ function PageLoader() {
   return (
     <div className="flex items-center justify-center min-h-[60vh]">
       <div className="text-center">
-        <div className="text-4xl mb-4 animate-bounce">⚔️</div>
-        <div className="text-amber-400 font-bold">Loading...</div>
+        <div className="text-6xl mb-6 animate-bounce">⚔️</div>
+        <div className="space-y-2">
+          <div className="h-4 w-48 mx-auto bg-slate-700/50 rounded animate-pulse" />
+          <div className="h-4 w-32 mx-auto bg-slate-700/50 rounded animate-pulse" />
+        </div>
+        <div className="mt-6 text-amber-400 font-bold">Loading your adventure...</div>
       </div>
     </div>
   )

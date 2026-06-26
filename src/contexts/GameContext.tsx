@@ -99,7 +99,8 @@ export interface GameState {
     memoryCount: number
     mathCount: number
     perfectQuiz: boolean // Had at least one perfect quiz
-    wrongAnswerCount: number // Total wrong answers for no_mistakes badge
+    wrongAnswerCount: number // Total wrong answers (legacy, for tracking)
+    perfectQuestCount: number // Quests completed with 0 wrong answers
     sessionQuestCount: number // Quests in current session for marathon badge
     earlyQuests: number // Quests completed before 8 AM
     nightQuests: number // Quests completed after 10 PM
@@ -263,6 +264,7 @@ function createDefaultGame(): GameState {
       mathCount: 0,
       perfectQuiz: false,
       wrongAnswerCount: 0,
+      perfectQuestCount: 0,
       sessionQuestCount: 0,
       earlyQuests: 0,
       nightQuests: 0,
@@ -355,9 +357,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const today = new Date().toISOString().split('T')[0]
       const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
 
-      // Apply XP and gold multipliers from collectibles
-      const xpReward = Math.floor(quest.xpReward * prev.character.xpMultiplier)
-      const goldReward = Math.floor((quest.xpReward / 10) * prev.character.goldMultiplier)
+      // Apply XP and gold multipliers from collectibles and companions
+      const companionXpBonus = prev.activeCompanion ? prev.activeCompanion.xpBonus : 0
+      const companionGoldBonus = prev.activeCompanion ? prev.activeCompanion.goldBonus : 0
+      const xpReward = Math.floor(quest.xpReward * prev.character.xpMultiplier * (1 + companionXpBonus))
+      const goldReward = Math.floor((quest.xpReward / 10) * prev.character.goldMultiplier * (1 + companionGoldBonus))
 
       // Calculate new XP and level
       const newXp = prev.character.xp + xpReward
@@ -484,6 +488,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         memoryCount: prev.stats.memoryCount,
         mathCount: prev.stats.mathCount,
         wrongAnswerCount: prev.stats.wrongAnswerCount,
+        perfectQuestCount: prev.stats.perfectQuestCount,
         // Derived stats for new badge requirement types
         allRealms: completedRealmIds.length >= Object.keys(realms).length,
         allTechnologies: completedTechIds.length >= Object.keys(technologies).length,
@@ -923,9 +928,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
           } else {
             updates.quizStreak = 0
           }
-          // Track wrong answers for no_mistakes badge
+          // Track wrong answers for no_mistakes badge (legacy tracking)
           if (wrongAnswers !== undefined) {
             updates.wrongAnswerCount = (prev.stats.wrongAnswerCount || 0) + wrongAnswers
+            // Track perfect quests (0 wrong answers) for flawless badge
+            if (wrongAnswers === 0) {
+              updates.perfectQuestCount = (prev.stats.perfectQuestCount || 0) + 1
+            }
           }
           // Track 80%+ scores for quiz_master badge
           if (passedWith80) {

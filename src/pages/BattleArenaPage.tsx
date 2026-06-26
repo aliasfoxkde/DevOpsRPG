@@ -88,12 +88,15 @@ export default function BattleArenaPage() {
     if (justCompleted) {
       // Calculate next quest AFTER completion to avoid stale closure
       const actualNextQuest = getNextQuest()
-      if (actualNextQuest) {
-        const timer = setTimeout(() => {
+      const timer = setTimeout(() => {
+        if (actualNextQuest) {
           navigate(`/quest/${actualNextQuest.id}`)
-        }, 1500)
-        return () => clearTimeout(timer)
-      }
+        } else {
+          // No more quests - navigate to quest journal
+          navigate('/quests')
+        }
+      }, 1500)
+      return () => clearTimeout(timer)
     }
   }, [justCompleted, getNextQuest, navigate])
 
