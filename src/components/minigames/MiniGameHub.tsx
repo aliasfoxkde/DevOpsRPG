@@ -4,8 +4,9 @@ import { CommandTyper } from './CommandTyper'
 import { MemoryMatch } from './MemoryMatch'
 import { MathChallengeGame } from './MathChallenge'
 import { CodePuzzleGame } from './CodePuzzle'
+import { QuizDashGame } from './QuizDash'
 
-type GameType = 'menu' | 'command' | 'memory' | 'math' | 'code'
+type GameType = 'menu' | 'command' | 'memory' | 'math' | 'code' | 'quiz'
 
 interface MiniGameHubProps {
   onClose: () => void
@@ -35,10 +36,11 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
     }
 
     // Track minigame completion stats
-    const statType: 'typer' | 'memory' | 'math' | 'minigame' =
+    const statType: 'typer' | 'memory' | 'math' | 'minigame' | 'quiz' =
       currentGame === 'command' ? 'typer' :
       currentGame === 'memory' ? 'memory' :
       currentGame === 'math' ? 'math' :
+      currentGame === 'quiz' ? 'quiz' :
       'minigame'
     incrementStat(statType)
   }
@@ -126,6 +128,22 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
           <div className="mt-3 text-xs text-green-400">+50 XP potential</div>
           {!isUnlocked && <div className="mt-2 text-xs text-slate-500">Level {UNLOCK_LEVEL} to unlock</div>}
         </button>
+
+        <button
+          onClick={() => isUnlocked && setCurrentGame('quiz')}
+          disabled={!isUnlocked}
+          className={`p-6 rounded-xl border transition-all group ${
+            isUnlocked
+              ? 'bg-gradient-to-br from-red-900/30 to-orange-900/30 border-red-700/50 hover:border-red-500'
+              : 'bg-slate-800/30 border-slate-700/50 opacity-50 cursor-not-allowed'
+          }`}
+        >
+          <div className={`text-4xl mb-3 ${!isUnlocked && 'grayscale'}`}>⚡</div>
+          <h3 className="text-lg font-bold text-white mb-1">Quiz Dash</h3>
+          <p className="text-sm text-slate-400">Rapid-fire DevOps quiz challenge!</p>
+          <div className="mt-3 text-xs text-red-400">+75 XP potential</div>
+          {!isUnlocked && <div className="mt-2 text-xs text-slate-500">Level {UNLOCK_LEVEL} to unlock</div>}
+        </button>
       </div>
 
       <button
@@ -202,6 +220,7 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
             {currentGame === 'memory' && '🧠 Memory Match'}
             {currentGame === 'math' && '🔢 Math Challenge'}
             {currentGame === 'code' && '💻 Code Puzzle'}
+            {currentGame === 'quiz' && '⚡ Quiz Dash'}
             {gameResult && '✨ Results'}
           </h2>
           <button
@@ -231,6 +250,11 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
            ) : currentGame === 'math' ? (
              <MathChallengeGame
                rounds={5}
+               onComplete={handleGameComplete}
+               onSkip={handleSkip}
+             />
+           ) : currentGame === 'quiz' ? (
+             <QuizDashGame
                onComplete={handleGameComplete}
                onSkip={handleSkip}
              />
