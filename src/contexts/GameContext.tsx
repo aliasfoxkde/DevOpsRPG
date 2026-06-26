@@ -348,7 +348,7 @@ function createDefaultGame(): GameState {
     lastDailyReset: today,
     completedRealms: [],
     showRealmCompletion: null,
-    hasSeenOnboarding: false,
+    hasSeenOnboarding: true, // Default to true so users can access quests immediately
     recentBadgeUnlocks: [],
     recentMilestoneUnlocks: [],
     stats: {
