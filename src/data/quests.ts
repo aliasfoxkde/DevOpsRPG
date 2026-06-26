@@ -107,38 +107,6 @@ export function generateQuests(): Quest[] {
       const totalTopics = tech.topics.length
       const positionRatio = positionInTech / totalTopics // 0 to 1
 
-      // Calculate difficulty: 1-5 scale
-      // Base difficulty from phase (1-6), adjusted by position in topic list
-      // Phase 1-2 topics start at difficulty 1-2, phase 3-4 at 2-3, phase 5-6 at 4-5
-      let baseDifficulty: number
-      if (tech.phase <= 2) {
-        baseDifficulty = 1 + (tech.phase - 1) * 0.5 // Phase 1→1, Phase 2→1.5
-      } else if (tech.phase <= 4) {
-        baseDifficulty = 2 + (tech.phase - 3) * 0.5 // Phase 3→2, Phase 4→2.5
-      } else {
-        baseDifficulty = 3.5 + (tech.phase - 5) * 0.75 // Phase 5→3.5, Phase 6→4.25
-      }
-
-      // Position multiplier: first 30% of topics are easier, last 20% are harder
-      let positionBonus = 0
-      if (positionRatio > 0.8) {
-        positionBonus = 1 // Last 20% = hardest
-      } else if (positionRatio > 0.6) {
-        positionBonus = 0.5 // Next 20% = medium-hard
-      } else if (positionRatio > 0.3) {
-        positionBonus = 0 // Middle 30% = baseline
-      } else if (positionInTech > 1) {
-        positionBonus = -0.5 // First 30% (except first) = easier
-      }
-      // First topic always difficulty 1
-
-      let difficulty: 1 | 2 | 3 | 4 | 5
-      if (positionInTech === 1) {
-        difficulty = 1
-      } else {
-        difficulty = Math.round(Math.min(5, Math.max(1, baseDifficulty + positionBonus))) as 1 | 2 | 3 | 4 | 5
-      }
-
       // Time estimates: intro topics are quick (~3-5 min), scale up realistically
       // Scale from 3 min (easy/intro) to 15 min (hard/expert)
       let estimatedMinutes: number
@@ -154,6 +122,31 @@ export function generateQuests(): Quest[] {
         estimatedMinutes = 15 // Expert topics
       }
 
+      // Calculate difficulty based on TIME and XP (not just position)
+      // Time is the primary factor, XP correlates with difficulty
+      // 3-5 min = 1-2, 5-8 min = 2-3, 8-12 min = 3-4, 12-15 min = 4-5
+      let difficulty: 1 | 2 | 3 | 4 | 5
+      if (positionInTech === 1 && tech.phase <= 2) {
+        // First topic of beginner techs can be 1
+        difficulty = 1
+      } else if (estimatedMinutes <= 3) {
+        difficulty = 1
+      } else if (estimatedMinutes <= 5) {
+        difficulty = 2
+      } else if (estimatedMinutes <= 8) {
+        difficulty = 3
+      } else if (estimatedMinutes <= 12) {
+        difficulty = 4
+      } else {
+        difficulty = 5
+      }
+
+      // Apply phase-based adjustment for advanced technologies
+      // Phase 5-6 techs get +1 difficulty (capped at 5)
+      if (tech.phase >= 5 && difficulty < 5) {
+        difficulty = Math.min(5, difficulty + 1) as 1 | 2 | 3 | 4 | 5
+      }
+
       quests.push({
         id: `quest_${topic.id}`,
         technologyId: tech.id,
@@ -162,8 +155,8 @@ export function generateQuests(): Quest[] {
         title: topic.name,
         description: `Learn ${topic.name} - ${tech.name}`,
         type: positionInTech === 1 && totalTopics > 3 ? 'boss' : 'battle',
-        // XP scales with difficulty: base * difficulty multiplier
-        xpReward: Math.round(tech.xpPerTopic * (0.7 + difficulty * 0.15)),
+        // XP scales with difficulty: base * multiplier (difficulty 1 = 0.8x, difficulty 5 = 1.5x)
+        xpReward: Math.round(tech.xpPerTopic * (0.5 + difficulty * 0.2)),
         difficulty,
         estimatedMinutes,
         order: positionInTech,
