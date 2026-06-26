@@ -5,7 +5,7 @@ import { COLLECTIBLES_POOL, openMysteryBox, type Collectible } from '../data/col
 import { REWARD_TIERS } from '../data/milestones'
 
 export default function RewardsPage() {
-  const { game, claimDailyReward, spinWheel, useCollectible, getActiveCollectibles, completedCount, addXP, addGold, grantBadge } = useGame()
+  const { game, claimDailyReward, spinWheel, consumeCollectible, getActiveCollectibles, completedCount, addXP, addGold, grantBadge } = useGame()
   const [wheelSpinning, setWheelSpinning] = useState(false)
   const [wheelResult, setWheelResult] = useState<{ label: string; icon: string } | null>(null)
   const [mysteryBoxToOpen, setMysteryBoxToOpen] = useState<Collectible | null>(null)
@@ -75,8 +75,7 @@ export default function RewardsPage() {
 
   const handleOpenMystery = (collectible: Collectible) => {
     if (collectible.type !== 'mystery_box') {
-      // eslint-disable-next-line react-hooks/rules-of-hooks -- useCollectible is NOT a hook, just a function starting with "use"
-      useCollectible(collectible.id)
+      consumeCollectible(collectible.id)
       return
     }
     try {
@@ -98,8 +97,7 @@ export default function RewardsPage() {
 
   const handleCloseMystery = () => {
     if (mysteryBoxToOpen) {
-      // eslint-disable-next-line react-hooks/rules-of-hooks -- useCollectible is NOT a hook, just a function starting with "use"
-      useCollectible(mysteryBoxToOpen.id)
+      consumeCollectible(mysteryBoxToOpen.id)
     }
     setShowMystery(false)
     setMysteryBoxToOpen(null)

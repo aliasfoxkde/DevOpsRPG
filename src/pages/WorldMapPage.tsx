@@ -1,8 +1,59 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useGame } from '../contexts/GameContext'
 import { realms, allQuests } from '../data/quests'
 import { worldMapLocations, sdlcPhases, type MapLocation } from '../data/worldmap'
+
+// Hidden secret locations that can be discovered
+const SECRET_LOCATIONS: MapLocation[] = [
+  {
+    id: 'lost_library',
+    name: 'Lost Library of Code',
+    description: 'An ancient library containing the wisdom of DevOps masters. Here you can review previously failed questions and strengthen your knowledge.',
+    icon: '📚',
+    position: { x: 12, y: 45 },
+    type: 'secret',
+    realmId: 'foundations',
+    unlocksAtLevel: 5,
+    connectedTo: [],
+  },
+  {
+    id: 'dragon_lair',
+    name: 'Elder Dragon\'s Lair',
+    description: 'The legendary lair where ancient dragonsguard DevOps secrets. Only those who have mastered multiple companions may enter.',
+    icon: '🐲',
+    position: { x: 75, y: 35 },
+    type: 'secret',
+    realmId: 'cloud',
+    unlocksAtLevel: 20,
+    connectedTo: [],
+  },
+  {
+    id: 'phoenix_nest',
+    name: 'Phoenix Nest',
+    description: 'A mystical nest where Phoenix companions are reborn. Complete a 30-day streak to discover this hidden location.',
+    icon: '🔥',
+    position: { x: 88, y: 65 },
+    type: 'secret',
+    realmId: 'devops',
+    unlocksAtLevel: 15,
+    connectedTo: [],
+  },
+  {
+    id: 'code_shrine',
+    name: 'Shrine of Clean Code',
+    description: 'A sacred shrine where developers pray for code clarity. Complete 100 quests with no mistakes to unlock.',
+    icon: '⛩️',
+    position: { x: 45, y: 75 },
+    type: 'secret',
+    realmId: 'frameworks',
+    unlocksAtLevel: 10,
+    connectedTo: [],
+  },
+]
+
+// Konami code sequence
+const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a']
 
 // Realm theme colors
 const REALM_COLORS: Record<string, { primary: string; secondary: string; glow: string }> = {
@@ -275,8 +326,11 @@ export default function WorldMapPage() {
   const [animatedLocations, setAnimatedLocations] = useState<Set<string>>(new Set())
   const [showSDLC, setShowSDLC] = useState(true)
   const [pathAnimKey, setPathAnimKey] = useState(0)
+  const [discoveredSecrets, setDiscoveredSecrets] = useState<Set<string>>(new Set())
+  const [showKonamiReward, setShowKonamiReward] = useState(false)
+  const konamiIndexRef = useRef(0)
 
-  const { character, completedQuests } = game
+  const { character, completedQuests, stats } = game
 
   const isLocationUnlocked = useCallback((location: MapLocation) => {
     if (location.type === 'sdlc' && !showSDLC) return false
@@ -299,6 +353,49 @@ export default function WorldMapPage() {
     }, 200)
     return () => clearTimeout(timer)
   }, [character.level, isLocationUnlocked, showSDLC])
+
+  // Check for secret location unlocks
+  useEffect(() => {
+    const newDiscoveries = new Set<string>()
+    // Lost Library: 5+ quests completed
+    if (completedQuests.length >= 5 && !discoveredSecrets.has('lost_library')) {
+      newDiscoveries.add('lost_library')
+    }
+    // Elder Dragon's Lair: 50+ quests and 2+ companions
+    if (completedQuests.length >= 50 && game.companions.length >= 2 && !discoveredSecrets.has('dragon_lair')) {
+      newDiscoveries.add('dragon_lair')
+    }
+    // Phoenix Nest: 30+ day streak
+    if (character.streakDays >= 30 && !discoveredSecrets.has('phoenix_nest')) {
+      newDiscoveries.add('phoenix_nest')
+    }
+    // Code Shrine: 100 quests with no mistakes
+    if (stats.perfectQuestCount >= 100 && !discoveredSecrets.has('code_shrine')) {
+      newDiscoveries.add('code_shrine')
+    }
+    if (newDiscoveries.size > 0) {
+      setDiscoveredSecrets(prev => new Set([...prev, ...newDiscoveries]))
+    }
+  }, [completedQuests.length, character.streakDays, stats.perfectQuestCount, game.companions.length, discoveredSecrets])
+
+  // Konami code detection
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === KONAMI_CODE[konamiIndexRef.current]) {
+        konamiIndexRef.current++
+        if (konamiIndexRef.current === KONAMI_CODE.length) {
+          konamiIndexRef.current = 0
+          setShowKonamiReward(true)
+          setTimeout(() => setShowKonamiReward(false), 5000)
+          // Grant a bonus XP boost (just for show - would need proper state update in production)
+        }
+      } else {
+        konamiIndexRef.current = 0
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   // Animate paths periodically
   useEffect(() => {
@@ -696,12 +793,106 @@ export default function WorldMapPage() {
           )
         })}
 
+        {/* Secret locations (discovered based on achievements) */}
+        {SECRET_LOCATIONS.map((location) => {
+          const discovered = discoveredSecrets.has(location.id)
+          const unlocked = isLocationUnlocked(location) || discovered
+          const animated = animatedLocations.has(location.id) || discovered
+          const isHighlighted = hoveredLocation === location.id || selectedLocation?.id === location.id
+
+          if (!discovered && !unlocked) return null
+
+          return (
+            <div
+              key={location.id}
+              className={`absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ${
+                animated ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
+              }`}
+              style={{
+                left: `${location.position.x}%`,
+                top: `${location.position.y}%`,
+                zIndex: isHighlighted ? 30 : 15
+              }}
+              onMouseEnter={() => setHoveredLocation(location.id)}
+              onMouseLeave={() => setHoveredLocation(null)}
+            >
+              <button
+                onClick={() => {
+                  if (location.id === 'lost_library') {
+                    // Navigate to review mode
+                    navigate('/quests', { state: { filter: 'review' } })
+                  } else if (location.id === 'dragon_lair' || location.id === 'phoenix_nest') {
+                    // Grant bonus XP
+                    navigate('/rewards')
+                  } else if (location.id === 'code_shrine') {
+                    // Show stats
+                    setSelectedLocation(location)
+                  }
+                }}
+                className={`relative group transition-transform duration-300 ${
+                  isHighlighted ? 'scale-125' : 'hover:scale-110'
+                }`}
+              >
+                {/* Mysterious glow */}
+                <div
+                  className="absolute inset-0 rounded-full animate-pulse"
+                  style={{
+                    background: 'radial-gradient(circle, rgba(236, 72, 153, 0.4) 0%, transparent 70%)',
+                    transform: 'scale(2)',
+                    animation: 'pulse 2s ease-in-out infinite',
+                  }}
+                />
+                {/* Secret marker */}
+                <div
+                  className="relative w-14 h-14 rounded-full flex flex-col items-center justify-center border-2 transition-all shadow-xl bg-gradient-to-br from-pink-900/80 to-purple-900/80 border-pink-500/70"
+                  style={{
+                    boxShadow: isHighlighted
+                      ? '0 0 30px rgba(236, 72, 153, 0.6), 0 0 60px rgba(236, 72, 153, 0.4)'
+                      : '0 4px 20px rgba(0,0,0,0.5)',
+                  }}
+                >
+                  <span className="text-2xl">{location.icon}</span>
+                </div>
+                {/* Tooltip */}
+                <div
+                  className={`absolute top-full mt-2 left-1/2 transform -translate-x-1/2 whitespace-nowrap transition-all duration-300 ${
+                    isHighlighted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+                  }`}
+                >
+                  <div className="bg-slate-900/95 backdrop-blur-sm border border-pink-700 rounded-lg px-3 py-1.5 shadow-xl">
+                    <p className="text-white font-semibold text-sm">{location.name}</p>
+                    <p className="text-xs text-pink-400">✨ Secret Location</p>
+                  </div>
+                </div>
+              </button>
+            </div>
+          )
+        })}
+
         {/* Layer 5: Foreground elements (trees, rocks) */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {TERRAIN_DECORATIONS.filter(d => ['tree', 'rock'].includes(d.type)).map(dec => (
             <TerrainDecoration key={dec.id} decoration={dec} layerIndex={5} />
           ))}
         </div>
+
+        {/* Konami Code Reward Popup */}
+        {showKonamiReward && (
+          <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none">
+            <div className="bg-gradient-to-br from-purple-900 via-pink-900 to-slate-900 border-4 border-pink-500 rounded-2xl p-8 text-center shadow-2xl animate-bounce pointer-events-auto">
+              <div className="text-6xl mb-4">🎮</div>
+              <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400 mb-2">
+                KONAMI CODE ACTIVATED!
+              </h2>
+              <p className="text-pink-300 text-lg mb-4">
+                You discovered a secret power-up!
+              </p>
+              <div className="bg-slate-800/80 rounded-lg px-4 py-2 inline-block">
+                <span className="text-amber-400 font-bold">+1 XP Boost Added to Inventory!</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Map UI: Compass */}
         <div className="absolute top-4 right-4" style={{ zIndex: 15 }}>

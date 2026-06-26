@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useGame } from '../../contexts/GameContext'
 import { useTheme } from '../../contexts/ThemeContext'
+import { useSoundEffects } from '../../hooks/useSoundEffects'
 import { XPBar } from './XPBar'
 
 const NAV_ITEMS = [
@@ -15,6 +16,7 @@ const NAV_ITEMS = [
   { to: '/store', icon: '🏪', label: 'Shop' },
   { to: '/character', icon: '👤', label: 'Hero' },
   { to: '/rewards', icon: '🎁', label: 'Rewards' },
+  { to: '/settings', icon: '⚙️', label: 'Settings' },
   { to: '/about', icon: 'ℹ️', label: 'About' },
 ]
 
@@ -22,6 +24,7 @@ export function HUD() {
   const { game, completedCount, totalQuests } = useGame()
   const { character } = game
   const { theme, resolvedTheme, setTheme } = useTheme()
+  const { isMuted, toggleMute } = useSoundEffects()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const location = useLocation()
 
@@ -109,6 +112,15 @@ export function HUD() {
               title={`Theme: ${themeLabels[theme]} (${resolvedTheme}) - Click to change`}
             >
               <span className="text-lg">{themeIcons[theme]}</span>
+            </button>
+
+            {/* Sound Toggle */}
+            <button
+              onClick={toggleMute}
+              className="flex items-center gap-1 p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
+              title={isMuted ? 'Sound: OFF - Click to enable' : 'Sound: ON - Click to mute'}
+            >
+              <span className="text-lg">{isMuted ? '🔇' : '🔊'}</span>
             </button>
 
             {/* Avatar - Desktop */}

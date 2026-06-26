@@ -4,7 +4,7 @@ export interface MapLocation {
   id: string
   name: string
   icon: string
-  type: 'realm' | 'sdlc' | 'milestone'
+  type: 'realm' | 'sdlc' | 'milestone' | 'secret'
   realmId?: string
   sdlcPhase?: number
   description: string

@@ -141,7 +141,8 @@ export default function BattleArenaPage() {
     completionLockRef.current = true
 
     // Track quiz stats before completing (includes wrong answers for no_mistakes badge)
-    incrementStat('quiz', isPerfect, wrongAnswers, passedWith80)
+    // Also track topic for spaced repetition system
+    incrementStat('quiz', isPerfect, wrongAnswers, passedWith80, quest?.topicId)
     completeQuest(quest.id)
     setJustCompleted(true)
 

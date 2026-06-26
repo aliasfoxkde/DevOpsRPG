@@ -30,7 +30,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   const allQuestions = getQuizForTopic(topicId)
   const hasQuestions = allQuestions.length > 0
   const { playSound } = useSoundEffects()
-  const { game, useCollectible } = useGame()
+  const { game, consumeCollectible } = useGame()
 
   // Check if player has unused hint scroll
   const hasHintScroll = game.collectibles.some(c => c.id === 'hint_scroll' && !c.used)
@@ -458,7 +458,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
               <button
                 onClick={() => {
                   if (hasHintScroll) {
-                    useCollectible('hint_scroll')
+                    consumeCollectible('hint_scroll')
                     setShowHint(true)
                   } else {
                     // Show message that hint scroll is needed

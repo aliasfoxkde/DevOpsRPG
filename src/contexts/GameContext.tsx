@@ -16,6 +16,58 @@ export interface Companion {
   xpBonus: number
   goldBonus: number
   specialAbility?: string
+  bondLevel: number // 1-10 bond level
+  totalQuestsCompleted: number // Total quests completed with this companion
+  evolvedForm?: string // ID of evolved form companion
+  maxBondLevel: number // Level at which evolution triggers
+}
+
+// Evolved companions data
+export const EVOLVED_COMPANIONS: Record<string, Companion> = {
+  owl_elder: {
+    id: 'owl_elder',
+    name: 'Elder Owl',
+    icon: '🦉',
+    xpBonus: 0.10,
+    goldBonus: 0.05,
+    specialAbility: 'Wisdom: +10% XP permanently',
+    bondLevel: 1,
+    totalQuestsCompleted: 0,
+    maxBondLevel: 10
+  },
+  cat_shadow: {
+    id: 'cat_shadow',
+    name: 'Shadow Cat',
+    icon: '🐱',
+    xpBonus: 0.05,
+    goldBonus: 0.12,
+    specialAbility: 'Lucky: +12% Gold permanently',
+    bondLevel: 1,
+    totalQuestsCompleted: 0,
+    maxBondLevel: 10
+  },
+  dragon_elder: {
+    id: 'dragon_elder',
+    name: 'Elder Dragon',
+    icon: '🐲',
+    xpBonus: 0.20,
+    goldBonus: 0.20,
+    specialAbility: 'Fire Breath: +20% XP & Gold permanently',
+    bondLevel: 1,
+    totalQuestsCompleted: 0,
+    maxBondLevel: 10
+  },
+  phoenix_legendary: {
+    id: 'phoenix_legendary',
+    name: 'Legendary Phoenix',
+    icon: '🔥',
+    xpBonus: 0.30,
+    goldBonus: 0.20,
+    specialAbility: 'Rebirth: Weekly Streak Shield + 2x XP on streak days',
+    bondLevel: 1,
+    totalQuestsCompleted: 0,
+    maxBondLevel: 10
+  },
 }
 
 export interface Character {
@@ -112,9 +164,28 @@ export interface GameState {
     milestoneTier: number // Highest milestone tier reached
     quizMasterScore: number // Quizzes passed with 80%+ score
   }
+  // Weak topic tracking for spaced repetition
+  weakTopics: Record<string, {
+    wrongCount: number
+    lastReviewed: string
+    nextReview: string
+    masteryLevel: number // 0-3, higher = more confident
+  }>
+  // Prestige system
+  prestigeLevel: number // Times player has prestiged (reset progress for permanent bonuses)
+  prestigeMultiplier: number // Permanent XP/Gold multiplier from prestige (starts at 1.0, increases with each prestige)
+  totalPrestigeXp: number // Total XP earned across all prestiges (for prestige badges)
   // Companions
   companions: Companion[]
   activeCompanion: Companion | null
+  // Daily Dash speedrun challenge
+  dailyDash: {
+    active: boolean
+    startTime: number | null
+    completedQuests: string[]
+    bestTime: number | null // Best time in seconds
+    lastPlayedDate: string | null
+  }
 }
 
 interface GameContextType {
@@ -137,7 +208,7 @@ interface GameContextType {
   // Badge/Sidequest/Milestone/Collectible methods
   claimDailyReward: (day: number) => { type: string; value?: number; collectible?: Collectible }
   spinWheel: () => { segment: { id: string; label: string; icon: string; reward: { type: string; value?: number; collectibleId?: string } } }
-  useCollectible: (collectibleId: string) => boolean
+  consumeCollectible: (collectibleId: string) => boolean
   getActiveCollectibles: () => Collectible[]
   checkAndUnlockBadges: () => Badge[]
   checkAndUnlockMilestones: () => Milestone[]
@@ -150,8 +221,15 @@ interface GameContextType {
   getSkillLevel: (skillId: string) => number
   getAvailableSkillPoints: () => number
   // Stats tracking for badges
-  incrementStat: (stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame' | 'challenge', isPerfect?: boolean, wrongAnswers?: number, passedWith80?: boolean) => void
+  incrementStat: (stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame' | 'challenge', isPerfect?: boolean, wrongAnswers?: number, passedWith80?: boolean, topicId?: string) => void
   resetQuizStreak: () => void
+  // Spaced repetition
+  getWeakTopics: () => Array<{ topicId: string; masteryLevel: number; wrongCount: number; nextReview: string }>
+  getTopicsDueForReview: () => string[]
+  // Prestige system
+  canPrestige: () => boolean
+  doPrestige: () => { newPrestigeLevel: number; newMultiplier: number }
+  getPrestigeBonuses: () => { xpBonus: number; goldBonus: number; bonusDescription: string }
   // Realm completion
   dismissRealmCompletion: () => void
   // Onboarding
@@ -164,6 +242,11 @@ interface GameContextType {
   // Streak shields
   useStreakShield: () => boolean
   addStreakShield: (count?: number) => void
+  // Daily Dash speedrun
+  startDailyDash: () => void
+  completeDailyDashQuest: (questId: string) => void
+  abandonDailyDash: () => void
+  isDailyDashActive: () => boolean
   // Store & Companions
   purchaseItem: (itemId: string, price: number) => boolean
   equipCompanion: (companionId: string) => void
@@ -276,8 +359,19 @@ function createDefaultGame(): GameState {
       milestoneTier: 0,
       quizMasterScore: 0,
     },
+    weakTopics: {},
+    prestigeLevel: 0,
+    prestigeMultiplier: 1.0,
+    totalPrestigeXp: 0,
     companions: [],
     activeCompanion: null,
+    dailyDash: {
+      active: false,
+      startTime: null,
+      completedQuests: [],
+      bestTime: null,
+      lastPlayedDate: null,
+    },
   }
 }
 
@@ -357,11 +451,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const today = new Date().toISOString().split('T')[0]
       const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
 
-      // Apply XP and gold multipliers from collectibles and companions
+      // Apply XP and gold multipliers from collectibles, companions, and prestige
       const companionXpBonus = prev.activeCompanion ? prev.activeCompanion.xpBonus : 0
       const companionGoldBonus = prev.activeCompanion ? prev.activeCompanion.goldBonus : 0
-      const xpReward = Math.floor(quest.xpReward * prev.character.xpMultiplier * (1 + companionXpBonus))
-      const goldReward = Math.floor((quest.xpReward / 10) * prev.character.goldMultiplier * (1 + companionGoldBonus))
+      const prestigeMultiplier = prev.prestigeMultiplier
+      const xpReward = Math.floor(quest.xpReward * prev.character.xpMultiplier * (1 + companionXpBonus) * prestigeMultiplier)
+      const goldReward = Math.floor((quest.xpReward / 10) * prev.character.goldMultiplier * (1 + companionGoldBonus) * prestigeMultiplier)
 
       // Calculate new XP and level
       const newXp = prev.character.xp + xpReward
@@ -499,6 +594,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
         sidequestComplete: prev.stats.sidequestComplete,
         milestoneTier: prev.stats.milestoneTier,
         quizMasterScore: prev.stats.quizMasterScore,
+        // Companion stats for evolution badges
+        companionOwned: prev.companions.length,
+        companionEvolution: prev.companions.filter(c =>
+          c.id.includes('_elder') || c.id.includes('_shadow') || c.id.includes('_legendary')
+        ).length,
+        maxBondLevel: Math.max(1, ...prev.companions.map(c => c.bondLevel)),
+        // Prestige stats for prestige badges
+        prestigeLevel: prev.prestigeLevel,
       }
 
       let newBadge: Badge | undefined
@@ -615,6 +718,67 @@ export function GameProvider({ children }: { children: ReactNode }) {
             ? Math.min(prev.stats.fastestQuestTime, (Date.now() - prev.currentQuestStartTime) / 1000)
             : prev.stats.fastestQuestTime,
         },
+        // Companion bond system - increase bond level and check for evolution
+        companions: prev.activeCompanion
+          ? prev.companions.map(c => {
+              if (c.id !== prev.activeCompanion?.id) return c
+              const newBondLevel = Math.min(c.bondLevel + 1, c.maxBondLevel)
+              const newTotalQuests = c.totalQuestsCompleted + 1
+              // Check if companion should evolve
+              if (newBondLevel >= c.maxBondLevel && c.evolvedForm && !c.id.includes('_elder') && !c.id.includes('_shadow') && !c.id.includes('_legendary')) {
+                const evolvedCompanion = EVOLVED_COMPANIONS[c.evolvedForm]
+                if (evolvedCompanion) {
+                  return {
+                    ...evolvedCompanion,
+                    bondLevel: newBondLevel,
+                    totalQuestsCompleted: newTotalQuests,
+                  }
+                }
+              }
+              return {
+                ...c,
+                bondLevel: newBondLevel,
+                totalQuestsCompleted: newTotalQuests,
+              }
+            })
+          : prev.companions,
+        activeCompanion: prev.activeCompanion
+          ? (() => {
+              const updated = prev.companions.find(c => c.id === prev.activeCompanion?.id)
+              // If evolved, switch to the evolved form
+              if (updated && updated.bondLevel >= updated.maxBondLevel && updated.evolvedForm && !updated.id.includes('_elder') && !updated.id.includes('_shadow') && !updated.id.includes('_legendary')) {
+                return EVOLVED_COMPANIONS[updated.evolvedForm] || updated
+              }
+              return updated || null
+            })()
+          : null,
+        // Daily Dash speedrun challenge - track quest completion
+        dailyDash: (() => {
+          if (!prev.dailyDash.active || !prev.dailyDash.startTime) return prev.dailyDash
+          if (prev.dailyDash.completedQuests.includes(questId)) return prev.dailyDash
+
+          const newCompletedQuests = [...prev.dailyDash.completedQuests, questId]
+
+          // Auto-complete dash when all 5 quests done
+          if (newCompletedQuests.length >= 5) {
+            const elapsed = Math.floor((Date.now() - prev.dailyDash.startTime) / 1000)
+            const newBestTime = prev.dailyDash.bestTime === null || elapsed < prev.dailyDash.bestTime
+              ? elapsed
+              : prev.dailyDash.bestTime
+            return {
+              active: false,
+              startTime: null,
+              completedQuests: newCompletedQuests,
+              bestTime: newBestTime,
+              lastPlayedDate: new Date().toISOString().split('T')[0],
+            }
+          }
+
+          return {
+            ...prev.dailyDash,
+            completedQuests: newCompletedQuests,
+          }
+        })(),
       }
     })
   }, [])
@@ -806,7 +970,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     return { segment }
   }, [])
 
-  const useCollectible = useCallback((collectibleId: string): boolean => {
+  const consumeCollectible = useCallback((collectibleId: string): boolean => {
     let found = false
     setGame(prev => {
       const collectible = COLLECTIBLES_POOL.find(c => c.id === collectibleId)
@@ -915,7 +1079,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     return newlyUnlocked
   }, [])
 
-  const incrementStat = useCallback((stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame' | 'challenge', isPerfect?: boolean, wrongAnswers?: number, passedWith80?: boolean) => {
+  const incrementStat = useCallback((stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame' | 'challenge', isPerfect?: boolean, wrongAnswers?: number, passedWith80?: boolean, topicId?: string) => {
     setGame(prev => {
       const updates: Partial<GameState['stats']> = {}
       switch (stat) {
@@ -957,7 +1121,35 @@ export function GameProvider({ children }: { children: ReactNode }) {
           updates.challengeComplete = (prev.stats.challengeComplete || 0) + 1
           break
       }
-      return { ...prev, stats: { ...prev.stats, ...updates } }
+
+      // Update weak topics for spaced repetition
+      let weakTopicsUpdate = prev.weakTopics
+      if (stat === 'quiz' && topicId && wrongAnswers !== undefined) {
+        const now = new Date().toISOString()
+        const existing = prev.weakTopics[topicId] || { wrongCount: 0, lastReviewed: now, nextReview: now, masteryLevel: 0 }
+        const newWrongCount = existing.wrongCount + (wrongAnswers > 0 ? 1 : 0)
+        // Mastery levels: 0=new, 1=learning, 2=reviewing, 3=mastered
+        // Decrease mastery if wrong, increase if correct
+        const masteryDelta = wrongAnswers === 0 ? 1 : -1
+        const newMastery = Math.max(0, Math.min(3, existing.masteryLevel + masteryDelta))
+
+        // Spaced repetition intervals: 1 day, 3 days, 7 days, 14 days
+        const intervals = [1, 3, 7, 14]
+        const intervalDays = intervals[Math.min(newMastery, intervals.length - 1)]
+        const nextReview = new Date(Date.now() + intervalDays * 24 * 60 * 60 * 1000).toISOString()
+
+        weakTopicsUpdate = {
+          ...prev.weakTopics,
+          [topicId]: {
+            wrongCount: newWrongCount,
+            lastReviewed: now,
+            nextReview,
+            masteryLevel: newMastery,
+          }
+        }
+      }
+
+      return { ...prev, stats: { ...prev.stats, ...updates }, weakTopics: weakTopicsUpdate }
     })
   }, [])
 
@@ -967,6 +1159,126 @@ export function GameProvider({ children }: { children: ReactNode }) {
       stats: { ...prev.stats, quizStreak: 0 }
     }))
   }, [])
+
+  // Get all weak topics for review
+  const getWeakTopics = useCallback(() => {
+    return Object.entries(game.weakTopics).map(([topicId, data]) => ({
+      topicId,
+      masteryLevel: data.masteryLevel,
+      wrongCount: data.wrongCount,
+      nextReview: data.nextReview,
+    }))
+  }, [game.weakTopics])
+
+  // Get topics that are due for review (past their nextReview date)
+  const getTopicsDueForReview = useCallback(() => {
+    const now = new Date().toISOString()
+    return Object.entries(game.weakTopics)
+      .filter(([, data]) => data.nextReview <= now && data.masteryLevel < 3)
+      .map(([topicId]) => topicId)
+  }, [game.weakTopics])
+
+  // Prestige system - check if player can prestige (all quests complete)
+  const canPrestige = useCallback(() => {
+    return game.completedQuests.length >= allQuests.length && game.prestigeLevel >= 0
+  }, [game.completedQuests.length, game.prestigeLevel])
+
+  // Get prestige bonuses description
+  const getPrestigeBonuses = useCallback(() => {
+    const currentBonus = (game.prestigeMultiplier - 1) * 100
+    const nextBonus = game.prestigeLevel * 5
+    return {
+      xpBonus: Math.round(currentBonus),
+      goldBonus: Math.round(currentBonus * 0.5),
+      bonusDescription: `Current: +${Math.round(currentBonus)}% XP, +${Math.round(currentBonus * 0.5)}% Gold | After prestige: +${nextBonus}% XP, +${Math.round(nextBonus * 0.5)}% Gold`,
+    }
+  }, [game.prestigeMultiplier, game.prestigeLevel])
+
+  // Perform prestige reset
+  const doPrestige = useCallback(() => {
+    const newPrestigeLevel = game.prestigeLevel + 1
+    const newMultiplier = 1 + (newPrestigeLevel * 0.05) // +5% per prestige level
+
+    setGame(prev => ({
+      ...prev,
+      // Keep character basics but reset progress
+      character: {
+        ...prev.character,
+        xp: 0,
+        level: 1,
+        xpToNextLevel: 100,
+        title: 'Novice',
+        gold: 0, // Gold reset on prestige
+        streakDays: 0,
+        streakShields: 0,
+        skillPoints: 0,
+        skillAllocations: {},
+        xpMultiplier: 1,
+        goldMultiplier: 1,
+      },
+      // Reset all quest progress
+      completedQuests: [],
+      currentQuestId: null,
+      completedRealms: [],
+      // Keep companions but reset their bond progress
+      companions: prev.companions.map(c => ({
+        ...c,
+        bondLevel: 1,
+        totalQuestsCompleted: 0,
+      })),
+      activeCompanion: null,
+      // Reset collectibles
+      collectibles: [],
+      // Reset side quests
+      sideQuests: generateDailyQuests().concat(
+        generateWeeklyQuests(),
+        generateSecretQuests()
+      ),
+      // Update prestige state
+      prestigeLevel: newPrestigeLevel,
+      prestigeMultiplier: newMultiplier,
+      totalPrestigeXp: prev.totalPrestigeXp + prev.character.xp,
+      // Keep badges (don't reset)
+      // Keep milestones (don't reset)
+      // Keep achievements (don't reset)
+      // Reset stats
+      stats: {
+        quizCount: 0,
+        quizPerfectCount: 0,
+        quizStreak: 0,
+        minigameCount: 0,
+        typerCount: 0,
+        memoryCount: 0,
+        mathCount: 0,
+        perfectQuiz: false,
+        wrongAnswerCount: 0,
+        perfectQuestCount: 0,
+        sessionQuestCount: 0,
+        earlyQuests: 0,
+        nightQuests: 0,
+        fastestQuestTime: Infinity,
+        jackpotSpins: 0,
+        mysteryBoxesOpened: 0,
+        challengeComplete: 0,
+        sidequestComplete: 0,
+        milestoneTier: 0,
+        quizMasterScore: 0,
+      },
+      // Reset weak topics
+      weakTopics: {},
+      // Reset daily rewards
+      dailyRewardsClaimed: [],
+      lastDailyReset: new Date().toISOString().split('T')[0],
+      // Keep settings
+      hasSeenOnboarding: true,
+      recentBadgeUnlocks: [],
+      recentMilestoneUnlocks: [],
+      showVictory: false,
+      showRealmCompletion: null,
+    }))
+
+    return { newPrestigeLevel, newMultiplier }
+  }, [game.prestigeLevel])
 
   const checkAndUnlockMilestones = useCallback((): Milestone[] => {
     const newlyUnlocked: Milestone[] = []
@@ -1205,12 +1517,79 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }))
   }, [])
 
+  // Daily Dash speedrun challenge
+  const startDailyDash = useCallback(() => {
+    setGame(prev => ({
+      ...prev,
+      dailyDash: {
+        active: true,
+        startTime: Date.now(),
+        completedQuests: [],
+        bestTime: prev.dailyDash.bestTime,
+        lastPlayedDate: new Date().toISOString().split('T')[0],
+      },
+    }))
+  }, [])
+
+  const completeDailyDashQuest = useCallback((questId: string) => {
+    setGame(prev => {
+      if (!prev.dailyDash.active || !prev.dailyDash.startTime) return prev
+      if (prev.dailyDash.completedQuests.includes(questId)) return prev
+
+      const newCompletedQuests = [...prev.dailyDash.completedQuests, questId]
+
+      // Auto-complete dash when all 5 quests done
+      if (newCompletedQuests.length >= 5) {
+        const elapsed = Math.floor((Date.now() - prev.dailyDash.startTime) / 1000)
+        const newBestTime = prev.dailyDash.bestTime === null || elapsed < prev.dailyDash.bestTime
+          ? elapsed
+          : prev.dailyDash.bestTime
+
+        return {
+          ...prev,
+          dailyDash: {
+            ...prev.dailyDash,
+            active: false,
+            startTime: null,
+            completedQuests: newCompletedQuests,
+            bestTime: newBestTime,
+          },
+        }
+      }
+
+      return {
+        ...prev,
+        dailyDash: {
+          ...prev.dailyDash,
+          completedQuests: newCompletedQuests,
+        },
+      }
+    })
+  }, [])
+
+  const abandonDailyDash = useCallback(() => {
+    setGame(prev => ({
+      ...prev,
+      dailyDash: {
+        active: false,
+        startTime: null,
+        completedQuests: [],
+        bestTime: prev.dailyDash.bestTime,
+        lastPlayedDate: prev.dailyDash.lastPlayedDate,
+      },
+    }))
+  }, [])
+
+  const isDailyDashActive = useCallback(() => {
+    return game.dailyDash.active
+  }, [game.dailyDash.active])
+
   // Purchase item from shop
   const COMPANIONS_DATA: Record<string, Companion> = {
-    owl: { id: 'owl', name: 'Wise Owl', icon: '🦉', xpBonus: 0.05, goldBonus: 0 },
-    cat: { id: 'cat', name: 'Lucky Cat', icon: '🐱', xpBonus: 0, goldBonus: 0.05 },
-    dragon: { id: 'dragon', name: 'Baby Dragon', icon: '🐲', xpBonus: 0.10, goldBonus: 0.10 },
-    phoenix: { id: 'phoenix', name: 'Phoenix', icon: '🦅', xpBonus: 0.20, goldBonus: 0.10, specialAbility: 'Weekly Streak Shield' },
+    owl: { id: 'owl', name: 'Wise Owl', icon: '🦉', xpBonus: 0.05, goldBonus: 0, bondLevel: 1, totalQuestsCompleted: 0, evolvedForm: 'owl_elder', maxBondLevel: 10 },
+    cat: { id: 'cat', name: 'Lucky Cat', icon: '🐱', xpBonus: 0, goldBonus: 0.05, bondLevel: 1, totalQuestsCompleted: 0, evolvedForm: 'cat_shadow', maxBondLevel: 10 },
+    dragon: { id: 'dragon', name: 'Baby Dragon', icon: '🐲', xpBonus: 0.10, goldBonus: 0.10, bondLevel: 1, totalQuestsCompleted: 0, evolvedForm: 'dragon_elder', maxBondLevel: 10 },
+    phoenix: { id: 'phoenix', name: 'Phoenix', icon: '🦅', xpBonus: 0.20, goldBonus: 0.10, specialAbility: 'Weekly Streak Shield', bondLevel: 1, totalQuestsCompleted: 0, evolvedForm: 'phoenix_legendary', maxBondLevel: 10 },
   }
 
   const purchaseItem = useCallback((itemId: string, price: number): boolean => {
@@ -1279,7 +1658,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         // New engagement systems
         claimDailyReward,
         spinWheel,
-        useCollectible,
+        consumeCollectible,
         getActiveCollectibles,
         checkAndUnlockBadges,
         checkAndUnlockMilestones,
@@ -1303,9 +1682,21 @@ export function GameProvider({ children }: { children: ReactNode }) {
         // Stats tracking
         incrementStat,
         resetQuizStreak,
+        // Spaced repetition
+        getWeakTopics,
+        getTopicsDueForReview,
+        // Prestige system
+        canPrestige,
+        doPrestige,
+        getPrestigeBonuses,
         // Streak shields
         useStreakShield,
         addStreakShield,
+        // Daily Dash speedrun
+        startDailyDash,
+        completeDailyDashQuest,
+        abandonDailyDash,
+        isDailyDashActive,
         // Store & Companions
         purchaseItem,
         equipCompanion,

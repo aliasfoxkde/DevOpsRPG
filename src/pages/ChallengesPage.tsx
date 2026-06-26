@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useGame } from '../contexts/GameContext'
+import { allQuests } from '../data/quests'
 
 interface Challenge {
   id: string
@@ -65,6 +66,12 @@ function formatTimeRemaining(expiresAt: string): string {
   return 'Less than 1h'
 }
 
+function formatTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60)
+  const secs = seconds % 60
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+}
+
 interface ChallengeState {
   progress: number
   completed: boolean
@@ -72,13 +79,31 @@ interface ChallengeState {
 }
 
 export default function ChallengesPage() {
-  const { game, addXP, addGold, grantBadge, incrementStat } = useGame()
-  const [activeTab, setActiveTab] = useState<'weekly' | 'monthly'>('weekly')
+  const { game, addXP, addGold, grantBadge, incrementStat, startDailyDash, abandonDailyDash } = useGame()
+  const [activeTab, setActiveTab] = useState<'daily' | 'weekly' | 'monthly'>('daily')
   const [challengeStates, setChallengeStates] = useState<Record<string, ChallengeState>>({})
+  const [dashTimeElapsed, setDashTimeElapsed] = useState(0)
 
   // Get challenges based on current tab
   const activeChallenges = activeTab === 'weekly' ? WEEKLY_CHALLENGES : MONTHLY_CHALLENGES
   const expiresAt = activeTab === 'weekly' ? getNextWeekStart() : getNextMonthStart()
+
+  // Daily Dash timer effect
+  useEffect(() => {
+    if (!game.dailyDash.active || !game.dailyDash.startTime) {
+      return
+    }
+    const interval = setInterval(() => {
+      setDashTimeElapsed(Math.floor((Date.now() - game.dailyDash.startTime!) / 1000))
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [game.dailyDash.active, game.dailyDash.startTime])
+
+  // Daily Dash completed quests for display
+  const dailyDashQuests = useMemo(() => {
+    if (activeTab !== 'daily') return []
+    return game.dailyDash.completedQuests.map(qId => allQuests.find(q => q.id === qId)).filter(Boolean)
+  }, [activeTab, game.dailyDash.completedQuests])
 
   // Calculate progress for each challenge based on game state
   const challengesWithProgress = useMemo(() => {
@@ -165,6 +190,16 @@ export default function ChallengesPage() {
       {/* Tab Switcher */}
       <div className="flex gap-2 mb-8 justify-center">
         <button
+          onClick={() => setActiveTab('daily')}
+          className={`px-6 py-3 rounded-lg font-bold transition-all ${
+            activeTab === 'daily'
+              ? 'bg-gradient-to-r from-red-600 to-orange-500 text-white'
+              : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+          }`}
+        >
+          ⚡ Daily Dash
+        </button>
+        <button
           onClick={() => setActiveTab('weekly')}
           className={`px-6 py-3 rounded-lg font-bold transition-all ${
             activeTab === 'weekly'
@@ -186,7 +221,103 @@ export default function ChallengesPage() {
         </button>
       </div>
 
-      {/* Overall Progress */}
+      {/* Daily Dash Section */}
+      {activeTab === 'daily' && (
+        <div className="bg-gradient-to-br from-red-900/30 to-orange-900/30 rounded-xl border border-red-500/30 p-6 mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-red-400 mb-1">⚡ Daily Dash Speedrun</h2>
+              <p className="text-slate-400 text-sm">Complete 5 quests as fast as possible!</p>
+            </div>
+            <div className="text-right">
+              {game.dailyDash.bestTime !== null && (
+                <div className="text-sm text-slate-400">Best Time</div>
+              )}
+              <div className={`text-2xl font-bold ${game.dailyDash.bestTime !== null ? 'text-yellow-400' : 'text-slate-500'}`}>
+                {game.dailyDash.bestTime !== null ? formatTime(game.dailyDash.bestTime) : '--:--'}
+              </div>
+            </div>
+          </div>
+
+          {/* Timer Display */}
+          {game.dailyDash.active ? (
+            <div className="text-center mb-6">
+              <div className="text-sm text-slate-400 mb-1">Time Elapsed</div>
+              <div className="text-5xl font-bold font-mono text-orange-400 animate-pulse">
+                {formatTime(dashTimeElapsed)}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center mb-6">
+              <button
+                onClick={startDailyDash}
+                className="px-8 py-4 bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-500 hover:to-orange-400 text-white font-bold text-xl rounded-lg transition-all transform hover:scale-105"
+              >
+                ⚡ START DAILY DASH
+              </button>
+              <p className="text-slate-500 text-sm mt-2">Complete 5 quests to finish the dash!</p>
+            </div>
+          )}
+
+          {/* Progress Dots */}
+          <div className="flex justify-center gap-4 mb-6">
+            {[0, 1, 2, 3, 4].map(i => (
+              <div
+                key={i}
+                className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold transition-all ${
+                  i < game.dailyDash.completedQuests.length
+                    ? 'bg-green-500 text-white scale-110'
+                    : i === game.dailyDash.completedQuests.length && game.dailyDash.active
+                    ? 'bg-orange-500 text-white ring-4 ring-orange-300 animate-pulse'
+                    : 'bg-slate-700 text-slate-500'
+                }`}
+              >
+                {i < game.dailyDash.completedQuests.length ? '✓' : i + 1}
+              </div>
+            ))}
+          </div>
+
+          {/* Active Quests During Dash */}
+          {game.dailyDash.active && (
+            <div className="bg-slate-800/50 rounded-lg p-4">
+              <h3 className="text-sm font-bold text-slate-300 mb-3">Complete these quests:</h3>
+              <div className="grid gap-2">
+                {dailyDashQuests.length > 0 ? dailyDashQuests.map(quest => quest && (
+                  <div key={quest.id} className="flex items-center gap-2 text-sm text-green-400">
+                    <span>✓</span>
+                    <span>{quest.title}</span>
+                  </div>
+                )) : (
+                  <p className="text-slate-500 text-sm">Complete quests to track them here!</p>
+                )}
+              </div>
+              <button
+                onClick={abandonDailyDash}
+                className="mt-4 w-full py-2 bg-slate-700 hover:bg-slate-600 text-slate-400 text-sm font-bold rounded-lg transition-colors"
+              >
+                🛑 Abandon Dash
+              </button>
+            </div>
+          )}
+
+          {/* Completed Dash Summary */}
+          {!game.dailyDash.active && game.dailyDash.bestTime !== null && game.dailyDash.completedQuests.length > 0 && (
+            <div className="text-center">
+              <div className="text-green-400 font-bold mb-2">🎉 Last Dash Complete!</div>
+              <div className="text-slate-400 text-sm">
+                {game.dailyDash.completedQuests.length} quests in {formatTime(
+                  game.dailyDash.bestTime && game.dailyDash.completedQuests.length === 5
+                    ? game.dailyDash.bestTime
+                    : 0
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Overall Progress (Weekly/Monthly) */}
+      {activeTab !== 'daily' && (
       <div className="bg-card rounded-xl border border-border p-6 mb-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold">
@@ -215,8 +346,10 @@ export default function ChallengesPage() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Challenge List */}
+      {activeTab !== 'daily' && (
       <div className="grid gap-4">
         {challengesWithProgress.map((challenge) => {
           const progressPercent = Math.min(100, Math.round((challenge.progress / challenge.requirement.count) * 100))
@@ -320,17 +453,30 @@ export default function ChallengesPage() {
           )
         })}
       </div>
+      )}
 
       {/* Info Footer */}
-      <div className="mt-8 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
-        <h3 className="font-bold text-amber-400 mb-2">💡 How Challenges Work</h3>
-        <ul className="text-sm text-slate-400 space-y-1">
-          <li>• Weekly challenges reset every Monday at midnight</li>
-          <li>• Monthly challenges reset on the 1st of each month</li>
-          <li>• Progress is automatically tracked as you complete quests and mini-games</li>
-          <li>• Claim your rewards before the challenge period ends!</li>
-        </ul>
-      </div>
+      {activeTab === 'daily' ? (
+        <div className="mt-8 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+          <h3 className="font-bold text-red-400 mb-2">⚡ How Daily Dash Works</h3>
+          <ul className="text-sm text-slate-400 space-y-1">
+            <li>• Start the Daily Dash to begin a 5-quest speedrun</li>
+            <li>• Complete quests as fast as you can - your time is tracked!</li>
+            <li>• Abandoning resets your current progress but keeps your best time</li>
+            <li>• Your best time is saved - beat it tomorrow!</li>
+          </ul>
+        </div>
+      ) : (
+        <div className="mt-8 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+          <h3 className="font-bold text-amber-400 mb-2">💡 How Challenges Work</h3>
+          <ul className="text-sm text-slate-400 space-y-1">
+            <li>• Weekly challenges reset every Monday at midnight</li>
+            <li>• Monthly challenges reset on the 1st of each month</li>
+            <li>• Progress is automatically tracked as you complete quests and mini-games</li>
+            <li>• Claim your rewards before the challenge period ends!</li>
+          </ul>
+        </div>
+      )}
     </div>
   )
 }

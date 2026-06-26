@@ -33,6 +33,7 @@ const FaqPage = lazy(() => import('./pages/FaqPage'))
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'))
 const GameLibraryPage = lazy(() => import('./pages/GameLibraryPage'))
 const StorePage = lazy(() => import('./pages/StorePage'))
+const SettingsPage = lazy(() => import('./pages/SettingsPage'))
 
 // Loading fallback component
 function PageLoader() {
@@ -138,6 +139,7 @@ function AppContent() {
             <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
             <Route path="games" element={<GameLibraryPage />} />
             <Route path="store" element={<StorePage />} />
+            <Route path="settings" element={<SettingsPage />} />
           </Route>
         </Routes>
       </Suspense>

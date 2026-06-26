@@ -161,11 +161,34 @@ export default function StorePage() {
             <h3 className="text-purple-400 font-bold mb-2">🐾 Active Companion</h3>
             <div className="flex items-center gap-4">
               <span className="text-4xl">{activeCompanion.icon}</span>
-              <div>
+              <div className="flex-1">
                 <div className="text-white font-bold">{activeCompanion.name}</div>
                 <div className="text-slate-400 text-sm">
                   +{Math.round(activeCompanion.xpBonus * 100)}% XP • +{Math.round(activeCompanion.goldBonus * 100)}% Gold
                   {activeCompanion.specialAbility && ` • ${activeCompanion.specialAbility}`}
+                </div>
+                {/* Bond Level */}
+                <div className="mt-2">
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="text-pink-400">Bond Lv.{activeCompanion.bondLevel}</span>
+                    <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden max-w-[120px]">
+                      <div
+                        className="h-full bg-gradient-to-r from-pink-500 to-purple-500 transition-all"
+                        style={{ width: `${(activeCompanion.bondLevel / activeCompanion.maxBondLevel) * 100}%` }}
+                      />
+                    </div>
+                    <span className="text-slate-500">{activeCompanion.bondLevel}/{activeCompanion.maxBondLevel}</span>
+                  </div>
+                  {activeCompanion.evolvedForm && !activeCompanion.id.includes('_') && (
+                    <div className="text-xs text-slate-500 mt-1">
+                      ✨ Evolves at bond level {activeCompanion.maxBondLevel}
+                    </div>
+                  )}
+                  {activeCompanion.totalQuestsCompleted > 0 && (
+                    <div className="text-xs text-slate-500 mt-1">
+                      Quests together: {activeCompanion.totalQuestsCompleted}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

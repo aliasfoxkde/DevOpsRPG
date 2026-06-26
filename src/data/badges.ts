@@ -116,6 +116,21 @@ export const BADGES: Badge[] = [
   { id: 'expert', name: 'Expert', description: 'Reach expert rank', icon: '🎖️', category: 'quest', rarity: 'rare', requirement: { type: 'milestone_tier', value: 2 }, xpReward: 300, goldReward: 150 },
   { id: 'master', name: 'Master', description: 'Reach master rank', icon: '🏅', category: 'quest', rarity: 'epic', requirement: { type: 'milestone_tier', value: 3 }, xpReward: 600, goldReward: 300 },
   { id: 'grandmaster', name: 'Grandmaster', description: 'Reach grandmaster rank', icon: '👑', category: 'quest', rarity: 'legendary', requirement: { type: 'milestone_tier', value: 4 }, xpReward: 1200, goldReward: 600 },
+
+  // Companion evolution badges
+  { id: 'first_companion', name: 'Best Friends', description: 'Unlock your first companion', icon: '🐾', category: 'secret', rarity: 'uncommon', requirement: { type: 'companion_owned', value: 1 }, xpReward: 100, goldReward: 50 },
+  { id: 'all_companions', name: 'Companion Collector', description: 'Unlock all 4 companions', icon: '🎒', category: 'secret', rarity: 'epic', requirement: { type: 'companion_owned', value: 4 }, xpReward: 500, goldReward: 250 },
+  { id: 'owl_evolution', name: 'Wise Beyond Years', description: 'Evolve your Owl to Elder Owl', icon: '🦉', category: 'secret', rarity: 'rare', requirement: { type: 'companion_evolution', value: 1 }, xpReward: 300, goldReward: 150 },
+  { id: 'cat_evolution', name: 'Shadow Stalker', description: 'Evolve your Cat to Shadow Cat', icon: '🐱', category: 'secret', rarity: 'rare', requirement: { type: 'companion_evolution', value: 1 }, xpReward: 300, goldReward: 150 },
+  { id: 'dragon_evolution', name: 'Ancient Fire', description: 'Evolve your Dragon to Elder Dragon', icon: '🐲', category: 'secret', rarity: 'epic', requirement: { type: 'companion_evolution', value: 1 }, xpReward: 500, goldReward: 250 },
+  { id: 'phoenix_evolution', name: 'Eternal Flame', description: 'Evolve your Phoenix to Legendary Phoenix', icon: '🔥', category: 'secret', rarity: 'legendary', requirement: { type: 'companion_evolution', value: 1 }, xpReward: 1000, goldReward: 500 },
+  { id: 'bond_master', name: 'Bond Master', description: 'Max bond level with any companion', icon: '💝', category: 'secret', rarity: 'epic', requirement: { type: 'max_bond_level', value: 10 }, xpReward: 750, goldReward: 375 },
+
+  // Prestige badges
+  { id: 'prestige_1', name: 'Reborn Hero', description: 'Complete your first prestige reset', icon: '🌟', category: 'secret', rarity: 'rare', requirement: { type: 'prestige_level', value: 1 }, xpReward: 500, goldReward: 250 },
+  { id: 'prestige_3', name: 'Cycles of Power', description: 'Prestige 3 times', icon: '⭐', category: 'secret', rarity: 'epic', requirement: { type: 'prestige_level', value: 3 }, xpReward: 1000, goldReward: 500 },
+  { id: 'prestige_5', name: 'Legendary Rebirth', description: 'Prestige 5 times', icon: '💫', category: 'secret', rarity: 'legendary', requirement: { type: 'prestige_level', value: 5 }, xpReward: 2500, goldReward: 1250 },
+  { id: 'prestige_10', name: 'Ascended Master', description: 'Prestige 10 times - true mastery', icon: '👑', category: 'secret', rarity: 'legendary', requirement: { type: 'prestige_level', value: 10 }, xpReward: 5000, goldReward: 2500 },
 ]
 
 // Get badge by ID
@@ -174,6 +189,10 @@ export function shouldUnlockBadge(badge: Badge, stats: {
   quizMasterScore?: number
   badgesEarned?: number
   earnedCategories?: string[]
+  companionOwned?: number
+  companionEvolution?: number
+  maxBondLevel?: number
+  prestigeLevel?: number
 }): boolean {
   switch (badge.requirement.type) {
     case 'quest_count':
@@ -246,6 +265,14 @@ export function shouldUnlockBadge(badge: Badge, stats: {
       return (stats.quizMasterScore || 0) >= badge.requirement.value
     case 'max_level':
       return stats.level >= badge.requirement.value
+    case 'companion_owned':
+      return (stats.companionOwned || 0) >= badge.requirement.value
+    case 'companion_evolution':
+      return (stats.companionEvolution || 0) >= badge.requirement.value
+    case 'max_bond_level':
+      return (stats.maxBondLevel || 0) >= badge.requirement.value
+    case 'prestige_level':
+      return (stats.prestigeLevel || 0) >= badge.requirement.value
     default:
       return false
   }
