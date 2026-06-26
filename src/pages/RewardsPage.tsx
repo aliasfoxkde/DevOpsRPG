@@ -164,6 +164,114 @@ export default function RewardsPage() {
         </p>
       </div>
 
+      {/* Streak Calendar */}
+      <div className="bg-card rounded-xl border border-border p-6 mb-8">
+        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          <span>🔥</span> Streak Calendar
+        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-4">
+            <div className="text-4xl">{game.character.streakDays >= 7 ? '🔥' : game.character.streakDays >= 3 ? '⚡' : '💤'}</div>
+            <div>
+              <div className="text-3xl font-bold text-amber-400">{game.character.streakDays}</div>
+              <div className="text-sm text-slate-400">Day Streak</div>
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-sm text-slate-400">Current Streak</div>
+            <div className="font-bold text-white">
+              {game.character.streakDays >= 30 ? '🏆 Legend' :
+               game.character.streakDays >= 14 ? '⭐ Master' :
+               game.character.streakDays >= 7 ? '⚔️ Warrior' :
+               game.character.streakDays >= 3 ? '🌱 Apprentice' : '👶 Beginner'}
+            </div>
+          </div>
+        </div>
+
+        {/* Weekly view */}
+        <div className="mb-4">
+          <div className="text-sm text-slate-400 mb-2">This Week</div>
+          <div className="grid grid-cols-7 gap-2">
+            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => {
+              // Simulate activity for demo - in real app would track daily activity
+              const dayIndex = (new Date().getDay() + 6) % 7 // Convert Sunday=0 to Monday=0
+              const isActive = index < dayIndex || index === dayIndex
+              const isToday = index === dayIndex
+
+              return (
+                <div
+                  key={day}
+                  className={`p-2 rounded-lg text-center ${
+                    isToday ? 'bg-amber-900/50 border border-amber-500' : 'bg-slate-800/50'
+                  }`}
+                >
+                  <div className="text-xs text-slate-500 mb-1">{day}</div>
+                  <div className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center ${
+                    isActive && game.character.streakDays > 0
+                      ? 'bg-green-600 text-white'
+                      : 'bg-slate-700 text-slate-500'
+                  }`}>
+                    {isActive && game.character.streakDays > 0 ? '✓' : '○'}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Streak milestones */}
+        <div className="grid grid-cols-4 gap-2 text-center">
+          <div className={`p-3 rounded-lg ${
+            game.character.streakDays >= 3 ? 'bg-green-900/30 border border-green-500/50' : 'bg-slate-800/50'
+          }`}>
+            <div className="text-xl mb-1">🌱</div>
+            <div className="text-xs text-slate-400">3 Days</div>
+            <div className={`text-sm font-bold ${game.character.streakDays >= 3 ? 'text-green-400' : 'text-slate-500'}`}>
+              {game.character.streakDays >= 3 ? '✓' : '🔒'}
+            </div>
+          </div>
+          <div className={`p-3 rounded-lg ${
+            game.character.streakDays >= 7 ? 'bg-green-900/30 border border-green-500/50' : 'bg-slate-800/50'
+          }`}>
+            <div className="text-xl mb-1">⚔️</div>
+            <div className="text-xs text-slate-400">7 Days</div>
+            <div className={`text-sm font-bold ${game.character.streakDays >= 7 ? 'text-green-400' : 'text-slate-500'}`}>
+              {game.character.streakDays >= 7 ? '✓' : '🔒'}
+            </div>
+          </div>
+          <div className={`p-3 rounded-lg ${
+            game.character.streakDays >= 14 ? 'bg-green-900/30 border border-green-500/50' : 'bg-slate-800/50'
+          }`}>
+            <div className="text-xl mb-1">⭐</div>
+            <div className="text-xs text-slate-400">14 Days</div>
+            <div className={`text-sm font-bold ${game.character.streakDays >= 14 ? 'text-green-400' : 'text-slate-500'}`}>
+              {game.character.streakDays >= 14 ? '✓' : '🔒'}
+            </div>
+          </div>
+          <div className={`p-3 rounded-lg ${
+            game.character.streakDays >= 30 ? 'bg-green-900/30 border border-green-500/50' : 'bg-slate-800/50'
+          }`}>
+            <div className="text-xl mb-1">🏆</div>
+            <div className="text-xs text-slate-400">30 Days</div>
+            <div className={`text-sm font-bold ${game.character.streakDays >= 30 ? 'text-green-400' : 'text-slate-500'}`}>
+              {game.character.streakDays >= 30 ? '✓' : '🔒'}
+            </div>
+          </div>
+        </div>
+
+        {game.character.streakShields > 0 && (
+          <div className="mt-4 p-3 bg-blue-900/30 border border-blue-500/50 rounded-lg flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">🛡️</span>
+              <div>
+                <div className="font-bold text-blue-400">Streak Shield Active</div>
+                <div className="text-xs text-slate-400">Your streak is protected for {game.character.streakShields} day(s)</div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Bonus Wheel */}
       <div className="bg-card rounded-xl border border-border p-6 mb-8">
         <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
