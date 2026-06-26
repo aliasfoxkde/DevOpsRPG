@@ -41,6 +41,8 @@ const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'))
 const TitlesFramesPage = lazy(() => import('./pages/TitlesFramesPage'))
 const SeasonalEventsPage = lazy(() => import('./pages/SeasonalEventsPage'))
 const PVPArenaPage = lazy(() => import('./pages/PVPArenaPage'))
+const SocialPage = lazy(() => import('./pages/SocialPage'))
+const GuildPage = lazy(() => import('./pages/GuildPage'))
 
 // Loading fallback component
 function PageLoader() {
@@ -165,6 +167,8 @@ function AppContent() {
             <Route path="titles-frames" element={<TitlesFramesPage />} />
             <Route path="seasonal-events" element={<SeasonalEventsPage />} />
             <Route path="pvp-arena" element={<PVPArenaPage />} />
+            <Route path="social" element={<SocialPage />} />
+            <Route path="guild" element={<GuildPage />} />
           </Route>
         </Routes>
       </Suspense>
