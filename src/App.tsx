@@ -10,6 +10,7 @@ import { ToastManager } from './components/ui/CelebrationToast'
 import MentorChat from './components/ui/MentorChat'
 import KeyboardShortcutsHelp from './components/ui/KeyboardShortcutsHelp'
 import { BackToTop } from './components/ui/BackToTop'
+import { OfflineIndicator, InstallPrompt } from './components/ui/OfflineIndicator'
 import { useKeyboardShortcuts } from './hooks'
 import Layout from './components/layout/Layout'
 import OnboardingWizard from './components/ui/OnboardingWizard'
@@ -154,6 +155,8 @@ function AppContent() {
       <MentorChat />
       <KeyboardShortcutsHelp />
       <BackToTop />
+      <OfflineIndicator />
+      <InstallPrompt />
     </div>
   )
 }
