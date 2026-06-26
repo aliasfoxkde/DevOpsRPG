@@ -86,19 +86,36 @@ export default function BattleArenaPage() {
   // Auto-navigate to next quest after completion
   useEffect(() => {
     if (justCompleted) {
-      // Calculate next quest AFTER completion to avoid stale closure
-      const actualNextQuest = getNextQuest()
+      // Pass the completed quest ID so we can exclude it from next quest calculation
+      // This avoids stale closure issues where completedQuests wasn't updated yet
+      const completedQuestId = questId
       const timer = setTimeout(() => {
-        if (actualNextQuest) {
-          navigate(`/quest/${actualNextQuest.id}`)
-        } else {
-          // No more quests - navigate to quest journal
+        // Re-read completed quests from localStorage to ensure we have fresh state
+        try {
+          const saved = localStorage.getItem('devopsquest_game')
+          if (saved) {
+            const freshGame = JSON.parse(saved)
+            const completedIds = new Set(freshGame.completedQuests.map((q: any) => q.topicId))
+            // Always exclude the just-completed quest to avoid showing it as "next"
+            if (completedQuestId) {
+              completedIds.add(completedQuestId)
+            }
+            const nextQ = getNextQuest(completedIds)
+            if (nextQ) {
+              navigate(`/quest/${nextQ.id}`)
+            } else {
+              navigate('/quests')
+            }
+          } else {
+            navigate('/quests')
+          }
+        } catch {
           navigate('/quests')
         }
-      }, 1500)
+      }, 2000) // Increased delay to ensure state is persisted
       return () => clearTimeout(timer)
     }
-  }, [justCompleted, getNextQuest, navigate])
+  }, [justCompleted, questId, getNextQuest, navigate])
 
   // Cleanup all pending timers on unmount
   useEffect(() => {
