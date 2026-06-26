@@ -191,7 +191,10 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
       e.preventDefault()
 
       if (quizComplete) {
-        handleFinish()
+        // Use RAF to ensure state is synced before handleFinish reads refs
+        requestAnimationFrame(() => {
+          handleFinish()
+        })
       } else if (showExplanation) {
         handleNext()
       } else if (currentQuestion) {
