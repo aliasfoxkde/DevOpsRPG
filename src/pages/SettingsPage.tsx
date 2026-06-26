@@ -3,6 +3,7 @@ import { useTheme } from '../contexts/ThemeContext'
 import { useGame } from '../contexts/GameContext'
 import { useSoundEffects } from '../hooks/useSoundEffects'
 import { downloadExport, importGameData } from '../utils/dataExport'
+import { VoiceSettings } from '../components/ui/VoiceSettings'
 
 export default function SettingsPage() {
   const { theme, setTheme, resolvedTheme } = useTheme()
@@ -119,6 +120,11 @@ export default function SettingsPage() {
             />
           </button>
         </div>
+      </div>
+
+      {/* Voice Narration */}
+      <div className="mb-6">
+        <VoiceSettings />
       </div>
 
       {/* Game Stats */}
