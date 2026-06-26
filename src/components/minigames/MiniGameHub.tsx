@@ -5,8 +5,9 @@ import { MemoryMatch } from './MemoryMatch'
 import { MathChallengeGame } from './MathChallenge'
 import { CodePuzzleGame } from './CodePuzzle'
 import { QuizDashGame } from './QuizDash'
+import { TerminalSimulator } from './TerminalSimulator'
 
-type GameType = 'menu' | 'command' | 'memory' | 'math' | 'code' | 'quiz'
+type GameType = 'menu' | 'command' | 'memory' | 'math' | 'code' | 'quiz' | 'terminal'
 
 interface MiniGameHubProps {
   onClose: () => void
@@ -144,6 +145,22 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
           <div className="mt-3 text-xs text-red-400">+75 XP potential</div>
           {!isUnlocked && <div className="mt-2 text-xs text-slate-500">Level {UNLOCK_LEVEL} to unlock</div>}
         </button>
+
+        <button
+          onClick={() => isUnlocked && setCurrentGame('terminal')}
+          disabled={!isUnlocked}
+          className={`p-6 rounded-xl border transition-all group ${
+            isUnlocked
+              ? 'bg-gradient-to-br from-slate-900/30 to-slate-800/30 border-slate-600/50 hover:border-slate-400'
+              : 'bg-slate-800/30 border-slate-700/50 opacity-50 cursor-not-allowed'
+          }`}
+        >
+          <div className={`text-4xl mb-3 ${!isUnlocked && 'grayscale'}`}>💻</div>
+          <h3 className="text-lg font-bold text-white mb-1">Terminal Simulator</h3>
+          <p className="text-sm text-slate-400">Type real DevOps commands</p>
+          <div className="mt-3 text-xs text-slate-400">+100 XP potential</div>
+          {!isUnlocked && <div className="mt-2 text-xs text-slate-500">Level {UNLOCK_LEVEL} to unlock</div>}
+        </button>
       </div>
 
       <button
@@ -221,6 +238,7 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
             {currentGame === 'math' && '🔢 Math Challenge'}
             {currentGame === 'code' && '💻 Code Puzzle'}
             {currentGame === 'quiz' && '⚡ Quiz Dash'}
+            {currentGame === 'terminal' && '💻 Terminal Simulator'}
             {gameResult && '✨ Results'}
           </h2>
           <button
@@ -257,6 +275,10 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
              <QuizDashGame
                onComplete={handleGameComplete}
                onSkip={handleSkip}
+             />
+           ) : currentGame === 'terminal' ? (
+             <TerminalSimulator
+               onComplete={handleGameComplete}
              />
            ) : (
              <CodePuzzleGame
