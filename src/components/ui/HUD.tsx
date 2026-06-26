@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { to: '/sidequests', icon: '⚔️', label: 'Side Quests' },
   { to: '/challenges', icon: '🎯', label: 'Challenges' },
   { to: '/skills', icon: '⚡', label: 'Skills' },
+  { to: '/pvp-arena', icon: '⚔️', label: 'PvP' },
   { to: '/leaderboard', icon: '🏆', label: 'Rank' },
   { to: '/store', icon: '🏪', label: 'Shop' },
   { to: '/character', icon: '👤', label: 'Hero' },
