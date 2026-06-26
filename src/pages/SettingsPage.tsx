@@ -1,11 +1,16 @@
+import { useState } from 'react'
 import { useTheme } from '../contexts/ThemeContext'
 import { useGame } from '../contexts/GameContext'
 import { useSoundEffects } from '../hooks/useSoundEffects'
+import { downloadExport, importGameData } from '../utils/dataExport'
 
 export default function SettingsPage() {
   const { theme, setTheme, resolvedTheme } = useTheme()
   const { game } = useGame()
   const { isMuted, toggleMute, playSound } = useSoundEffects()
+  const [importStatus, setImportStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [showImport, setShowImport] = useState(false)
+  const [importText, setImportText] = useState('')
 
   const handleThemeChange = (newTheme: 'light' | 'dark' | 'system') => {
     playSound('click')
@@ -146,6 +151,91 @@ export default function SettingsPage() {
           <div className="bg-slate-800/50 rounded-lg p-4 text-center">
             <div className="text-2xl font-bold text-blue-400">{game.character.streakDays}</div>
             <div className="text-xs text-slate-400">Day Streak 🔥</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Data Management */}
+      <div className="bg-card rounded-xl border border-border p-6 mb-6">
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          💾 Data Management
+        </h2>
+
+        <div className="space-y-4">
+          {/* Export */}
+          <div className="p-4 bg-slate-800/50 rounded-lg">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <div className="font-medium text-slate-200">Export Game Data</div>
+                <div className="text-xs text-slate-400">Download your progress as a JSON file</div>
+              </div>
+              <button
+                onClick={() => {
+                  playSound('click')
+                  downloadExport(game)
+                }}
+                className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg transition-colors"
+              >
+                📥 Export
+              </button>
+            </div>
+          </div>
+
+          {/* Import */}
+          <div className="p-4 bg-slate-800/50 rounded-lg">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <div className="font-medium text-slate-200">Import Game Data</div>
+                <div className="text-xs text-slate-400">Restore from a backup file</div>
+              </div>
+              <button
+                onClick={() => setShowImport(!showImport)}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors"
+              >
+                {showImport ? 'Cancel' : '📤 Import'}
+              </button>
+            </div>
+
+            {showImport && (
+              <div className="mt-3">
+                <textarea
+                  value={importText}
+                  onChange={(e) => setImportText(e.target.value)}
+                  placeholder="Paste your backup JSON here..."
+                  className="w-full h-32 px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 text-sm font-mono focus:outline-none focus:border-amber-500"
+                />
+                <div className="mt-2 flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      try {
+                        const data = importGameData(importText)
+                        if (data) {
+                          localStorage.setItem('devopsquest-import', JSON.stringify(data))
+                          setImportStatus('success')
+                          setTimeout(() => {
+                            window.location.reload()
+                          }, 1000)
+                        } else {
+                          setImportStatus('error')
+                        }
+                      } catch {
+                        setImportStatus('error')
+                      }
+                    }}
+                    disabled={!importText.trim()}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-bold rounded-lg transition-colors"
+                  >
+                    Restore Backup
+                  </button>
+                  {importStatus === 'success' && (
+                    <span className="text-green-400 text-sm">✓ Import successful! Reloading...</span>
+                  )}
+                  {importStatus === 'error' && (
+                    <span className="text-red-400 text-sm">✗ Invalid backup file</span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
