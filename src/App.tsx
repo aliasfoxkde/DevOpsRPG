@@ -7,6 +7,7 @@ import { HUD } from './components/ui/HUD'
 import { VictoryModal } from './components/ui/VictoryModal'
 import { RealmCompletionModal } from './components/ui/RealmCompletionModal'
 import { ToastManager } from './components/ui/CelebrationToast'
+import { Confetti } from './components/ui/Confetti'
 import MentorChat from './components/ui/MentorChat'
 import KeyboardShortcutsHelp from './components/ui/KeyboardShortcutsHelp'
 import { BackToTop } from './components/ui/BackToTop'
@@ -65,6 +66,7 @@ function AppContent() {
   const { game, dismissRealmCompletion, dismissRecentUnlocks } = useGame()
   const [toasts, setToasts] = useState<Toast[]>([])
   const [showOnboarding, setShowOnboarding] = useState(!game.hasSeenOnboarding)
+  const [showConfetti, setShowConfetti] = useState(false)
   useKeyboardShortcuts()
 
   const removeToast = (id: string) => {
@@ -85,6 +87,11 @@ function AppContent() {
         icon: badge.icon,
       }
       addToast(toast)
+      // Trigger confetti for legendary/epic badges
+      if (badge.rarity === 'legendary' || badge.rarity === 'epic') {
+        setShowConfetti(true)
+        setTimeout(() => setShowConfetti(false), 3000)
+      }
     })
     if (game.recentBadgeUnlocks.length > 0) {
       dismissRecentUnlocks()
@@ -152,6 +159,7 @@ function AppContent() {
         />
       )}
       <ToastManager toasts={toasts} onRemove={removeToast} />
+      <Confetti active={showConfetti} />
       <MentorChat />
       <KeyboardShortcutsHelp />
       <BackToTop />
