@@ -8,6 +8,7 @@ import { VictoryModal } from './components/ui/VictoryModal'
 import { RealmCompletionModal } from './components/ui/RealmCompletionModal'
 import { ToastManager } from './components/ui/CelebrationToast'
 import { Confetti } from './components/ui/Confetti'
+import { LevelUpEffect } from './components/ui/LevelUpEffect'
 import MentorChat from './components/ui/MentorChat'
 import KeyboardShortcutsHelp from './components/ui/KeyboardShortcutsHelp'
 import { BackToTop } from './components/ui/BackToTop'
@@ -67,6 +68,8 @@ function AppContent() {
   const [toasts, setToasts] = useState<Toast[]>([])
   const [showOnboarding, setShowOnboarding] = useState(!game.hasSeenOnboarding)
   const [showConfetti, setShowConfetti] = useState(false)
+  const [showLevelUp, setShowLevelUp] = useState(false)
+  const [levelUpNumber, setLevelUpNumber] = useState(0)
   useKeyboardShortcuts()
 
   const removeToast = (id: string) => {
@@ -98,7 +101,13 @@ function AppContent() {
     }
   }, [game.recentBadgeUnlocks, dismissRecentUnlocks])
 
-  // Show toasts for recent milestone unlocks
+  // Trigger level up effect when victory shows a level up
+  useEffect(() => {
+    if (game.lastVictory?.levelUp && game.lastVictory.newLevel) {
+      setLevelUpNumber(game.lastVictory.newLevel)
+      setShowLevelUp(true)
+    }
+  }, [game.lastVictory])
   useEffect(() => {
     game.recentMilestoneUnlocks.forEach((milestone) => {
       const toast: Toast = {
@@ -160,6 +169,9 @@ function AppContent() {
       )}
       <ToastManager toasts={toasts} onRemove={removeToast} />
       <Confetti active={showConfetti} />
+      {showLevelUp && (
+        <LevelUpEffect level={levelUpNumber} onComplete={() => setShowLevelUp(false)} />
+      )}
       <MentorChat />
       <KeyboardShortcutsHelp />
       <BackToTop />
