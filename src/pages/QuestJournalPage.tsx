@@ -1,15 +1,105 @@
+import { useState, useMemo } from 'react'
 import { useGame } from '../contexts/GameContext'
 import { realms, realmStories, allQuests } from '../data/quests'
 import { getRandomEncouragement } from '../data/milestones'
 import { Link } from 'react-router-dom'
+
+type FilterStatus = 'all' | 'available' | 'completed' | 'locked'
+type SortBy = 'level' | 'xp' | 'difficulty' | 'name'
+type FilterDifficulty = 1 | 2 | 3 | 4 | 5 | 'all'
 
 export default function QuestJournalPage() {
   const { game, isQuestCompleted, getNextQuest, getRealmProgress, completedCount, totalQuests } = useGame()
   const { character } = game
   const encouragement = getRandomEncouragement()
 
+  const [filterStatus, setFilterStatus] = useState<FilterStatus>('all')
+  const [filterDifficulty, setFilterDifficulty] = useState<FilterDifficulty>('all')
+  const [sortBy, setSortBy] = useState<SortBy>('level')
+  const [searchQuery, setSearchQuery] = useState('')
+
   const nextQuest = getNextQuest()
   const currentRealm = nextQuest ? realms[nextQuest.realmId] : null
+
+  // Get unique technologies
+  const technologies = useMemo(() => {
+    const techs = new Set(allQuests.map(q => q.technologyId))
+    return Array.from(techs).sort()
+  }, [])
+
+  const [filterTech, setFilterTech] = useState<string>('all')
+
+  // Get unique realms for filtering
+  const realmOptions = useMemo(() => {
+    return Object.values(realms).map(r => ({ id: r.id, name: r.name }))
+  }, [])
+
+  const [filterRealm, setFilterRealm] = useState<string>('all')
+
+  // Filter and sort quests
+  const filteredQuests = useMemo(() => {
+    let quests = [...allQuests]
+
+    // Filter by status
+    if (filterStatus === 'available') {
+      quests = quests.filter(q => !isQuestCompleted(q.id))
+    } else if (filterStatus === 'completed') {
+      quests = quests.filter(q => isQuestCompleted(q.id))
+    }
+
+    // Filter by difficulty
+    if (filterDifficulty !== 'all') {
+      quests = quests.filter(q => q.difficulty === filterDifficulty)
+    }
+
+    // Filter by technology
+    if (filterTech !== 'all') {
+      quests = quests.filter(q => q.technologyId === filterTech)
+    }
+
+    // Filter by realm
+    if (filterRealm !== 'all') {
+      quests = quests.filter(q => q.realmId === filterRealm)
+    }
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      quests = quests.filter(q =>
+        q.title.toLowerCase().includes(query) ||
+        q.description.toLowerCase().includes(query) ||
+        q.technologyId.toLowerCase().includes(query)
+      )
+    }
+
+    // Sort quests
+    quests.sort((a, b) => {
+      switch (sortBy) {
+        case 'xp':
+          return b.xpReward - a.xpReward
+        case 'difficulty':
+          return b.difficulty - a.difficulty
+        case 'name':
+          return a.title.localeCompare(b.title)
+        case 'level':
+        default:
+          // Sort by realm order then by order in realm
+          const realmOrder = Object.keys(realms).indexOf(a.realmId) - Object.keys(realms).indexOf(b.realmId)
+          if (realmOrder !== 0) return realmOrder
+          return a.order - b.order
+      }
+    })
+
+    return quests
+  }, [filterStatus, filterDifficulty, filterTech, filterRealm, searchQuery, sortBy, isQuestCompleted])
+
+  const difficultyColors: Record<number, string> = {
+    1: 'text-green-400 bg-green-900/30',
+    2: 'text-blue-400 bg-blue-900/30',
+    3: 'text-yellow-400 bg-yellow-900/30',
+    4: 'text-orange-400 bg-orange-900/30',
+    5: 'text-red-400 bg-red-900/30',
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
@@ -47,6 +137,182 @@ export default function QuestJournalPage() {
             </div>
           )}
         </div>
+      </section>
+
+      {/* Filter Bar */}
+      <section className="max-w-6xl mx-auto px-4 py-4">
+        <div className="bg-slate-800/80 rounded-xl border border-slate-700 p-4">
+          <div className="flex flex-wrap gap-4 items-center">
+            {/* Search */}
+            <div className="flex-1 min-w-[200px]">
+              <input
+                type="text"
+                placeholder="🔍 Search quests..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-amber-500"
+              />
+            </div>
+
+            {/* Status Filter */}
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
+              className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
+            >
+              <option value="all">All Status</option>
+              <option value="available">Available</option>
+              <option value="completed">Completed</option>
+              <option value="locked">Locked</option>
+            </select>
+
+            {/* Realm Filter */}
+            <select
+              value={filterRealm}
+              onChange={(e) => setFilterRealm(e.target.value)}
+              className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
+            >
+              <option value="all">All Realms</option>
+              {realmOptions.map(r => (
+                <option key={r.id} value={r.id}>{r.name}</option>
+              ))}
+            </select>
+
+            {/* Tech Filter */}
+            <select
+              value={filterTech}
+              onChange={(e) => setFilterTech(e.target.value)}
+              className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
+            >
+              <option value="all">All Technologies</option>
+              {technologies.map(t => (
+                <option key={t} value={t}>{t.toUpperCase()}</option>
+              ))}
+            </select>
+
+            {/* Difficulty Filter */}
+            <select
+              value={filterDifficulty}
+              onChange={(e) => setFilterDifficulty(e.target.value as FilterDifficulty)}
+              className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
+            >
+              <option value="all">All Difficulties</option>
+              <option value={1}>⭐ Beginner</option>
+              <option value={2}>⭐⭐ Easy</option>
+              <option value={3}>⭐⭐⭐ Medium</option>
+              <option value={4}>⭐⭐⭐⭐ Hard</option>
+              <option value={5}>⭐⭐⭐⭐⭐ Expert</option>
+            </select>
+
+            {/* Sort */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortBy)}
+              className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
+            >
+              <option value="level">Sort: Realm Order</option>
+              <option value="xp">Sort: XP (High→Low)</option>
+              <option value="difficulty">Sort: Difficulty</option>
+              <option value="name">Sort: Name (A→Z)</option>
+            </select>
+          </div>
+
+          <div className="mt-3 text-sm text-slate-400">
+            Showing {filteredQuests.length} of {allQuests.length} quests
+            {filteredQuests.length !== allQuests.length && (
+              <button
+                onClick={() => {
+                  setFilterStatus('all')
+                  setFilterDifficulty('all')
+                  setFilterTech('all')
+                  setFilterRealm('all')
+                  setSearchQuery('')
+                }}
+                className="ml-2 text-amber-400 hover:text-amber-300 underline"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Quest List */}
+      <section className="max-w-6xl mx-auto px-4 py-4">
+        <div className="grid gap-3">
+          {filteredQuests.map(quest => {
+            const isCompleted = isQuestCompleted(quest.id)
+            const questRealm = realms[quest.realmId]
+            const isUnlocked = character.level >= questRealm.requiredLevel
+
+            return (
+              <Link
+                key={quest.id}
+                to={isUnlocked ? `/quest/${quest.id}` : '#'}
+                className={`block p-4 rounded-xl border transition-all ${
+                  !isUnlocked
+                    ? 'bg-slate-900/50 border-slate-700/50 opacity-50 cursor-not-allowed'
+                    : isCompleted
+                    ? 'bg-green-900/20 border-green-700/50 hover:border-green-500'
+                    : 'bg-slate-800/80 border-slate-600 hover:border-amber-500/50'
+                }`}
+                onClick={(e) => !isUnlocked && e.preventDefault()}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl ${
+                      isCompleted ? 'bg-green-900/50' : 'bg-slate-700'
+                    }`}>
+                      {isCompleted ? '✓' : questRealm.icon}
+                    </div>
+                    <div>
+                      <h3 className={`font-bold ${
+                        isCompleted ? 'text-green-400 line-through' : 'text-white'
+                      }`}>
+                        {quest.title}
+                      </h3>
+                      <div className="flex items-center gap-3 text-xs text-slate-400">
+                        <span className={`px-2 py-0.5 rounded ${difficultyColors[quest.difficulty]}`}>
+                          {'⭐'.repeat(quest.difficulty)}
+                        </span>
+                        <span>{quest.technologyId.toUpperCase()}</span>
+                        <span>•</span>
+                        <span>{questRealm.name}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className={`font-bold ${isCompleted ? 'text-green-400' : 'text-amber-400'}`}>
+                      {quest.xpReward} XP
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      ~{quest.estimatedMinutes} min
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+
+        {filteredQuests.length === 0 && (
+          <div className="text-center py-12 text-slate-400">
+            <div className="text-4xl mb-4">🔍</div>
+            <p>No quests match your filters.</p>
+            <button
+              onClick={() => {
+                setFilterStatus('all')
+                setFilterDifficulty('all')
+                setFilterTech('all')
+                setFilterRealm('all')
+                setSearchQuery('')
+              }}
+              className="mt-2 text-amber-400 hover:text-amber-300 underline"
+            >
+              Clear all filters
+            </button>
+          </div>
+        )}
       </section>
 
       {/* Realm Map */}
