@@ -5,6 +5,7 @@ import { MILESTONES, checkMilestone, type Milestone } from '../data/milestones'
 import { generateDailyQuests, generateWeeklyQuests, generateSecretQuests, type SideQuest } from '../data/sidequests'
 import { getRandomCollectible, COLLECTIBLES_POOL, DAILY_REWARDS, spinWheel as doSpin, type Collectible } from '../data/collectibles'
 import { technologies } from '../data/technologies'
+import { TITLES, FRAMES } from '../data/titles'
 
 export type CharacterClass = 'Cloud Knight' | 'Script Warrior' | 'Data Mage' | 'DevOps Sage'
 
@@ -91,6 +92,11 @@ export interface Character {
   xpMultiplier: number // Active XP multiplier (1 = no multiplier)
   goldMultiplier: number // Active gold multiplier (1 = no multiplier)
   streakShields: number // Number of streak shields available
+  // Titles and Frames
+  equippedTitle: string // Currently equipped title ID
+  equippedFrame: string // Currently equipped frame ID
+  unlockedTitles: string[] // List of unlocked title IDs
+  unlockedFrames: string[] // List of unlocked frame IDs
 }
 
 export interface TopicProgress {
@@ -250,6 +256,10 @@ interface GameContextType {
   // Store & Companions
   purchaseItem: (itemId: string, price: number) => boolean
   equipCompanion: (companionId: string) => void
+  // Titles & Frames
+  checkAndUnlockTitlesFrames: () => { unlockedTitles: string[], unlockedFrames: string[] }
+  equipTitle: (titleId: string) => boolean
+  equipFrame: (frameId: string) => boolean
 }
 
 const STORAGE_KEY = 'devopsquest_game'
@@ -311,6 +321,10 @@ function createDefaultCharacter(): Character {
     xpMultiplier: 1,
     goldMultiplier: 1,
     streakShields: 0,
+    equippedTitle: 'novice-devops',
+    equippedFrame: 'default',
+    unlockedTitles: ['novice-devops'],
+    unlockedFrames: ['default'],
   }
 }
 
@@ -1636,6 +1650,106 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }
   }, [game.companions])
 
+  const checkAndUnlockTitlesFrames = useCallback((): { unlockedTitles: string[], unlockedFrames: string[] } => {
+    let newTitles: string[] = []
+    let newFrames: string[] = []
+
+    setGame(prev => {
+      const completedQuestCount = prev.completedQuests.length
+      const level = prev.character.level
+      const streakDays = prev.character.streakDays
+
+      // Count tech-specific completions
+      const techCounts: Record<string, number> = {}
+      for (const cq of prev.completedQuests) {
+        const quest = allQuests.find(q => q.id === cq.questId)
+        if (quest) {
+          techCounts[quest.technologyId] = (techCounts[quest.technologyId] || 0) + 1
+        }
+      }
+
+      // Check titles
+      newTitles = []
+      for (const title of TITLES) {
+        if (prev.character.unlockedTitles.includes(title.id)) continue
+
+        let unlocked = false
+        switch (title.id) {
+          case 'novice-devops': unlocked = completedQuestCount >= 5; break
+          case 'eager-learner': unlocked = completedQuestCount >= 10; break
+          case 'quest-seeker': unlocked = completedQuestCount >= 15; break
+          case 'code-crusader': unlocked = completedQuestCount >= 25; break
+          case 'cloud-hopeful': unlocked = (techCounts['aws'] || 0) >= 5; break
+          case 'container-captain': unlocked = (techCounts['docker'] || 0) >= 5; break
+          case 'git-guru': unlocked = (techCounts['git'] || 0) >= 5; break
+          case 'python-pro': unlocked = (techCounts['python'] || 0) >= 5; break
+          case 'ci-cd-champion': unlocked = (techCounts['cicd'] || 0) >= 10; break
+          case 'kubernetes-knight': unlocked = (techCounts['kubernetes'] || 0) >= 10; break
+          case 'infrastructure-inquisitor': unlocked = (techCounts['terraform'] || 0) >= 10; break
+          case 'monitoring-master': unlocked = (techCounts['monitoring'] || 0) >= 10; break
+          case 'streak-slayer': unlocked = streakDays >= 14; break
+          case 'devops-dragon': unlocked = completedQuestCount >= 100; break
+          case 'realm-ruler': unlocked = prev.completedRealms.length >= Object.keys(realms).length; break
+          case 'almighty-architect': unlocked = level >= 50; break
+          case 'golden-gamer': unlocked = prev.badges.filter(b => b.unlockedAt).length >= 50; break
+          case 'speed-demon': unlocked = prev.stats.fastestQuestTime < 30; break
+        }
+        if (unlocked) newTitles.push(title.id)
+      }
+
+      // Check frames
+      newFrames = []
+      for (const frame of FRAMES) {
+        if (prev.character.unlockedFrames.includes(frame.id)) continue
+
+        let unlocked = false
+        switch (frame.id) {
+          case 'default': unlocked = true; break
+          case 'bronze': unlocked = completedQuestCount >= 10; break
+          case 'silver': unlocked = completedQuestCount >= 25; break
+          case 'gold': unlocked = completedQuestCount >= 50; break
+          case 'emerald': unlocked = (techCounts['python'] || 0) >= 10; break
+          case 'ruby': unlocked = (techCounts['git'] || 0) >= 10; break
+          case 'sapphire': unlocked = (techCounts['aws'] || 0) >= 10; break
+          case 'amethyst': unlocked = (techCounts['docker'] || 0) >= 10; break
+          case 'diamond': unlocked = completedQuestCount >= 100; break
+          case 'prismatic': unlocked = level >= 50; break
+        }
+        if (unlocked) newFrames.push(frame.id)
+      }
+
+      if (newTitles.length === 0 && newFrames.length === 0) return prev
+
+      return {
+        ...prev,
+        character: {
+          ...prev.character,
+          unlockedTitles: [...prev.character.unlockedTitles, ...newTitles],
+          unlockedFrames: [...prev.character.unlockedFrames, ...newFrames],
+        },
+      }
+    })
+    return { unlockedTitles: newTitles, unlockedFrames: newFrames }
+  }, [])
+
+  const equipTitle = useCallback((titleId: string): boolean => {
+    if (!game.character.unlockedTitles.includes(titleId)) return false
+    setGame(prev => ({
+      ...prev,
+      character: { ...prev.character, equippedTitle: titleId },
+    }))
+    return true
+  }, [game.character.unlockedTitles])
+
+  const equipFrame = useCallback((frameId: string): boolean => {
+    if (!game.character.unlockedFrames.includes(frameId)) return false
+    setGame(prev => ({
+      ...prev,
+      character: { ...prev.character, equippedFrame: frameId },
+    }))
+    return true
+  }, [game.character.unlockedFrames])
+
   return (
     <GameContext.Provider
       value={{
@@ -1700,6 +1814,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
         // Store & Companions
         purchaseItem,
         equipCompanion,
+        // Titles & Frames
+        checkAndUnlockTitlesFrames,
+        equipTitle,
+        equipFrame,
       }}
     >
       {children}
