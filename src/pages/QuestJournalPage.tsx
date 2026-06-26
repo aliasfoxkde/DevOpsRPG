@@ -9,7 +9,7 @@ type SortBy = 'level' | 'xp' | 'difficulty' | 'name'
 type FilterDifficulty = 1 | 2 | 3 | 4 | 5 | 'all'
 
 export default function QuestJournalPage() {
-  const { game, isQuestCompleted, getNextQuest, getRealmProgress, completedCount, totalQuests } = useGame()
+  const { game, isQuestCompleted, getNextQuest, getRealmProgress, completedCount, totalQuests, getWeakTopics, getTopicsDueForReview } = useGame()
   const { character } = game
   const encouragement = getRandomEncouragement()
 
@@ -236,6 +236,67 @@ export default function QuestJournalPage() {
           </div>
         </div>
       </section>
+
+      {/* Smart Recommendations based on weak topics */}
+      {(() => {
+        const weakTopics = getWeakTopics()
+        const dueTopics = getTopicsDueForReview()
+
+        // Get recommended quests based on weak topics
+        const recommendedQuests = allQuests
+          .filter(q => {
+            // Filter to available quests that aren't completed
+            if (isQuestCompleted(q.id)) return false
+            const questRealm = realms[q.realmId]
+            if (character.level < questRealm.requiredLevel) return false
+
+            // Match weak topics
+            if (dueTopics.length > 0) {
+              return dueTopics.includes(q.topicId)
+            }
+
+            // If no due topics, recommend based on low mastery
+            const weakMatch = weakTopics.find(w => w.topicId === q.topicId)
+            return weakMatch && weakMatch.masteryLevel < 2
+          })
+          .slice(0, 3)
+
+        if (recommendedQuests.length === 0) return null
+
+        return (
+          <section className="max-w-6xl mx-auto px-4 py-4">
+            <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-xl border border-purple-500/30 p-4">
+              <h3 className="text-lg font-bold text-purple-300 mb-3 flex items-center gap-2">
+                🎯 Smart Recommendations
+              </h3>
+              <p className="text-sm text-slate-400 mb-4">
+                Based on your weak areas, we recommend:
+              </p>
+              <div className="grid gap-2">
+                {recommendedQuests.map(quest => {
+                  const questRealm = realms[quest.realmId]
+                  return (
+                    <Link
+                      key={quest.id}
+                      to={`/quest/${quest.id}`}
+                      className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg hover:bg-slate-700/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{questRealm.icon}</span>
+                        <div>
+                          <div className="font-medium text-white">{quest.title}</div>
+                          <div className="text-xs text-slate-400">{quest.technologyId.toUpperCase()}</div>
+                        </div>
+                      </div>
+                      <div className="text-amber-400 font-bold">{quest.xpReward} XP</div>
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+          </section>
+        )
+      })()}
 
       {/* Quest List */}
       <section className="max-w-6xl mx-auto px-4 py-4">
