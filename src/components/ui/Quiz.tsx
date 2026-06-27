@@ -150,6 +150,9 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   }, [showExplanation, codeAnswer, currentQuestion, playSound])
 
   const handleNext = useCallback(() => {
+    // Reset finish handler when moving to next question
+    // This allows handleFinish to be called again for the new quiz state
+    finishHandledRef.current = false
     if (currentIndex < allQuestions.length - 1) {
       setCurrentIndex(i => i + 1)
       setSelectedIndex(null)
