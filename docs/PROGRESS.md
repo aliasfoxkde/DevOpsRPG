@@ -41,10 +41,11 @@
 |------|--------|-------|
 | Quest auto-navigation fix | ✅ Done | commit bfe9a12 |
 | Add career paths | ✅ Done | 3 new paths added |
-| Navigation scrollbar fix | [ ] Pending | Fix overflow-x |
+| Navigation scrollbar fix | ✅ Done | commit 4415889 |
+| HUD redesign (7 items) | ✅ Done | commit 4415889 |
 | Level jumping investigation | [ ] Pending | - |
 | HTML Forms repetition | [ ] Pending | - |
-| HUD redesign (7 items) | [ ] Pending | - |
+| Visual design audit | [ ] Pending | Typography, icons, animations |
 
 ---
 
