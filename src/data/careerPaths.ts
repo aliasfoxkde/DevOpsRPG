@@ -33,6 +33,9 @@ export interface CareerMilestone {
   }
 }
 
+// Import quests for technology completion calculation
+import { allQuests } from './quests'
+
 export const CAREER_PATHS: CareerPath[] = [
   {
     id: 'devops-engineer',
@@ -283,12 +286,139 @@ export const CAREER_PATHS: CareerPath[] = [
       },
     ],
   },
+  // IT Support Track
+  {
+    id: 'it-support',
+    name: 'IT Support Specialist',
+    icon: '🎧',
+    description: 'Start your tech career providing technical support, troubleshooting systems, and helping users resolve their technology challenges.',
+    averageSalary: '$45,000 - $75,000',
+    demandLevel: 'medium',
+    estimatedMonths: 4,
+    prerequisites: ['Basic computer skills', 'Problem-solving mindset', 'Communication skills'],
+    technologies: [
+      { id: 'hardware', name: 'Hardware Fundamentals', icon: '🖥️', category: 'fundamentals', difficulty: 'beginner', questIds: [] },
+      { id: 'networking', name: 'Networking Basics', icon: '🌐', category: 'fundamentals', difficulty: 'beginner', questIds: [] },
+      { id: 'os', name: 'Operating Systems', icon: '💿', category: 'fundamentals', difficulty: 'beginner', questIds: [] },
+      { id: 'security', name: 'Security Basics', icon: '🔒', category: 'security', difficulty: 'beginner', questIds: [] },
+      { id: 'troubleshooting', name: 'IT Troubleshooting', icon: '🔧', category: 'fundamentals', difficulty: 'beginner', questIds: [] },
+      { id: 'scripting', name: 'Basic Scripting', icon: '📟', category: 'fundamentals', difficulty: 'intermediate', questIds: [] },
+    ],
+    milestones: [
+      {
+        id: 'helpdesk-hero',
+        name: 'Helpdesk Hero',
+        description: 'Complete hardware, OS, and networking fundamentals',
+        icon: '🎧',
+        requiredTechnologies: ['hardware', 'os', 'networking'],
+        rewards: { xpBonus: 400, goldBonus: 150, badgeId: 'helpdesk_hero' },
+      },
+      {
+        id: 'support-pro',
+        name: 'Support Professional',
+        description: 'Master troubleshooting and security basics',
+        icon: '⭐',
+        requiredTechnologies: ['troubleshooting', 'security', 'scripting'],
+        rewards: { xpBonus: 600, goldBonus: 250, badgeId: 'support_pro' },
+      },
+    ],
+  },
+  // Security Track
+  {
+    id: 'security-engineer',
+    name: 'Security Engineer',
+    icon: '🔐',
+    description: 'Protect systems and data from cyber threats. Master vulnerability assessment, security automation, and incident response.',
+    averageSalary: '$110,000 - $170,000',
+    demandLevel: 'high',
+    estimatedMonths: 8,
+    prerequisites: ['Networking knowledge', 'Linux basics', 'Security fundamentals'],
+    technologies: [
+      { id: 'security', name: 'Security Fundamentals', icon: '🔒', category: 'security', difficulty: 'beginner', questIds: [] },
+      { id: 'networking', name: 'Networking', icon: '🌐', category: 'fundamentals', difficulty: 'intermediate', questIds: [] },
+      { id: 'linux', name: 'Linux', icon: '🐧', category: 'fundamentals', difficulty: 'intermediate', questIds: [] },
+      { id: 'python', name: 'Python', icon: '🐍', category: 'fundamentals', difficulty: 'intermediate', questIds: [] },
+      { id: 'aws', name: 'AWS Security', icon: '☁️', category: 'cloud', difficulty: 'advanced', questIds: [] },
+      { id: 'containersecurity', name: 'Container Security', icon: '🐳', category: 'security', difficulty: 'advanced', questIds: [] },
+      { id: 'threatmodeling', name: 'Threat Modeling', icon: '🎯', category: 'security', difficulty: 'advanced', questIds: [] },
+      { id: 'incident', name: 'Incident Response', icon: '🚨', category: 'monitoring', difficulty: 'advanced', questIds: [] },
+    ],
+    milestones: [
+      {
+        id: 'security-analyst',
+        name: 'Security Analyst',
+        description: 'Complete security fundamentals and networking',
+        icon: '🔍',
+        requiredTechnologies: ['security', 'networking', 'linux'],
+        rewards: { xpBonus: 700, goldBonus: 300, badgeId: 'security_analyst' },
+      },
+      {
+        id: 'security-specialist',
+        name: 'Security Specialist',
+        description: 'Master Python, AWS security, and container security',
+        icon: '🛡️',
+        requiredTechnologies: ['python', 'aws', 'containersecurity'],
+        rewards: { xpBonus: 1200, goldBonus: 600, badgeId: 'security_specialist' },
+      },
+    ],
+  },
+  // Management Track
+  {
+    id: 'tech-lead',
+    name: 'Tech Lead / Manager',
+    icon: '👔',
+    description: 'Lead engineering teams, make technical decisions, and grow into management roles while staying connected to technology.',
+    averageSalary: '$130,000 - $220,000',
+    demandLevel: 'medium',
+    estimatedMonths: 10,
+    prerequisites: ['Software development experience', 'Leadership skills', 'Technical depth'],
+    technologies: [
+      { id: 'git', name: 'Git', icon: '🌿', category: 'version-control', difficulty: 'intermediate', questIds: [] },
+      { id: 'docker', name: 'Docker', icon: '🐳', category: 'containers', difficulty: 'intermediate', questIds: [] },
+      { id: 'kubernetes', name: 'Kubernetes', icon: '☸️', category: 'orchestration', difficulty: 'intermediate', questIds: [] },
+      { id: 'aws', name: 'AWS', icon: '☁️', category: 'cloud', difficulty: 'intermediate', questIds: [] },
+      { id: 'agile', name: 'Agile/Scrum', icon: '📋', category: 'infrastructure', difficulty: 'intermediate', questIds: [] },
+      { id: 'leadership', name: 'Engineering Leadership', icon: '👥', category: 'infrastructure', difficulty: 'advanced', questIds: [] },
+      { id: 'architecture', name: 'System Architecture', icon: '🏗️', category: 'infrastructure', difficulty: 'advanced', questIds: [] },
+      { id: 'communication', name: 'Technical Communication', icon: '💬', category: 'infrastructure', difficulty: 'advanced', questIds: [] },
+    ],
+    milestones: [
+      {
+        id: 'tech-lead',
+        name: 'Tech Lead',
+        description: 'Master Docker, Kubernetes, and AWS foundations',
+        icon: '👔',
+        requiredTechnologies: ['docker', 'kubernetes', 'aws'],
+        rewards: { xpBonus: 900, goldBonus: 450, badgeId: 'tech_lead' },
+      },
+      {
+        id: 'engineering-manager',
+        name: 'Engineering Manager',
+        description: 'Complete Agile, leadership, and architecture',
+        icon: '🎯',
+        requiredTechnologies: ['agile', 'leadership', 'architecture'],
+        rewards: { xpBonus: 1500, goldBonus: 750, badgeId: 'eng_manager' },
+      },
+    ],
+  },
 ]
 
-export function getTechnologyCompletion(_techId: string, _completedQuestIds: Set<string>): number {
-  // This would be calculated from actual quest data
-  // For now, return a placeholder
-  return 0
+export function getTechnologyCompletion(techId: string, completedQuestIds: Set<string>): number {
+  // Find all quests for this technology
+  const techQuests = allQuests.filter((q) =>
+    q.technologyId.toLowerCase() === techId.toLowerCase() ||
+    q.topicId.toLowerCase().includes(techId.toLowerCase())
+  )
+
+  if (techQuests.length === 0) {
+    return 0
+  }
+
+  // Count completed quests for this technology
+  const completedForTech = techQuests.filter((q) => completedQuestIds.has(q.id)).length
+
+  // Return percentage completion
+  return Math.round((completedForTech / techQuests.length) * 100)
 }
 
 export const CATEGORY_COLORS: Record<CareerTechnology['category'], string> = {
