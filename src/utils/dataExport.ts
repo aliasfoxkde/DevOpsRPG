@@ -102,12 +102,65 @@ export function importGameData(jsonString: string): ExportedGameData | null {
   try {
     const data = JSON.parse(jsonString)
 
-    // Validate basic structure
-    if (!data.version || !data.character || !data.completedQuests) {
-      throw new Error('Invalid backup file structure')
+    // Validate structure
+    if (!data || typeof data !== 'object') {
+      throw new Error('Invalid JSON structure')
     }
 
-    return data as ExportedGameData
+    // Validate required fields exist
+    if (!data.version || typeof data.version !== 'string') {
+      throw new Error('Missing or invalid version field')
+    }
+    if (!data.character || typeof data.character !== 'object') {
+      throw new Error('Missing or invalid character field')
+    }
+    if (!Array.isArray(data.completedQuests)) {
+      throw new Error('Missing or invalid completedQuests field')
+    }
+    if (!Array.isArray(data.badges)) {
+      throw new Error('Missing or invalid badges field')
+    }
+    if (!data.character.name || typeof data.character.name !== 'string') {
+      throw new Error('Missing or invalid character name')
+    }
+
+    // Sanitize data - only keep known fields to prevent injection
+    const sanitized: ExportedGameData = {
+      version: String(data.version),
+      exportedAt: String(data.exportedAt || new Date().toISOString()),
+      character: {
+        name: String(data.character.name || 'Hero'),
+        level: Number(data.character.level) || 1,
+        xp: Number(data.character.xp) || 0,
+        gold: Number(data.character.gold) || 0,
+        title: data.character.title ? String(data.character.title) : undefined,
+        avatar: data.character.avatar ? String(data.character.avatar) : undefined,
+      },
+      completedQuests: Array.isArray(data.completedQuests)
+        ? data.completedQuests
+            .filter((q: unknown) => q && typeof q === 'object' && 'id' in q)
+            .map((q: { id: unknown }) => ({ id: String(q.id) }))
+        : [],
+      badges: Array.isArray(data.badges)
+        ? data.badges
+            .filter((b: unknown) => b && typeof b === 'object' && 'id' in b)
+            .map((b: { id: unknown; unlockedAt?: unknown }) => ({
+              id: String(b.id),
+              unlockedAt: b.unlockedAt ? String(b.unlockedAt) : null,
+            }))
+        : [],
+      companions: Array.isArray(data.companions)
+        ? data.companions
+            .filter((c: unknown) => c && typeof c === 'object' && 'id' in c)
+            .map((c: { id: unknown }) => ({ id: String(c.id) }))
+        : [],
+      stats: data.stats && typeof data.stats === 'object' ? data.stats : {},
+      prestigeLevel: Number(data.prestigeLevel) || 0,
+      prestigeMultiplier: Number(data.prestigeMultiplier) || 1.0,
+      totalPrestigeXp: Number(data.totalPrestigeXp) || 0,
+    }
+
+    return sanitized
   } catch (error) {
     console.error('Failed to parse import data:', error)
     return null

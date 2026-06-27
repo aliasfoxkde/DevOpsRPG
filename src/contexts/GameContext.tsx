@@ -6,6 +6,7 @@ import { generateDailyQuests, generateWeeklyQuests, generateSecretQuests, type S
 import { getRandomCollectible, COLLECTIBLES_POOL, DAILY_REWARDS, spinWheel as doSpin, type Collectible } from '../data/collectibles'
 import { technologies } from '../data/technologies'
 import { TITLES, FRAMES } from '../data/titles'
+import { getEquipmentById, calculateEquipmentBonuses } from '../data/equipment'
 
 export type CharacterClass = 'Cloud Knight' | 'Script Warrior' | 'Data Mage' | 'DevOps Sage'
 
@@ -281,10 +282,41 @@ interface GameContextType {
 }
 
 const STORAGE_KEY = 'devopsquest_game'
+const BACKUP_KEY = 'devopsquest_backup'
 
 export const XP_PER_LEVEL = 100
 export const MAX_HP = 100
 export const MAX_MP = 100
+
+// Game constants
+export const COLLECTIBLE_DROP_RATE = 0.15 // 15% chance for collectible drops
+export const GOLD_XP_RATIO = 0.1 // Gold reward = XP reward * this ratio
+
+// Deep merge utility for game state recovery
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function deepMerge(target: any, source: any): any {
+  const output = { ...target }
+  for (const key in source) {
+    if (Object.prototype.hasOwnProperty.call(source, key)) {
+      const sourceValue = source[key]
+      const targetValue = target[key]
+      if (
+        sourceValue !== null &&
+        typeof sourceValue === 'object' &&
+        !Array.isArray(sourceValue) &&
+        targetValue !== null &&
+        typeof targetValue === 'object' &&
+        !Array.isArray(targetValue)
+      ) {
+        // Recursively merge nested objects
+        output[key] = deepMerge(targetValue, sourceValue)
+      } else {
+        output[key] = sourceValue
+      }
+    }
+  }
+  return output
+}
 
 function calculateLevel(xp: number): number {
   return Math.floor(xp / XP_PER_LEVEL) + 1
@@ -417,59 +449,84 @@ function createDefaultGame(): GameState {
 const GameContext = createContext<GameContextType | undefined>(undefined)
 
 export function GameProvider({ children }: { children: ReactNode }) {
+  // Helper function to validate and merge game state
+  const loadAndValidateGame = (storedJson: string | null): GameState | null => {
+    if (!storedJson) return null
+    try {
+      const parsed = JSON.parse(storedJson)
+      // Basic validation - check for required top-level properties
+      if (!parsed || typeof parsed.character !== 'object' || !Array.isArray(parsed.badges)) {
+        console.warn('Game data validation failed: missing required fields')
+        return null
+      }
+      const defaults = createDefaultGame()
+      // Merge stored data with defaults to ensure all fields exist
+      const merged = deepMerge(defaults, parsed)
+      // Ensure achievements are properly restored
+      merged.achievements = ACHIEVEMENTS.map(a => {
+        const stored = parsed.achievements?.find((ua: Achievement) => ua.id === a.id)
+        return stored?.unlockedAt ? { ...a, unlockedAt: stored.unlockedAt } : a
+      })
+      // Ensure arrays exist
+      if (!merged.recentBadgeUnlocks) merged.recentBadgeUnlocks = []
+      if (!merged.recentMilestoneUnlocks) merged.recentMilestoneUnlocks = []
+      if (!Array.isArray(merged.badges)) merged.badges = []
+      if (!Array.isArray(merged.collectibles)) merged.collectibles = []
+      if (!Array.isArray(merged.completedRealms)) merged.completedRealms = []
+      // Ensure character fields
+      if (typeof merged.character.streakShields !== 'number') {
+        merged.character.streakShields = 0
+      }
+      return merged
+    } catch (error) {
+      console.warn('Failed to parse game data:', error)
+      return null
+    }
+  }
+
   const [game, setGame] = useState<GameState>(() => {
     /* istanbul ignore if */
     if (typeof window !== 'undefined') {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY)
-        if (stored) {
-          const parsed = JSON.parse(stored)
-          const defaults = createDefaultGame()
-          // Merge stored data with defaults to ensure all fields exist
-          const merged = { ...defaults, ...parsed }
-          // Ensure achievements are properly restored
-          merged.achievements = ACHIEVEMENTS.map(a => {
-            const stored = parsed.achievements?.find((ua: Achievement) => ua.id === a.id)
-            return stored?.unlockedAt ? { ...a, unlockedAt: stored.unlockedAt } : a
-          })
-          // Ensure arrays exist
-          if (!merged.recentBadgeUnlocks) merged.recentBadgeUnlocks = []
-          if (!merged.recentMilestoneUnlocks) merged.recentMilestoneUnlocks = []
-          if (!Array.isArray(merged.badges)) merged.badges = []
-          if (!Array.isArray(merged.collectibles)) merged.collectibles = []
-          if (!Array.isArray(merged.completedRealms)) merged.completedRealms = []
-          // Ensure character fields
-          if (typeof merged.character.streakShields !== 'number') {
-            merged.character.streakShields = 0
-          }
-          return merged
-        }
-      } catch {
-        return createDefaultGame()
+      // Try main storage first
+      const stored = localStorage.getItem(STORAGE_KEY)
+      let loaded = loadAndValidateGame(stored)
+      if (loaded) return loaded
+
+      // Try backup storage if main is corrupted/missing
+      const backup = localStorage.getItem(BACKUP_KEY)
+      loaded = loadAndValidateGame(backup)
+      if (loaded) {
+        console.info('Restored game from backup')
+        return loaded
       }
+
+      // Both failed - start fresh but log error
+      console.error('All game data corrupted, starting fresh. Previous data may be recoverable from browser storage.')
     }
     return createDefaultGame()
   })
 
-  // Persist to localStorage
+  // Persist to localStorage with backup
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(game))
+      // Also save backup for recovery
+      localStorage.setItem(BACKUP_KEY, JSON.stringify(game))
     } catch (error) {
-      // Handle QuotaExceededError or other localStorage errors silently
+      // Handle QuotaExceededError or other localStorage errors
       console.warn('Failed to save game state to localStorage:', error)
     }
   }, [game])
 
-  // Cross-tab synchronization
+  // Cross-tab synchronization with deep merge
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === STORAGE_KEY && e.newValue) {
         try {
           const parsed = JSON.parse(e.newValue)
-          // Merge with defaults to ensure all fields exist
+          // Deep merge with defaults to ensure all fields exist
           const defaults = createDefaultGame()
-          const merged = { ...defaults, ...parsed }
+          const merged = deepMerge(defaults, parsed)
           if (!merged.achievements) merged.achievements = defaults.achievements
           if (!merged.recentBadgeUnlocks) merged.recentBadgeUnlocks = []
           if (!merged.recentMilestoneUnlocks) merged.recentMilestoneUnlocks = []
@@ -500,7 +557,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const companionGoldBonus = prev.activeCompanion ? prev.activeCompanion.goldBonus : 0
       const prestigeMultiplier = prev.prestigeMultiplier
       const xpReward = Math.floor(quest.xpReward * prev.character.xpMultiplier * (1 + companionXpBonus) * prestigeMultiplier)
-      const goldReward = Math.floor((quest.xpReward / 10) * prev.character.goldMultiplier * (1 + companionGoldBonus) * prestigeMultiplier)
+      const goldReward = Math.floor(quest.xpReward * GOLD_XP_RATIO * prev.character.goldMultiplier * (1 + companionGoldBonus) * prestigeMultiplier)
 
       // Calculate new XP and level
       const newXp = prev.character.xp + xpReward
@@ -683,7 +740,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
       // Maybe give a collectible
       let newCollectibles = prev.collectibles
-      if (Math.random() < 0.15) { // 15% chance
+      if (Math.random() < COLLECTIBLE_DROP_RATE) {
         const collectible = getRandomCollectible()
         newCollectibles = [...prev.collectibles, collectible]
       }
@@ -985,7 +1042,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
       // Chance for bonus streak shield at high streaks
       let newStreakShields = prev.character.streakShields
-      if (prev.character.streakDays >= 14 && Math.random() < 0.15) {
+      if (prev.character.streakDays >= 14 && Math.random() < COLLECTIBLE_DROP_RATE) {
         newStreakShields += 1
       }
 
@@ -1854,11 +1911,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [game.character.equippedItems])
 
   const getEquipmentBonuses = useCallback(() => {
-    // Import equipment data
-    const { getEquipmentById, calculateEquipmentBonuses } = require('../data/equipment')
     const equipped = game.character.equippedItems
       .map((id: string) => getEquipmentById(id))
-      .filter(Boolean)
+      .filter((item): item is NonNullable<typeof item> => item !== undefined)
     return calculateEquipmentBonuses(equipped)
   }, [game.character.equippedItems])
 
