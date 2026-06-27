@@ -164,12 +164,14 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   }, [currentIndex, allQuestions.length])
 
   const handleFinish = useCallback(() => {
-    if (finishHandledRef.current) return
+    if (finishHandledRef.current) {
+      console.warn('handleFinish already called, ignoring duplicate')
+      return
+    }
     finishHandledRef.current = true
     setIsFinishing(true)
 
-    // Guard against calling callbacks after unmount
-    if (!isMountedRef.current) return
+    // Guard against calling callbacks after unmount - but still call onPass/onSkip
     if (!hasQuestions) {
       onPass(false, 0, false)
       return
@@ -177,9 +179,11 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
     const passThreshold = Math.ceil(allQuestionsLengthRef.current * 0.6)
     const isPerfect = correctCountRef.current === allQuestionsLengthRef.current
     const passedWith80 = correctCountRef.current >= Math.ceil(allQuestionsLengthRef.current * 0.8)
+    console.log(`handleFinish: correct=${correctCountRef.current}, threshold=${passThreshold}, passed=${correctCountRef.current >= passThreshold}`)
     if (correctCountRef.current >= passThreshold) {
       onPass(isPerfect, wrongCountRef.current, passedWith80)
     } else {
+      console.log('handleFinish: not passed, calling onSkip')
       onSkip()
     }
   }, [hasQuestions, onPass, onSkip])
@@ -190,14 +194,19 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
       if (e.key.toLowerCase() !== 'n') return
       e.preventDefault()
 
+      console.log(`n key: quizComplete=${quizComplete}, showExplanation=${showExplanation}, questionIndex=${currentIndex}`)
+
       if (quizComplete) {
-        // Use RAF to ensure state is synced before handleFinish reads refs
-        requestAnimationFrame(() => {
-          handleFinish()
-        })
+        // Final press - complete the quest
+        console.log('n key: calling handleFinish')
+        handleFinish()
       } else if (showExplanation) {
+        // Move to next question
+        console.log('n key: calling handleNext')
         handleNext()
       } else if (currentQuestion) {
+        // Auto-answer the question
+        console.log('n key: auto-answering')
         if (currentQuestion.correctIndex !== undefined) {
           handleSelect(currentQuestion.correctIndex)
         } else if (currentQuestion.correctAnswer) {
