@@ -1,0 +1,59 @@
+name: Feature Request
+description: Suggest an idea or enhancement
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Feature requests are welcome! The more context you give, the better we can evaluate fit and priority.
+        **Note**: For simple typo fixes or minor changes, feel free to submit a PR directly instead.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the situation where you hit this limitation.
+      placeholder: When I'm playing the game, I wish I could...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What would you like to see?
+      placeholder: A feature that allows...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you've considered
+      placeholder: I tried using... but it doesn't support...
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Quest System
+        - Battle Arena
+        - Mini-games
+        - World Map
+        - Social Features
+        - Store/Marketplace
+        - Settings
+        - UI/UX
+        - Accessibility
+        - Documentation
+        - Performance
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Examples, links, related issues, mockups.

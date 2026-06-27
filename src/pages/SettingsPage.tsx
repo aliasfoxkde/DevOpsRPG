@@ -274,6 +274,24 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      {/* Submit Feedback */}
+      <div className="mt-8 bg-slate-800/50 rounded-xl border border-slate-700 p-6">
+        <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
+          📝 Submit Feedback
+        </h2>
+        <p className="text-sm text-slate-400 mb-4">
+          Found a bug? Have a feature request? Want to see something changed?
+          Submit feedback directly from the app and our AI agents will automatically
+          review, prioritize, and implement improvements.
+        </p>
+        <a
+          href="/feedback"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-medium rounded-lg transition-colors"
+        >
+          📝 Submit Feedback
+        </a>
+      </div>
+
       {/* About */}
       <div className="mt-8 text-center text-sm text-slate-500">
         <p>DevOpsQuest v1.0.0</p>
