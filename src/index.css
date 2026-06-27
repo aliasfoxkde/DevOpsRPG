@@ -86,4 +86,39 @@ body {
   .border-border {
     border-color: var(--border);
   }
+
+  /* Standardized button variants */
+  .btn {
+    @apply px-4 py-2 rounded-lg font-semibold transition-all duration-200;
+  }
+  .btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-500;
+  }
+  .btn-secondary {
+    @apply bg-slate-700 text-slate-200 hover:bg-slate-600;
+  }
+  .btn-ghost {
+    @apply bg-transparent text-slate-300 hover:bg-slate-700;
+  }
+  .btn-success {
+    @apply bg-green-600 text-white hover:bg-green-500;
+  }
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-500;
+  }
+
+  /* Standardized card pattern */
+  .card {
+    @apply bg-slate-800 rounded-xl border border-slate-700 p-4 sm:p-6;
+  }
+
+  /* Subtle hover for interactive elements */
+  .hover-lift {
+    @apply transition-transform duration-200 hover:-translate-y-0.5;
+  }
+
+  /* Focus ring utility */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-slate-900;
+  }
 }

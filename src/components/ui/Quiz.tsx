@@ -253,9 +253,9 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
               }
               onPass(false, 0, false)
             }}
-            className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-bold rounded-lg shadow-lg transform transition-all hover:scale-105"
+            className="btn btn-success px-8 py-3"
           >
-            ✨ Complete Quest
+            Complete Quest
           </button>
         </div>
       </div>
@@ -277,14 +277,13 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
     const encouragement = getRandomEncouragement()
 
     return (
-      <div className="bg-slate-800/80 rounded-xl border overflow-hidden">
+      <div className="bg-slate-800/80 rounded-xl border border-slate-700 overflow-hidden">
         <div className="bg-gradient-to-r from-amber-900/30 via-slate-800 to-amber-900/30 px-6 py-4 border-b border-slate-700">
-          <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-            📝 Quiz Complete!
+          <h2 className="text-lg font-bold text-slate-100">
+            Quiz Complete
           </h2>
         </div>
         <div className="p-6 text-center">
-          <div className="text-6xl mb-4">{passed ? '🎉' : '📚'}</div>
           <h3 className="text-2xl font-bold text-white mb-2">
             {passed ? 'Quest Passed!' : 'Keep Learning!'}
           </h3>
@@ -305,15 +304,11 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
             <button
               onClick={handleFinish}
               disabled={isFinishing}
-              className={`px-8 py-3 font-bold rounded-lg shadow-lg transform transition-all ${
-                isFinishing ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'
-              } ${
-                passed
-                  ? 'bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white'
-                  : 'bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white'
+              className={`btn ${passed ? 'btn-success' : 'btn-secondary'} px-8 py-3 ${
+                isFinishing ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              {isFinishing ? '⏳ Finishing...' : passed ? '✨ Complete Quest' : '🔄 Practice More'}
+              {isFinishing ? 'Finishing...' : passed ? 'Complete Quest' : 'Practice More'}
             </button>
           </div>
         </div>
@@ -328,19 +323,17 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
     <div className="bg-slate-800/80 rounded-xl border border-amber-600/50 overflow-hidden">
       <div className="bg-gradient-to-r from-amber-900/30 via-slate-800 to-amber-900/30 px-6 py-4 border-b border-slate-700">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-              📝 Knowledge Check
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg font-bold text-slate-100">
+              Knowledge Check
             </h2>
             <span className="text-xs px-2 py-1 bg-amber-600/30 text-amber-400 rounded">
               {getQuestionTypeLabel()}
             </span>
           </div>
           <div className="flex items-center gap-4 text-sm">
-            <span className="text-green-400">✓ {correctCount}</span>
-            <span className="text-red-400">✗ {wrongCount}</span>
+            <span className="text-green-400 font-medium">{correctCount} correct</span>
             <span className="text-slate-400">{currentIndex + 1}/{allQuestions.length}</span>
-            <span className="text-xs text-slate-500">Press N for all (answer/next/complete)</span>
           </div>
         </div>
       </div>
@@ -516,13 +509,13 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
               <button
                 onClick={handleCodeSubmit}
                 disabled={!codeAnswer.trim()}
-                className={`w-full py-3 font-bold rounded-lg transition-all ${
+                className={`btn w-full ${
                   codeAnswer.trim()
-                    ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white'
+                    ? 'btn-success'
                     : 'bg-slate-700 text-slate-500 cursor-not-allowed'
                 }`}
               >
-                ▶️ Run Code (Ctrl+Enter)
+                Run Code (Ctrl+Enter)
               </button>
             )}
           </div>
@@ -556,10 +549,10 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
           <div className="mt-6 flex justify-end">
             <button
               onClick={handleNext}
-              className="px-6 py-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-lg shadow-lg transform transition-all hover:scale-105"
+              className="btn btn-secondary"
               aria-label={currentIndex < allQuestions.length - 1 ? 'Go to next question' : 'See quiz results'}
             >
-              {currentIndex < allQuestions.length - 1 ? 'Next Question →' : 'See Results'} (N)
+              {currentIndex < allQuestions.length - 1 ? 'Next Question' : 'See Results'} (N)
             </button>
           </div>
         )}

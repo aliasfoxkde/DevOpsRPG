@@ -69,7 +69,7 @@ export default function CareerPathPage() {
       <main className="max-w-5xl mx-auto px-4 py-6">
         {/* Intro */}
         <div className="bg-gradient-to-r from-blue-900/30 via-slate-800 to-purple-900/30 rounded-xl border border-blue-600/50 p-6 mb-6">
-          <h2 className="text-2xl font-bold text-white mb-2">🚀 Your DevOps Career Journey</h2>
+          <h2 className="text-2xl font-bold text-white mb-2">Your DevOps Career Journey</h2>
           <p className="text-slate-400 mb-4">
             Explore different career paths in DevOps. Each path shows the technologies you need to master,
             estimated time to proficiency, and potential salary ranges.
@@ -95,7 +95,7 @@ export default function CareerPathPage() {
                   : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
               }`}
             >
-              🔥 High Demand
+              High Demand
             </button>
             <button
               onClick={() => setFilterDemand('growing')}
@@ -105,7 +105,7 @@ export default function CareerPathPage() {
                   : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
               }`}
             >
-              📈 Growing
+              Growing
             </button>
           </div>
         </div>

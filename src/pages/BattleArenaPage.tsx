@@ -241,11 +241,11 @@ export default function BattleArenaPage() {
               ← Quest Journal
             </Link>
             <div className="flex items-center gap-2">
-              <span className="text-xl">{realm.icon}</span>
+              <span className="text-lg">{realm.icon}</span>
               <span className="text-slate-300 hidden sm:inline">{realm.name}</span>
             </div>
             <div className="text-amber-400 font-bold">
-              ✨ {quest.xpReward} XP
+              {quest.xpReward} XP
             </div>
           </div>
         </div>
@@ -256,7 +256,7 @@ export default function BattleArenaPage() {
         {/* Quest Title */}
         <div className="text-center mb-6 sm:mb-8">
           <div className="inline-block px-4 py-1 bg-slate-800 rounded-full text-sm text-slate-400 mb-4">
-            {quest.type === 'boss' ? '🏆 BOSS BATTLE' : '⚔️ BATTLE'}
+            {quest.type === 'boss' ? 'BOSS BATTLE' : 'QUEST'}
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">
             {quest.title}
@@ -267,27 +267,27 @@ export default function BattleArenaPage() {
         </div>
 
         {/* Status Bar */}
-        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 mb-6 sm:mb-8 text-xs sm:text-sm">
+        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 mb-6 sm:mb-8 text-sm">
           <div className="flex items-center gap-2">
-            <span className="text-slate-500">Difficulty:</span>
-            <div className="flex gap-0.5">
+            <span className="text-slate-400">Difficulty:</span>
+            <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map(i => (
-                <span key={i} className={i <= quest.difficulty ? 'text-red-400' : 'text-slate-700'}>
-                  💀
+                <span key={i} className={`text-sm ${i <= quest.difficulty ? 'text-red-400' : 'text-slate-700'}`}>
+                  ●
                 </span>
               ))}
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-slate-500">Est. Time:</span>
+            <span className="text-slate-400">Est. Time:</span>
             <span className="text-slate-300">~{quest.estimatedMinutes} min</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-slate-500">Status:</span>
+            <span className="text-slate-400">Status:</span>
             {isCompleted ? (
-              <span className="text-green-400">✅ Completed</span>
+              <span className="text-green-400 font-medium">Completed</span>
             ) : (
-              <span className="text-amber-400">⚔️ In Progress</span>
+              <span className="text-amber-400 font-medium">In Progress</span>
             )}
           </div>
         </div>

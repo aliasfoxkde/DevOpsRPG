@@ -47,34 +47,34 @@ export default function DashboardPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-8 text-slate-100">Dashboard</h1>
 
       <section aria-label="Statistics" className="grid md:grid-cols-3 gap-6 mb-8">
         {/* XP Card */}
-        <div className="bg-card rounded-lg border border-border p-6" role="region" aria-labelledby="xp-heading">
-          <h3 id="xp-heading" className="text-muted-foreground mb-2">Total XP</h3>
-          <p className="text-4xl font-bold text-primary" aria-live="polite">{character.xp.toLocaleString()}</p>
-          <div className="mt-2">
-            <p className="text-sm text-muted-foreground mb-1">Level {character.level}</p>
+        <div className="bg-slate-800 rounded-xl border border-slate-700 p-6" role="region" aria-labelledby="xp-heading">
+          <h3 id="xp-heading" className="text-sm font-medium text-slate-400 mb-2">Total XP</h3>
+          <p className="text-4xl font-bold text-blue-400" aria-live="polite">{character.xp.toLocaleString()}</p>
+          <div className="mt-3">
+            <p className="text-sm text-slate-400 mb-1">Level {character.level}</p>
             <ProgressBar value={xpProgress} max={100} size="sm" color="primary" aria-label={`Level ${character.level} progress: ${xpProgress} of 100 XP`} />
-            <p className="text-xs text-muted-foreground mt-1">{xpProgress}/{100} XP to next level</p>
+            <p className="text-xs text-slate-500 mt-1">{xpProgress}/{100} XP to next level</p>
           </div>
         </div>
 
         {/* Enhanced Streak Tracker */}
-        <div className="bg-card rounded-lg border border-border p-6" role="region" aria-labelledby="streak-heading">
-          <h3 id="streak-heading" className="text-muted-foreground mb-2">Current Streak</h3>
+        <div className="bg-slate-800 rounded-xl border border-slate-700 p-6" role="region" aria-labelledby="streak-heading">
+          <h3 id="streak-heading" className="text-sm font-medium text-slate-400 mb-2">Current Streak</h3>
           <span aria-hidden="true" className="text-2xl">🔥</span>
           <StreakTracker />
         </div>
 
         {/* Progress Card */}
-        <div className="bg-card rounded-lg border border-border p-6" role="region" aria-labelledby="progress-heading">
-          <h3 id="progress-heading" className="text-muted-foreground mb-2">Topics Completed</h3>
-          <p className="text-4xl font-bold text-success" aria-live="polite">
+        <div className="bg-slate-800 rounded-xl border border-slate-700 p-6" role="region" aria-labelledby="progress-heading">
+          <h3 id="progress-heading" className="text-sm font-medium text-slate-400 mb-2">Topics Completed</h3>
+          <p className="text-4xl font-bold text-green-400" aria-live="polite">
             {completedTopics}/500
           </p>
-          <div className="mt-2">
+          <div className="mt-3">
             <ProgressBar
               value={completedTopics}
               max={500}
@@ -82,7 +82,7 @@ export default function DashboardPage() {
               color="success"
               aria-label={`Topics progress: ${completedTopics} of 500 completed`}
             />
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-sm text-slate-400 mt-1">
               { Math.round((completedTopics / 500) * 100) }% complete
             </p>
           </div>
@@ -91,28 +91,28 @@ export default function DashboardPage() {
 
       {/* Achievements */}
       <section className="mb-8" aria-labelledby="achievements-heading">
-        <h2 id="achievements-heading" className="text-2xl font-semibold mb-4">Achievements</h2>
+        <h2 id="achievements-heading" className="text-xl font-semibold mb-4 text-slate-100">Achievements</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" role="list" aria-label="Earned achievements">
           {earnedAchievements.length > 0 ? (
             earnedAchievements.map((achievement) => (
               <article
                 key={achievement.key}
-                className="bg-card rounded-lg border border-border p-4 flex items-center gap-4"
+                className="bg-slate-800 rounded-xl border border-slate-700 p-4 flex items-center gap-4"
                 role="listitem"
               >
-                <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center text-2xl" aria-hidden="true">
+                <div className="w-12 h-12 bg-amber-500/20 rounded-full flex items-center justify-center text-xl" aria-hidden="true">
                   🏆
                 </div>
                 <div>
-                  <h4 className="font-semibold">{achievement.name}</h4>
-                  <p className="text-sm text-muted-foreground">
+                  <h4 className="font-semibold text-slate-100">{achievement.name}</h4>
+                  <p className="text-sm text-slate-400">
                     {achievement.description}
                   </p>
                 </div>
               </article>
             ))
           ) : (
-            <p className="text-muted-foreground col-span-full">
+            <p className="text-slate-400 col-span-full">
               Complete topics and maintain streaks to earn achievements!
             </p>
           )}
@@ -121,9 +121,9 @@ export default function DashboardPage() {
 
       {/* XP Needed for Next Level */}
       <section className="mb-8" aria-labelledby="level-progress-heading">
-        <h2 id="level-progress-heading" className="text-2xl font-semibold mb-4">Progress to Next Level</h2>
-        <div className="bg-card rounded-lg border border-border p-6">
-          <div className="flex justify-between mb-2" role="status" aria-live="polite">
+        <h2 id="level-progress-heading" className="text-xl font-semibold mb-4 text-slate-100">Progress to Next Level</h2>
+        <div className="bg-slate-800 rounded-xl border border-slate-700 p-6">
+          <div className="flex justify-between mb-2 text-sm text-slate-400" role="status" aria-live="polite">
             <span>Level {character.level}</span>
             <span>Level {character.level + 1}</span>
           </div>
@@ -134,7 +134,7 @@ export default function DashboardPage() {
             color="primary"
             aria-label={`Level progress: ${xpProgress} of 100 XP until level ${character.level + 1}`}
           />
-          <p className="text-center text-muted-foreground mt-2">
+          <p className="text-center text-slate-400 mt-2 text-sm">
             {xpProgress} / 100 XP
           </p>
         </div>
@@ -142,10 +142,10 @@ export default function DashboardPage() {
 
       {/* Continue Learning */}
       <section aria-labelledby="continue-heading">
-        <h2 id="continue-heading" className="text-2xl font-semibold mb-4">Continue Learning</h2>
+        <h2 id="continue-heading" className="text-xl font-semibold mb-4 text-slate-100">Continue Learning</h2>
         <Link
           to="/learn"
-          className="inline-block bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+          className="btn btn-primary inline-block"
         >
           Go to Learning Path
         </Link>

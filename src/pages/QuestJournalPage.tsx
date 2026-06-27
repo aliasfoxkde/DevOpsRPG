@@ -107,7 +107,7 @@ export default function QuestJournalPage() {
       <section className="relative overflow-hidden bg-gradient-to-r from-amber-900/30 via-slate-900 to-purple-900/30 border-b border-slate-700">
         <div className="max-w-4xl mx-auto px-4 py-8 text-center">
           <h1 className="text-3xl md:text-4xl font-bold text-amber-400 mb-2">
-            ⚔️ Quest Journal ⚔️
+            Quest Journal
           </h1>
           <p className="text-slate-400 mb-4">
             Your journey to become a DevOps Master awaits
@@ -116,7 +116,7 @@ export default function QuestJournalPage() {
           {/* Current Quest CTA */}
           {nextQuest && (
             <div className="mt-6 p-4 bg-slate-800/80 rounded-xl border border-amber-600/50 max-w-lg mx-auto">
-              <div className="text-sm text-amber-400 mb-1">CURRENT QUEST</div>
+              <div className="text-sm text-amber-400 mb-1 font-semibold">CURRENT QUEST</div>
               <Link
                 to={`/quest/${nextQuest.id}`}
                 className="block text-xl font-bold text-white hover:text-amber-400 transition-colors mb-2"
@@ -124,15 +124,15 @@ export default function QuestJournalPage() {
                 {nextQuest.title}
               </Link>
               <div className="flex items-center justify-center gap-4 text-sm text-slate-400">
-                <span>✨ {nextQuest.xpReward} XP</span>
-                <span>⏱️ ~{nextQuest.estimatedMinutes} min</span>
-                <span>📍 {currentRealm?.name}</span>
+                <span>{nextQuest.xpReward} XP</span>
+                <span>~{nextQuest.estimatedMinutes} min</span>
+                <span>{currentRealm?.name}</span>
               </div>
               <Link
                 to={`/quest/${nextQuest.id}`}
-                className="mt-4 inline-flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-lg shadow-lg transform transition-all hover:scale-105"
+                className="mt-4 inline-flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-lg shadow-lg transition-all"
               >
-                ⚔️ Begin Battle
+                Begin Quest
               </Link>
             </div>
           )}

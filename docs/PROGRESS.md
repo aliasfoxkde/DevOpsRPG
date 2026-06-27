@@ -12,7 +12,7 @@
 |-------|--------|----------|-------|
 | Phase 1: Critical Bug Fixes | ✅ Complete | 100% | Quest nav, career paths done |
 | Phase 2: Navigation Overhaul | ✅ Complete | 100% | HUD redesigned, More dropdown |
-| Phase 3: Visual Design Audit | ~ In Progress | 10% | Starting typography audit |
+| Phase 3: Visual Design Audit | ~ In Progress | 40% | Typography, buttons, cards standardized |
 | Phase 4: Career Path Completion | - Pending | 0% | Planned Week 2 |
 | Phase 5: Skill System Enhancement | - Pending | 0% | Planned Week 3 |
 | Phase 6: Equipment System | - Pending | 0% | Planned Week 4 |
@@ -30,10 +30,12 @@
 
 1. ✅ Fix quest auto-navigation stale closure bug
 2. ✅ Add career paths (AI Engineer, Software Engineer, AI Architect)
-3. [ ] Investigate level jumping bug
-4. [ ] Investigate HTML Forms repetition bug
-5. [ ] Navigation overhaul (reduce HUD items)
-6. [ ] Visual design audit
+3. ✅ Navigation overhaul (HUD redesign)
+4. [~] Visual design audit (in progress)
+5. [ ] Phase 4: Career Path Completion
+6. [ ] Phase 5: Skill System Enhancement
+7. [ ] Phase 6: Equipment System
+8. [ ] Phase 7: Polish & Testing
 
 ### Sprint Backlog
 
@@ -43,9 +45,9 @@
 | Add career paths | ✅ Done | 3 new paths added |
 | Navigation scrollbar fix | ✅ Done | commit 4415889 |
 | HUD redesign (7 items) | ✅ Done | commit 4415889 |
+| Visual design audit | [~] In Progress | Typography, buttons, cards standardized |
 | Level jumping investigation | [ ] Pending | - |
 | HTML Forms repetition | [ ] Pending | - |
-| Visual design audit | [ ] Pending | Typography, icons, animations |
 
 ---
 
