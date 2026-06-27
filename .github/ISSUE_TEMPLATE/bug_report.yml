@@ -1,0 +1,62 @@
+name: Bug Report
+description: Report something that isn't working correctly
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please fill out as much as you can — it speeds up diagnosis considerably.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug.
+      placeholder: When I complete a quest and refresh the page, the progress resets...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+      placeholder: I expected the quest progress to persist after refresh...
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps to trigger the bug.
+      placeholder: |
+        1. Go to Quest Journal
+        2. Complete a quest
+        3. Refresh the page
+        4. See...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Quest System
+        - Battle Arena
+        - Mini-games
+        - World Map
+        - Social Features
+        - Store/Marketplace
+        - Settings
+        - UI/UX
+        - Performance
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Browser, device, screenshots, anything else relevant.
