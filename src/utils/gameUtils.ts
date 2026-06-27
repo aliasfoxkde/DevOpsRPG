@@ -96,3 +96,18 @@ export const GAME_DURATION = {
   QUIZ_DASH: 60,
   INCIDENT_SIMULATOR_BASE: 300,
 } as const
+
+// Game balance constants
+export const GAME_BALANCE = {
+  XP_PER_LEVEL: 100,
+  MAX_HP: 100,
+  MAX_MP: 100,
+  COLLECTIBLE_DROP_RATE: 0.15, // 15% chance for collectible drops
+  GOLD_XP_RATIO: 0.1, // Gold reward = XP reward * this ratio
+} as const
+
+// LocalStorage keys
+export const STORAGE_KEYS = {
+  GAME: 'devopsquest_game',
+  BACKUP: 'devopsquest_backup',
+} as const

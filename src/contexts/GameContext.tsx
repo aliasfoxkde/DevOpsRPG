@@ -7,6 +7,7 @@ import { getRandomCollectible, COLLECTIBLES_POOL, DAILY_REWARDS, spinWheel as do
 import { technologies } from '../data/technologies'
 import { TITLES, FRAMES } from '../data/titles'
 import { getEquipmentById, calculateEquipmentBonuses } from '../data/equipment'
+import { GAME_BALANCE, STORAGE_KEYS } from '../utils/gameUtils'
 
 export type CharacterClass = 'Cloud Knight' | 'Script Warrior' | 'Data Mage' | 'DevOps Sage'
 
@@ -281,16 +282,12 @@ interface GameContextType {
   getEquipmentBonuses: () => { xpBonus: number; goldBonus: number; techBonuses: Record<string, number> }
 }
 
-const STORAGE_KEY = 'devopsquest_game'
-const BACKUP_KEY = 'devopsquest_backup'
-
-export const XP_PER_LEVEL = 100
-export const MAX_HP = 100
-export const MAX_MP = 100
-
-// Game constants
-export const COLLECTIBLE_DROP_RATE = 0.15 // 15% chance for collectible drops
-export const GOLD_XP_RATIO = 0.1 // Gold reward = XP reward * this ratio
+// Re-export constants from gameUtils for backward compatibility
+export const XP_PER_LEVEL = GAME_BALANCE.XP_PER_LEVEL
+export const MAX_HP = GAME_BALANCE.MAX_HP
+export const MAX_MP = GAME_BALANCE.MAX_MP
+export const COLLECTIBLE_DROP_RATE = GAME_BALANCE.COLLECTIBLE_DROP_RATE
+export const GOLD_XP_RATIO = GAME_BALANCE.GOLD_XP_RATIO
 
 // Deep merge utility for game state recovery
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -488,12 +485,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
     /* istanbul ignore if */
     if (typeof window !== 'undefined') {
       // Try main storage first
-      const stored = localStorage.getItem(STORAGE_KEY)
+      const stored = localStorage.getItem(STORAGE_KEYS.GAME)
       let loaded = loadAndValidateGame(stored)
       if (loaded) return loaded
 
       // Try backup storage if main is corrupted/missing
-      const backup = localStorage.getItem(BACKUP_KEY)
+      const backup = localStorage.getItem(STORAGE_KEYS.BACKUP)
       loaded = loadAndValidateGame(backup)
       if (loaded) {
         console.info('Restored game from backup')
@@ -509,9 +506,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
   // Persist to localStorage with backup
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(game))
+      localStorage.setItem(STORAGE_KEYS.GAME, JSON.stringify(game))
       // Also save backup for recovery
-      localStorage.setItem(BACKUP_KEY, JSON.stringify(game))
+      localStorage.setItem(STORAGE_KEYS.BACKUP, JSON.stringify(game))
     } catch (error) {
       // Handle QuotaExceededError or other localStorage errors
       console.warn('Failed to save game state to localStorage:', error)
@@ -521,7 +518,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   // Cross-tab synchronization with deep merge
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY && e.newValue) {
+      if (e.key === STORAGE_KEYS.GAME && e.newValue) {
         try {
           const parsed = JSON.parse(e.newValue)
           // Deep merge with defaults to ensure all fields exist
