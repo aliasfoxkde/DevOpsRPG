@@ -18,22 +18,49 @@ interface UseSoundEffectsReturn {
   isMuted: boolean
   toggleMute: () => void
   setMuted: (muted: boolean) => void
+  initAudio: () => void
 }
 
 // Simple audio context for generating sounds
 class SoundGenerator {
   private audioContext: AudioContext | null = null
+  private needsInit = true
 
-  private getContext(): AudioContext {
+  private getContext(): AudioContext | null {
     if (!this.audioContext) {
-      this.audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
+      // AudioContext requires user gesture to create - return null if not initialized
+      if (this.needsInit) return null
+      try {
+        this.audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
+      } catch {
+        return null
+      }
     }
     return this.audioContext
+  }
+
+  // Call this on user interaction to initialize audio context
+  initialize(): boolean {
+    if (this.needsInit) {
+      try {
+        this.audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
+        // Resume if suspended (browser autoplay policy)
+        if (this.audioContext.state === 'suspended') {
+          this.audioContext.resume()
+        }
+        this.needsInit = false
+        return true
+      } catch {
+        return false
+      }
+    }
+    return true
   }
 
   play(type: SoundType) {
     try {
       const ctx = this.getContext()
+      if (!ctx) return // Audio not initialized (needs user gesture)
       const oscillator = ctx.createOscillator()
       const gainNode = ctx.createGain()
 
@@ -194,11 +221,17 @@ export function useSoundEffects(): UseSoundEffectsReturn {
     setIsMuted(prev => !prev)
   }, [])
 
+  // Initialize audio on user interaction (required by browsers)
+  const initAudio = useCallback(() => {
+    soundGenerator.initialize()
+  }, [])
+
   return {
     playSound,
     isMuted,
     toggleMute,
-    setMuted: setIsMuted
+    setMuted: setIsMuted,
+    initAudio
   }
 }
 
@@ -208,9 +241,11 @@ export const globalSound = {
     try {
       const stored = localStorage.getItem('soundEnabled')
       if (stored === 'false') return
+      soundGenerator.initialize() // Ensure audio context is ready
       soundGenerator.play(type)
     } catch {
       // Silently fail
     }
-  }
+  },
+  init: () => soundGenerator.initialize()
 }

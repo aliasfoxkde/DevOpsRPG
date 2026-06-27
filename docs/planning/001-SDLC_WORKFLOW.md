@@ -66,77 +66,77 @@ git commit -m "refactor(game): split large context into smaller pieces"
 
 ## 🪝 Pre-Commit Hooks
 
-The project uses pre-commit hooks defined in `.git/hooks/`.
+The project uses pre-commit hooks defined in `.git/hooks/pre-commit`.
 
-### Current Hooks
-- **No explicit pre-commit hook file** - needs to be added
-- Git operations are manually reviewed
+### Implemented Hooks
 
-### Recommended Hooks (TODO)
+The pre-commit hook runs automatically before each commit:
+
 ```bash
-#!/bin/bash
+#!/bin/sh
 # .git/hooks/pre-commit
 
-# Check for versioned files (anti-pattern)
-if git diff --cached --name-only | grep -E "(_v[0-9]|_new|_backup|_old)" | grep -v ".md"; then
-    echo "Error: Versioned filenames detected"
-    exit 1
-fi
+# 1. Check for versioned files (anti-pattern)
+# 2. Run ESLint on staged TypeScript files
+# 3. Run TypeScript type check
+# 4. Run Vitest tests
 
-# Run TypeScript check
-npx tsc --noEmit || exit 1
-
-# Run linting
-npx eslint src/ || exit 1
-
-# Run tests
-npx vitest run || exit 1
+# Exit codes:
+# 0 = success, all checks passed
+# 1 = check failed, commit blocked
 ```
+
+### Hook Location
+- **File**: `.git/hooks/pre-commit` (executable)
+- **Installed**: Via `npm run prepare` or manual `chmod +x`
+
+### Skipping Hook (if needed)
+```bash
+git commit --no-verify -m "emergency fix"
+```
+*Use only in emergencies - bypasses all quality checks*
 
 ---
 
 ## ⚙️ CI/CD Pipeline
 
-### Current Pipeline (Cloudflare Pages)
+### Implemented Pipeline (.github/workflows/ci.yml)
+
+The CI pipeline runs on every push to `main`/`stable` and on pull requests:
+
 ```yaml
-# Manual deploy via wrangler
-npx wrangler pages deploy dist --project-name=devopsquest
+Jobs:
+  1. lint      - ESLint code quality check
+  2. typecheck - TypeScript compilation check
+  3. test      - Vitest unit tests (164 tests)
+  4. build     - Production build + artifact upload
+
+Deploy jobs (on merge to main):
+  - deploy-preview   - Preview URL for PRs
+  - deploy-production - Production deployment
 ```
 
-### Recommended GitHub Actions (TODO)
-```yaml
-# .github/workflows/deploy.yml
-name: Deploy
+### Local Pipeline Commands
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+```bash
+# Run all checks locally (mirrors CI)
+npm run lint    # ESLint
+npm run typecheck  # TypeScript
+npm run test    # Vitest
+npm run build   # Production build
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm run test
+# Full local pipeline
+npm run lint && npm run typecheck && npm run test && npm run build
+```
 
-  deploy:
-    needs: test
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+### Manual Deployment
+
+```bash
+# Build and deploy to Cloudflare Pages
+npm run deploy
+# or
+npm run build && npx wrangler pages deploy dist --project-name=devopsquest
+```
           cache: 'npm'
       - run: npm ci
       - run: npm run build

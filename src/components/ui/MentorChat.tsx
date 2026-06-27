@@ -1,6 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { useGame } from '../../contexts/GameContext'
 
+// Escape HTML to prevent XSS
+function escapeHtml(text: string): string {
+  const div = document.createElement('div')
+  div.textContent = text
+  return div.innerHTML
+}
+
 interface Message {
   id: string
   text: string
@@ -375,7 +382,7 @@ export default function MentorChat() {
                   {!message.isUser && (
                     <div className="text-xs mb-1">🧙‍♂️ Mentor</div>
                   )}
-                  <p className="text-sm">{message.text}</p>
+                  <p className="text-sm">{escapeHtml(message.text)}</p>
                 </div>
               </div>
             ))}
