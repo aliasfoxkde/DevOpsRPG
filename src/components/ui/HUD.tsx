@@ -1,31 +1,43 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useGame } from '../../contexts/GameContext'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useSoundEffects } from '../../hooks/useSoundEffects'
 import { XPBar } from './XPBar'
 
-const NAV_ITEMS = [
-  { to: '/', icon: '🏠', label: 'Tavern' },
-  { to: '/worldmap', icon: '🗺️', label: 'Map' },
+// Primary navigation - 7 essential items
+const PRIMARY_NAV = [
+  { to: '/', icon: '🏠', label: 'Home' },
   { to: '/quests', icon: '📜', label: 'Quests' },
-  { to: '/sidequests', icon: '⚔️', label: 'Side Quests' },
+  { to: '/worldmap', icon: '🗺️', label: 'Map' },
   { to: '/challenges', icon: '🎯', label: 'Challenges' },
-  { to: '/skills', icon: '⚡', label: 'Skills' },
-  { to: '/pvp-arena', icon: '⚔️', label: 'PvP' },
-  { to: '/social', icon: '👥', label: 'Social' },
-  { to: '/guild', icon: '🏰', label: 'Guild' },
-  { to: '/career-path', icon: '🗺️', label: 'Career' },
-  { to: '/storylines', icon: '📖', label: 'Story' },
+  { to: '/career-path', icon: '🛤️', label: 'Career' },
   { to: '/leaderboard', icon: '🏆', label: 'Rank' },
-  { to: '/store', icon: '🏪', label: 'Shop' },
   { to: '/character', icon: '👤', label: 'Hero' },
+]
+
+// Secondary navigation - accessible via "More" dropdown
+const SECONDARY_NAV = [
+  { to: '/skills', icon: '⚡', label: 'Skills' },
+  { to: '/sidequests', icon: '⚔️', label: 'Side Quests' },
   { to: '/rewards', icon: '🎁', label: 'Rewards' },
-  { to: '/settings', icon: '⚙️', label: 'Settings' },
-  { to: '/analytics', icon: '📊', label: 'Analytics' },
-  { to: '/titles-frames', icon: '🏅', label: 'Titles' },
+  { to: '/store', icon: '🏪', label: 'Shop' },
+  { to: '/badges', icon: '🏅', label: 'Badges' },
+  { to: '/titles-frames', icon: '✨', label: 'Titles' },
   { to: '/seasonal-events', icon: '🎭', label: 'Events' },
+  { to: '/storylines', icon: '📖', label: 'Story' },
+  { to: '/guild', icon: '🏰', label: 'Guild' },
+  { to: '/social', icon: '👥', label: 'Social' },
+  { to: '/analytics', icon: '📊', label: 'Analytics' },
+  { to: '/settings', icon: '⚙️', label: 'Settings' },
   { to: '/about', icon: 'ℹ️', label: 'About' },
+]
+
+// Group secondary nav into categories
+const SECONDARY_GROUPS = [
+  { label: 'Progress', items: SECONDARY_NAV.slice(0, 3) },
+  { label: 'Social', items: SECONDARY_NAV.slice(7, 10) },
+  { label: 'Tools', items: SECONDARY_NAV.slice(10) },
 ]
 
 export function HUD() {
@@ -171,25 +183,27 @@ export function HUD() {
             </div>
           </div>
 
-          {/* Nav Links */}
-          <nav className="flex items-center gap-0.5 overflow-x-auto scrollbar-thin">
-            {NAV_ITEMS.map((item) => {
+          {/* Primary Nav Links */}
+          <nav className="hidden lg:flex items-center gap-1">
+            {PRIMARY_NAV.map((item) => {
               const isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to))
               return (
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`px-2 py-1 text-xs rounded whitespace-nowrap transition-all flex-shrink-0 ${
+                  className={`px-3 py-1.5 text-sm rounded-lg whitespace-nowrap transition-all ${
                     isActive
                       ? 'bg-amber-600 text-white font-semibold shadow-lg shadow-amber-600/30'
                       : 'text-slate-300 hover:text-amber-400 hover:bg-slate-700/50'
                   }`}
                 >
-                  <span className="hidden lg:inline">{item.icon} {item.label}</span>
-                  <span className="lg:hidden">{item.icon}</span>
+                  <span className="mr-1">{item.icon}</span>
+                  <span>{item.label}</span>
                 </Link>
               )
             })}
+            {/* More Dropdown */}
+            <MoreDropdown />
           </nav>
         </div>
 
@@ -210,8 +224,34 @@ export function HUD() {
         {/* Mobile Nav Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-slate-700/50 animate-slide-down">
-            <nav className="grid grid-cols-3 gap-2">
-              {NAV_ITEMS.map((item) => {
+            {/* Primary Nav - 2 column grid */}
+            <nav className="grid grid-cols-2 gap-2">
+              {PRIMARY_NAV.map((item) => {
+                const isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to))
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex flex-col items-center gap-1 p-3 rounded-lg transition-colors ${
+                      isActive
+                        ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/30'
+                        : 'bg-slate-800 hover:bg-slate-700'
+                    }`}
+                  >
+                    <span className="text-2xl">{item.icon}</span>
+                    <span className="text-xs">{item.label}</span>
+                  </Link>
+                )
+              })}
+            </nav>
+
+            {/* Divider */}
+            <div className="my-3 border-t border-slate-700"></div>
+
+            {/* Secondary Nav - 2 column grid */}
+            <nav className="grid grid-cols-2 gap-2">
+              {SECONDARY_NAV.map((item) => {
                 const isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to))
                 return (
                   <Link
@@ -247,5 +287,73 @@ export function HUD() {
         )}
       </div>
     </header>
+  )
+}
+
+// More Dropdown Component
+function MoreDropdown() {
+  const [isOpen, setIsOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const location = useLocation()
+
+  // Close on outside click
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Close on route change
+  useEffect(() => {
+    setIsOpen(false)
+  }, [location.pathname])
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`px-3 py-1.5 text-sm rounded-lg whitespace-nowrap transition-all flex items-center gap-1 ${
+          isOpen
+            ? 'bg-amber-600 text-white'
+            : 'text-slate-300 hover:text-amber-400 hover:bg-slate-700/50'
+        }`}
+      >
+        <span>⋯</span>
+        <span>More</span>
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 top-full mt-2 w-56 bg-slate-800 border border-slate-700 rounded-xl shadow-xl z-50 py-2">
+          {SECONDARY_GROUPS.map((group) => (
+            <div key={group.label}>
+              <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                {group.label}
+              </div>
+              {group.items.map((item) => {
+                const isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to))
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className={`flex items-center gap-2 px-3 py-2 text-sm transition-colors ${
+                      isActive
+                        ? 'bg-amber-600/20 text-amber-400'
+                        : 'text-slate-300 hover:bg-slate-700 hover:text-amber-400'
+                    }`}
+                  >
+                    <span>{item.icon}</span>
+                    <span>{item.label}</span>
+                  </Link>
+                )
+              })}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
