@@ -15,13 +15,13 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         aria-disabled={disabled}
         className={clsx(
           'inline-flex items-center justify-center font-medium rounded-lg transition-colors',
-          'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary',
+          'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           {
-            'bg-primary text-white hover:opacity-90': variant === 'primary',
-            'bg-secondary text-white hover:opacity-90': variant === 'secondary',
-            'border border-border bg-transparent hover:bg-muted': variant === 'outline',
-            'bg-transparent hover:bg-muted': variant === 'ghost',
+            'bg-amber-600 text-white hover:bg-amber-500 active:bg-amber-700': variant === 'primary',
+            'bg-slate-700 text-white hover:bg-slate-600 active:bg-slate-800': variant === 'secondary',
+            'border border-slate-600 bg-transparent hover:bg-slate-800': variant === 'outline',
+            'bg-transparent hover:bg-slate-800 text-slate-300': variant === 'ghost',
           },
           {
             'px-3 py-1.5 text-sm': size === 'sm',
