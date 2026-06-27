@@ -192,6 +192,8 @@ export interface GameState {
     bestTime: number | null // Best time in seconds
     lastPlayedDate: string | null
   }
+  // Per-skill XP tracking (skillId/technologyId -> xp)
+  skillXp: Record<string, number>
 }
 
 interface GameContextType {
@@ -226,6 +228,9 @@ interface GameContextType {
   allocateSkillPoint: (skillId: string) => boolean
   getSkillLevel: (skillId: string) => number
   getAvailableSkillPoints: () => number
+  // Per-skill XP tracking
+  getSkillXp: (techId: string) => number
+  getSkillLevelFromXp: (xp: number) => number
   // Stats tracking for badges
   incrementStat: (stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame' | 'challenge', isPerfect?: boolean, wrongAnswers?: number, passedWith80?: boolean, topicId?: string) => void
   resetQuizStreak: () => void
@@ -386,6 +391,7 @@ function createDefaultGame(): GameState {
       bestTime: null,
       lastPlayedDate: null,
     },
+    skillXp: {},
   }
 }
 
@@ -688,6 +694,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
             completedAt: new Date().toISOString(),
           },
         ],
+        // Award skill XP for this technology
+        skillXp: {
+          ...prev.skillXp,
+          [quest.technologyId]: (prev.skillXp[quest.technologyId] || 0) + xpReward,
+        },
         currentQuestId: nextQuest?.id || null,
         achievements: newAchievements,
         showVictory: true,
@@ -1440,6 +1451,27 @@ export function GameProvider({ children }: { children: ReactNode }) {
     return game.character.skillPoints
   }, [game.character.skillPoints])
 
+  // Get XP for a specific technology/skill
+  const getSkillXp = useCallback((techId: string): number => {
+    return game.skillXp[techId] || 0
+  }, [game.skillXp])
+
+  // Calculate skill level from XP (each level requires more XP)
+  const getSkillLevelFromXp = useCallback((xp: number): number => {
+    // Level 0-10 based on XP: 0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700, 3250
+    if (xp < 100) return 0
+    if (xp < 250) return 1
+    if (xp < 450) return 2
+    if (xp < 700) return 3
+    if (xp < 1000) return 4
+    if (xp < 1350) return 5
+    if (xp < 1750) return 6
+    if (xp < 2200) return 7
+    if (xp < 2700) return 8
+    if (xp < 3250) return 9
+    return 10
+  }, [])
+
   const dismissRealmCompletion = useCallback(() => {
     setGame(prev => ({ ...prev, showRealmCompletion: null }))
   }, [])
@@ -1784,6 +1816,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
         allocateSkillPoint,
         getSkillLevel,
         getAvailableSkillPoints,
+        // Per-skill XP tracking
+        getSkillXp,
+        getSkillLevelFromXp,
         // Realm completion
         dismissRealmCompletion,
         // Onboarding
