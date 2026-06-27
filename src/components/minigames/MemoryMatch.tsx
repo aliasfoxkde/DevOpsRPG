@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { memoryIcons, type MemoryCard } from '../../data/minigames'
+import { shuffleArray } from '../../utils/gameUtils'
 
 interface MemoryMatchProps {
   pairs?: number
@@ -7,19 +8,10 @@ interface MemoryMatchProps {
   onSkip?: () => void
 }
 
-function shuffle<T>(array: T[]): T[] {
-  const shuffled = [...array]
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-  }
-  return shuffled
-}
-
 export function MemoryMatch({ pairs = 6, onComplete }: MemoryMatchProps) {
   const [cards] = useState<MemoryCard[]>(() => {
-    const selectedIcons = shuffle(memoryIcons).slice(0, pairs)
-    const cardPairs = shuffle([...selectedIcons, ...selectedIcons].map((icon, idx) => ({
+    const selectedIcons = shuffleArray(memoryIcons).slice(0, pairs)
+    const cardPairs = shuffleArray([...selectedIcons, ...selectedIcons].map((icon, idx) => ({
       ...icon,
       id: `${icon.id}-${idx}`,
       matched: false,
