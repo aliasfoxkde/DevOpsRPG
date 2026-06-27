@@ -1,23 +1,65 @@
 // Data Export/Import utilities for game progress
 
+export interface Character {
+  name: string
+  level?: number
+  xp?: number
+  gold?: number
+  title?: string
+  avatar?: string
+}
+
+export interface CompletedQuest {
+  id: string
+  completedAt?: string
+}
+
+export interface Badge {
+  id: string
+  name?: string
+  description?: string
+  icon?: string
+  rarity?: string
+  unlockedAt?: string | null
+}
+
+export interface Companion {
+  id: string
+  name?: string
+}
+
+export interface Stats {
+  totalQuestsCompleted?: number
+  fastestQuestTime?: number
+  [key: string]: unknown
+}
+
 export interface ExportedGameData {
   version: string
   exportedAt: string
-  character: any
-  completedQuests: any[]
-  badges: any[]
-  companions: any[]
-  stats: any
-  // Add other game state as needed
+  character: Character
+  completedQuests: CompletedQuest[]
+  badges: Badge[]
+  companions: Companion[]
+  stats: Stats
+  prestigeLevel?: number
+  prestigeMultiplier?: number
+  totalPrestigeXp?: number
 }
 
-export function exportGameData(gameState: any): string {
+export function exportGameData(gameState: {
+  character: Character
+  completedQuests: CompletedQuest[]
+  badges: Badge[]
+  companions: Companion[]
+  stats: Stats
+}): string {
   const exportData: ExportedGameData = {
     version: '1.0.0',
     exportedAt: new Date().toISOString(),
     character: gameState.character,
     completedQuests: gameState.completedQuests,
-    badges: gameState.badges.filter((b: any) => b.unlockedAt),
+    badges: gameState.badges.filter((b: Badge) => b.unlockedAt),
     companions: gameState.companions,
     stats: gameState.stats,
   }
@@ -30,13 +72,14 @@ export function exportGameData(gameState: any): string {
   return base64
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function downloadExport(gameState: any, filename?: string): void {
   const jsonString = JSON.stringify({
     version: '1.0.0',
     exportedAt: new Date().toISOString(),
     character: gameState.character,
     completedQuests: gameState.completedQuests,
-    badges: gameState.badges.filter((b: any) => b.unlockedAt),
+    badges: gameState.badges.filter((b: Badge) => b.unlockedAt),
     companions: gameState.companions,
     stats: gameState.stats,
     prestigeLevel: gameState.prestigeLevel,
@@ -82,7 +125,20 @@ export function parseBase64Import(base64String: string): ExportedGameData | null
 }
 
 // Merge imported data with current game state
-export function mergeImportData(currentState: any, importedData: ExportedGameData): any {
+export function mergeImportData(
+  currentState: {
+    character: Character
+    badges: Badge[]
+    companions: Companion[]
+    stats: Stats
+  },
+  importedData: ExportedGameData
+): {
+  character: Character
+  badges: Badge[]
+  companions: Companion[]
+  stats: Stats
+} {
   // For now, just return the imported data structure
   // In a full implementation, you'd want to merge intelligently
   return {
@@ -91,13 +147,13 @@ export function mergeImportData(currentState: any, importedData: ExportedGameDat
       ...currentState.character,
       ...importedData.character,
       // Keep the better of current or imported stats
-      xp: Math.max(currentState.character.xp, importedData.character.xp),
-      gold: Math.max(currentState.character.gold, importedData.character.gold),
-      level: Math.max(currentState.character.level, importedData.character.level),
+      xp: Math.max(currentState.character.xp || 0, importedData.character.xp || 0),
+      gold: Math.max(currentState.character.gold || 0, importedData.character.gold || 0),
+      level: Math.max(currentState.character.level || 0, importedData.character.level || 0),
     },
     // Merge badges - unlock any that aren't already unlocked
-    badges: currentState.badges.map((badge: any) => {
-      const imported = importedData.badges?.find((b: any) => b.id === badge.id)
+    badges: currentState.badges.map((badge: Badge) => {
+      const imported = importedData.badges?.find((b: Badge) => b.id === badge.id)
       if (imported && imported.unlockedAt && !badge.unlockedAt) {
         return { ...badge, unlockedAt: imported.unlockedAt }
       }
