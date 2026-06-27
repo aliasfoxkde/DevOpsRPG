@@ -196,6 +196,12 @@ export interface GameState {
   }
   // Per-skill XP tracking (skillId/technologyId -> xp)
   skillXp: Record<string, number>
+  // Community challenges tracking
+  communityStats: {
+    weeklyQuestsCompleted: number
+    weeklyXPCompleted: number
+    lastWeekReset: string
+  }
 }
 
 interface GameContextType {
@@ -400,6 +406,11 @@ function createDefaultGame(): GameState {
       lastPlayedDate: null,
     },
     skillXp: {},
+    communityStats: {
+      weeklyQuestsCompleted: 0,
+      weeklyXPCompleted: 0,
+      lastWeekReset: new Date().toISOString(),
+    },
   }
 }
 
@@ -810,6 +821,18 @@ export function GameProvider({ children }: { children: ReactNode }) {
           return {
             ...prev.dailyDash,
             completedQuests: newCompletedQuests,
+          }
+        })(),
+        // Community challenges - update weekly stats
+        communityStats: (() => {
+          const now = new Date()
+          const lastReset = new Date(prev.communityStats.lastWeekReset)
+          const needsReset = now.getDay() === 1 && now.getTime() - lastReset.getTime() > 6 * 24 * 60 * 60 * 1000
+
+          return {
+            weeklyQuestsCompleted: needsReset ? 1 : prev.communityStats.weeklyQuestsCompleted + 1,
+            weeklyXPCompleted: needsReset ? xpReward : prev.communityStats.weeklyXPCompleted + xpReward,
+            lastWeekReset: needsReset ? now.toISOString() : prev.communityStats.lastWeekReset,
           }
         })(),
       }

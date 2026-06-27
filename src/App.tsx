@@ -45,6 +45,9 @@ const SocialPage = lazy(() => import('./pages/SocialPage'))
 const GuildPage = lazy(() => import('./pages/GuildPage'))
 const CareerPathPage = lazy(() => import('./pages/CareerPathPage'))
 const StorylinesPage = lazy(() => import('./pages/StorylinesPage'))
+const TechnologyCollectionPage = lazy(() => import('./pages/TechnologyCollectionPage'))
+const CertificationsPage = lazy(() => import('./pages/CertificationsPage'))
+const MarketplacePage = lazy(() => import('./pages/MarketplacePage'))
 
 // Loading fallback component
 function PageLoader() {
@@ -173,6 +176,9 @@ function AppContent() {
             <Route path="guild" element={<GuildPage />} />
             <Route path="career-path" element={<CareerPathPage />} />
             <Route path="storylines" element={<StorylinesPage />} />
+            <Route path="technology-collection" element={<TechnologyCollectionPage />} />
+            <Route path="certifications" element={<CertificationsPage />} />
+            <Route path="marketplace" element={<MarketplacePage />} />
           </Route>
         </Routes>
       </Suspense>

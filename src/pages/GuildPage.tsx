@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useGame } from '../contexts/GameContext'
 import {
   MOCK_GUILD,
@@ -11,8 +12,13 @@ import {
   type GuildChallenge,
   type Guild,
 } from '../data/guilds'
+import {
+  generateWeeklyChallenges,
+  formatChallengeTimeRemaining,
+  type CommunityChallenge,
+} from '../data/communityChallenges'
 
-type Tab = 'overview' | 'members' | 'challenges' | 'discover'
+type Tab = 'overview' | 'members' | 'challenges' | 'discover' | 'community'
 
 export default function GuildPage() {
   const { game } = useGame()
@@ -21,13 +27,15 @@ export default function GuildPage() {
   // State
   const [activeTab, setActiveTab] = useState<Tab>('overview')
   const [joinedGuild] = useState<Guild | null>(MOCK_GUILD)
-  const [members] = useState<GuildMember[]>(MOCK_GUILD_MEMBERS)
-  const [challenges] = useState<GuildChallenge[]>(MOCK_GUILD_CHALLENGES)
   const [showJoinConfirm, setShowJoinConfirm] = useState<string | null>(null)
 
-  // Player's guild role (would come from game state in real implementation)
-  const playerRole: GuildMember['role'] = 'member'
+  // Player's guild role - determined by their real character data
+  const playerRole: GuildMember['role'] = character.level >= 30 ? 'officer' : 'member'
   const playerRank = getGuildRankInfo(playerRole)
+
+  // Calculate player's weekly contribution based on their character stats
+  const playerWeeklyXP = game.skillXp ? Object.values(game.skillXp).reduce((sum, xp) => sum + (xp as number), 0) : 0
+  const playerTotalQuests = game.completedQuests.length
 
   // Check if player meets guild requirements
   const canJoinGuild = (guild: Guild): boolean => {
@@ -35,13 +43,65 @@ export default function GuildPage() {
            game.completedQuests.length >= guild.requirements.minQuests
   }
 
+  // Real members with player's actual stats mixed in
+  const members: GuildMember[] = [
+    ...MOCK_GUILD_MEMBERS.slice(0, 3),
+    // Add current player as a member with real stats
+    {
+      id: 'player',
+      name: character.name,
+      avatar: character.avatar,
+      level: character.level,
+      title: character.title,
+      role: playerRole,
+      joinedAt: character.joinedAt,
+      weeklyXP: Math.min(playerWeeklyXP, 1000), // Cap for display
+      totalXP: character.xp,
+      questsThisWeek: playerTotalQuests,
+      streakDays: character.streakDays,
+      contributionPoints: character.xp,
+    },
+    ...MOCK_GUILD_MEMBERS.slice(3),
+  ]
+
+  // Real challenges with player progress mixed in
+  const challenges: GuildChallenge[] = MOCK_GUILD_CHALLENGES.map(c => ({
+    ...c,
+    progress: c.progress + Math.floor(playerTotalQuests / 10),
+  }))
+
+  // Community challenges - simulated community progress
+  const communityChallenges: CommunityChallenge[] = generateWeeklyChallenges({
+    totalQuestsCompleted: game.completedQuests.length,
+    totalXPEarned: character.xp,
+    highestStreak: character.streakDays,
+    totalQuizzesTaken: game.stats.quizCount,
+    totalPerfectQuizzes: game.stats.quizPerfectCount,
+    weeklyQuestsCompleted: game.communityStats.weeklyQuestsCompleted,
+    weeklyXPCompleted: game.communityStats.weeklyXPCompleted,
+    lastWeekReset: game.communityStats.lastWeekReset,
+    challengeHistory: { completedChallenges: [], totalContributions: 0 },
+  })
+
+  // Calculate player's contribution to community challenges
+  const playerContributionPercent = communityChallenges.length > 0
+    ? Math.min(100, Math.round((game.communityStats.weeklyQuestsCompleted / communityChallenges[0].target) * 100))
+    : 0
+
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-2">🏰 Guild Hall</h1>
-        <p className="text-slate-400">Team up with other adventurers!</p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <Link
+            to="/"
+            className="text-amber-400 hover:text-amber-300 transition-colors text-sm mb-4 inline-block"
+          >
+            ← Back to Home
+          </Link>
+          <h1 className="text-4xl font-bold mb-2 text-amber-400">🏰 Guild Hall</h1>
+          <p className="text-slate-400">Team up with other adventurers to complete challenges and earn guild rewards!</p>
+        </div>
 
       {/* Current Guild Banner */}
       {joinedGuild ? (
@@ -99,6 +159,7 @@ export default function GuildPage() {
           </p>
         </div>
       )}
+      </div>
 
       {/* Tabs */}
       <div className="flex gap-2 mb-6 flex-wrap">
@@ -106,6 +167,7 @@ export default function GuildPage() {
           { id: 'overview' as Tab, label: '📊 Overview' },
           { id: 'members' as Tab, label: '👥 Members' },
           { id: 'challenges' as Tab, label: '⚔️ Challenges' },
+          { id: 'community' as Tab, label: '🌐 Community' },
           { id: 'discover' as Tab, label: '🔍 Discover' },
         ].map(tab => (
           <button
@@ -124,44 +186,72 @@ export default function GuildPage() {
 
       {/* Overview Tab */}
       {activeTab === 'overview' && joinedGuild && (
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Guild Stats */}
-          <div className="bg-card rounded-xl border border-border p-6">
-            <h3 className="text-lg font-bold mb-4">📊 Guild Statistics</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
-                <span className="text-slate-400">Total XP</span>
-                <span className="font-bold text-purple-400">{joinedGuild.xp.toLocaleString()}</span>
+        <div className="space-y-6">
+          {/* Your Contribution */}
+          <div className="bg-gradient-to-r from-purple-900/30 to-slate-800/50 rounded-xl border border-purple-500/30 p-6">
+            <h3 className="text-lg font-bold text-purple-400 mb-4">🧙 Your Guild Contribution</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center p-3 bg-slate-800/50 rounded-lg">
+                <div className="text-2xl font-bold text-amber-400">{character.level}</div>
+                <div className="text-xs text-slate-400">Your Level</div>
               </div>
-              <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
-                <span className="text-slate-400">Total Quests</span>
-                <span className="font-bold text-green-400">{joinedGuild.totalQuests.toLocaleString()}</span>
+              <div className="text-center p-3 bg-slate-800/50 rounded-lg">
+                <div className="text-2xl font-bold text-green-400">{playerTotalQuests}</div>
+                <div className="text-xs text-slate-400">Your Quests</div>
               </div>
-              <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
-                <span className="text-slate-400">This Week</span>
-                <span className="font-bold text-amber-400">{joinedGuild.weeklyQuests} quests</span>
+              <div className="text-center p-3 bg-slate-800/50 rounded-lg">
+                <div className="text-2xl font-bold text-purple-400">{Math.floor(character.xp * 0.01)}</div>
+                <div className="text-xs text-slate-400">Guild XP Contributed</div>
               </div>
-              <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
-                <span className="text-slate-400">Guild Rank</span>
-                <span className="font-bold text-yellow-400">#{joinedGuild.rank}</span>
-              </div>
-              <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
-                <span className="text-slate-400">Member Count</span>
-                <span className="font-bold text-blue-400">{joinedGuild.memberCount}/{joinedGuild.maxMembers}</span>
+              <div className="text-center p-3 bg-slate-800/50 rounded-lg">
+                <div className="text-2xl font-bold text-orange-400">{character.streakDays}</div>
+                <div className="text-xs text-slate-400">Your Streak</div>
               </div>
             </div>
+            <p className="text-sm text-slate-400 mt-4 text-center">
+              💡 Every quest you complete contributes 1% of your XP to your guild!
+            </p>
           </div>
 
-          {/* Recent Activity */}
-          <div className="bg-card rounded-xl border border-border p-6">
-            <h3 className="text-lg font-bold mb-4">🏆 Achievements</h3>
-            <div className="space-y-2">
-              {['🏅 Guild Founded', '🔥 30-Day Streak', '⚔️ 1000 Quests Completed', '👑 Weekly Champion'].map((achievement, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
-                  <span className="text-2xl">{achievement.includes('Guild') ? '🏅' : achievement.includes('30') ? '🔥' : achievement.includes('1000') ? '⚔️' : '👑'}</span>
-                  <span className="text-slate-300">{achievement}</span>
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Guild Stats */}
+            <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-6">
+              <h3 className="text-lg font-bold mb-4">📊 Guild Statistics</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
+                  <span className="text-slate-400">Total XP</span>
+                  <span className="font-bold text-purple-400">{joinedGuild.xp.toLocaleString()}</span>
                 </div>
-              ))}
+                <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
+                  <span className="text-slate-400">Total Quests</span>
+                  <span className="font-bold text-green-400">{joinedGuild.totalQuests.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
+                  <span className="text-slate-400">This Week</span>
+                  <span className="font-bold text-amber-400">{joinedGuild.weeklyQuests} quests</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
+                  <span className="text-slate-400">Guild Rank</span>
+                  <span className="font-bold text-yellow-400">#{joinedGuild.rank}</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
+                  <span className="text-slate-400">Member Count</span>
+                  <span className="font-bold text-blue-400">{joinedGuild.memberCount}/{joinedGuild.maxMembers}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Activity */}
+            <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-6">
+              <h3 className="text-lg font-bold mb-4">🏆 Guild Achievements</h3>
+              <div className="space-y-2">
+                {['🏅 Guild Founded', '🔥 30-Day Streak', '⚔️ 1000 Quests Completed', '👑 Weekly Champion'].map((achievement, i) => (
+                  <div key={i} className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
+                    <span className="text-2xl">{achievement.includes('Guild') ? '🏅' : achievement.includes('30') ? '🔥' : achievement.includes('1000') ? '⚔️' : '👑'}</span>
+                    <span className="text-slate-300">{achievement}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -299,6 +389,144 @@ export default function GuildPage() {
               </div>
             )
           })}
+        </div>
+      )}
+
+      {/* Community Tab */}
+      {activeTab === 'community' && (
+        <div className="space-y-6">
+          {/* Community Header */}
+          <div className="bg-gradient-to-r from-green-900/30 to-teal-900/30 rounded-xl border border-green-600/30 p-6">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="text-5xl">🌐</div>
+              <div>
+                <h3 className="text-xl font-bold text-green-400">Community Challenges</h3>
+                <p className="text-slate-400 text-sm">Work together with the community to achieve weekly goals!</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center p-3 bg-slate-800/50 rounded-lg">
+                <div className="text-2xl font-bold text-green-400">{game.communityStats.weeklyQuestsCompleted}</div>
+                <div className="text-xs text-slate-400">Your Weekly Quests</div>
+              </div>
+              <div className="text-center p-3 bg-slate-800/50 rounded-lg">
+                <div className="text-2xl font-bold text-amber-400">{game.communityStats.weeklyXPCompleted.toLocaleString()}</div>
+                <div className="text-xs text-slate-400">Your Weekly XP</div>
+              </div>
+              <div className="text-center p-3 bg-slate-800/50 rounded-lg">
+                <div className="text-2xl font-bold text-purple-400">{playerContributionPercent}%</div>
+                <div className="text-xs text-slate-400">Your Contribution</div>
+              </div>
+              <div className="text-center p-3 bg-slate-800/50 rounded-lg">
+                <div className="text-2xl font-bold text-orange-400">{character.streakDays}</div>
+                <div className="text-xs text-slate-400">Your Streak</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Weekly Challenges */}
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold">🏆 Weekly Community Goals</h3>
+            <span className="text-sm text-slate-400">Resets every Monday</span>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {communityChallenges.map(challenge => {
+              const progress = Math.min(100, (challenge.current / challenge.target) * 100)
+              const isComplete = challenge.current >= challenge.target
+
+              return (
+                <div
+                  key={challenge.id}
+                  className={`rounded-xl border-2 p-5 ${
+                    isComplete
+                      ? 'border-green-500/50 bg-green-900/20'
+                      : 'border-slate-700 bg-slate-800/50'
+                  }`}
+                >
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className={`text-4xl ${isComplete ? '' : 'grayscale opacity-70'}`}>
+                      {challenge.icon}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h4 className={`font-bold ${isComplete ? 'text-green-400' : 'text-white'}`}>
+                          {challenge.title}
+                        </h4>
+                        {isComplete && (
+                          <span className="px-2 py-1 bg-green-600/30 text-green-400 text-xs rounded-full">
+                            ✓ Complete!
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-slate-400 mt-1">{challenge.description}</p>
+                    </div>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="mb-3">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-slate-400">Progress</span>
+                      <span className={isComplete ? 'text-green-400' : 'text-amber-400'}>
+                        {challenge.current.toLocaleString()} / {challenge.target.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="h-4 bg-slate-900 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full transition-all ${
+                          isComplete
+                            ? 'bg-gradient-to-r from-green-600 to-green-400'
+                            : 'bg-gradient-to-r from-green-700 to-teal-500'
+                        }`}
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                    <div className="text-right text-xs text-slate-500 mt-1">
+                      {Math.round(progress)}% complete
+                    </div>
+                  </div>
+
+                  {/* Footer */}
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-slate-500">
+                      ⏰ {formatChallengeTimeRemaining(challenge.expiresAt)}
+                    </span>
+                    <div className="flex gap-3">
+                      <span className="text-amber-400">+{challenge.xpReward} XP</span>
+                      <span className="text-yellow-400">+{challenge.goldReward} Gold</span>
+                    </div>
+                  </div>
+
+                  {/* Your Contribution */}
+                  <div className="mt-3 pt-3 border-t border-slate-700">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-slate-500">Your contribution:</span>
+                      <span className="text-green-400">
+                        {challenge.type === 'quests' && `${game.communityStats.weeklyQuestsCompleted} quests`}
+                        {challenge.type === 'xp' && `${game.communityStats.weeklyXPCompleted.toLocaleString()} XP`}
+                        {challenge.type === 'streak' && `${character.streakDays} days`}
+                        {challenge.type === 'quiz' && `${game.stats.quizPerfectCount} perfect`}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Info Box */}
+          <div className="bg-blue-900/20 border border-blue-600/30 rounded-xl p-4 mt-6">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">💡</span>
+              <div>
+                <h4 className="font-bold text-blue-400 mb-1">How Community Challenges Work</h4>
+                <p className="text-sm text-slate-400">
+                  Every quest you complete contributes to the community total. Help your guild and fellow players
+                  reach weekly goals to earn bonus XP and Gold rewards. The community progress resets every Monday!
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

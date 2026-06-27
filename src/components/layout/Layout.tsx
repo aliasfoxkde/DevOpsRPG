@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom'
+import Breadcrumbs from '../ui/Breadcrumbs'
 
 export default function Layout() {
   return (
@@ -9,6 +10,7 @@ export default function Layout() {
       >
         Skip to main content
       </a>
+      <Breadcrumbs />
       <main id="main-content" className="flex-1" tabIndex={-1}>
         <Outlet />
       </main>

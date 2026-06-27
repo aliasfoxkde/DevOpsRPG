@@ -23,6 +23,8 @@ const SECONDARY_NAV = [
   { to: '/rewards', icon: '🎁', label: 'Rewards' },
   { to: '/store', icon: '🏪', label: 'Shop' },
   { to: '/badges', icon: '🏅', label: 'Badges' },
+  { to: '/technology-collection', icon: '📚', label: 'Tech Cards' },
+  { to: '/certifications', icon: '🏆', label: 'Certs' },
   { to: '/titles-frames', icon: '✨', label: 'Titles' },
   { to: '/seasonal-events', icon: '🎭', label: 'Events' },
   { to: '/storylines', icon: '📖', label: 'Story' },
@@ -128,7 +130,7 @@ export function HUD() {
             {/* Theme Toggle */}
             <button
               onClick={cycleTheme}
-              className="flex items-center gap-1 p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="flex items-center justify-center w-11 h-11 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500"
               title={`Theme: ${themeLabels[theme]} (${resolvedTheme}) - Click to change`}
               aria-label={`Current theme: ${themeLabels[theme]}. Click to change.`}
             >
@@ -138,7 +140,7 @@ export function HUD() {
             {/* Sound Toggle */}
             <button
               onClick={toggleMute}
-              className="flex items-center gap-1 p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="flex items-center justify-center w-11 h-11 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500"
               title={isMuted ? 'Sound: OFF - Click to enable' : 'Sound: ON - Click to mute'}
               aria-label={isMuted ? 'Sound is muted. Click to enable sound.' : 'Sound is enabled. Click to mute.'}
             >
@@ -161,7 +163,7 @@ export function HUD() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
+              className="md:hidden flex items-center justify-center w-11 h-11 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
               aria-label="Toggle menu"
             >
               <span className="text-xl">{mobileMenuOpen ? '✕' : '☰'}</span>
