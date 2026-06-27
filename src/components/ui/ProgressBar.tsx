@@ -21,6 +21,10 @@ export function ProgressBar({
   return (
     <div
       className={clsx('w-full bg-muted rounded-full overflow-hidden', className)}
+      role="progressbar"
+      aria-valuenow={value}
+      aria-valuemin={0}
+      aria-valuemax={max}
       {...props}
     >
       <div

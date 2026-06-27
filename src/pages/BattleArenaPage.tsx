@@ -156,6 +156,18 @@ export default function BattleArenaPage() {
   const topicContent = techContent?.topics.find(t => t.id === quest.topicId)
   const techData = technologies[quest.technologyId]
   const topicUrl = techData?.topics.find(t => t.id === quest.topicId)?.url
+
+  // Guard against missing content - show error state
+  if (!techContent || !techData) {
+    return (
+      <div className="min-h-screen bg-slate-900 text-white p-8">
+        <div className="max-w-2xl mx-auto text-center">
+          <h1 className="text-2xl font-bold text-red-400 mb-4">Quest Content Unavailable</h1>
+          <p className="text-slate-400">The requested learning content could not be found.</p>
+        </div>
+      </div>
+    )
+  }
   const isCompleted = isQuestCompleted(quest.id)
 
   const handleComplete = (isPerfect: boolean, wrongAnswers: number = 0, passedWith80: boolean = false) => {

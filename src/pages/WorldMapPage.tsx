@@ -997,29 +997,34 @@ export default function WorldMapPage() {
             <div className="p-6">
               <p className="text-slate-300 mb-6 leading-relaxed">{selectedLocation.description}</p>
 
-              {selectedLocation.type === 'realm' && (
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-slate-400 text-sm font-medium">Quest Progress</span>
-                    <span
-                      className="text-sm font-bold"
-                      style={{ color: getRealmColor(selectedLocation.realmId).primary }}
-                    >
-                      {getLocationStatus(selectedLocation)?.completed || 0}/{getLocationStatus(selectedLocation)?.total || 0}
-                    </span>
+              {selectedLocation.type === 'realm' && (() => {
+                const locationStatus = getLocationStatus(selectedLocation)
+                const completed = locationStatus?.completed ?? 0
+                const total = locationStatus?.total ?? 0
+                const progressPercent = total > 0 ? (completed / total) * 100 : 0
+                return (
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-slate-400 text-sm font-medium">Quest Progress</span>
+                      <span
+                        className="text-sm font-bold"
+                        style={{ color: getRealmColor(selectedLocation.realmId).primary }}
+                      >
+                        {completed}/{total}
+                      </span>
+                    </div>
+                    <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-700"
+                        style={{
+                          width: `${progressPercent}%`,
+                          background: `linear-gradient(90deg, ${getRealmColor(selectedLocation.realmId).primary} 0%, ${getRealmColor(selectedLocation.realmId).secondary} 100%)`
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all duration-700"
-                      style={{
-                        width: `${getLocationStatus(selectedLocation)?.total ?
-                          (getLocationStatus(selectedLocation)!.completed / getLocationStatus(selectedLocation)!.total) * 100 : 0}%`,
-                        background: `linear-gradient(90deg, ${getRealmColor(selectedLocation.realmId).primary} 0%, ${getRealmColor(selectedLocation.realmId).secondary} 100%)`
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
+                )
+              })()}
 
               {selectedLocation.type === 'sdlc' && selectedLocation.sdlcPhase && (
                 <div className="mb-6">

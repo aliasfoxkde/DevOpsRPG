@@ -15,7 +15,17 @@ export function useVoiceNarration() {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
-        return JSON.parse(stored)
+        try {
+          return JSON.parse(stored)
+        } catch {
+          return {
+            enabled: false,
+            volume: 1,
+            rate: 1,
+            pitch: 1,
+            voiceURI: null,
+          }
+        }
       }
     }
     return {

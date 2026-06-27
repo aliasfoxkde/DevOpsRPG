@@ -120,6 +120,7 @@ export default function SpinWheel({ onSpinComplete, isSpinning }: SpinWheelProps
       {!spinning && (
         <button
           onClick={spin}
+          aria-label="Spin wheel for prizes"
           className="mt-6 px-8 py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-full shadow-lg transform transition-all hover:scale-105"
         >
           🎰 SPIN FOR PRIZES!

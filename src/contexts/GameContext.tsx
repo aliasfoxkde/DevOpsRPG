@@ -453,7 +453,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   // Persist to localStorage
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(game))
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(game))
+    } catch (error) {
+      // Handle QuotaExceededError or other localStorage errors silently
+      console.warn('Failed to save game state to localStorage:', error)
+    }
   }, [game])
 
   // Cross-tab synchronization

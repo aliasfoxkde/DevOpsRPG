@@ -16,7 +16,14 @@ export function XPBar({ compact = false }: XPBarProps) {
     return (
       <div className="flex items-center gap-2">
         <span className="text-xs font-bold text-amber-400">LV {character.level}</span>
-        <div className="w-20 h-2 bg-gray-800 rounded-full overflow-hidden">
+        <div
+          className="w-20 h-2 bg-gray-800 rounded-full overflow-hidden"
+          role="progressbar"
+          aria-valuenow={xpInCurrentLevel}
+          aria-valuemin={0}
+          aria-valuemax={XP_PER_LEVEL}
+          aria-label="Experience progress"
+        >
           <div
             className="h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-500"
             style={{ width: `${progressPercent}%` }}
@@ -38,7 +45,14 @@ export function XPBar({ compact = false }: XPBarProps) {
           {xpInCurrentLevel} / {XP_PER_LEVEL} XP to next level
         </span>
       </div>
-      <div className="w-full h-3 bg-gray-800 rounded-full overflow-hidden border border-gray-700">
+      <div
+        className="w-full h-3 bg-gray-800 rounded-full overflow-hidden border border-gray-700"
+        role="progressbar"
+        aria-valuenow={xpInCurrentLevel}
+        aria-valuemin={0}
+        aria-valuemax={XP_PER_LEVEL}
+        aria-label="Experience progress"
+      >
         <div
           className="h-full bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400 transition-all duration-700 ease-out"
           style={{ width: `${progressPercent}%` }}

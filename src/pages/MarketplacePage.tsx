@@ -87,6 +87,7 @@ export default function MarketplacePage() {
   const [category, setCategory] = useState('all')
   const [selectedListing, setSelectedListing] = useState<MarketplaceListing | null>(null)
   const [showCreateListing, setShowCreateListing] = useState(false)
+  const [notification, setNotification] = useState<{ type: 'error' | 'info'; message: string } | null>(null)
 
   // Filter listings by category
   const filteredListings = category === 'all'
@@ -106,11 +107,13 @@ export default function MarketplacePage() {
 
   const handlePurchase = (listing: MarketplaceListing) => {
     if (character.gold < listing.price) {
-      alert(`Not enough gold! Need ${listing.price} gold.`)
+      setNotification({ type: 'error', message: `Not enough gold! Need ${listing.price} gold.` })
+      setTimeout(() => setNotification(null), 3000)
       return
     }
     // In a real implementation, this would call backend API
-    alert(`This feature requires a backend server for real P2P trading.\n\nWould purchase "${listing.itemName}" from ${listing.sellerName} for ${listing.price} gold.`)
+    setNotification({ type: 'info', message: `Would purchase "${listing.itemName}" from ${listing.sellerName} for ${listing.price} gold. (Requires backend)` })
+    setTimeout(() => setNotification(null), 4000)
     setSelectedListing(null)
   }
 
@@ -128,6 +131,17 @@ export default function MarketplacePage() {
           <h1 className="text-4xl font-bold text-amber-400 mb-2">🏪 Marketplace</h1>
           <p className="text-slate-400">Trade items with other adventurers! (Coming Soon)</p>
         </div>
+
+        {/* Notification Banner */}
+        {notification && (
+          <div className={`mb-6 p-4 rounded-lg border ${
+            notification.type === 'error'
+              ? 'bg-red-900/30 border-red-600 text-red-300'
+              : 'bg-blue-900/30 border-blue-600 text-blue-300'
+          }`}>
+            {notification.message}
+          </div>
+        )}
 
         {/* Coming Soon Banner */}
         <div className="bg-gradient-to-r from-amber-900/30 via-slate-800 to-amber-900/30 rounded-xl border border-amber-600/30 p-6 mb-8">

@@ -95,6 +95,7 @@ export default function TreasureChest({ questDifficulty = 1, preGeneratedLoot, o
       <button
         onClick={openChest}
         disabled={isOpen || isAnimating}
+        aria-label={isOpen ? 'Treasure chest opened' : 'Open treasure chest'}
         className={`relative w-24 h-20 transition-all transform ${
           isAnimating ? 'animate-bounce' : ''
         } ${isOpen ? 'opacity-50' : 'hover:scale-110'}`}

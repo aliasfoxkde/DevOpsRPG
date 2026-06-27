@@ -49,6 +49,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   const [showHint, setShowHint] = useState(false)
   const [takeawayText, setTakeawayText] = useState('')
   const [takeawayError, setTakeawayError] = useState('')
+  const [hintMessage, setHintMessage] = useState<string | null>(null)
 
   // Use ref to avoid stale closure in handleFinish
   const isMountedRef = useRef(true)
@@ -468,15 +469,22 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
                   if (hasHintScroll) {
                     consumeCollectible('hint_scroll')
                     setShowHint(true)
+                    setHintMessage(null)
                   } else {
                     // Show message that hint scroll is needed
-                    alert('You need a Hint Scroll to reveal the hint! Visit the Shop to buy one.')
+                    setHintMessage('You need a Hint Scroll to reveal the hint! Visit the Shop to buy one.')
+                    setTimeout(() => setHintMessage(null), 3000)
                   }
                 }}
                 className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1"
               >
                 💡 {hasHintScroll ? 'Use hint scroll' : 'Need a hint?'}
               </button>
+            )}
+            {hintMessage && (
+              <div className="p-2 bg-amber-900/30 border border-amber-600 rounded-lg text-amber-300 text-sm">
+                {hintMessage}
+              </div>
             )}
             {showHint && q.hint && (
               <div className="p-3 bg-purple-900/30 border border-purple-700 rounded-lg">

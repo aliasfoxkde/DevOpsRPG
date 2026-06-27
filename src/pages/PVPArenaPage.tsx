@@ -65,11 +65,13 @@ export default function PVPArenaPage() {
 
   // Handle answer selection
   const handleAnswer = (answerIndex: number) => {
-    if (selectedAnswer !== null) return // Already answered
+    if (selectedAnswer !== null || !currentMatch) return // Already answered or no match
 
     setSelectedAnswer(answerIndex)
 
-    const isCorrect = answerIndex === currentMatch!.questions[currentQuestionIndex].correctIndex
+    const isCorrect = answerIndex === currentMatch.questions[currentQuestionIndex].correctIndex
+    const newCorrectCount = correctCount + (isCorrect ? 1 : 0)
+
     if (isCorrect) {
       setCorrectCount(prev => prev + 1)
     }
@@ -78,11 +80,11 @@ export default function PVPArenaPage() {
     setTimeout(() => {
       setSelectedAnswer(null)
 
-      if (currentQuestionIndex < currentMatch!.questions.length - 1) {
+      if (currentQuestionIndex < currentMatch.questions.length - 1) {
         setCurrentQuestionIndex(prev => prev + 1)
       } else {
-        // Match complete
-        finishMatch(correctCount + (isCorrect ? 1 : 0))
+        // Match complete - pass correct count directly to avoid stale closure
+        finishMatch(newCorrectCount)
       }
     }, 1000)
   }
