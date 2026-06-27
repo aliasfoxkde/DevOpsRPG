@@ -1,0 +1,58 @@
+name: Change Request
+description: Request a change to existing functionality
+labels: ["change-request", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to suggest changes to existing features, UI, or behavior.
+        For bugs, use the Bug Report template instead.
+
+  - type: textarea
+    id: current
+    attributes:
+      label: Current behavior
+      description: What currently happens?
+      placeholder: Currently, the quest journal shows...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed change
+      description: What should change?
+      placeholder: The quest journal should show...
+    validations:
+      required: true
+
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Why this change is better
+      description: What benefit does this bring?
+      placeholder: This would make it easier to...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Quest System
+        - Battle Arena
+        - Mini-games
+        - World Map
+        - Social Features
+        - Store/Marketplace
+        - Settings
+        - UI/UX
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context

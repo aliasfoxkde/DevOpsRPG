@@ -1,0 +1,11 @@
+name: Issue Triage Configuration
+description: Configuration for issue templates
+labels:
+  - needs-triage
+  - triage
+  - review
+  - help-wanted
+  - good-first-issue
+  - priority-high
+  - priority-medium
+  - priority-low

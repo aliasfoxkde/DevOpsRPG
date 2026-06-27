@@ -48,6 +48,7 @@ const StorylinesPage = lazy(() => import('./pages/StorylinesPage'))
 const TechnologyCollectionPage = lazy(() => import('./pages/TechnologyCollectionPage'))
 const CertificationsPage = lazy(() => import('./pages/CertificationsPage'))
 const MarketplacePage = lazy(() => import('./pages/MarketplacePage'))
+const FeedbackPage = lazy(() => import('./pages/FeedbackPage'))
 
 // Loading fallback component
 function PageLoader() {
@@ -182,6 +183,7 @@ function AppContent() {
             <Route path="technology-collection" element={<TechnologyCollectionPage />} />
             <Route path="certifications" element={<CertificationsPage />} />
             <Route path="marketplace" element={<MarketplacePage />} />
+            <Route path="feedback" element={<FeedbackPage />} />
           </Route>
         </Routes>
       </Suspense>
