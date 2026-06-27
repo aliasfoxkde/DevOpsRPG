@@ -18,11 +18,40 @@
 
 | Date | URL | Commit | Notes |
 |------|-----|--------|-------|
+| 2026-06-27 | https://77660f17.devopsquest.pages.dev | adc8450 | CI/CD pipeline, pre-commit hooks, 164 tests |
 | 2026-06-27 | https://5fc1084f.devopsquest.pages.dev | 5035867 | Critical bugs, accessibility, alert removal |
 | 2026-06-27 | https://35029ca4.devopsquest.pages.dev | 4c43675 | All 141 tests passing - test failures fixed |
 | 2026-06-27 | https://33a1250b.devopsquest.pages.dev | 40a5750 | Vitest config fix - E2E tests excluded |
 | 2026-06-27 | https://5438d38b.devopsquest.pages.dev | d9e82d7 | Quiz bug fixes |
 | 2026-06-26 | https://bdcc7097.devopsquest.pages.dev | 77fe0fb | Community/Marketplace features |
+
+---
+
+## 🔧 NEW INFRASTRUCTURE (2026-06-27)
+
+### CI/CD Pipeline
+- **GitHub Actions**: `.github/workflows/ci.yml`
+  - Lint, TypeScript check, Test, Build jobs
+  - Preview deployments for PRs
+  - Production deployment on main branch
+
+### Pre-commit Hooks
+- **Hook**: `.git/hooks/pre-commit`
+  - ESLint on staged files
+  - TypeScript check
+  - Tests run
+
+### Contributing Guide
+- **File**: `CONTRIBUTING.md`
+  - Setup instructions
+  - Coding standards
+  - Commit message conventions
+  - PR process
+
+### Expanded Test Coverage
+- **dataExport.test.ts**: 12 tests for export/import/merge
+- **achievementCardGenerator.test.ts**: 11 tests for SVG generation
+- **Total tests**: 164 passing
 
 ---
 
