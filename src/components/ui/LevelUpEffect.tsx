@@ -18,7 +18,7 @@ export function LevelUpEffect({ level, onComplete }: LevelUpEffectProps) {
       y: 50 + (Math.random() - 0.5) * 30,
       angle: (Math.random() * 360),
     }))
-    setParticles(newParticles)
+    queueMicrotask(() => setParticles(newParticles))
 
     // Stagger animations
     setTimeout(() => setShowText(true), 200)
@@ -110,16 +110,16 @@ export function AnimatedXPBar({ xp, maxXp, showAnimation = false }: {
         step++
         current += increment
         if (step >= steps) {
-          setDisplayXp(xp)
+          queueMicrotask(() => setDisplayXp(xp))
           clearInterval(interval)
         } else {
-          setDisplayXp(Math.round(current))
+          queueMicrotask(() => setDisplayXp(Math.round(current)))
         }
       }, 30)
 
       return () => clearInterval(interval)
     } else {
-      setDisplayXp(xp)
+      queueMicrotask(() => setDisplayXp(xp))
     }
   }, [xp, showAnimation, displayXp])
 

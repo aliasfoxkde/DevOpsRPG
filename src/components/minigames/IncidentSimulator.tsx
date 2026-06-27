@@ -40,21 +40,45 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
       setTimer(prev => {
         if (prev.remaining <= 0) {
           clearInterval(interval)
+          // Timer expired - complete will be handled via gameState change
           return prev
         }
-        return { ...prev, remaining: prev.remaining - 1 }
+        const newRemaining = prev.remaining - 1
+        if (newRemaining <= 0) {
+          clearInterval(interval)
+        }
+        return { ...prev, remaining: newRemaining }
       })
     }, 1000)
 
     return () => clearInterval(interval)
   }, [gameState])
 
-  // Handle time expiration
+  // Handle time expiration - triggered when timer reaches 0
   useEffect(() => {
-    if (timer.remaining <= 0 && (gameState === 'diagnosing' || gameState === 'resolving')) {
-      handleComplete()
+    if (timer.remaining <= 0 && (gameState === 'diagnosing' || gameState === 'resolving') && selectedScenario) {
+      // Use setTimeout to avoid calling handleComplete synchronously
+      const timeout = setTimeout(() => {
+        if (!selectedScenario) return
+
+        const timeBonus = Math.max(0, Math.round((timer.remaining / selectedScenario.estimatedTime) * 100))
+        const accuracyBonus = Math.round((completedSteps.length / (selectedScenario.diagnostics.length + selectedScenario.resolution.length)) * 100)
+        const penaltyFactor = Math.max(0, 1 - (timer.penalty / 60))
+        const score = Math.round((timeBonus * 0.3 + accuracyBonus * 0.7) * penaltyFactor)
+
+        setFinalScore(score)
+        setGameState('complete')
+
+        const xpEarned = Math.round((score / 100) * selectedScenario.xpReward)
+        const goldEarned = Math.round((score / 100) * selectedScenario.goldReward)
+
+        addXP(xpEarned)
+        addGold(goldEarned)
+        onComplete?.(score, xpEarned)
+      }, 0)
+      return () => clearTimeout(timeout)
     }
-  }, [timer.remaining, gameState])
+  }, [timer.remaining, gameState, selectedScenario, timer.penalty, completedSteps, addXP, addGold, onComplete])
 
   const startGame = useCallback((scenario: IncidentScenario) => {
     setSelectedScenario(scenario)

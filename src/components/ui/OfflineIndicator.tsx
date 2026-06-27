@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 
 export function OfflineIndicator() {
   const [, setIsOnline] = useState(navigator.onLine)
-  const [showOffline, setShowOffline] = useState(false)
+  const [showOffline, setShowOffline] = useState(!navigator.onLine)
 
   useEffect(() => {
     const handleOnline = () => {
@@ -17,11 +17,6 @@ export function OfflineIndicator() {
 
     window.addEventListener('online', handleOnline)
     window.addEventListener('offline', handleOffline)
-
-    // Check initial state
-    if (!navigator.onLine) {
-      setShowOffline(true)
-    }
 
     return () => {
       window.removeEventListener('online', handleOnline)
@@ -41,16 +36,13 @@ export function OfflineIndicator() {
 }
 
 export function InstallPrompt() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
   const [showPrompt, setShowPrompt] = useState(false)
-  const [isInstalled, setIsInstalled] = useState(false)
+  const [isInstalled] = useState(() => window.matchMedia('(display-mode: standalone)').matches)
 
   useEffect(() => {
-    // Check if already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      setIsInstalled(true)
-      return
-    }
+    if (isInstalled) return
 
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault()
@@ -63,7 +55,7 @@ export function InstallPrompt() {
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstall)
     }
-  }, [])
+  }, [isInstalled])
 
   const handleInstall = async () => {
     if (!deferredPrompt) return
@@ -72,7 +64,7 @@ export function InstallPrompt() {
     const { outcome } = await deferredPrompt.userChoice
 
     if (outcome === 'accepted') {
-      setIsInstalled(true)
+      setShowPrompt(false)
     }
     setShowPrompt(false)
     setDeferredPrompt(null)

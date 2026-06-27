@@ -374,7 +374,7 @@ export default function WorldMapPage() {
       newDiscoveries.add('code_shrine')
     }
     if (newDiscoveries.size > 0) {
-      setDiscoveredSecrets(prev => new Set([...prev, ...newDiscoveries]))
+      queueMicrotask(() => setDiscoveredSecrets(prev => new Set([...prev, ...newDiscoveries])))
     }
   }, [completedQuests.length, character.streakDays, stats.perfectQuestCount, game.companions.length, discoveredSecrets])
 

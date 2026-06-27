@@ -98,7 +98,7 @@ export default function BattleArenaPage() {
           const saved = localStorage.getItem('devopsquest_game')
           if (saved) {
             const freshGame = JSON.parse(saved)
-            const completedIds = new Set<string>(freshGame.completedQuests.map((q: any) => q.topicId))
+            const completedIds = new Set<string>(freshGame.completedQuests.map((q: { topicId: string }) => q.topicId))
             // Always exclude the just-completed quest to avoid showing it as "next"
             if (completedQuestId) {
               completedIds.add(completedQuestId)

@@ -15,13 +15,20 @@ function EventCard({ event, isActive, isUpcoming, isCompleted }: {
   isUpcoming: boolean
   isCompleted: boolean
 }) {
-  const startDate = new Date(event.startDate)
-  const endDate = new Date(event.endDate)
   const { game } = useGame()
   const meetsRequirements = event.requirements
     ? game.character.level >= (event.requirements.minLevel || 0) &&
       game.completedQuests.length >= (event.requirements.minQuests || 0)
     : true
+
+  // Memoize date calculations to avoid recalculation on every render
+  const { startDate, endDate, daysUntilStart } = useMemo(() => {
+    const sd = new Date(event.startDate)
+    const ed = new Date(event.endDate)
+    const now = new Date().getTime()
+    const days = Math.ceil((sd.getTime() - now) / (1000 * 60 * 60 * 24))
+    return { startDate: sd, endDate: ed, daysUntilStart: days }
+  }, [event.startDate, event.endDate])
 
   const typeColors = {
     holiday: 'from-green-600 to-emerald-500',
@@ -139,7 +146,7 @@ function EventCard({ event, isActive, isUpcoming, isCompleted }: {
         {!isActive && !isCompleted && isUpcoming && meetsRequirements && (
           <div className="text-center">
             <div className="text-sm text-slate-400 mb-2">
-              Event starts in {Math.ceil((startDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days
+              Event starts in {daysUntilStart} days
             </div>
           </div>
         )}

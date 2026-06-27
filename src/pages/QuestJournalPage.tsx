@@ -82,11 +82,12 @@ export default function QuestJournalPage() {
         case 'name':
           return a.title.localeCompare(b.title)
         case 'level':
-        default:
+        default: {
           // Sort by realm order then by order in realm
           const realmOrder = Object.keys(realms).indexOf(a.realmId) - Object.keys(realms).indexOf(b.realmId)
           if (realmOrder !== 0) return realmOrder
           return a.order - b.order
+        }
       }
     })
 

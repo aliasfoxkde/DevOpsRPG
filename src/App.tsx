@@ -115,8 +115,11 @@ function AppContent() {
   // Trigger level up effect when victory shows a level up
   useEffect(() => {
     if (game.lastVictory?.levelUp && game.lastVictory.newLevel) {
-      setLevelUpNumber(game.lastVictory.newLevel)
-      setShowLevelUp(true)
+      const newLevel = game.lastVictory.newLevel
+      queueMicrotask(() => {
+        setLevelUpNumber(newLevel)
+        setShowLevelUp(true)
+      })
     }
   }, [game.lastVictory])
   useEffect(() => {

@@ -29,7 +29,7 @@ export default function SocialPage() {
   // Send a gift to a friend
   const sendGift = (friend: Friend, gift: Gift) => {
     const sentGift: SentGift = {
-      id: `sent_${Date.now()}`,
+      id: `sent_${Date.now()}`, // eslint-disable-line react-hooks/purity
       friendId: friend.id,
       giftId: gift.id,
       sentAt: new Date().toISOString(),
@@ -54,9 +54,10 @@ export default function SocialPage() {
 
     const cooldownMs = gift.cooldownDays * 24 * 60 * 60 * 1000
     const nextAvailable = new Date(lastSent.sentAt).getTime() + cooldownMs
+    const now = Date.now() // eslint-disable-line react-hooks/purity
 
-    if (Date.now() < nextAvailable) {
-      const remaining = nextAvailable - Date.now()
+    if (now < nextAvailable) {
+      const remaining = nextAvailable - now
       const hours = Math.ceil(remaining / (60 * 60 * 1000))
       return hours
     }

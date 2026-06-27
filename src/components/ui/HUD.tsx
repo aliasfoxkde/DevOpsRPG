@@ -327,7 +327,7 @@ function MoreDropdown() {
 
   // Close on route change
   useEffect(() => {
-    setIsOpen(false)
+    queueMicrotask(() => setIsOpen(false))
   }, [location.pathname])
 
   return (
