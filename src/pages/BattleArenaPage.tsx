@@ -45,6 +45,8 @@ export default function BattleArenaPage() {
   const encounterTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Lock to prevent handleComplete being called multiple times
   const completionLockRef = useRef(false)
+  // Lock to prevent multiple navigations
+  const navigationLockRef = useRef(false)
 
   const quest = allQuests.find(q => q.id === questId)
   const nextQuest = quest ? getNextQuest() : null
@@ -85,7 +87,8 @@ export default function BattleArenaPage() {
 
   // Auto-navigate to next quest after completion
   useEffect(() => {
-    if (justCompleted) {
+    if (justCompleted && !navigationLockRef.current) {
+      navigationLockRef.current = true
       // Pass the completed quest ID so we can exclude it from next quest calculation
       // This avoids stale closure issues where completedQuests wasn't updated yet
       const completedQuestId = questId
@@ -112,8 +115,11 @@ export default function BattleArenaPage() {
         } catch {
           navigate('/quests')
         }
-      }, 2000) // Increased delay to ensure state is persisted
+      }, 2500) // Increased delay to ensure state is persisted
       return () => clearTimeout(timer)
+    } else {
+      // Reset navigation lock when not completing
+      navigationLockRef.current = false
     }
   }, [justCompleted, questId, getNextQuest, navigate])
 

@@ -9,7 +9,7 @@ export default function Navbar() {
         <Link to="/" className="text-xl font-bold text-primary" aria-label="DevOpsQuest Home">
           DevOpsQuest
         </Link>
-        <div className="flex gap-6" role="list">
+        <div className="flex gap-6 overflow-x-auto scrollbar-thin" role="list">
           <Link
             to="/"
             className="hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary rounded px-2 py-1"
