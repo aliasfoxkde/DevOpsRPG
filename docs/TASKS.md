@@ -1,7 +1,8 @@
-# Task List - DevOpsQuest
+# Task List - DevOpsRPG Comprehensive Enhancement
 
-**Version**: 1.0.0
-**Last Updated**: 2026-06-22
+**Version**: 2.0
+**Last Updated**: 2026-06-26
+**Status**: IN PROGRESS
 
 ---
 
@@ -15,303 +16,224 @@
 
 ---
 
-## Phase 1: Foundation
+## Phase 1: Critical Bug Fixes (Immediate)
 
-### 1.1 Project Setup
+### 1.1 Navigation Scrollbar Fix
+- [ ] Fix scrollbar-thin wrapper in Navbar.tsx
+- [ ] Test on all viewport sizes
+- [ ] Verify no horizontal scroll
 
-- [x] Create package.json with dependencies
-- [ ] Create tsconfig.json
-- [ ] Create next.config.js
-- [ ] Create tailwind.config.ts
-- [ ] Create postcss.config.js
-- [ ] Create .gitignore
-- [ ] Create src/app/layout.tsx
-- [ ] Create src/app/page.tsx
-- [ ] Create src/app/globals.css
-- [ ] Install dependencies
+### 1.2 Quest Auto-Navigation Bug
+- [x] Fix stale closure in BattleArenaPage.tsx - DONE (commit bfe9a12)
+- [x] Add navigationLockRef to prevent duplicates - DONE
+- [x] Increase delay to 2500ms - DONE
+- [ ] Validate with Playwright test
 
-**Estimated Time**: 2 hours
-**Dependencies**: None
-**Priority**: Critical
+### 1.3 Level Jumping Bug
+- [ ] Investigate XP calculation in GameContext
+- [ ] Verify quest completion updates correctly
+- [ ] Test level progression with Playwright
 
-### 1.2 Theming System
-
-- [ ] Create CSS variables for dark/light modes
-- [ ] Implement theme provider with system detection
-- [ ] Create useTheme hook
-- [ ] Create ThemeSwitcher component
-- [ ] Test dark/light/system modes
-
-**Estimated Time**: 3 hours
-**Dependencies**: 1.1
-**Priority**: Critical
-
-### 1.3 PWA Configuration
-
-- [ ] Create public/manifest.json
-- [ ] Create public/sw.js service worker
-- [ ] Add app icons (192x192, 512x512)
-- [ ] Create PWA provider component
-- [ ] Implement install prompt
-
-**Estimated Time**: 4 hours
-**Dependencies**: 1.1, 1.2
-**Priority**: High
-
-### 1.4 Documentation Structure
-
-- [x] Create docs/PLAN.md
-- [x] Create docs/RESEARCH.md
-- [x] Create docs/TASKS.md
-- [x] Create docs/PROGRESS.md
-- [ ] Create CLAUDE.md
-
-**Estimated Time**: 1 hour
-**Dependencies**: None
-**Priority**: High
+### 1.4 HTML Forms Repetition Bug
+- [ ] Check quest generation for duplicates
+- [ ] Verify w3schools-content has no repeats
+- [ ] Ensure quizzes generate correctly
 
 ---
 
-## Phase 2: Authentication
+## Phase 2: Navigation Overhaul
 
-### 2.1 Cloudflare Workers Setup
+### 2.1 HUD Redesign (Priority: HIGH)
+- [ ] Audit current 19 navigation items in HUD.tsx
+- [ ] Design 7-item primary navigation structure
+- [ ] Create "More" dropdown menu for secondary items
+- [ ] Update NAV_ITEMS array
+- [ ] Test responsive behavior
 
-- [ ] Create wrangler.toml
-- [ ] Create workers/api/index.ts
-- [ ] Create workers/api/auth.ts
-- [ ] Create workers/api/user.ts
-- [ ] Configure KV and D1 bindings
-- [ ] Test Workers locally
+### 2.2 Mobile Menu Improvement
+- [ ] Replace 3-column grid with 2-column
+- [ ] Increase touch target sizes (min 44px)
+- [ ] Add section dividers
+- [ ] Improve close behavior
 
-**Estimated Time**: 6 hours
-**Dependencies**: 1.1
-**Priority**: Critical
+### 2.3 Breadcrumb Navigation
+- [ ] Create Breadcrumb component
+- [ ] Add to Quest Journal, Battle Arena, Career Path pages
+- [ ] Style consistently with theme
 
-### 2.2 OAuth Integration
-
-- [ ] Set up Google OAuth app
-- [ ] Set up GitHub OAuth app
-- [ ] Implement OAuth callback handlers
-- [ ] Create session management
-- [ ] Implement logout
-
-**Estimated Time**: 8 hours
-**Dependencies**: 2.1
-**Priority**: Critical
-
-### 2.3 Database Schema
-
-- [ ] Create D1 migrations
-- [ ] Implement user model
-- [ ] Implement progress model
-- [ ] Implement achievements model
-- [ ] Seed technology data
-
-**Estimated Time**: 4 hours
-**Dependencies**: 2.1
-**Priority**: High
+### 2.4 Dead Code Removal
+- [ ] Remove unused Navbar.tsx (/src/components/layout/Navbar.tsx)
+- [ ] Audit Layout.tsx usage
+- [ ] Clean up unused imports across codebase
 
 ---
 
-## Phase 3: Core Learning UI
+## Phase 3: Visual Design Audit (Priority: HIGH)
 
-### 3.1 Base Components
+### 3.1 Typography Standardization
+- [ ] Audit all text sizes (text-xs, text-sm, text-base, text-lg, text-xl, etc.)
+- [ ] Create typography scale standard
+- [ ] Apply consistent sizing across components
+- [ ] Check and improve contrast ratios (WCAG AA)
 
-- [ ] Button component
-- [ ] Card component
-- [ ] Progress bar component
-- [ ] Avatar component
-- [ ] Badge component
-- [ ] Navigation sidebar
+### 3.2 Icon System Upgrade
+- [ ] Audit emoji usage across UI
+- [ ] Replace core navigation/action icons with SVG
+- [ ] Keep emoji for decorative elements only
+- [ ] Create reusable Icon component
 
-**Estimated Time**: 6 hours
-**Dependencies**: 1.2
-**Priority**: High
+### 3.3 Component Consistency
+- [ ] Standardize Card component (rounded-xl, border, padding)
+- [ ] Create Button variants (primary/secondary/ghost/danger)
+- [ ] Standardize form inputs (height, focus states, error states)
+- [ ] Document component patterns in code
 
-### 3.2 Technology Catalog
-
-- [ ] Create technologies data model
-- [ ] Build TechnologyCard component
-- [ ] Build CategorySection component
-- [ ] Create /learn page
-- [ ] Create /learn/[technology] page
-
-**Estimated Time**: 8 hours
-**Dependencies**: 3.1
-**Priority**: High
-
-### 3.3 Topic Viewer
-
-- [ ] Create TopicViewer component
-- [ ] Implement W3Schools iframe
-- [ ] Build topic navigation
-- [ ] Add progress indicator
-- [ ] Implement "Mark Complete" button
-
-**Estimated Time**: 6 hours
-**Dependencies**: 3.2
-**Priority**: High
-
-### 3.4 Dashboard
-
-- [ ] Create /dashboard page
-- [ ] Show user progress overview
-- [ ] Display XP and level
-- [ ] Show streak calendar
-- [ ] Display recent achievements
-
-**Estimated Time**: 4 hours
-**Dependencies**: 2.2, 3.1
-**Priority**: Medium
+### 3.4 Animation Refinement
+- [ ] Audit all animations (confetti, bounces, pulses)
+- [ ] Remove distracting/bouncing effects
+- [ ] Standardize transition durations (200-300ms)
+- [ ] Keep confetti for significant achievements only (badges, milestones)
 
 ---
 
-## Phase 4: Gamification
+## Phase 4: Career Path Completion (Priority: MEDIUM)
 
-### 4.1 XP System
+### 4.1 Add Missing Career Paths
+- [ ] IT Support Track: Helpdesk → Desktop Support → Field Technician → Systems Administrator
+- [ ] Development Track: Junior Developer → Software Engineer → Senior Engineer → Tech Lead
+- [ ] Security Track: Security Analyst → Security Engineer → Cloud Security Architect
+- [ ] Management Track: Team Lead → Manager → Director → VP → CTO
 
-- [ ] Create XP context provider
-- [ ] Implement XP calculation
-- [ ] Add XP animation components
-- [ ] Create XP toast notifications
-- [ ] Implement level-up celebration
+### 4.2 Implement Technology Completion Function
+- [ ] Fix getTechnologyCompletion() stub in careerPaths.ts (currently returns 0)
+- [ ] Calculate completion percentage from actual completed quests
+- [ ] Update career progress UI to show real data
 
-**Estimated Time**: 6 hours
-**Dependencies**: 3.1
-**Priority**: High
+### 4.3 Link Quests to Career Technologies
+- [ ] Add questIds to each technology in career paths
+- [ ] Calculate career progress from quest completion
+- [ ] Show career recommendations based on progress
 
-### 4.2 Achievement System
-
-- [ ] Create achievements data model
-- [ ] Build AchievementCard component
-- [ ] Implement achievement checking
-- [ ] Create achievement unlock animation
-- [ ] Add achievement toast notifications
-
-**Estimated Time**: 6 hours
-**Dependencies**: 4.1
-**Priority**: High
-
-### 4.3 Streak System
-
-- [ ] Implement streak tracking
-- [ ] Create streak display component
-- [ ] Add streak fire animation
-- [ ] Implement daily bonus calculation
-- [ ] Add streak recovery (1 day grace)
-
-**Estimated Time**: 4 hours
-**Dependencies**: 4.1
-**Priority**: High
-
-### 4.4 Theme Selection
-
-- [ ] Create theme cards
-- [ ] Implement theme switching
-- [ ] Add theme preview
-- [ ] Save theme preference
-
-**Estimated Time**: 3 hours
-**Dependencies**: 3.1
-**Priority**: Medium
+### 4.4 Career Transition System
+- [ ] Design prestige-like career transition mechanic
+- [ ] Create permanent bonus system ("+5% Linux XP Forever")
+- [ ] Add skill token as special currency
+- [ ] Design career transition UI and flow
 
 ---
 
-## Phase 5: Polish & PWA
+## Phase 5: Skill System Enhancement (Priority: MEDIUM)
 
-### 5.1 Service Worker
+### 5.1 Per-Skill XP Tracking
+- [ ] Add skillXp tracking to GameState interface
+- [ ] Create skill XP calculation on quest completion
+- [ ] Award skill XP when completing related technology quests
+- [ ] Display skill levels with XP progress bars
 
-- [ ] Register service worker
-- [ ] Implement offline caching
-- [ ] Cache API responses
-- [ ] Implement background sync
-- [ ] Add offline fallback page
+### 5.2 Skill Effects Implementation
+- [ ] Implement skill-based XP bonuses (e.g., Linux Level 10+ = +5% XP)
+- [ ] Add skill unlock requirements for advanced quests
+- [ ] Create skill synergy bonuses (e.g., Linux + AWS for cloud infra)
+- [ ] Balance skill progression curve
 
-**Estimated Time**: 6 hours
-**Dependencies**: 1.3
-**Priority**: High
+### 5.3 Visual Skill Trees
+- [ ] Redesign SkillsPage with interactive skill trees
+- [ ] Show skill unlock requirements and dependencies
+- [ ] Add recommended skill paths
+- [ ] Display active skill bonuses
 
-### 5.2 Install Prompt
+---
 
-- [ ] Detect install eligibility
-- [ ] Show install banner
-- [ ] Implement install handler
-- [ ] Track installation events
+## Phase 6: Equipment System (Priority: LOW - Phase 3)
 
-**Estimated Time**: 2 hours
-**Dependencies**: 1.3
-**Priority**: Medium
+### 6.1 Equipment Data Model
+- [ ] Create equipment types (Workstation, Accessories, Cosmetic, Special)
+- [ ] Define 4-6 equipment slots
+- [ ] Add rarity tiers (Common, Uncommon, Rare, Epic, Legendary)
+- [ ] Design equipment bonus types
 
-### 5.3 Performance
+### 6.2 Equipment Store Integration
+- [ ] Add equipment items to store
+- [ ] Implement purchase flow with gold
+- [ ] Balance gold costs
+- [ ] Add equipment preview before purchase
 
-- [ ] Optimize images
-- [ ] Implement code splitting
-- [ ] Add loading skeletons
+### 6.3 Equipment Slots UI
+- [ ] Add equipment slots to Character page
+- [ ] Create equip/unequip interactions
+- [ ] Show active bonuses from equipment
+- [ ] Visual equipment display (icons)
+
+### 6.4 Equipment Gameplay Effects
+- [ ] Implement XP bonuses from equipment
+- [ ] Apply gold bonuses
+- [ ] Add quiz score modifiers
+- [ ] Connect equipment to skill system
+
+---
+
+## Phase 7: Polish & Testing (Ongoing)
+
+### 7.1 Playwright E2E Testing
+- [ ] Quest flow test (start → complete → next)
+- [ ] Navigation test (all routes accessible)
+- [ ] Career path progression test
+- [ ] Skill system test
+- [ ] Equipment flow test
+- [ ] Victory modal test
+
+### 7.2 Visual Regression Testing
+- [ ] Set up visual testing framework
+- [ ] Capture baseline screenshots
+- [ ] Compare after CSS/theme changes
+
+### 7.3 Performance Optimization
+- [ ] Lazy load non-critical pages
 - [ ] Optimize bundle size
-- [ ] Lighthouse audit
+- [ ] Check render performance with React DevTools
 
-**Estimated Time**: 4 hours
-**Dependencies**: All prior
-**Priority**: Medium
-
----
-
-## Phase 6: Testing & Deployment
-
-### 6.1 Unit Tests
-
-- [ ] Set up Vitest configuration
-- [ ] Write tests for utils
-- [ ] Write tests for hooks
-- [ ] Write tests for components
-- [ ] Achieve 80% coverage
-
-**Estimated Time**: 10 hours
-**Dependencies**: All prior
-**Priority**: Critical
-
-### 6.2 E2E Tests
-
-- [ ] Set up Playwright
-- [ ] Write auth flow tests
-- [ ] Write learning flow tests
-- [ ] Write gamification tests
-- [ ] Run on CI
-
-**Estimated Time**: 8 hours
-**Dependencies**: 6.1
-**Priority**: High
-
-### 6.3 CI/CD Pipeline
-
-- [ ] Create GitHub Actions workflow
-- [ ] Add lint step
-- [ ] Add test step
-- [ ] Add build step
-- [ ] Add deploy step
-
-**Estimated Time**: 4 hours
-**Dependencies**: 6.1
-**Priority**: High
-
-### 6.4 Production Deployment
-
-- [ ] Configure Cloudflare Pages
-- [ ] Set up environment variables
-- [ ] Deploy to production
-- [ ] Verify in production
-- [ ] Create deployment runbook
-
-**Estimated Time**: 4 hours
-**Dependencies**: 6.3
-**Priority**: Critical
+### 7.4 Accessibility Audit
+- [ ] ARIA labels on all interactive elements
+- [ ] Keyboard navigation support
+- [ ] Focus indicators
+- [ ] Screen reader testing
 
 ---
 
 ## Progress Summary
 
-- **Total Tasks**: 68
-- **Completed**: 6
-- **In Progress**: 0
-- **Pending**: 62
-- **Completion**: 9%
+| Phase | Tasks | Completed | In Progress | Pending |
+|-------|-------|-----------|-------------|---------|
+| Phase 1 | 4 | 3 | 0 | 1 |
+| Phase 2 | 4 | 0 | 0 | 4 |
+| Phase 3 | 4 | 0 | 0 | 4 |
+| Phase 4 | 4 | 0 | 0 | 4 |
+| Phase 5 | 3 | 0 | 0 | 3 |
+| Phase 6 | 4 | 0 | 0 | 4 |
+| Phase 7 | 4 | 0 | 0 | 4 |
+| **Total** | **27** | **3** | **0** | **24** |
+
+**Completion**: 11%
+
+---
+
+## Dependencies
+
+- Phase 1 (Bug Fixes) → No dependencies
+- Phase 2 (Navigation) → Phase 1
+- Phase 3 (Visual Design) → Phase 2
+- Phase 4 (Career Paths) → Phase 1
+- Phase 5 (Skills) → Phase 4
+- Phase 6 (Equipment) → Phase 5
+- Phase 7 (Polish) → All phases
+
+---
+
+## References
+
+- BRAINSTORM.md - Core design philosophy
+- docs/COMPREHENSIVE_ENHANCEMENT_PLAN.md - Full plan
+- src/components/ui/HUD.tsx - Current navigation (19 items)
+- src/data/careerPaths.ts - Career path data
+- src/data/skills.ts - Skills system
+- src/contexts/GameContext.tsx - Game state management

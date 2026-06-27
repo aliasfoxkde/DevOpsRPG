@@ -1,86 +1,131 @@
-# Project Progress - DevOpsQuest
+# Project Progress - DevOpsRPG
 
-**Last Updated**: 2026-06-23
-**Current Phase**: Phase 1: Foundation
-**Overall Progress**: 15%
+**Last Updated**: 2026-06-26
+**Current Phase**: Comprehensive Enhancement Planning
+**Overall Progress**: 20%
 
 ---
 
 ## Progress Summary
 
-| Phase | Status | Progress | Start Date | Target Date |
-|-------|--------|----------|------------|-------------|
-| Phase 1: Foundation | ~ In Progress | 15% | 2026-06-22 | 2026-07-06 |
-| Phase 2: Authentication | - Pending | 0% | 2026-07-07 | 2026-07-20 |
-| Phase 3: Core Learning UI | - Pending | 0% | 2026-07-21 | 2026-08-03 |
-| Phase 4: Gamification | - Pending | 0% | 2026-08-04 | 2026-08-10 |
-| Phase 5: Polish & PWA | - Pending | 0% | 2026-08-11 | 2026-08-17 |
-| Phase 6: Testing | - Pending | 0% | 2026-08-18 | 2026-08-31 |
+| Phase | Status | Progress | Notes |
+|-------|--------|----------|-------|
+| Phase 1: Critical Bug Fixes | ~ In Progress | 75% | Quest nav fixed, level jumping investigation pending |
+| Phase 2: Navigation Overhaul | - Pending | 0% | Planned for Week 1 |
+| Phase 3: Visual Design Audit | - Pending | 0% | Planned for Week 1-2 |
+| Phase 4: Career Path Completion | - Pending | 0% | Planned for Week 2-3 |
+| Phase 5: Skill System Enhancement | - Pending | 0% | Planned for Week 3-4 |
+| Phase 6: Equipment System | - Pending | 0% | Planned for Week 4-5 |
+| Phase 7: Polish & Testing | - Pending | 0% | Planned for Week 5-6 |
 
 ---
 
 ## Current Sprint
 
-**Sprint**: 1
-**Dates**: 2026-06-22 - 2026-07-06
-**Focus**: Foundation - project setup, theming, PWA
+**Sprint**: Comprehensive Enhancement
+**Dates**: 2026-06-26 - Ongoing
+**Focus**: Fix critical bugs, then implement Phase 2-7 enhancements
 
 ### Sprint Goals
 
-1. Complete Next.js 14 scaffold with TypeScript and Tailwind
-2. Implement dark/light/system theme modes
-3. Set up PWA configuration
-4. Create core layout components
+1. ✅ Fix quest auto-navigation stale closure bug
+2. ✅ Add career paths (AI Engineer, Software Engineer, AI Architect)
+3. [ ] Investigate level jumping bug
+4. [ ] Investigate HTML Forms repetition bug
+5. [ ] Navigation overhaul (reduce HUD items)
+6. [ ] Visual design audit
 
 ### Sprint Backlog
 
-| Task | Status | Assignee | Estimated | Actual |
-|------|--------|----------|-----------|--------|
-| Project Setup (package.json) | x Done | AI | 30m | 15m |
-| Project Setup (configs) | ~ In Progress | AI | 1h | - |
-| Theming System | - Pending | AI | 3h | - |
-| PWA Configuration | - Pending | AI | 4h | - |
-| Documentation | x Done | AI | 1h | 30m |
+| Task | Status | Notes |
+|------|--------|-------|
+| Quest auto-navigation fix | ✅ Done | commit bfe9a12 |
+| Add career paths | ✅ Done | 3 new paths added |
+| Navigation scrollbar fix | [ ] Pending | Fix overflow-x |
+| Level jumping investigation | [ ] Pending | - |
+| HTML Forms repetition | [ ] Pending | - |
+| HUD redesign (7 items) | [ ] Pending | - |
 
 ---
 
 ## Recent Activity
 
-### Completed (2026-06-22)
+### Completed (2026-06-26)
 
-- Created package.json with all dependencies
-- Created RESEARCH.md with problem analysis
-- Created PLAN.md with full architecture
-- Created TASKS.md with task breakdown
-- Created PROGRESS.md with tracking
+- Fixed quest auto-navigation stale closure bug (BattleArenaPage.tsx)
+- Added navigationLockRef to prevent duplicate navigations
+- Added 3 new career paths (AI Engineer, Software Engineer, AI Architect)
+- Created comprehensive enhancement plan (COMPREHENSIVE_ENHANCEMENT_PLAN.md)
+- Updated RESEARCH.md with codebase analysis
+- Updated TASKS.md with 27-task breakdown
+- Commits pushed to main: f7593a2, bfe9a12
 
 ### In Progress
 
-- Creating configuration files (tsconfig, tailwind, postcss, next.config)
+- Planning comprehensive enhancement based on BRAINSTORM.md
+- Investigating remaining bugs (level jumping, HTML Forms repetition)
+
+---
+
+## Bug Fixes Log
+
+### 2026-06-26: Quest Auto-Navigation Stale Closure
+**Commit**: bfe9a12
+**Issue**: Level jumping 16→17→18 without completing quests
+**Fix**:
+- Added navigationLockRef to prevent duplicate navigations
+- Replaced stale getNextQuest() with fresh localStorage read
+- Increased delay to 2500ms
+
+### 2026-06-26: Career Path Additions
+**Commit**: f7593a2
+**Issue**: Missing career paths per BRAINSTORM.md
+**Fix**:
+- Added AI Engineer career path
+- Added Software Engineer career path
+- Added AI Architect career path
+
+---
+
+## Code Quality
+
+### Build Status
+- **Lint**: 0 errors
+- **TypeScript**: 0 errors
+- **Build**: Passing (vite build)
+- **Tests**: 5/6 Playwright quest-flow tests passing
+
+### Test Coverage (Legacy)
+- **Statements**: 97.16% (206/212) ✅
+- **Branches**: 97.64% (83/85) ✅
+- **Functions**: 96% (72/75) ✅
+- **Lines**: 97.44% (191/196) ✅
 
 ---
 
 ## Metrics
 
-### Code Quality
-
-- **Test Coverage**: ALL METRICS ≥95%
-  - Statements: 97.16% (206/212) ✅
-  - Branches: 97.64% (83/85) ✅
-  - Functions: 96% (72/75) ✅
-  - Lines: 97.44% (191/196) ✅
-- **Linting Issues**: 0
-- **Build Status**: Passing
-- **Tests**: 146 passing across 18 test files
-
 ### Development Velocity
 
-- **Tasks Completed (Day 1)**: 5
-- **Tasks Completed (Sprint)**: 5/25
-- **Estimated Sprint Completion**: 60%
+| Day | Tasks Completed | Notes |
+|-----|-----------------|-------|
+| 2026-06-26 | 5 | Bug fixes, career paths, planning |
+
+### Overall Completion
+
+| Metric | Value | Target |
+|--------|-------|--------|
+| Critical Bugs Fixed | 1/4 | 4/4 |
+| Navigation Items Reduced | 0/12 | 19→7 |
+| Career Paths Implemented | 7/11 | Per BRAINSTORM |
+| Skill System Enhanced | No | Yes |
+| Equipment System | No | Yes |
 
 ---
 
-## Notes
+## References
 
-2026-06-22: Started greenfield DevOpsQuest project. Created comprehensive documentation structure and package.json. Encountered TaskWizer scaffolding enforcement hook which required creating documentation before code. Using Next.js 14 + TypeScript + Tailwind + Cloudflare Workers stack.
+- BRAINSTORM.md - Core design philosophy
+- COMPREHENSIVE_ENHANCEMENT_PLAN.md - Full enhancement plan
+- TASKS.md - Task breakdown (27 tasks)
+- RESEARCH.md - Codebase analysis
