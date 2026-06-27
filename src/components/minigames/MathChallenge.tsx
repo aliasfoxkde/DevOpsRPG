@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { mathChallenges, type MathChallenge } from '../../data/minigames'
-import { shuffleArray } from '../../utils/gameUtils'
+import { shuffleArray, GAME_DURATION } from '../../utils/gameUtils'
 
 interface MathChallengeGameProps {
   rounds?: number
@@ -12,7 +12,7 @@ export function MathChallengeGame({ rounds = 5, onComplete, onSkip }: MathChalle
   const [gameProblems] = useState<MathChallenge[]>(() => shuffleArray(mathChallenges).slice(0, rounds))
   const [currentIndex, setCurrentIndex] = useState(0)
   const [input, setInput] = useState('')
-  const [timeLeft, setTimeLeft] = useState(45)
+  const [timeLeft, setTimeLeft] = useState<number>(GAME_DURATION.MATH_CHALLENGE)
   const [score, setScore] = useState(0)
   const [correctCount, setCorrectCount] = useState(0)
   const [wrongCount, setWrongCount] = useState(0)

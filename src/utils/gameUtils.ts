@@ -77,3 +77,22 @@ export function xpForNextLevel(currentXP: number): number {
   if (currentLevel >= XP_THRESHOLDS.length) return Infinity
   return XP_THRESHOLDS[currentLevel] - currentXP
 }
+
+// Animation and transition timings (ms)
+export const ANIMATION = {
+  FAST: 150,
+  NORMAL: 300,
+  SLOW: 500,
+  TYPING_INDICATOR: 800,
+  MODAL_DELAY: 1500,
+  LEVEL_UP_DELAY: 2000,
+  TOAST_DURATION: 3000,
+} as const
+
+// Mini-game durations (seconds)
+export const GAME_DURATION = {
+  COMMAND_TYPER: 30,
+  MATH_CHALLENGE: 45,
+  QUIZ_DASH: 60,
+  INCIDENT_SIMULATOR_BASE: 300,
+} as const

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { getRandomCommands, type Command } from '../../data/minigames'
+import { GAME_DURATION } from '../../utils/gameUtils'
 
 interface CommandTyperProps {
   category?: Command['category']
@@ -12,7 +13,7 @@ export function CommandTyper({ category, rounds = 5, onComplete, onSkip }: Comma
   const [gameCommands] = useState<Command[]>(() => getRandomCommands(rounds, category))
   const [currentIndex, setCurrentIndex] = useState(0)
   const [input, setInput] = useState('')
-  const [timeLeft, setTimeLeft] = useState(30)
+  const [timeLeft, setTimeLeft] = useState<number>(GAME_DURATION.COMMAND_TYPER)
   const [score, setScore] = useState(0)
   const [correctCount, setCorrectCount] = useState(0)
   const [wrongCount, setWrongCount] = useState(0)
