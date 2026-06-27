@@ -97,6 +97,8 @@ export interface Character {
   equippedFrame: string // Currently equipped frame ID
   unlockedTitles: string[] // List of unlocked title IDs
   unlockedFrames: string[] // List of unlocked frame IDs
+  // Equipment slots
+  equippedItems: string[] // List of equipped equipment item IDs
 }
 
 export interface TopicProgress {
@@ -265,6 +267,11 @@ interface GameContextType {
   checkAndUnlockTitlesFrames: () => { unlockedTitles: string[], unlockedFrames: string[] }
   equipTitle: (titleId: string) => boolean
   equipFrame: (frameId: string) => boolean
+  // Equipment
+  equipItem: (itemId: string) => boolean
+  unequipItem: (itemId: string) => boolean
+  getEquippedItems: () => string[]
+  getEquipmentBonuses: () => { xpBonus: number; goldBonus: number; techBonuses: Record<string, number> }
 }
 
 const STORAGE_KEY = 'devopsquest_game'
@@ -330,6 +337,7 @@ function createDefaultCharacter(): Character {
     equippedFrame: 'default',
     unlockedTitles: ['novice-devops'],
     unlockedFrames: ['default'],
+    equippedItems: [],
   }
 }
 
@@ -1782,6 +1790,50 @@ export function GameProvider({ children }: { children: ReactNode }) {
     return true
   }, [game.character.unlockedFrames])
 
+  // Equipment management
+  const equipItem = useCallback((itemId: string): boolean => {
+    setGame(prev => {
+      const equipped = prev.character.equippedItems
+      if (equipped.includes(itemId)) return prev // Already equipped
+      return {
+        ...prev,
+        character: {
+          ...prev.character,
+          equippedItems: [...equipped, itemId],
+        },
+      }
+    })
+    return true
+  }, [])
+
+  const unequipItem = useCallback((itemId: string): boolean => {
+    setGame(prev => {
+      const equipped = prev.character.equippedItems
+      if (!equipped.includes(itemId)) return prev // Not equipped
+      return {
+        ...prev,
+        character: {
+          ...prev.character,
+          equippedItems: equipped.filter(id => id !== itemId),
+        },
+      }
+    })
+    return true
+  }, [])
+
+  const getEquippedItems = useCallback((): string[] => {
+    return game.character.equippedItems
+  }, [game.character.equippedItems])
+
+  const getEquipmentBonuses = useCallback(() => {
+    // Import equipment data
+    const { getEquipmentById, calculateEquipmentBonuses } = require('../data/equipment')
+    const equipped = game.character.equippedItems
+      .map((id: string) => getEquipmentById(id))
+      .filter(Boolean)
+    return calculateEquipmentBonuses(equipped)
+  }, [game.character.equippedItems])
+
   return (
     <GameContext.Provider
       value={{
@@ -1853,6 +1905,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
         checkAndUnlockTitlesFrames,
         equipTitle,
         equipFrame,
+        // Equipment
+        equipItem,
+        unequipItem,
+        getEquippedItems,
+        getEquipmentBonuses,
       }}
     >
       {children}

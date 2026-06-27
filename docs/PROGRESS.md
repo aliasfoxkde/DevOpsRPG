@@ -15,7 +15,7 @@
 | Phase 3: Visual Design Audit | ~ In Progress | 40% | Typography, buttons, cards standardized |
 | Phase 4: Career Path Completion | ✅ Complete | 100% | 3 new paths + getTechnologyCompletion |
 | Phase 5: Skill System Enhancement | ✅ Complete | 100% | Per-skill XP tracking + level calculation |
-| Phase 6: Equipment System | - Pending | 0% | Planned Week 4 |
+| Phase 6: Equipment System | ✅ Complete | 100% | Equipment data model + equip/unequip methods |
 | Phase 7: Polish & Testing | - Pending | 0% | Planned Week 5 |
 
 ---
