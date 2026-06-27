@@ -4,7 +4,7 @@ import { XPBar } from '../components/ui/XPBar'
 import { EQUIPMENT_ITEMS, RARITY_COLORS, type EquipmentItem } from '../data/equipment'
 
 export default function CharacterSheetPage() {
-  const { game, completedCount, totalQuests, getEquipmentBonuses } = useGame()
+  const { game, completedCount, totalQuests, getEquipmentBonuses, unequipItem } = useGame()
   const { character, companions, activeCompanion } = game
   const { achievements } = game
 
@@ -157,9 +157,16 @@ export default function CharacterSheetPage() {
                     {items.map(item => (
                       <div
                         key={item.id}
-                        className="p-3 rounded-lg border"
+                        className="p-3 rounded-lg border relative group"
                         style={{ borderColor: RARITY_COLORS[item.rarity], backgroundColor: `${RARITY_COLORS[item.rarity]}15` }}
                       >
+                        <button
+                          onClick={() => unequipItem(item.id)}
+                          className="absolute top-1 right-1 w-5 h-5 bg-red-600/80 hover:bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                          title="Unequip"
+                        >
+                          ×
+                        </button>
                         <div className="flex items-center gap-2">
                           <span className="text-2xl">{item.icon}</span>
                           <div>
@@ -168,6 +175,18 @@ export default function CharacterSheetPage() {
                           </div>
                         </div>
                         <p className="text-xs text-slate-400 mt-1">{item.description}</p>
+                        {/* Show bonuses */}
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {item.bonuses.xpBonus && (
+                            <span className="text-xs px-1 py-0.5 bg-blue-900/50 text-blue-300 rounded">+{Math.round(item.bonuses.xpBonus * 100)}% XP</span>
+                          )}
+                          {item.bonuses.goldBonus && (
+                            <span className="text-xs px-1 py-0.5 bg-yellow-900/50 text-yellow-300 rounded">+{Math.round(item.bonuses.goldBonus * 100)}% Gold</span>
+                          )}
+                          {item.techBonus && (
+                            <span className="text-xs px-1 py-0.5 bg-purple-900/50 text-purple-300 rounded">+{Math.round(item.techBonus.bonus * 100)}% {item.techBonus.technologyId.toUpperCase()}</span>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>

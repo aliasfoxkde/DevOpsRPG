@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useGame } from '../contexts/GameContext'
+import { EQUIPMENT_ITEMS, type EquipmentItem } from '../data/equipment'
 
 // Shop item definition
 interface ShopItem {
@@ -9,11 +10,29 @@ interface ShopItem {
   description: string
   icon: string
   price: number
-  category: 'powerup' | 'utility' | 'cosmetics' | 'companion'
-  rarity?: 'common' | 'rare' | 'epic' | 'legendary'
+  category: 'powerup' | 'utility' | 'cosmetics' | 'companion' | 'equipment'
+  rarity?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
   effect?: string
   maxPurchases?: number
+  // For equipment items
+  equipmentData?: EquipmentItem
 }
+
+// Convert equipment items to shop items
+const EQUIPMENT_SHOP_ITEMS: ShopItem[] = EQUIPMENT_ITEMS.map(item => ({
+  id: `buy_equipment_${item.id}`,
+  name: item.name,
+  description: item.description,
+  icon: item.icon,
+  price: item.price,
+  category: 'equipment' as const,
+  rarity: item.rarity,
+  effect: item.bonuses.xpBonus ? `+${Math.round(item.bonuses.xpBonus * 100)}% XP` :
+          item.bonuses.goldBonus ? `+${Math.round(item.bonuses.goldBonus * 100)}% Gold` :
+          item.techBonus ? `+${Math.round(item.techBonus.bonus * 100)}% ${item.techBonus.technologyId.toUpperCase()} XP` :
+          item.bonuses.quizScoreBonus ? `+${Math.round(item.bonuses.quizScoreBonus * 100)}% Quiz Score` : 'Special',
+  equipmentData: item,
+}))
 
 // Available shop items
 const SHOP_ITEMS: ShopItem[] = [
@@ -71,21 +90,46 @@ const CATEGORIES = [
   { id: 'utility', name: 'Utilities', icon: '🔧' },
   { id: 'cosmetics', name: 'Cosmetics', icon: '👕' },
   { id: 'companion', name: 'Companions', icon: '🐾' },
+  { id: 'equipment', name: 'Equipment', icon: '⚙️' },
 ]
 
 export default function StorePage() {
-  const { game, purchaseItem, equipCompanion } = useGame()
+  const { game, purchaseItem, equipItem, equipCompanion } = useGame()
   const { character, activeCompanion } = game
   const [category, setCategory] = useState('all')
   const [purchaseMessage, setPurchaseMessage] = useState<string | null>(null)
 
-  const filteredItems = category === 'all'
-    ? SHOP_ITEMS
-    : SHOP_ITEMS.filter(item => item.category === category)
+  // Get all items including equipment
+  const getAllItems = (): ShopItem[] => {
+    if (category === 'equipment') {
+      return EQUIPMENT_SHOP_ITEMS
+    }
+    if (category === 'all') {
+      return [...SHOP_ITEMS, ...EQUIPMENT_SHOP_ITEMS]
+    }
+    return SHOP_ITEMS.filter(item => item.category === category)
+  }
+
+  const filteredItems = getAllItems()
 
   const handlePurchase = (item: ShopItem) => {
     if (character.gold < item.price) {
       setPurchaseMessage(`Not enough gold! Need ${item.price} gold.`)
+      return
+    }
+
+    // Handle equipment purchase
+    if (item.category === 'equipment' && item.equipmentData) {
+      // Check if already owned
+      if (character.equippedItems.includes(item.equipmentData.id)) {
+        setPurchaseMessage(`You already own ${item.name}!`)
+        return
+      }
+      // Deduct gold and equip
+      purchaseItem(item.id, item.price)
+      equipItem(item.equipmentData.id)
+      setPurchaseMessage(`Purchased and equipped ${item.name}!`)
+      setTimeout(() => setPurchaseMessage(null), 3000)
       return
     }
 
@@ -96,23 +140,25 @@ export default function StorePage() {
     }
   }
 
-  const getRarityColor = (rarity?: string) => {
-    switch (rarity) {
-      case 'common': return 'text-slate-400 border-slate-600'
-      case 'rare': return 'text-blue-400 border-blue-600'
-      case 'epic': return 'text-purple-400 border-purple-600'
-      case 'legendary': return 'text-amber-400 border-amber-600'
-      default: return 'text-slate-400 border-slate-600'
-    }
-  }
-
   const getRarityBg = (rarity?: string) => {
     switch (rarity) {
       case 'common': return 'from-slate-700 to-slate-800'
+      case 'uncommon': return 'from-green-900/50 to-slate-800'
       case 'rare': return 'from-blue-900/50 to-slate-800'
       case 'epic': return 'from-purple-900/50 to-slate-800'
       case 'legendary': return 'from-amber-900/50 to-slate-800'
       default: return 'from-slate-700 to-slate-800'
+    }
+  }
+
+  const getRarityBorder = (rarity?: string) => {
+    switch (rarity) {
+      case 'common': return 'border-slate-500'
+      case 'uncommon': return 'border-green-600'
+      case 'rare': return 'border-blue-600'
+      case 'epic': return 'border-purple-600'
+      case 'legendary': return 'border-amber-600'
+      default: return 'border-slate-600'
     }
   }
 
@@ -199,13 +245,16 @@ export default function StorePage() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filteredItems.map((item) => {
             const canAfford = character.gold >= item.price
-            const rarityClass = getRarityColor(item.rarity)
             const bgClass = getRarityBg(item.rarity)
+            const borderClass = getRarityBorder(item.rarity)
+            const isEquipment = item.category === 'equipment'
+            const isOwned = isEquipment && character.equippedItems.includes(item.equipmentData?.id || '')
+            const isAlreadyPurchased = item.category === 'companion' && game.companions.some(c => c.id === `buy_companion_${item.id.replace('buy_companion_', '')}`)
 
             return (
               <div
                 key={item.id}
-                className={`bg-gradient-to-br ${bgClass} rounded-xl border ${rarityClass} overflow-hidden transition-all hover:scale-105`}
+                className={`bg-gradient-to-br ${bgClass} rounded-xl border ${borderClass} overflow-hidden transition-all hover:scale-105 ${isOwned || isAlreadyPurchased ? 'opacity-60' : ''}`}
               >
                 {/* Header */}
                 <div className="p-4 text-center border-b border-slate-700/50">
@@ -216,9 +265,15 @@ export default function StorePage() {
                       item.rarity === 'legendary' ? 'bg-amber-600/30 text-amber-400' :
                       item.rarity === 'epic' ? 'bg-purple-600/30 text-purple-400' :
                       item.rarity === 'rare' ? 'bg-blue-600/30 text-blue-400' :
+                      item.rarity === 'uncommon' ? 'bg-green-600/30 text-green-400' :
                       'bg-slate-600/30 text-slate-400'
                     }`}>
                       {item.rarity.toUpperCase()}
+                    </span>
+                  )}
+                  {isEquipment && (
+                    <span className="text-xs px-2 py-0.5 rounded mt-1 ml-1 inline-block bg-slate-600/30 text-slate-300">
+                      {item.equipmentData?.slot.toUpperCase()}
                     </span>
                   )}
                 </div>
@@ -236,13 +291,29 @@ export default function StorePage() {
                   {/* Price & Buy */}
                   <div className="flex items-center justify-between">
                     <span className="text-yellow-400 font-bold">💰 {item.price}</span>
-                    {item.category === 'companion' ? (
+                    {isOwned ? (
+                      <span className="px-3 py-1 bg-green-600/30 text-green-400 text-sm rounded">Owned</span>
+                    ) : isAlreadyPurchased ? (
+                      <span className="px-3 py-1 bg-green-600/30 text-green-400 text-sm rounded">Purchased</span>
+                    ) : item.category === 'companion' ? (
                       <button
                         onClick={() => handlePurchase(item)}
                         disabled={!canAfford}
                         className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
                           canAfford
                             ? 'bg-purple-600 hover:bg-purple-500 text-white'
+                            : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                        }`}
+                      >
+                        {canAfford ? 'Buy & Equip' : 'Need Gold'}
+                      </button>
+                    ) : isEquipment ? (
+                      <button
+                        onClick={() => handlePurchase(item)}
+                        disabled={!canAfford}
+                        className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                          canAfford
+                            ? 'bg-amber-600 hover:bg-amber-500 text-white'
                             : 'bg-slate-700 text-slate-500 cursor-not-allowed'
                         }`}
                       >

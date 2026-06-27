@@ -128,19 +128,21 @@ export function HUD() {
             {/* Theme Toggle */}
             <button
               onClick={cycleTheme}
-              className="flex items-center gap-1 p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
+              className="flex items-center gap-1 p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500"
               title={`Theme: ${themeLabels[theme]} (${resolvedTheme}) - Click to change`}
+              aria-label={`Current theme: ${themeLabels[theme]}. Click to change.`}
             >
-              <span className="text-lg">{themeIcons[theme]}</span>
+              <span className="text-lg" aria-hidden="true">{themeIcons[theme]}</span>
             </button>
 
             {/* Sound Toggle */}
             <button
               onClick={toggleMute}
-              className="flex items-center gap-1 p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
+              className="flex items-center gap-1 p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500"
               title={isMuted ? 'Sound: OFF - Click to enable' : 'Sound: ON - Click to mute'}
+              aria-label={isMuted ? 'Sound is muted. Click to enable sound.' : 'Sound is enabled. Click to mute.'}
             >
-              <span className="text-lg">{isMuted ? '🔇' : '🔊'}</span>
+              <span className="text-lg" aria-hidden="true">{isMuted ? '🔇' : '🔊'}</span>
             </button>
 
             {/* Avatar - Desktop */}
@@ -184,20 +186,21 @@ export function HUD() {
           </div>
 
           {/* Primary Nav Links */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1" aria-label="Primary navigation">
             {PRIMARY_NAV.map((item) => {
               const isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to))
               return (
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`px-3 py-1.5 text-sm rounded-lg whitespace-nowrap transition-all ${
+                  className={`px-3 py-1.5 text-sm rounded-lg whitespace-nowrap transition-all focus:outline-none focus:ring-2 focus:ring-amber-500 ${
                     isActive
                       ? 'bg-amber-600 text-white font-semibold shadow-lg shadow-amber-600/30'
                       : 'text-slate-300 hover:text-amber-400 hover:bg-slate-700/50'
                   }`}
+                  aria-current={isActive ? 'page' : undefined}
                 >
-                  <span className="mr-1">{item.icon}</span>
+                  <span className="mr-1" aria-hidden="true">{item.icon}</span>
                   <span>{item.label}</span>
                 </Link>
               )
@@ -294,6 +297,7 @@ export function HUD() {
 function MoreDropdown() {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
   const location = useLocation()
 
   // Close on outside click
@@ -307,6 +311,18 @@ function MoreDropdown() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  // Keyboard navigation - Escape to close
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape' && isOpen) {
+        setIsOpen(false)
+        buttonRef.current?.focus()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen])
+
   // Close on route change
   useEffect(() => {
     setIsOpen(false)
@@ -315,22 +331,36 @@ function MoreDropdown() {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
+        ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
-        className={`px-3 py-1.5 text-sm rounded-lg whitespace-nowrap transition-all flex items-center gap-1 ${
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowDown' && !isOpen) {
+            e.preventDefault()
+            setIsOpen(true)
+          }
+        }}
+        className={`px-3 py-1.5 text-sm rounded-lg whitespace-nowrap transition-all flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-amber-500 ${
           isOpen
             ? 'bg-amber-600 text-white'
             : 'text-slate-300 hover:text-amber-400 hover:bg-slate-700/50'
         }`}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+        aria-label="More navigation options"
       >
-        <span>⋯</span>
+        <span aria-hidden="true">⋯</span>
         <span>More</span>
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-56 bg-slate-800 border border-slate-700 rounded-xl shadow-xl z-50 py-2">
+        <div
+          className="absolute right-0 top-full mt-2 w-56 bg-slate-800 border border-slate-700 rounded-xl shadow-xl z-50 py-2"
+          role="menu"
+          aria-label="More navigation"
+        >
           {SECONDARY_GROUPS.map((group) => (
             <div key={group.label}>
-              <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+              <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wide" role="presentation">
                 {group.label}
               </div>
               {group.items.map((item) => {
@@ -339,13 +369,14 @@ function MoreDropdown() {
                   <Link
                     key={item.to}
                     to={item.to}
-                    className={`flex items-center gap-2 px-3 py-2 text-sm transition-colors ${
+                    role="menuitem"
+                    className={`flex items-center gap-2 px-3 py-2 text-sm transition-colors focus:outline-none focus:bg-slate-700 ${
                       isActive
                         ? 'bg-amber-600/20 text-amber-400'
                         : 'text-slate-300 hover:bg-slate-700 hover:text-amber-400'
                     }`}
                   >
-                    <span>{item.icon}</span>
+                    <span aria-hidden="true">{item.icon}</span>
                     <span>{item.label}</span>
                   </Link>
                 )
