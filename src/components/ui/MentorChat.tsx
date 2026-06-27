@@ -330,6 +330,8 @@ export default function MentorChat() {
       {/* Floating Mentor Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? 'Close mentor chat' : 'Open mentor chat'}
+        aria-expanded={isOpen}
         className={`fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl transition-all transform hover:scale-110 ${
           isOpen
             ? 'bg-amber-600 hover:bg-amber-500 rotate-0'
@@ -342,16 +344,22 @@ export default function MentorChat() {
 
       {/* Chat Panel */}
       {isOpen && (
-        <div className="fixed bottom-36 right-4 z-50 w-80 sm:w-96 max-h-[500px] bg-slate-800/95 backdrop-blur-lg rounded-2xl border border-amber-600/50 shadow-2xl flex flex-col overflow-hidden">
+        <div
+          className="fixed bottom-36 right-4 z-50 w-80 sm:w-96 max-h-[500px] bg-slate-800/95 backdrop-blur-lg rounded-2xl border border-amber-600/50 shadow-2xl flex flex-col overflow-hidden"
+          role="dialog"
+          aria-labelledby="mentor-chat-title"
+          aria-modal="false"
+        >
           {/* Header */}
           <div className="bg-gradient-to-r from-amber-900/50 to-purple-900/50 px-4 py-3 border-b border-slate-700 flex items-center gap-3">
             <div className="text-3xl">🧙‍♂️</div>
             <div>
-              <h3 className="font-bold text-amber-400">DevOps Mentor</h3>
+              <h3 id="mentor-chat-title" className="font-bold text-amber-400">DevOps Mentor</h3>
               <p className="text-xs text-slate-400">Your guide to mastery</p>
             </div>
             <button
               onClick={() => setIsOpen(false)}
+              aria-label="Close chat"
               className="ml-auto text-slate-400 hover:text-white text-xl"
             >
               ✕
@@ -366,7 +374,7 @@ export default function MentorChat() {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3" role="log" aria-live="polite" aria-label="Chat messages">
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -406,7 +414,9 @@ export default function MentorChat() {
           {/* Input */}
           <div className="p-3 border-t border-slate-700">
             <div className="flex gap-2">
+              <label htmlFor="mentor-input" className="sr-only">Type your question</label>
               <input
+                id="mentor-input"
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -417,6 +427,7 @@ export default function MentorChat() {
               <button
                 onClick={handleSend}
                 disabled={!input.trim()}
+                aria-label="Send message"
                 className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
                   input.trim()
                     ? 'bg-amber-600 hover:bg-amber-500 text-white'
@@ -429,18 +440,21 @@ export default function MentorChat() {
             <div className="mt-2 flex flex-wrap gap-1">
               <button
                 onClick={() => setInput('How do I earn XP?')}
+                aria-label="Ask about XP"
                 className="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-full"
               >
                 XP Help
               </button>
               <button
                 onClick={() => setInput('Where should I go next?')}
+                aria-label="Ask for guidance"
                 className="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-full"
               >
                 Guidance
               </button>
               <button
                 onClick={() => setInput('Show me my progress')}
+                aria-label="Show my progress"
                 className="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-full"
               >
                 Progress

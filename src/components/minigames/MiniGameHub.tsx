@@ -70,7 +70,9 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
         <button
           onClick={() => isUnlocked && setCurrentGame('command')}
           disabled={!isUnlocked}
-          className={`p-6 rounded-xl border transition-all group ${
+          aria-label={isUnlocked ? 'Play Command Typer game' : `Command Typer - requires level ${UNLOCK_LEVEL}`}
+          aria-disabled={!isUnlocked}
+          className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
             isUnlocked
               ? 'bg-gradient-to-br from-orange-900/30 to-red-900/30 border-orange-700/50 hover:border-orange-500'
               : 'bg-slate-800/30 border-slate-700/50 opacity-50 cursor-not-allowed'
@@ -86,7 +88,9 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
         <button
           onClick={() => isUnlocked && setCurrentGame('memory')}
           disabled={!isUnlocked}
-          className={`p-6 rounded-xl border transition-all group ${
+          aria-label={isUnlocked ? 'Play Memory Match game' : `Memory Match - requires level ${UNLOCK_LEVEL}`}
+          aria-disabled={!isUnlocked}
+          className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
             isUnlocked
               ? 'bg-gradient-to-br from-purple-900/30 to-pink-900/30 border-purple-700/50 hover:border-purple-500'
               : 'bg-slate-800/30 border-slate-700/50 opacity-50 cursor-not-allowed'
@@ -102,7 +106,9 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
         <button
           onClick={() => isUnlocked && setCurrentGame('math')}
           disabled={!isUnlocked}
-          className={`p-6 rounded-xl border transition-all group ${
+          aria-label={isUnlocked ? 'Play Math Challenge game' : `Math Challenge - requires level ${UNLOCK_LEVEL}`}
+          aria-disabled={!isUnlocked}
+          className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
             isUnlocked
               ? 'bg-gradient-to-br from-cyan-900/30 to-blue-900/30 border-cyan-700/50 hover:border-cyan-500'
               : 'bg-slate-800/30 border-slate-700/50 opacity-50 cursor-not-allowed'
@@ -118,7 +124,9 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
         <button
           onClick={() => isUnlocked && setCurrentGame('code')}
           disabled={!isUnlocked}
-          className={`p-6 rounded-xl border transition-all group ${
+          aria-label={isUnlocked ? 'Play Code Puzzle game' : `Code Puzzle - requires level ${UNLOCK_LEVEL}`}
+          aria-disabled={!isUnlocked}
+          className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
             isUnlocked
               ? 'bg-gradient-to-br from-green-900/30 to-emerald-900/30 border-green-700/50 hover:border-green-500'
               : 'bg-slate-800/30 border-slate-700/50 opacity-50 cursor-not-allowed'
@@ -134,7 +142,9 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
         <button
           onClick={() => isUnlocked && setCurrentGame('quiz')}
           disabled={!isUnlocked}
-          className={`p-6 rounded-xl border transition-all group ${
+          aria-label={isUnlocked ? 'Play Quiz Dash game' : `Quiz Dash - requires level ${UNLOCK_LEVEL}`}
+          aria-disabled={!isUnlocked}
+          className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
             isUnlocked
               ? 'bg-gradient-to-br from-red-900/30 to-orange-900/30 border-red-700/50 hover:border-red-500'
               : 'bg-slate-800/30 border-slate-700/50 opacity-50 cursor-not-allowed'
@@ -150,7 +160,9 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
         <button
           onClick={() => isUnlocked && setCurrentGame('terminal')}
           disabled={!isUnlocked}
-          className={`p-6 rounded-xl border transition-all group ${
+          aria-label={isUnlocked ? 'Play Incident Simulator game' : `Incident Simulator - requires level ${UNLOCK_LEVEL}`}
+          aria-disabled={!isUnlocked}
+          className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
             isUnlocked
               ? 'bg-gradient-to-br from-slate-900/30 to-slate-800/30 border-slate-600/50 hover:border-slate-400'
               : 'bg-slate-800/30 border-slate-700/50 opacity-50 cursor-not-allowed'
@@ -166,7 +178,9 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
         <button
           onClick={() => isUnlocked && setCurrentGame('incident')}
           disabled={!isUnlocked}
-          className={`p-6 rounded-xl border transition-all group ${
+          aria-label={isUnlocked ? 'Play Incident Response game' : `Incident Response - requires level ${UNLOCK_LEVEL}`}
+          aria-disabled={!isUnlocked}
+          className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
             isUnlocked
               ? 'bg-gradient-to-br from-red-900/30 to-orange-900/30 border-red-700/50 hover:border-red-500'
               : 'bg-slate-800/30 border-slate-700/50 opacity-50 cursor-not-allowed'
@@ -182,7 +196,8 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
 
       <button
         onClick={onClose}
-        className="mt-8 w-full py-3 bg-slate-700 hover:bg-slate-600 text-slate-300 font-medium rounded-lg transition-colors"
+        aria-label="Back to Game"
+        className="mt-8 w-full py-3 bg-slate-700 hover:bg-slate-600 text-slate-300 font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500"
       >
         Back to Game
       </button>
