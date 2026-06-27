@@ -125,39 +125,47 @@ export function importGameData(jsonString: string): ExportedGameData | null {
     }
 
     // Sanitize data - only keep known fields to prevent injection
+    // Add bounds checking to prevent invalid game state
+    const level = Number(data.character.level) || 1
+    const xp = Number(data.character.xp) || 0
+    const gold = Number(data.character.gold) || 0
+
     const sanitized: ExportedGameData = {
       version: String(data.version),
       exportedAt: String(data.exportedAt || new Date().toISOString()),
       character: {
-        name: String(data.character.name || 'Hero'),
-        level: Number(data.character.level) || 1,
-        xp: Number(data.character.xp) || 0,
-        gold: Number(data.character.gold) || 0,
-        title: data.character.title ? String(data.character.title) : undefined,
-        avatar: data.character.avatar ? String(data.character.avatar) : undefined,
+        name: String(data.character.name || 'Hero').slice(0, 50), // Max 50 chars
+        level: Math.min(Math.max(level, 1), 100), // Bound between 1-100
+        xp: Math.min(Math.max(xp, 0), 10000000), // Bound between 0-10M
+        gold: Math.min(Math.max(gold, 0), 10000000), // Bound between 0-10M
+        title: data.character.title ? String(data.character.title).slice(0, 100) : undefined,
+        avatar: data.character.avatar ? String(data.character.avatar).slice(0, 200) : undefined,
       },
       completedQuests: Array.isArray(data.completedQuests)
         ? data.completedQuests
             .filter((q: unknown) => q && typeof q === 'object' && 'id' in q)
-            .map((q: { id: unknown }) => ({ id: String(q.id) }))
+            .slice(0, 1000) // Max 1000 quests
+            .map((q: { id: unknown }) => ({ id: String(q.id).slice(0, 100) }))
         : [],
       badges: Array.isArray(data.badges)
         ? data.badges
             .filter((b: unknown) => b && typeof b === 'object' && 'id' in b)
+            .slice(0, 500) // Max 500 badges
             .map((b: { id: unknown; unlockedAt?: unknown }) => ({
-              id: String(b.id),
+              id: String(b.id).slice(0, 100),
               unlockedAt: b.unlockedAt ? String(b.unlockedAt) : null,
             }))
         : [],
       companions: Array.isArray(data.companions)
         ? data.companions
             .filter((c: unknown) => c && typeof c === 'object' && 'id' in c)
-            .map((c: { id: unknown }) => ({ id: String(c.id) }))
+            .slice(0, 20) // Max 20 companions
+            .map((c: { id: unknown }) => ({ id: String(c.id).slice(0, 100) }))
         : [],
       stats: data.stats && typeof data.stats === 'object' ? data.stats : {},
-      prestigeLevel: Number(data.prestigeLevel) || 0,
-      prestigeMultiplier: Number(data.prestigeMultiplier) || 1.0,
-      totalPrestigeXp: Number(data.totalPrestigeXp) || 0,
+      prestigeLevel: Math.min(Math.max(Number(data.prestigeLevel) || 0, 0), 100),
+      prestigeMultiplier: Math.min(Math.max(Number(data.prestigeMultiplier) || 1.0, 1.0), 10.0),
+      totalPrestigeXp: Math.min(Math.max(Number(data.totalPrestigeXp) || 0, 0), 100000000),
     }
 
     return sanitized

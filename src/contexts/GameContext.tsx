@@ -294,7 +294,10 @@ export const GOLD_XP_RATIO = GAME_BALANCE.GOLD_XP_RATIO
 function deepMerge(target: any, source: any): any {
   const output = { ...target }
   for (const key in source) {
-    if (Object.prototype.hasOwnProperty.call(source, key)) {
+    if (
+      Object.prototype.hasOwnProperty.call(source, key) &&
+      Object.prototype.hasOwnProperty.call(target, key)
+    ) {
       const sourceValue = source[key]
       const targetValue = target[key]
       if (
