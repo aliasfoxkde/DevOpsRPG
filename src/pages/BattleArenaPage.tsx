@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useGame } from '../contexts/GameContext'
-import { allQuests, realms } from '../data/quests'
+import { allQuests, getNextQuest as getNextQuestFromData, realms } from '../data/quests'
 import { w3schoolsContent } from '../data/w3schools-content'
 import { technologies } from '../data/technologies'
 import Quiz from '../components/ui/Quiz'
@@ -95,12 +95,12 @@ export default function BattleArenaPage() {
           const saved = localStorage.getItem('devopsquest_game')
           if (saved) {
             const freshGame = JSON.parse(saved)
-            const completedIds = new Set(freshGame.completedQuests.map((q: any) => q.topicId))
+            const completedIds = new Set<string>(freshGame.completedQuests.map((q: any) => q.topicId))
             // Always exclude the just-completed quest to avoid showing it as "next"
             if (completedQuestId) {
               completedIds.add(completedQuestId)
             }
-            const nextQ = getNextQuest(completedIds)
+            const nextQ = getNextQuestFromData(completedIds)
             if (nextQ) {
               navigate(`/quest/${nextQ.id}`)
             } else {
