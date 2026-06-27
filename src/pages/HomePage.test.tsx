@@ -20,7 +20,8 @@ describe('HomePage', () => {
 
   it('renders quest journal link', () => {
     renderWithRouter(<HomePage />)
-    expect(screen.getByText('Quest Journal')).toBeInTheDocument()
+    // Use getAllByText since "Quest Journal" appears in multiple places
+    expect(screen.getAllByText('Quest Journal').length).toBeGreaterThan(0)
   })
 
   it('renders character sheet link', () => {
@@ -30,7 +31,9 @@ describe('HomePage', () => {
 
   it('renders realm preview', () => {
     renderWithRouter(<HomePage />)
-    expect(screen.getByText('Your Journey')).toBeInTheDocument()
+    // Text includes emoji prefix: "⚔️ Your Journey" - use getAllByText and check first match
+    const matches = screen.getAllByText(/Your Journey/i)
+    expect(matches.length).toBeGreaterThan(0)
   })
 
   it('renders chronicle section', () => {

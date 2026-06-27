@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen, act } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { GameProvider } from '@/contexts/GameContext'
+import { GameProvider } from '../contexts/GameContext'
 import TechnologyPage from './TechnologyPage'
 
 function renderWithRouter(entries = ['/learn/html']) {
@@ -45,7 +45,7 @@ describe('TechnologyPage', () => {
 
   it('can click mark complete button', async () => {
     renderWithRouter()
-    const buttons = screen.getAllByText('Mark as Complete (+25 XP)')
+    const buttons = screen.getAllByText('Mark as Complete (+75 XP)')
     await act(async () => {
       buttons[0].click()
     })

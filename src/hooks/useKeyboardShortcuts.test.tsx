@@ -26,11 +26,11 @@ describe('useKeyboardShortcuts', () => {
   it('returns shortcuts list', () => {
     const { result } = renderHook(() => useKeyboardShortcuts(), { wrapper })
 
-    expect(result.current.shortcuts).toHaveLength(11)
-    expect(result.current.shortcuts[0].key).toBe('g h')
-    expect(result.current.shortcuts[1].key).toBe('g l')
-    expect(result.current.shortcuts[2].key).toBe('g d')
-    expect(result.current.shortcuts[3].key).toBe('g q')
+    expect(result.current.shortcuts).toHaveLength(24)
+    expect(result.current.shortcuts[0].key).toBe('j')
+    expect(result.current.shortcuts[1].key).toBe('k')
+    expect(result.current.shortcuts[2].key).toBe('gg')
+    expect(result.current.shortcuts[3].key).toBe('G')
   })
 
   it('does not trigger when disabled', () => {
@@ -42,10 +42,10 @@ describe('useKeyboardShortcuts', () => {
   it('contains correct descriptions', () => {
     const { result } = renderHook(() => useKeyboardShortcuts(), { wrapper })
 
-    expect(result.current.shortcuts[0].description).toBe('Go to Home')
-    expect(result.current.shortcuts[1].description).toBe('Go to Learn')
-    expect(result.current.shortcuts[2].description).toBe('Go to Dashboard')
-    expect(result.current.shortcuts[3].description).toBe('Go to Quests')
+    expect(result.current.shortcuts[0].description).toBe('Scroll down')
+    expect(result.current.shortcuts[1].description).toBe('Scroll up')
+    expect(result.current.shortcuts[2].description).toBe('Go to top')
+    expect(result.current.shortcuts[3].description).toBe('Go to bottom')
   })
 
   it('does not trigger when typing in input', () => {
