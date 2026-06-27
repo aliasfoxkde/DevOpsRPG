@@ -159,6 +159,11 @@ export default function BattleArenaPage() {
   const isCompleted = isQuestCompleted(quest.id)
 
   const handleComplete = (isPerfect: boolean, wrongAnswers: number = 0, passedWith80: boolean = false) => {
+    // CRITICAL: Double-check quest isn't already completed - this prevents re-completing after refresh
+    if (isQuestCompleted(quest.id)) {
+      console.warn('Quest already completed, preventing re-completion')
+      return
+    }
     // Prevent multiple calls from rapid clicks
     if (completionLockRef.current) return
     completionLockRef.current = true
