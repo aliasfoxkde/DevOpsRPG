@@ -67,23 +67,6 @@ const SHOP_ITEMS: ShopItem[] = [
   { id: 'buy_companion_phoenix', name: 'Phoenix', description: 'A legendary companion of rebirth', icon: '🦅', price: 2500, category: 'companion', rarity: 'legendary', effect: '+20% XP, +10% Gold, +1 Streak Shield/week' },
 ]
 
-// Companions data
-export interface Companion {
-  id: string
-  name: string
-  icon: string
-  xpBonus: number
-  goldBonus: number
-  specialAbility?: string
-}
-
-export const COMPANIONS: Companion[] = [
-  { id: 'owl', name: 'Wise Owl', icon: '🦉', xpBonus: 0.05, goldBonus: 0 },
-  { id: 'cat', name: 'Lucky Cat', icon: '🐱', xpBonus: 0, goldBonus: 0.05 },
-  { id: 'dragon', name: 'Baby Dragon', icon: '🐲', xpBonus: 0.10, goldBonus: 0.10 },
-  { id: 'phoenix', name: 'Phoenix', icon: '🦅', xpBonus: 0.20, goldBonus: 0.10, specialAbility: 'Weekly Streak Shield' },
-]
-
 const CATEGORIES = [
   { id: 'all', name: 'All Items', icon: '🏪' },
   { id: 'powerup', name: 'Power-Ups', icon: '⚡' },
@@ -372,7 +355,7 @@ export default function StorePage() {
             <h3 className="text-slate-300 font-bold mb-3">🐾 Companions</h3>
             {game.companions && game.companions.length > 0 ? (
               <div className="flex flex-wrap gap-4">
-                {game.companions.map((comp: Companion) => (
+                {game.companions.map(comp => (
                   <div
                     key={comp.id}
                     className={`flex items-center gap-3 px-4 py-3 rounded-lg border ${

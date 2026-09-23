@@ -1,6 +1,7 @@
 export { ThemeProvider, useTheme } from './ThemeContext'
 export { ProgressProvider, useProgress } from './ProgressContext'
-export { GameProvider, useGame, XP_PER_LEVEL, MAX_HP, MAX_MP } from './GameContext'
+export { GameProvider, useGame } from './GameContext'
+export { XP_PER_LEVEL } from '../utils/gameUtils'
 export type { Theme } from './ThemeContext'
 export type { UserProgress, TopicProgress } from './ProgressContext'
 export type { Character, GameState, Achievement } from './GameContext'

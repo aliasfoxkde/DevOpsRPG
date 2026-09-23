@@ -11,6 +11,11 @@ export default defineConfig({
       '@': resolve(__dirname, './src'),
     },
   },
+  optimizeDeps: {
+    // Pre-bundle core deps at server start so the first page load doesn't
+    // trigger mid-session re-optimization reloads (breaks E2E cold starts).
+    include: ['react', 'react-dom', 'react-router-dom', 'clsx', 'lucide-react'],
+  },
   build: {
     outDir: 'dist',
     sourcemap: false,
@@ -19,11 +24,10 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: resolve(__dirname, './src/test/setup.ts'),
-    exclude: [
-      '**/node_modules/**',
-      '**/e2e/**',  // Exclude Playwright E2E tests
-      '**/dist/**',
-    ],
+    // Only pick up tests from src/ — the repo checkout can contain
+    // symlinked tooling directories (e.g. .claude) whose own tests
+    // must not run as part of this project's suite.
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

@@ -60,7 +60,7 @@ export function useVoiceNarration() {
     return () => {
       window.speechSynthesis.onvoiceschanged = null
     }
-  }, [])
+  }, [settings.voiceURI])
 
   // Save settings
   useEffect(() => {

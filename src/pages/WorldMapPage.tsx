@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useGame } from '../contexts/GameContext'
 import { realms, allQuests } from '../data/quests'
@@ -463,10 +463,14 @@ export default function WorldMapPage() {
   }
 
   // Animated trail path component
-  const TrailPath = ({ trail, isHighlighted, color }: {
-    trail: typeof TRAIL_PATHS[0]; isHighlighted: boolean; color: string
+  const TrailPath = ({ trail, isHighlighted, color, animKey }: {
+    trail: typeof TRAIL_PATHS[0]; isHighlighted: boolean; color: string; animKey: number
   }) => {
-    const dashOffset = useMemo(() => Math.random() * 20, [pathAnimKey])
+    const [dashOffset, setDashOffset] = useState(() => Math.random() * 20)
+    useEffect(() => {
+      // Re-randomize the dash animation offset only when the animation key bumps
+      setDashOffset(Math.random() * 20)
+    }, [animKey])
     const pathD = generateSmoothPath(trail.cp)
 
     return (
@@ -675,6 +679,7 @@ export default function WorldMapPage() {
                 trail={trail}
                 isHighlighted={isHighlighted}
                 color={color}
+                animKey={pathAnimKey}
               />
             )
           })}

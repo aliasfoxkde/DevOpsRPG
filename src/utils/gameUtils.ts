@@ -106,6 +106,13 @@ export const GAME_BALANCE = {
   GOLD_XP_RATIO: 0.1, // Gold reward = XP reward * this ratio
 } as const
 
+// Frequently used balance values, re-exported for convenience
+export const XP_PER_LEVEL = GAME_BALANCE.XP_PER_LEVEL
+export const MAX_HP = GAME_BALANCE.MAX_HP
+export const MAX_MP = GAME_BALANCE.MAX_MP
+export const COLLECTIBLE_DROP_RATE = GAME_BALANCE.COLLECTIBLE_DROP_RATE
+export const GOLD_XP_RATIO = GAME_BALANCE.GOLD_XP_RATIO
+
 // LocalStorage keys
 export const STORAGE_KEYS = {
   GAME: 'devopsquest_game',

@@ -88,7 +88,7 @@ export default function Breadcrumbs() {
             const isLast = index === breadcrumbs.length - 1
 
             return (
-              <li key={crumb.path} className="flex items-center gap-2">
+              <li key={`${crumb.label}-${crumb.path}`} className="flex items-center gap-2">
                 {index > 0 && (
                   <span className="text-slate-600" aria-hidden="true">
                     /

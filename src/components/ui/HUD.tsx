@@ -35,10 +35,11 @@ const SECONDARY_NAV = [
   { to: '/about', icon: 'ℹ️', label: 'About' },
 ]
 
-// Group secondary nav into categories
+// Group secondary nav into categories (slices cover every item exactly once)
 const SECONDARY_GROUPS = [
   { label: 'Progress', items: SECONDARY_NAV.slice(0, 3) },
-  { label: 'Social', items: SECONDARY_NAV.slice(7, 10) },
+  { label: 'Shop', items: SECONDARY_NAV.slice(3, 7) },
+  { label: 'Content', items: SECONDARY_NAV.slice(7, 10) },
   { label: 'Tools', items: SECONDARY_NAV.slice(10) },
 ]
 

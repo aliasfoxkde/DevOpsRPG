@@ -224,7 +224,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [currentQuestion, showExplanation, quizComplete, handleFinish, handleNext, handleSelect])
+  }, [currentQuestion, currentIndex, showExplanation, quizComplete, handleFinish, handleNext, handleSelect])
 
   // Handle empty quiz case - AFTER all hooks
   // User must still prove they've engaged with the material

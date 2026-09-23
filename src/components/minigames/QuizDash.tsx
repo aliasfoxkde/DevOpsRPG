@@ -85,24 +85,6 @@ export function QuizDashGame({ onComplete, onSkip }: QuizDashProps) {
   const currentQuestion = questions[currentIndex]
   const maxScore = questions.length
 
-  // Timer effect
-  useEffect(() => {
-    if (isComplete || showResult) return
-
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          // Time's up - auto advance
-          handleAnswer(-1)
-          return 10
-        }
-        return prev - 1
-      })
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [currentIndex, showResult, isComplete])
-
   const handleAnswer = useCallback((answerIndex: number) => {
     if (showResult) return
 
@@ -131,6 +113,24 @@ export function QuizDashGame({ onComplete, onSkip }: QuizDashProps) {
       }
     }, 1000)
   }, [currentQuestion, currentIndex, questions.length, score, maxScore, showResult, onComplete])
+
+  // Timer effect
+  useEffect(() => {
+    if (isComplete || showResult) return
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          // Time's up - auto advance
+          handleAnswer(-1)
+          return 10
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [currentIndex, showResult, isComplete, handleAnswer])
 
   const getOptionClass = (index: number) => {
     if (!showResult) {

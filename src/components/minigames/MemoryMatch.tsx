@@ -67,7 +67,7 @@ export function MemoryMatch({ pairs = 6, onComplete }: MemoryMatchProps) {
         }, 1000)
       }
     }
-  }, [flippedIndices, matchedIndices, cards, gameState, startTime, moves, pairs])
+  }, [flippedIndices, matchedIndices, cards, gameState, startTime, pairs])
 
   const handleComplete = () => {
     if (!wonStats) return

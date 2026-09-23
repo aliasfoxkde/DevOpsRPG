@@ -7,7 +7,7 @@ import { getRandomCollectible, COLLECTIBLES_POOL, DAILY_REWARDS, spinWheel as do
 import { technologies } from '../data/technologies'
 import { TITLES, FRAMES } from '../data/titles'
 import { getEquipmentById, calculateEquipmentBonuses } from '../data/equipment'
-import { GAME_BALANCE, STORAGE_KEYS } from '../utils/gameUtils'
+import { STORAGE_KEYS, XP_PER_LEVEL, MAX_HP, MAX_MP, COLLECTIBLE_DROP_RATE, GOLD_XP_RATIO } from '../utils/gameUtils'
 
 export type CharacterClass = 'Cloud Knight' | 'Script Warrior' | 'Data Mage' | 'DevOps Sage'
 
@@ -25,8 +25,8 @@ export interface Companion {
   maxBondLevel: number // Level at which evolution triggers
 }
 
-// Evolved companions data
-export const EVOLVED_COMPANIONS: Record<string, Companion> = {
+// Evolved companions data (internal to the game state module)
+const EVOLVED_COMPANIONS: Record<string, Companion> = {
   owl_elder: {
     id: 'owl_elder',
     name: 'Elder Owl',
@@ -71,6 +71,14 @@ export const EVOLVED_COMPANIONS: Record<string, Companion> = {
     totalQuestsCompleted: 0,
     maxBondLevel: 10
   },
+}
+
+// Base companions available for purchase in the store
+const COMPANIONS_DATA: Record<string, Companion> = {
+  owl: { id: 'owl', name: 'Wise Owl', icon: '🦉', xpBonus: 0.05, goldBonus: 0, bondLevel: 1, totalQuestsCompleted: 0, evolvedForm: 'owl_elder', maxBondLevel: 10 },
+  cat: { id: 'cat', name: 'Lucky Cat', icon: '🐱', xpBonus: 0, goldBonus: 0.05, bondLevel: 1, totalQuestsCompleted: 0, evolvedForm: 'cat_shadow', maxBondLevel: 10 },
+  dragon: { id: 'dragon', name: 'Baby Dragon', icon: '🐲', xpBonus: 0.10, goldBonus: 0.10, bondLevel: 1, totalQuestsCompleted: 0, evolvedForm: 'dragon_elder', maxBondLevel: 10 },
+  phoenix: { id: 'phoenix', name: 'Phoenix', icon: '🦅', xpBonus: 0.20, goldBonus: 0.10, specialAbility: 'Weekly Streak Shield', bondLevel: 1, totalQuestsCompleted: 0, evolvedForm: 'phoenix_legendary', maxBondLevel: 10 },
 }
 
 export interface Character {
@@ -282,12 +290,7 @@ interface GameContextType {
   getEquipmentBonuses: () => { xpBonus: number; goldBonus: number; techBonuses: Record<string, number> }
 }
 
-// Re-export constants from gameUtils for backward compatibility
-export const XP_PER_LEVEL = GAME_BALANCE.XP_PER_LEVEL
-export const MAX_HP = GAME_BALANCE.MAX_HP
-export const MAX_MP = GAME_BALANCE.MAX_MP
-export const COLLECTIBLE_DROP_RATE = GAME_BALANCE.COLLECTIBLE_DROP_RATE
-export const GOLD_XP_RATIO = GAME_BALANCE.GOLD_XP_RATIO
+// Game balance constants live in utils/gameUtils.ts (import GAME_BALANCE from there)
 
 // Deep merge utility for game state recovery
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1722,14 +1725,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const isDailyDashActive = useCallback(() => {
     return game.dailyDash.active
   }, [game.dailyDash.active])
-
-  // Purchase item from shop
-  const COMPANIONS_DATA: Record<string, Companion> = {
-    owl: { id: 'owl', name: 'Wise Owl', icon: '🦉', xpBonus: 0.05, goldBonus: 0, bondLevel: 1, totalQuestsCompleted: 0, evolvedForm: 'owl_elder', maxBondLevel: 10 },
-    cat: { id: 'cat', name: 'Lucky Cat', icon: '🐱', xpBonus: 0, goldBonus: 0.05, bondLevel: 1, totalQuestsCompleted: 0, evolvedForm: 'cat_shadow', maxBondLevel: 10 },
-    dragon: { id: 'dragon', name: 'Baby Dragon', icon: '🐲', xpBonus: 0.10, goldBonus: 0.10, bondLevel: 1, totalQuestsCompleted: 0, evolvedForm: 'dragon_elder', maxBondLevel: 10 },
-    phoenix: { id: 'phoenix', name: 'Phoenix', icon: '🦅', xpBonus: 0.20, goldBonus: 0.10, specialAbility: 'Weekly Streak Shield', bondLevel: 1, totalQuestsCompleted: 0, evolvedForm: 'phoenix_legendary', maxBondLevel: 10 },
-  }
 
   const purchaseItem = useCallback((itemId: string, price: number): boolean => {
     if (game.character.gold < price) return false

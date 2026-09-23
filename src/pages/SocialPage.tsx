@@ -71,7 +71,7 @@ export default function SocialPage() {
   }
 
   // Current player stats for leaderboard
-  const playerStats = {
+  const playerStats = useMemo(() => ({
     rank: 0,
     id: 'player',
     name: character.name,
@@ -80,7 +80,7 @@ export default function SocialPage() {
     totalXP: character.xp,
     streakDays: character.streakDays,
     isFriend: false,
-  }
+  }), [character])
 
   // Combined leaderboard with player
   const fullLeaderboard = useMemo(() => {
@@ -88,7 +88,7 @@ export default function SocialPage() {
       .sort((a, b) => b.totalXP - a.totalXP)
       .map((entry, index) => ({ ...entry, rank: index + 1 }))
     return combined
-  }, [character])
+  }, [playerStats])
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">

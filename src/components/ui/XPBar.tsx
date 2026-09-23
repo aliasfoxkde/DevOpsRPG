@@ -1,4 +1,5 @@
-import { useGame, XP_PER_LEVEL } from '../../contexts/GameContext'
+import { useGame } from '../../contexts/GameContext'
+import { XP_PER_LEVEL } from '../../utils/gameUtils'
 
 interface XPBarProps {
   compact?: boolean
