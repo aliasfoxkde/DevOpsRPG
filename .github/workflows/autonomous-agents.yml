@@ -33,7 +33,7 @@ jobs:
             --state open \
             --json number,title,labels,createdAt \
             --jq '[.[] | {number: .number, title: .title, labels: [.labels[].name], createdAt: .createdAt}]')
-          echo "issues=$ISSUES" >> $GITHUB_OUTPUT
+          echo "issues=$ISSUES" >> "$GITHUB_OUTPUT"
 
       - name: Display issues to triage
         run: |
@@ -76,7 +76,7 @@ jobs:
               estimated_time: "2h"
             })
           ')
-          echo "result=$ANALYZED" >> $GITHUB_OUTPUT
+          echo "result=$ANALYZED" >> "$GITHUB_OUTPUT"
 
       - name: Store analysis results
         run: |
@@ -105,12 +105,12 @@ jobs:
 
       - name: Analyze issue and create branch
         run: |
-          ISSUE_NUMBER=${{ matrix.issue.number }}
+          ISSUE_NUMBER="${{ matrix.issue.number }}"
           BRANCH_NAME="auto/issue-${ISSUE_NUMBER}-$(date +%Y%m%d%H%M%S)"
-          echo "branch=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          echo "branch=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
 
           # Create branch from main
-          git checkout -b $BRANCH_NAME
+          git checkout -b "$BRANCH_NAME"
 
       - name: Validate current state
         run: |

@@ -1,10 +1,12 @@
 import { defineConfig, devices } from '@playwright/test'
 
-// Port can be overridden (e.g. when 5173 is occupied by another dev server):
-//   E2E_PORT=5174 npm run test:e2e
+// E2E gets its own dedicated port, decoupled from the dev-server default:
+// 5173 is Vite's default, so any other checkout running `vite` on this
+// machine (local `reuseExistingServer`) would otherwise silently serve the
+// wrong app to every test. Override with E2E_PORT if this one is taken.
 // Host is pinned to 127.0.0.1: Vite may bind IPv6 ::1 while the browser
-// resolves localhost to IPv4, and other servers may hold 0.0.0.0:5173.
-const port = Number(process.env.E2E_PORT) || 5173
+// resolves localhost to IPv4, and other servers may hold 0.0.0.0.
+const port = Number(process.env.E2E_PORT) || 5299
 const host = '127.0.0.1'
 const baseURL = `http://${host}:${port}`
 
