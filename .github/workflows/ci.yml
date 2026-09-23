@@ -104,7 +104,19 @@ jobs:
           name: dist
           path: dist/
 
+      - name: Check deploy credentials
+        id: creds
+        run: |
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::CLOUDFLARE_API_TOKEN secret is not set — skipping preview deploy."
+            echo "::warning::Add repo secrets CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID to enable Cloudflare Pages deploys."
+          else
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Deploy to Cloudflare Pages
+        if: steps.creds.outputs.deploy == 'true'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -113,7 +125,11 @@ jobs:
 
       - name: Output preview URL
         id: deploy
-        run: echo "preview_url=https://${{ github.head_ref }}.devopsquest.pages.dev" >> $GITHUB_OUTPUT
+        env:
+          # Pass the branch through env — never interpolate untrusted
+          # values directly into inline scripts.
+          PR_BRANCH: ${{ github.head_ref }}
+        run: echo "preview_url=https://${PR_BRANCH}.devopsquest.pages.dev" >> "$GITHUB_OUTPUT"
 
   deploy-production:
     name: Deploy Production
@@ -137,7 +153,19 @@ jobs:
           name: dist
           path: dist/
 
+      - name: Check deploy credentials
+        id: creds
+        run: |
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::CLOUDFLARE_API_TOKEN secret is not set — skipping production deploy."
+            echo "::warning::Add repo secrets CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID to enable Cloudflare Pages deploys."
+          else
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Deploy to Cloudflare Pages
+        if: steps.creds.outputs.deploy == 'true'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
