@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-09-22
+
+First tagged release. Ships the previously unreleased feature work below plus a
+quality/infrastructure hardening pass. Full baselines and the phased roadmap live in
+[docs/planning/003-QUALITY_PLAN.md](planning/003-QUALITY_PLAN.md).
+
 ### Added
 - New technologies: Ansible (configuration management), Kafka (event streaming), RabbitMQ (message broker), Istio (service mesh)
 - Enhanced Terraform topics with modules and state management
@@ -13,14 +19,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Daily Streak System UI (StreakTracker component with 7-day activity grid, milestone markers, streak-at-risk warnings)
 - Weekly/Monthly Challenges page (ChallengesPage with 5 weekly + 5 monthly challenges)
 - Added quizzes for Ansible (5 topics), Kafka (6 topics), RabbitMQ (5 topics), and Istio (4 topics)
+- `docs/planning/003-QUALITY_PLAN.md`: verified quality baselines (gates, axe-core a11y, Aegis scan, code smells) and a 7-phase roadmap (coverage ratchet to 99%, WCAG AA→AAA, strict linting, E2E browser matrix, release cadence)
+- `axe-core` as a devDependency for accessibility auditing
+- `src/vite-env.d.ts` for `import.meta.env` typing
 
 ### Changed
 - Improved technologies count from 47 to 51+
 - DashboardPage now uses enhanced StreakTracker component
 - Replaced W3Schools placeholder URLs with official documentation URLs for Kubernetes, Terraform, CI/CD, Prometheus, Security, ML, Networking, API Design, Observability, Ansible, Kafka, RabbitMQ, Istio, and Bash
+- Playwright pins the dev server to `127.0.0.1` and honours an `E2E_PORT` override, avoiding `::1`/`0.0.0.0` port conflicts
+- Vitest only collects tests under `src/`; Vite pre-bundles the 5 runtime dependencies (`optimizeDeps.include`) to stop mid-session re-optimization reloads
+- Service worker registration is production-only (`import.meta.env.PROD`) — no more dev-server navigation hijacking
 
 ### Fixed
-- All ESLint warnings resolved (8 warnings fixed with eslint-disable comments for intentional architectural patterns)
+- Removed the tracked `.claude` symlink that pulled the global agent-harness tree into Vite's file watcher, wedging the dev server event loop and failing all 13 E2E tests
+- E2E specs rewritten against current behavior (the onboarding wizard is skipped by default; selectors now role-based) — 10/10 passing on Chromium
+- All 14 ESLint warnings resolved: 8 `react-hooks/exhaustive-deps` fixed properly (callback ordering, memoization, effect deps) and 6 `react-refresh/only-export-components` resolved by moving constants to `gameUtils` or deleting dead exports
+- Shared game constants (`XP_PER_LEVEL`, `MAX_HP`, `MAX_MP`, `COLLECTIBLE_DROP_RATE`, `GOLD_XP_RATIO`) are now first-class exports from `gameUtils` instead of implicit GameContext re-exports
+- Duplicate React key on `/quests` (Battle Arena breadcrumb reused the Quests path)
+- HUD secondary nav dropped 4 of 15 items (Shop, Badges, Tech Cards, Certs) — regrouped, all render
+- False "data corrupted" console error on every first visit — empty storage is now silent; warnings only when existing data is unreadable
+- Documentation accuracy: `CONTRIBUTING.md` no longer references a nonexistent `stable` branch; `.github/copilot-instructions.md` no longer claims a pre-commit hook (validation runs in CI); `docs/README.md` index refreshed
 - Badge system gaps: added missing requirement type handlers (challenge_complete, sidequest_complete, milestone_tier, all_realms, all_technologies, gold_hoard, first_legendary, quiz_master)
 - GameContext badgeStats now includes derived stats (allRealms, allTechnologies, goldHoard)
 - Milestone speed_quest trigger now properly handled in checkMilestone function

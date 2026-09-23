@@ -503,8 +503,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return loaded
       }
 
-      // Both failed - start fresh but log error
-      console.error('All game data corrupted, starting fresh. Previous data may be recoverable from browser storage.')
+      // Both failed - start fresh. A first visit (no data at all) is normal;
+      // only warn when data existed but was unreadable.
+      if (stored !== null || backup !== null) {
+        console.warn('Game data was unreadable, starting fresh. Previous data may be recoverable from browser storage.')
+      }
     }
     return createDefaultGame()
   })

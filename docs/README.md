@@ -30,7 +30,8 @@ docs/
 │   └── SDLC_WORKFLOW.md        # Development lifecycle
 ├── planning/
 │   ├── 000-AUDIT_OVERVIEW.md   # Project audit and status
-│   └── 002-REFACTORING.md      # Refactoring roadmap
+│   ├── 002-REFACTORING.md      # Refactoring roadmap
+│   └── 003-QUALITY_PLAN.md     # Quality baselines & phased roadmap (coverage, a11y, CI)
 │
 ├── # Game Documentation
 ├── AUTONOMOUS_WORKFLOW.md      # Automated issue handling system

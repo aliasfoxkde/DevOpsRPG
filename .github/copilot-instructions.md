@@ -22,11 +22,11 @@ npm run test      # All tests must pass
 npm run build     # Production build must succeed
 ```
 
-### Pre-commit Hook
-The project uses pre-commit hooks that run:
-1. ESLint on staged files
-2. TypeScript check
-3. Vitest tests
+### Validation
+There is no enforced pre-commit hook; validation runs in CI on every push and PR:
+1. `npm run lint` — ESLint
+2. `npm run typecheck` — TypeScript
+3. `npm run test` — Vitest (run locally before claiming completion)
 
 ## Issue Handling Workflow
 
@@ -76,7 +76,7 @@ The project uses pre-commit hooks that run:
 2. Implement in appropriate directory
 3. Add tests if applicable
 4. Run validation commands
-5. Create PR to `stable` branch
+5. Create PR to `main` branch
 
 ### Fixing a Bug
 1. Create fix branch: `git checkout -b fix/description`

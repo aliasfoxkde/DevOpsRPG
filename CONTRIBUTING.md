@@ -57,8 +57,7 @@ npm run test:watch
 ### Branch Structure
 
 ```
-main (production)
-  └── stable (integration branch)
+main (production & integration)
        ├── feature/description
        ├── fix/description
        ├── docs/description
@@ -72,8 +71,8 @@ main (production)
 ### 1. Create a Branch
 
 ```bash
-# Start from stable (or main)
-git checkout stable
+# Start from the latest main
+git checkout main
 git pull
 
 # Create feature branch
@@ -110,7 +109,7 @@ git push -u origin feature/your-feature-name
 
 ### 5. After Approval
 
-- Squash and merge to `stable`
+- Squash and merge to `main`
 - Delete the feature branch
 - Deploy to production
 
