@@ -32,6 +32,11 @@ docs/
 │   ├── 000-AUDIT_OVERVIEW.md   # Project audit and status
 │   ├── 002-REFACTORING.md      # Refactoring roadmap
 │   └── 003-QUALITY_PLAN.md     # Quality baselines & phased roadmap (coverage, a11y, CI)
+├── decisions/                  # Architecture Decision Records (ADRs)
+│   ├── 0001-gitforge-primary-ci.md
+│   ├── 0002-service-worker-prod-only.md
+│   ├── 0003-onboarding-default.md
+│   └── 0004-coverage-ratchet-policy.md
 │
 ├── # Game Documentation
 ├── AUTONOMOUS_WORKFLOW.md      # Automated issue handling system

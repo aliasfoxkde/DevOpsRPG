@@ -6,6 +6,44 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-09-23
+
+Quality hardening pass: accessibility driven to zero violations, strict linting enforced,
+and a test campaign that caught real data/logic defects.
+
+### Added
+- `npm run audit:a11y` (scripts/axe-audit.mjs): Playwright + axe-core scan of 6 routes in both themes, non-zero exit on critical/serious violations
+- `src/data/integrity.test.ts`: 37 cross-module data-integrity tests (unique ids, referential integrity, prerequisite cycles, quiz answerability, phase→realm mapping, badge requirement handling, puzzle solvability)
+- `src/contexts/GameContext.test.tsx`: 21 behavior tests (XP/level, quest completion idempotency, badge grants, streak shields, learning topics, daily rewards, persistence + backup recovery + cross-tab sync)
+- E2E job in CI: 3-browser matrix (chromium, firefox, webkit) with browser caching and report artifacts; both deploy jobs now gate on it
+- `HANDLED_REQUIREMENT_TYPES` export in badges.ts guarding against badge requirement types with no unlock handler
+- Page smoke suites for every route in `src/pages/` (34 files) plus UI-kit, mini-game, export/import and data-integrity suites — 73 test files, 636 tests
+- Coverage ratchet wired into `vite.config.ts` (`coverage.thresholds` pinned just below measured values; policy in `docs/decisions/0004-coverage-ratchet-policy.md`)
+- Architecture Decision Records under `docs/decisions/` (GitForge-first CI, prod-only service worker, onboarding default, coverage ratchet)
+
+### Changed
+- ESLint runs with `--max-warnings 0` and promoted rules to error: `react-hooks/exhaustive-deps`, `@typescript-eslint/no-explicit-any`, `no-fallthrough`, `eqeqeq`, `prefer-const`
+- Playwright E2E boots its dev server on dedicated port 5299 (E2E_PORT overrides) so a foreign Vite app on the default port can no longer silently serve the wrong app to every test; human dev server stays on 5173
+- Dark-first theme default matching the app's design (dark was already the visual default; now explicit and tested)
+
+### Fixed
+- **`grantBadge` was a no-op for every catalog badge** — badges are pre-seeded in locked state and the guard tested "id exists" instead of "id unlocked", so challenge/reward/seasonal badge claims silently did nothing
+- Secret side quest `perfectionist` rewarded badge id `perfectionist`, which had no badge definition (claims would have rendered a broken entry) — badge added (epic, 300 XP / 150 gold)
+- Phase 7 had no category in `technologies.ts` although Kafka/RabbitMQ/Istio are phase 7 — added `Streaming & Mesh`
+- `aiintelligence` realm omitted `ansible` (phase 6) and all phase-7 techs from its technologies list, leaving them unreachable on the world map
+- Orphaned `gitops_intro` / `gitops_argocd` quizzes referenced topics that never existed — removed
+- Code puzzle `css_prop` was unanswerable (answer `red` not among its options) and `git_cmd`/`python_list` shipped options missing their answers — a deck containing them could never be solved; all now offer their answers
+- Incident scenario `high-cpu-production` ended on a command-less "Monitor for 5 minutes" step that dead-ended every run — final step now accepts `kubectl top nodes`
+- `IncidentSimulator` scored a flawless run at 86% (stale completion callback dropped the last step from accuracy) — the final step list is passed explicitly, flawless runs now score 98-99%
+- `IncidentSimulator` hint button advertised "+10s penalty" but never applied it — the penalty is now charged to the clock
+- `MiniGameHub` accuracy could exceed 100% (Math Challenge raw score 1175/750 displayed 157%) — clamped to 100%
+- `MiniGameHub` Terminal Simulator tile was announced as "Play Incident Simulator game", duplicating the incident tile's accessible name — each tile now announces its own title
+- `ChallengesPage` claim guard was inverted (`completed || claimed` instead of `!completed || claimed`), so the CLAIM! button — only rendered for completed challenges — silently did nothing: no rewards, no claimed state
+- The "no fastest quest yet" sentinel (`Infinity`) does not survive JSON persistence, so after a reload the Analytics "Fastest Quest" showed `0s` and the next completed quest collapsed the record to 0 (wrongly unlocking the speed badge) — the load path restores the sentinel
+- `BadgesPage` counted the pre-seeded catalog array as "earned", reading "81 of 81 badges earned" for a brand-new player — the count now reflects actual unlocks
+- WCAG contrast failures: 12 critical + 107 serious axe violations → **0/0** across all audited routes in both themes (token-level palette remaps, dark surface tokens for light-mode cards, named controls, modal focus restoration, `animate-pulse` replaced by a glow effect that keeps text above AA mid-animation)
+- shellcheck SC2086 warnings in autonomous-agents workflow (actionlint 1.7.7 clean)
+
 ## [0.1.1] - 2026-09-22
 
 First tagged release. Ships the previously unreleased feature work below plus a

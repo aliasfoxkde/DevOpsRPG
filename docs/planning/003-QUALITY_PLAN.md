@@ -202,8 +202,9 @@ tracked per page.
       `hasSeenOnboarding: false` default + E2E, or delete the component and its 4% coverage
       burden).
 - [ ] Port `scripts/deep-audit.mjs` + `scrape-w3schools.js` off sync I/O; add tests.
-- [ ] Delete or merge root-level `PLAN.md`/`TASKS.md`/`PROGRESS.md`/`RESEARCH.md` into
-      `docs/` (single source of truth).
+- [x] Delete or merge root-level `PLAN.md`/`TASKS.md`/`PROGRESS.md`/`RESEARCH.md` into
+      `docs/` (single source of truth). — `docs/TASKS.md` (the last stale duplicate) was
+      retired 2026-09-23; its content is superseded by this plan.
 
 **Acceptance:** no file > 700 lines outside `src/data/`; knip clean; all behavior covered by
 Phase 2 tests before/after each split.
@@ -226,7 +227,77 @@ Phase 2 tests before/after each split.
 
 ---
 
-## 3. Current Session Position
+## 3. Session Log
 
-- Phase 0: **complete** (all 10 infrastructure/defect items above fixed, committed, gates green).
-- Next action: Phase 1 (GitForge routing + release automation).
+### Session 2026-09-23 — hardening execution
+
+**Phase 2 (coverage).** New `src/data/integrity.test.ts` (35 tests) cross-validates every
+static data module (ids, referential integrity, prereq cycles, quiz answerability,
+phase→realm mapping). New `src/contexts/GameContext.test.tsx` (21 behavior tests: XP/level
+transitions, quest-completion idempotency, badge grants, streak shields, learning topics,
+daily rewards, persistence + backup recovery + cross-tab merge). `dataExport.test.ts`
+extended to 28 tests (sanitization bounds, collection caps, download flow);
+`gameUtils.test.ts` boundary branches. UI/minigame/page suites added in parallel.
+
+Real defects the new tests caught:
+1. `grantBadge` was a **no-op for every catalog badge** — badges are pre-seeded locked and
+   the guard tested "id exists" instead of "id unlocked", so challenge/reward badge claims
+   silently did nothing. (`src/contexts/GameContext.tsx`)
+2. Orphaned `gitops_intro` / `gitops_argocd` quizzes referenced topics that never existed.
+3. `categories` had no phase-7 entry although kafka/rabbitmq/istio are phase 7 → added the
+   `Streaming & Mesh` category.
+4. The `aiintelligence` realm omitted `ansible` (phase 6) and all phase-7 techs, leaving
+   them unreachable on the world map.
+5. Secret side quest `perfectionist` rewarded a badge id with no badge definition → added
+   the badge (300 xp / 150 gold, matching its side-quest reward).
+
+**Phase 3 (a11y).** 12 critical + 107 serious axe violations → **0/0** across 6 routes ×
+2 themes via `npm run audit:a11y`: token-level contrast remaps in `@theme` (slate/amber/
+green scales), dark surface tokens for light-mode `--card`, named controls, modal focus
+restoration, glow-pulse instead of `animate-pulse` (opacity pulses break AA mid-animation),
+dark-first default matching the app's design.
+
+**Phase 4 (strict linting).** `eslint . --max-warnings 0`; promoted `react-hooks/
+exhaustive-deps`, `@typescript-eslint/no-explicit-any`, `no-fallthrough`, `eqeqeq`,
+`prefer-const` to error. CI inherits.
+
+**Phase 6 (E2E matrix).** Local: chromium 10/10, firefox 10/10, webkit 9 + 1 flaky
+(passes on retry — `N`-key modal close under load). CI gained the missing `e2e` job
+(3-browser matrix, browser cache, report artifact); both deploy jobs now gate on it.
+
+**Infrastructure findings.**
+- **E2E port squatting:** a foreign Vite app bound `0.0.0.0:5173` and Playwright's
+  `reuseExistingServer` served it to every test — 100% false failures that looked like app
+  breakage. E2E now boots its own dev server on dedicated port **5299** (`E2E_PORT` still
+  overrides); human dev server stays on 5173.
+- actionlint 1.7.7 clean on both workflows (fixed the remaining SC2086 shellcheck nits).
+- **GitForge status:** gateway `:42780` healthy; CLI unauthenticated (401). Pipeline
+  routing requires the user's interactive `gitforge auth --login` (user-only credential
+  path); remote/push/pipeline steps are mechanical afterwards.
+
+**Coverage ratchet (same session).** With all parallel suites landed the full run is
+**73 test files / 636 tests, all green**, measuring 62.63% statements / 58.30% branches /
+62.23% functions / 65.24% lines. `coverage.thresholds` in `vite.config.ts` is pinned just
+below those values (60/56/60/63) per ADR-0004, so coverage can only move up.
+
+Four more defects fixed while integrating the page suites:
+6. `ChallengesPage.handleClaim` guard was inverted — the CLAIM! button (rendered only for
+   completed challenges) silently did nothing.
+7. The `Infinity` "no fastest quest yet" sentinel did not survive JSON persistence: after
+   reload Analytics showed `0s` and the next quest collapsed the record to 0 (wrongly
+   unlocking the speed badge). The load path now restores the sentinel.
+8. `BadgesPage` counted the pre-seeded catalog as "earned" ("81 of 81" for a new player) —
+   now counts real unlocks.
+9. Minigames batch (found by re-encoding agent tests to the fixed behavior): unanswerable
+   `css_prop` puzzle, `git_cmd`/`python_list` options missing their answers, command-less
+   final step in `high-cpu-production`, IncidentSimulator stale-closure scoring (86% on a
+   flawless run) and unapplied hint penalty, duplicated Terminal-tile accessible name,
+   hub accuracy >100%.
+
+Also this session: ADRs added under `docs/decisions/` (Phase 7 start); stale
+`docs/DECISIONS.md` entries marked superseded; `docs/TASKS.md` (the last stale
+root-planning duplicate) retired; `testTimeout` raised to 15s for coverage-instrumented
+page renders.
+
+**Still open:** Phase 5 refactoring (GameContext split), knip/prettier adoption,
+quarterly dependency refresh (Phase 7 cadence).

@@ -188,4 +188,4 @@ W3Schools offers comprehensive DevOps/development tutorials covering 47+ technol
 - src/data/skills.ts - Skills
 - src/contexts/GameContext.tsx - State
 - docs/COMPREHENSIVE_ENHANCEMENT_PLAN.md - Full plan
-- docs/TASKS.md - Task breakdown
+- docs/planning/003-QUALITY_PLAN.md - Current quality roadmap (TASKS.md retired 2026-09)

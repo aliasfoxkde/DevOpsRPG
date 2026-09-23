@@ -1,6 +1,11 @@
 # Architectural Decisions - DevOpsQuest
 
-**Last Updated**: 2026-06-22
+> **Historical record.** Current decisions live as numbered ADRs in
+> [`docs/decisions/`](decisions/). Several entries below describe an earlier
+> planned architecture (Next.js, Workers-based auth) that the shipped Vite SPA
+> did not adopt — their status lines mark the outcome.
+
+**Last Updated**: 2026-09-23
 
 ---
 
@@ -96,7 +101,8 @@ Use `level = floor(sqrt(totalXP / 100))` formula.
 - **Pros**: Early levels are quick, later levels require sustained effort, mathematically smooth
 - **Cons**: May feel slow at high levels
 
-### Status: ACCEPTED
+### Status: SUPERSEDED — leveling uses the `XP_THRESHOLDS` table in
+`src/utils/gameUtils.ts` (the single source of truth, imported everywhere).
 
 ---
 
@@ -113,7 +119,8 @@ Organize into 5 phases based on prerequisites and difficulty:
 - Phase 4: Advanced & Cloud (9)
 - Phase 5: Modern DevOps (13)
 
-### Status: ACCEPTED
+### Status: SUPERSEDED — expanded to 51 technologies across 7 phases; see
+`src/data/technologies.ts` (`categories`) and `src/data/quests.ts` (`realms`).
 
 ---
 

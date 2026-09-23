@@ -60,7 +60,7 @@
 - Added 3 new career paths (AI Engineer, Software Engineer, AI Architect)
 - Created comprehensive enhancement plan (COMPREHENSIVE_ENHANCEMENT_PLAN.md)
 - Updated RESEARCH.md with codebase analysis
-- Updated TASKS.md with 27-task breakdown
+- Documented the 27-task breakdown (later moved to docs/planning/003-QUALITY_PLAN.md)
 - Commits pushed to main: f7593a2, bfe9a12
 
 ### In Progress
@@ -130,5 +130,5 @@
 
 - BRAINSTORM.md - Core design philosophy
 - COMPREHENSIVE_ENHANCEMENT_PLAN.md - Full enhancement plan
-- TASKS.md - Task breakdown (27 tasks)
+- docs/planning/003-QUALITY_PLAN.md - Roadmap superseding the 27-task list
 - RESEARCH.md - Codebase analysis
