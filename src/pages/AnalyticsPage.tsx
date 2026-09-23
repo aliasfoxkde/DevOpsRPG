@@ -265,7 +265,7 @@ export default function AnalyticsPage() {
             </div>
             <div className="bg-slate-800/50 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-orange-400">
-                {stats.fastestQuestTime !== Infinity ? `${Math.round(stats.fastestQuestTime)}s` : '--'}
+                {Number.isFinite(stats.fastestQuestTime) ? `${Math.round(stats.fastestQuestTime)}s` : '--'}
               </div>
               <div className="text-xs text-slate-400">Fastest Quest</div>
             </div>

@@ -160,7 +160,8 @@ export default function ChallengesPage() {
   }, [challengesWithProgress])
 
   const handleClaim = (challenge: typeof challengesWithProgress[0]) => {
-    if (challenge.completed || challenge.claimed) return
+    // Claims are offered only for completed, unclaimed challenges.
+    if (!challenge.completed || challenge.claimed) return
 
     // Grant rewards
     addXP(challenge.rewards.xp)

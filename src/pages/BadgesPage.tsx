@@ -147,7 +147,7 @@ export default function BadgesPage() {
     })
   }, [filterCategory, filterRarity, filterStatus, isUnlocked])
 
-  const unlockedCount = badges.length
+  const unlockedCount = BADGES.filter(isUnlocked).length
   const totalCount = BADGES.length
   const completionPercent = Math.round((unlockedCount / totalCount) * 100)
 
