@@ -72,14 +72,26 @@ export function exportGameData(gameState: {
   return base64
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function downloadExport(gameState: any, filename?: string): void {
+// Structural subset the exporter reads — kept loose so any GameState-like
+// object (e.g. TopicProgress-based quest lists) satisfies it.
+export interface ExportableGameState {
+  character: object
+  completedQuests: unknown[]
+  badges: Array<{ id: string; unlockedAt?: string | null }>
+  companions: unknown[]
+  stats: object
+  prestigeLevel?: number
+  prestigeMultiplier?: number
+  totalPrestigeXp?: number
+}
+
+export function downloadExport(gameState: ExportableGameState, filename?: string): void {
   const jsonString = JSON.stringify({
     version: '1.0.0',
     exportedAt: new Date().toISOString(),
     character: gameState.character,
     completedQuests: gameState.completedQuests,
-    badges: gameState.badges.filter((b: Badge) => b.unlockedAt),
+    badges: gameState.badges.filter((b) => b.unlockedAt),
     companions: gameState.companions,
     stats: gameState.stats,
     prestigeLevel: gameState.prestigeLevel,

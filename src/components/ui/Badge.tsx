@@ -20,7 +20,7 @@ export function Badge({
           'bg-muted text-muted-foreground': variant === 'default',
           'bg-primary/10 text-primary': variant === 'primary',
           'bg-secondary/10 text-secondary': variant === 'secondary',
-          'bg-green-500/10 text-green-500': variant === 'success',
+          'bg-green-500/10 text-green-400': variant === 'success',
           'bg-yellow-500/10 text-yellow-500': variant === 'warning',
           'bg-red-500/10 text-red-500': variant === 'error',
         },

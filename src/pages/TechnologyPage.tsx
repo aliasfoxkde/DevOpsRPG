@@ -97,7 +97,7 @@ export default function TechnologyPage() {
                     <h3 id={`topic-${topic.id}`} className="text-xl font-semibold mb-4">
                       {topic.name}
                       {isCompleted && (
-                        <span className="ml-2 text-green-500 text-sm font-normal" aria-label="Completed">
+                        <span className="ml-2 text-green-400 text-sm font-normal" aria-label="Completed">
                           Completed
                         </span>
                       )}

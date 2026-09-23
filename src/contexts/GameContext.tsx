@@ -292,25 +292,23 @@ interface GameContextType {
 
 // Game balance constants live in utils/gameUtils.ts (import GAME_BALANCE from there)
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
 // Deep merge utility for game state recovery
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function deepMerge(target: any, source: any): any {
-  const output = { ...target }
-  for (const key in source) {
+function deepMerge<T extends object>(target: T, source: object): T {
+  const output = { ...(target as Record<string, unknown>) }
+  const src = source as Record<string, unknown>
+  const tgt = target as Record<string, unknown>
+  for (const key in src) {
     if (
-      Object.prototype.hasOwnProperty.call(source, key) &&
-      Object.prototype.hasOwnProperty.call(target, key)
+      Object.prototype.hasOwnProperty.call(src, key) &&
+      Object.prototype.hasOwnProperty.call(tgt, key)
     ) {
-      const sourceValue = source[key]
-      const targetValue = target[key]
-      if (
-        sourceValue !== null &&
-        typeof sourceValue === 'object' &&
-        !Array.isArray(sourceValue) &&
-        targetValue !== null &&
-        typeof targetValue === 'object' &&
-        !Array.isArray(targetValue)
-      ) {
+      const sourceValue: unknown = src[key]
+      const targetValue: unknown = tgt[key]
+      if (isPlainObject(sourceValue) && isPlainObject(targetValue)) {
         // Recursively merge nested objects
         output[key] = deepMerge(targetValue, sourceValue)
       } else {
@@ -318,7 +316,7 @@ function deepMerge(target: any, source: any): any {
       }
     }
   }
-  return output
+  return output as T
 }
 
 function calculateLevel(xp: number): number {

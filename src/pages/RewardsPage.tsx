@@ -129,7 +129,7 @@ export default function RewardsPage() {
                   isClaimed
                     ? 'bg-green-900/30 border-green-500/50'
                     : isToday
-                    ? 'bg-amber-900/30 border-amber-500/50 animate-pulse'
+                    ? 'bg-amber-900/30 border-amber-500/50 animate-glow-pulse'
                     : 'bg-slate-800/50 border-slate-700'
                 }`}
               >
@@ -392,7 +392,7 @@ export default function RewardsPage() {
                   complete && !canClaim
                     ? 'bg-green-900/30 border-green-500/50'
                     : complete
-                    ? 'bg-amber-900/30 border-amber-500 animate-pulse'
+                    ? 'bg-amber-900/30 border-amber-500 animate-glow-pulse'
                     : 'bg-slate-800/50 border-slate-700'
                 }`}
               >

@@ -1,14 +1,38 @@
 @import "tailwindcss";
 
+/*
+ * WCAG 2.1 AA contrast remaps (Tailwind v4 CSS-first theme tokens).
+ *
+ * The app's components are styled for dark surfaces; these shades are tuned
+ * so text passes >= 4.5:1 against the surfaces it is actually rendered on.
+ * Verified with `node scripts/axe-audit.mjs` (dev server required):
+ *   - slate-500 muted text on dark surfaces: 4.8:1 on slate-800,
+ *     6.0:1 on slate-950 (was 3.1-3.8)
+ *   - amber-500/600 fills under white text: 6.0:1 / 5.0:1 (was ~3.2)
+ *   - green-500/600 fills under white text: 5.0:1 / 6.7:1 (was ~3.2)
+ */
+@theme {
+  --color-slate-500: #90a1b9;
+  --color-amber-500: #a34808;
+  --color-amber-600: #b45309;
+  --color-green-500: #15803d;
+  --color-green-600: #116a33;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #1f2937;
   --primary: #3b82f6;
-  --card: #ffffff;
-  --card-foreground: #1f2937;
-  --muted: #f3f4f6;
-  --muted-foreground: #6b7280;
-  --border: #e5e7eb;
+  /* Cards use dark surfaces in BOTH themes: page components hardcode dark
+   * slate styling, so a white --card turns their translucent overlays
+   * (bg-slate-800/50) into a mid-gray that fails WCAG AA contrast. Dark
+   * card tokens keep the composite dark in light mode as well.
+   * Revisit when light theme gets a full component-level pass (Phase 3). */
+  --card: #1e293b;
+  --card-foreground: #f1f5f9;
+  --muted: #334155;
+  --muted-foreground: #cbd5e1;
+  --border: #334155;
 }
 
 .dark {
@@ -76,6 +100,17 @@ body {
   animation: slide-down 0.2s ease-out forwards;
 }
 
+/* Attention pulse that animates border + glow only — never element opacity,
+   which would drag contained text below WCAG AA contrast mid-animation. */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+  50% { box-shadow: 0 0 16px 2px rgba(245, 158, 11, 0.45); }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
 @layer components {
   .bg-card {
     background-color: var(--card);
@@ -92,7 +127,7 @@ body {
     @apply px-4 py-2 rounded-lg font-semibold transition-all duration-200;
   }
   .btn-primary {
-    @apply bg-amber-600 text-white hover:bg-amber-500 active:bg-amber-700;
+    @apply bg-amber-600 text-white hover:bg-amber-500 active:bg-amber-800;
   }
   .btn-secondary {
     @apply bg-slate-700 text-slate-200 hover:bg-slate-600 active:bg-slate-800;

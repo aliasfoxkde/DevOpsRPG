@@ -56,6 +56,18 @@ const SECRET_LOCATIONS: MapLocation[] = [
 const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a']
 
 // Realm theme colors
+// Return a dark text color when the fill is too light for white text (WCAG AA
+// needs 4.5:1; luminance > 0.1833 is where white drops below that).
+function readableTextColor(hex: string): string {
+  const lin = (c: number) =>
+    c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
+  const r = lin(parseInt(hex.slice(1, 3), 16) / 255)
+  const g = lin(parseInt(hex.slice(3, 5), 16) / 255)
+  const b = lin(parseInt(hex.slice(5, 7), 16) / 255)
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+  return luminance > 0.1833 ? '#0f172a' : '#ffffff'
+}
+
 const REALM_COLORS: Record<string, { primary: string; secondary: string; glow: string }> = {
   foundations: { primary: '#22c55e', secondary: '#16a34a', glow: 'rgba(34, 197, 94, 0.5)' },
   scripts: { primary: '#f59e0b', secondary: '#d97706', glow: 'rgba(245, 158, 11, 0.5)' },
@@ -593,7 +605,7 @@ export default function WorldMapPage() {
                 className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all hover:scale-105"
                 style={{
                   backgroundColor: `${phase.color}25`,
-                  color: phase.color,
+                  color: phase.textColor,
                   border: `1px solid ${phase.color}40`
                 }}
               >
@@ -752,9 +764,9 @@ export default function WorldMapPage() {
                   {status && status.total > 0 && (
                     <div
                       className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold shadow-lg"
-                      style={{ backgroundColor: realmColor.primary }}
+                      style={{ backgroundColor: realmColor.primary, color: readableTextColor(realmColor.primary) }}
                     >
-                      <span className="text-white">{Math.round((status.completed / status.total) * 100)}%</span>
+                      <span>{Math.round((status.completed / status.total) * 100)}%</span>
                     </div>
                   )}
 

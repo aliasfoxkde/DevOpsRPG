@@ -46,7 +46,7 @@ export default function SettingsPage() {
               name="theme"
               checked={theme === 'dark'}
               onChange={() => handleThemeChange('dark')}
-              className="w-5 h-5 text-amber-500"
+              className="w-5 h-5 text-amber-400"
             />
           </label>
 
@@ -63,7 +63,7 @@ export default function SettingsPage() {
               name="theme"
               checked={theme === 'light'}
               onChange={() => handleThemeChange('light')}
-              className="w-5 h-5 text-amber-500"
+              className="w-5 h-5 text-amber-400"
             />
           </label>
 
@@ -80,7 +80,7 @@ export default function SettingsPage() {
               name="theme"
               checked={theme === 'system'}
               onChange={() => handleThemeChange('system')}
-              className="w-5 h-5 text-amber-500"
+              className="w-5 h-5 text-amber-400"
             />
           </label>
         </div>
@@ -105,6 +105,9 @@ export default function SettingsPage() {
             </div>
           </div>
           <button
+            role="switch"
+            aria-checked={!isMuted}
+            aria-label="Sound effects"
             onClick={() => {
               if (!isMuted) playSound('click')
               toggleMute()

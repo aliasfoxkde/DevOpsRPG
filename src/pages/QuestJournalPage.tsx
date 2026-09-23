@@ -157,6 +157,7 @@ export default function QuestJournalPage() {
 
             {/* Status Filter */}
             <select
+              aria-label="Filter quests by status"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
               className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
@@ -169,6 +170,7 @@ export default function QuestJournalPage() {
 
             {/* Realm Filter */}
             <select
+              aria-label="Filter quests by realm"
               value={filterRealm}
               onChange={(e) => setFilterRealm(e.target.value)}
               className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
@@ -181,6 +183,7 @@ export default function QuestJournalPage() {
 
             {/* Tech Filter */}
             <select
+              aria-label="Filter quests by technology"
               value={filterTech}
               onChange={(e) => setFilterTech(e.target.value)}
               className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
@@ -193,6 +196,7 @@ export default function QuestJournalPage() {
 
             {/* Difficulty Filter */}
             <select
+              aria-label="Filter quests by difficulty"
               value={filterDifficulty}
               onChange={(e) => setFilterDifficulty(e.target.value as FilterDifficulty)}
               className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
@@ -207,6 +211,7 @@ export default function QuestJournalPage() {
 
             {/* Sort */}
             <select
+              aria-label="Sort quests"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as SortBy)}
               className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"

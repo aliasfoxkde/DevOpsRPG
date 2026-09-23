@@ -47,6 +47,15 @@ export function Modal({
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, onClose])
 
+  // Restore focus to the trigger element when the modal closes
+  useEffect(() => {
+    if (!isOpen) return
+    const previouslyFocused = document.activeElement as HTMLElement | null
+    return () => {
+      previouslyFocused?.focus?.()
+    }
+  }, [isOpen])
+
   // Focus trap
   useEffect(() => {
     if (!isOpen) return
@@ -100,12 +109,12 @@ export function Modal({
       onClick={(e) => {
         if (e.target === overlayRef.current) onClose()
       }}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby={title ? 'modal-title' : undefined}
     >
       <div
         ref={contentRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={title ? 'modal-title' : undefined}
         className={`${sizeClasses[size]} ${variantClasses[variant]} w-full rounded-2xl border shadow-2xl p-6`}
       >
         {(title || showCloseButton) && (

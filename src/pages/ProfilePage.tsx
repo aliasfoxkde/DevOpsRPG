@@ -196,7 +196,7 @@ export default function ProfilePage() {
                 <div className="text-green-400">✓</div>
               )}
               {!milestone.unlocked && (
-                <div className="text-amber-500 text-sm">+{milestone.xpBonus} XP</div>
+                <div className="text-amber-400 text-sm">+{milestone.xpBonus} XP</div>
               )}
             </div>
           ))}

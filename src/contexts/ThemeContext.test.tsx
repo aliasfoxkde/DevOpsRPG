@@ -45,19 +45,20 @@ describe('ThemeContext', () => {
     vi.restoreAllMocks()
   })
 
-  it('provides initial state with system default', async () => {
+  it('defaults to dark when no preference is stored (dark-first app)', async () => {
     render(
       <ThemeProvider>
         <TestComponent />
       </ThemeProvider>
     )
 
-    expect(screen.getByTestId('theme')).toHaveTextContent('system')
-    expect(screen.getByTestId('resolved-theme')).toHaveTextContent('light')
+    expect(screen.getByTestId('theme')).toHaveTextContent('dark')
+    expect(screen.getByTestId('resolved-theme')).toHaveTextContent('dark')
   })
 
   it('resolves system theme to light when prefers-color-scheme is light', () => {
     // matchMedia is already stubbed globally to return false (light mode)
+    localStorage.setItem('theme', 'system')
     render(
       <ThemeProvider>
         <TestComponent />

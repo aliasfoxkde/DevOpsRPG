@@ -20,17 +20,20 @@ export interface SDLCPhase {
   icon: string
   description: string
   color: string
+  // AA-safe text variant of `color` for use on dark surfaces
+  // (phase.color at 500-level is below 4.5:1 against the map background).
+  textColor: string
 }
 
 // SDLC phases that run through all realms
 export const sdlcPhases: SDLCPhase[] = [
-  { id: 1, name: 'Plan', icon: '📋', description: 'Planning and requirements', color: '#6366f1' },
-  { id: 2, name: 'Code', icon: '💻', description: 'Writing and reviewing code', color: '#8b5cf6' },
-  { id: 3, name: 'Build', icon: '🔨', description: 'Compiling and building', color: '#ec4899' },
-  { id: 4, name: 'Test', icon: '🧪', description: 'Testing and quality assurance', color: '#f59e0b' },
-  { id: 5, name: 'Deploy', icon: '🚀', description: 'Deployment and release', color: '#22c55e' },
-  { id: 6, name: 'Operate', icon: '⚙️', description: 'Operating and maintaining', color: '#06b6d4' },
-  { id: 7, name: 'Monitor', icon: '📊', description: 'Monitoring and feedback', color: '#ef4444' },
+  { id: 1, name: 'Plan', icon: '📋', description: 'Planning and requirements', color: '#6366f1', textColor: '#a5b4fc' },
+  { id: 2, name: 'Code', icon: '💻', description: 'Writing and reviewing code', color: '#8b5cf6', textColor: '#c4b5fd' },
+  { id: 3, name: 'Build', icon: '🔨', description: 'Compiling and building', color: '#ec4899', textColor: '#f9a8d4' },
+  { id: 4, name: 'Test', icon: '🧪', description: 'Testing and quality assurance', color: '#f59e0b', textColor: '#fcd34d' },
+  { id: 5, name: 'Deploy', icon: '🚀', description: 'Deployment and release', color: '#22c55e', textColor: '#86efac' },
+  { id: 6, name: 'Operate', icon: '⚙️', description: 'Operating and maintaining', color: '#06b6d4', textColor: '#67e8f9' },
+  { id: 7, name: 'Monitor', icon: '📊', description: 'Monitoring and feedback', color: '#ef4444', textColor: '#fca5a5' },
 ]
 
 // World map locations representing the journey

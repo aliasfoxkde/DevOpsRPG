@@ -2,6 +2,12 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 
 export type Theme = 'light' | 'dark' | 'system'
 
+// Dark is the app's designed, accessibility-audited presentation. The light
+// palette is not yet coherently themed (components hardcode dark surfaces),
+// so first-time visitors default to dark; the setting remains fully
+// user-overridable. See docs/planning/003-QUALITY_PLAN.md Phase 3.
+export const DEFAULT_THEME: Theme = 'dark'
+
 interface ThemeContextType {
   theme: Theme
   resolvedTheme: 'light' | 'dark'
@@ -14,9 +20,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
     /* istanbul ignore if */
     if (typeof window !== 'undefined') {
-      return (localStorage.getItem('theme') as Theme) || 'system'
+      return (localStorage.getItem('theme') as Theme) || DEFAULT_THEME
     }
-    return 'system'
+    return DEFAULT_THEME
   })
 
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => {
