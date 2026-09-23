@@ -120,9 +120,12 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
           setGameState('resolving')
         }, 1500)
       } else {
-        // All done!
+        // All done! Pass the final step list explicitly — the setTimeout
+        // would otherwise call handleComplete with a closure that predates
+        // this step's completion and undercount accuracy.
+        const finalSteps = [...completedSteps, currentStep.id]
         setTimeout(() => {
-          handleComplete()
+          handleComplete(finalSteps)
         }, 1500)
       }
     } else {
@@ -132,11 +135,12 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
     }
   }
 
-  const handleComplete = useCallback(() => {
+  const handleComplete = useCallback((stepsOverride?: string[]) => {
     if (!selectedScenario) return
 
+    const steps = stepsOverride ?? completedSteps
     const timeBonus = Math.max(0, Math.round((timer.remaining / selectedScenario.estimatedTime) * 100))
-    const accuracyBonus = Math.round((completedSteps.length / (selectedScenario.diagnostics.length + selectedScenario.resolution.length)) * 100)
+    const accuracyBonus = Math.round((steps.length / (selectedScenario.diagnostics.length + selectedScenario.resolution.length)) * 100)
     const penaltyFactor = Math.max(0, 1 - (timer.penalty / 60)) // Reduce score for penalties
     const score = Math.round((timeBonus * 0.3 + accuracyBonus * 0.7) * penaltyFactor)
 
@@ -363,7 +367,10 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
             {/* Hint Button */}
             {!showHint && currentStep && (
               <button
-                onClick={() => setShowHint(true)}
+                onClick={() => {
+                  setTimer(prev => ({ ...prev, penalty: prev.penalty + 10 }))
+                  setShowHint(true)
+                }}
                 className="text-sm text-slate-500 hover:text-amber-400 transition-colors"
               >
                 💡 Need a hint? (+10s penalty)

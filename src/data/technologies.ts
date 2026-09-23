@@ -23,7 +23,7 @@ export interface Technology {
   topics: Topic[]
 }
 
-type CategoryKey = 'Foundations' | 'Backend Basics' | 'Frameworks & Databases' | 'Advanced & Cloud' | 'Modern DevOps' | 'AI & Intelligence'
+type CategoryKey = 'Foundations' | 'Backend Basics' | 'Frameworks & Databases' | 'Advanced & Cloud' | 'Modern DevOps' | 'AI & Intelligence' | 'Streaming & Mesh'
 
 interface CategoryInfo {
   name: CategoryKey
@@ -39,6 +39,7 @@ export const categories: Record<string, CategoryInfo> = {
   'advanced-cloud': { name: 'Advanced & Cloud', phase: 4, icon: '☁️', color: '#f59e0b' },
   'modern-devops': { name: 'Modern DevOps', phase: 5, icon: '🚀', color: '#ef4444' },
   'ai-intelligence': { name: 'AI & Intelligence', phase: 6, icon: '🤖', color: '#7c3aed' },
+  'streaming-mesh': { name: 'Streaming & Mesh', phase: 7, icon: '🌐', color: '#0ea5e9' },
 }
 
 export const technologies: Record<string, Omit<Technology, 'category'>> = {

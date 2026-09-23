@@ -478,6 +478,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
       if (typeof merged.character.streakShields !== 'number') {
         merged.character.streakShields = 0
       }
+      // The "no record yet" sentinel is Infinity, which JSON serializes to
+      // null; restore it or Math.min updates would collapse the record to 0.
+      if (!Number.isFinite(merged.stats.fastestQuestTime)) {
+        merged.stats.fastestQuestTime = Infinity
+      }
       return merged
     } catch (error) {
       console.warn('Failed to parse game data:', error)
@@ -1617,11 +1622,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const grantBadge = useCallback((badgeId: string) => {
     setGame(prev => {
       const badge = BADGES.find(b => b.id === badgeId)
-      if (!badge || prev.badges.some(b => b.id === badgeId)) return prev
+      // The full catalog is pre-seeded in locked state, so an existing entry
+      // only blocks the grant when it is already unlocked.
+      const existing = prev.badges.find(b => b.id === badgeId)
+      if (!badge || existing?.unlockedAt) return prev
       const newlyUnlocked = { ...badge, unlockedAt: new Date().toISOString() }
       return {
         ...prev,
-        badges: [...prev.badges, newlyUnlocked],
+        badges: existing
+          ? prev.badges.map(b => (b.id === badgeId ? newlyUnlocked : b))
+          : [...prev.badges, newlyUnlocked],
         recentBadgeUnlocks: [...prev.recentBadgeUnlocks, newlyUnlocked],
       }
     })

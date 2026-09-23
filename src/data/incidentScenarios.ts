@@ -89,6 +89,7 @@ export const INCIDENT_SCENARIOS: IncidentScenario[] = [
       {
         id: 'r3',
         action: 'Monitor for 5 minutes to confirm resolution',
+        command: 'kubectl top nodes',
         verification: 'CPU stable at <40%, response times back to normal',
       },
     ],

@@ -160,7 +160,7 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
         <button
           onClick={() => isUnlocked && setCurrentGame('terminal')}
           disabled={!isUnlocked}
-          aria-label={isUnlocked ? 'Play Incident Simulator game' : `Incident Simulator - requires level ${UNLOCK_LEVEL}`}
+          aria-label={isUnlocked ? 'Play Terminal Simulator game' : `Terminal Simulator - requires level ${UNLOCK_LEVEL}`}
           aria-disabled={!isUnlocked}
           className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
             isUnlocked
@@ -207,7 +207,9 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
   const renderResult = () => {
     if (!gameResult) return null
 
-    const percentage = Math.round((gameResult.score / gameResult.maxScore) * 100)
+    // The time bonus can push the raw score past maxScore; accuracy itself
+    // is still capped at a perfect score.
+    const percentage = Math.min(100, Math.round((gameResult.score / gameResult.maxScore) * 100))
     const xpEarned = Math.round((gameResult.score / gameResult.maxScore) * 50)
     const goldEarned = Math.round((gameResult.score / gameResult.maxScore) * 25)
 

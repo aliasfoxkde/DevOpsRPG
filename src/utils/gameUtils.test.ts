@@ -10,6 +10,7 @@ import {
   SCORING,
   GAME_BALANCE,
   GAME_DURATION,
+  XP_THRESHOLDS,
   ANIMATION,
 } from './gameUtils'
 
@@ -115,6 +116,11 @@ describe('gameUtils', () => {
     it('should return 1 for negative XP', () => {
       expect(calculateLevel(-100)).toBe(1)
     })
+
+    it('should cap at the top threshold level beyond it', () => {
+      expect(calculateLevel(3250)).toBe(XP_THRESHOLDS.length)
+      expect(calculateLevel(999999)).toBe(XP_THRESHOLDS.length)
+    })
   })
 
   describe('xpForNextLevel', () => {
@@ -126,6 +132,10 @@ describe('gameUtils', () => {
 
     it('should return Infinity at max level', () => {
       expect(xpForNextLevel(10000)).toBe(Infinity)
+    })
+
+    it('should return Infinity exactly at the final threshold', () => {
+      expect(xpForNextLevel(3250)).toBe(Infinity)
     })
   })
 

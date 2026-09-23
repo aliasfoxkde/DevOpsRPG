@@ -78,9 +78,18 @@ export const realms: Record<string, Realm> = {
     name: 'AI Nexus',
     icon: '🧠',
     color: '#7c3aed',
-    description: 'The realm of machine learning, neural networks, and artificial intelligence.',
+    description: 'The realm of machine learning, event streaming, and service meshes — where automation meets intelligence.',
     requiredLevel: 25,
-    technologies: ['machine_learning', 'networking', 'api_design', 'observability'],
+    technologies: [
+      'machine_learning',
+      'networking',
+      'api_design',
+      'observability',
+      'ansible',
+      'kafka',
+      'rabbitmq',
+      'istio',
+    ],
   },
 }
 

@@ -1,9 +1,10 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import {
   exportGameData,
   importGameData,
   parseBase64Import,
   mergeImportData,
+  downloadExport,
   type Character,
   type Badge,
   type CompletedQuest,
@@ -154,5 +155,217 @@ describe('dataExport', () => {
       const result = mergeImportData(currentState, importedData)
       expect(result.stats.fastestQuestTime).toBe(80)
     })
+  })
+})
+
+describe('importGameData sanitization', () => {
+  const valid = (overrides: Record<string, unknown> = {}) =>
+    JSON.stringify({
+      version: '1.0.0',
+      character: { name: 'Hero' },
+      completedQuests: [],
+      badges: [],
+      companions: [],
+      stats: {},
+      ...overrides,
+    })
+
+  it('rejects a payload without a version', () => {
+    expect(importGameData(valid({ version: undefined }))).toBeNull()
+  })
+
+  it('rejects a payload whose character is not an object', () => {
+    expect(importGameData(valid({ character: 'Hero' }))).toBeNull()
+  })
+
+  it('rejects a payload without badges array', () => {
+    expect(importGameData(valid({ badges: undefined }))).toBeNull()
+  })
+
+  it('rejects a payload without a character name', () => {
+    expect(importGameData(valid({ character: { level: 3 } }))).toBeNull()
+  })
+
+  it('clamps level to 1-100 and xp/gold to non-negative bounds', () => {
+    const result = importGameData(
+      valid({ character: { name: 'Hero', level: 9999, xp: -50, gold: 20_000_000 } })
+    )
+    expect(result?.character.level).toBe(100)
+    expect(result?.character.xp).toBe(0)
+    expect(result?.character.gold).toBe(10_000_000)
+  })
+
+  it('defaults missing numeric fields for a brand-new character', () => {
+    const result = importGameData(valid())
+    expect(result?.character.level).toBe(1)
+    expect(result?.character.xp).toBe(0)
+    expect(result?.character.gold).toBe(0)
+  })
+
+  it('truncates the character name to 50 characters', () => {
+    const result = importGameData(valid({ character: { name: 'x'.repeat(80) } }))
+    expect(result?.character.name).toHaveLength(50)
+  })
+
+  it('truncates title and avatar fields', () => {
+    const result = importGameData(
+      valid({ character: { name: 'Hero', title: 't'.repeat(150), avatar: 'a'.repeat(300) } })
+    )
+    expect(result?.character.title).toHaveLength(100)
+    expect(result?.character.avatar).toHaveLength(200)
+  })
+
+  it('drops list entries without ids and stringifies id values', () => {
+    const result = importGameData(
+      valid({
+        completedQuests: [{ id: 42 }, { nope: true }, { id: 'quest_1' }],
+        badges: [{ id: 'b1' }, null, { id: 'b2', unlockedAt: '2026-01-01' }],
+        companions: [{ id: 'c1' }, 'garbage'],
+      })
+    )
+    expect(result?.completedQuests).toEqual([{ id: '42' }, { id: 'quest_1' }])
+    expect(result?.badges).toEqual([
+      { id: 'b1', unlockedAt: null },
+      { id: 'b2', unlockedAt: '2026-01-01' },
+    ])
+    expect(result?.companions).toEqual([{ id: 'c1' }])
+  })
+
+  it('caps imported collections at sane sizes', () => {
+    const quests = Array.from({ length: 1500 }, (_, i) => ({ id: `q${i}` }))
+    const badges = Array.from({ length: 800 }, (_, i) => ({ id: `b${i}` }))
+    const companions = Array.from({ length: 50 }, (_, i) => ({ id: `c${i}` }))
+    const result = importGameData(valid({ completedQuests: quests, badges, companions }))
+    expect(result?.completedQuests).toHaveLength(1000)
+    expect(result?.badges).toHaveLength(500)
+    expect(result?.companions).toHaveLength(20)
+  })
+
+  it('bounds prestige values', () => {
+    const result = importGameData(
+      valid({ prestigeLevel: 500, prestigeMultiplier: 99, totalPrestigeXp: -10 })
+    )
+    expect(result?.prestigeLevel).toBe(100)
+    expect(result?.prestigeMultiplier).toBe(10)
+    expect(result?.totalPrestigeXp).toBe(0)
+  })
+
+  it('keeps stats objects and defaults missing stats to empty', () => {
+    expect(importGameData(valid({ stats: { quizCount: 3 } }))?.stats).toEqual({ quizCount: 3 })
+    expect(importGameData(valid({ stats: 'nope' }))?.stats).toEqual({})
+  })
+})
+
+describe('downloadExport', () => {
+  const createObjectURL = vi.fn<(blob: Blob) => string>(() => 'blob:mock-url')
+  const revokeObjectURL = vi.fn<(url: string) => void>()
+  // downloadExport removes its anchor from the DOM after clicking, so capture
+  // the created element in a spy to inspect the download attributes.
+  let clicked: HTMLAnchorElement | null = null
+  const realCreateElement = document.createElement.bind(document)
+
+  beforeEach(() => {
+    clicked = null
+    Object.defineProperty(URL, 'createObjectURL', { value: createObjectURL, configurable: true })
+    Object.defineProperty(URL, 'revokeObjectURL', { value: revokeObjectURL, configurable: true })
+    vi.spyOn(document, 'createElement').mockImplementation((tag: string) => {
+      const el = realCreateElement(tag)
+      if (tag === 'a') clicked = el as HTMLAnchorElement
+      return el
+    })
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('downloads JSON containing only unlocked badges under a dated filename', async () => {
+    downloadExport(
+      {
+        character: { name: 'DlHero', level: 4, xp: 300, gold: 25 },
+        completedQuests: [{ questId: 'quest_html_intro', topicId: 'html_intro' }],
+        badges: [
+          { id: 'earned', unlockedAt: '2026-01-01' },
+          { id: 'locked', unlockedAt: null },
+        ],
+        companions: [],
+        stats: { quizCount: 2 },
+        prestigeLevel: 2,
+        prestigeMultiplier: 1.5,
+        totalPrestigeXp: 900,
+      },
+      'my-save.json'
+    )
+
+    expect(createObjectURL).toHaveBeenCalledTimes(1)
+    const data = JSON.parse(await createObjectURL.mock.calls[0][0].text())
+    expect(data.version).toBe('1.0.0')
+    expect(data.character.name).toBe('DlHero')
+    expect(data.badges.map((b: { id: string }) => b.id)).toEqual(['earned'])
+    expect(data.prestigeLevel).toBe(2)
+
+    expect(clicked?.download).toBe('my-save.json')
+    expect(revokeObjectURL).toHaveBeenCalledWith('blob:mock-url')
+  })
+
+  it('falls back to a dated backup filename', () => {
+    downloadExport({
+      character: { name: 'Hero' },
+      completedQuests: [],
+      badges: [],
+      companions: [],
+      stats: {},
+    })
+    const today = new Date().toISOString().split('T')[0]
+    expect(clicked?.download).toBe(`devopsquest-backup-${today}.json`)
+  })
+})
+
+describe('mergeImportData keeps the player ahead', () => {
+  it('keeps current progress when the import is behind', () => {
+    const result = mergeImportData(
+      {
+        character: { name: 'Current', xp: 900, gold: 500, level: 10 },
+        badges: [],
+        companions: [{ id: 'kept' }],
+        stats: { fastestQuestTime: 30 },
+      },
+      {
+        version: '1.0.0',
+        exportedAt: '2026-01-01',
+        character: { name: 'Old', xp: 10, gold: 5, level: 1 },
+        completedQuests: [],
+        badges: [],
+        companions: [],
+        stats: {},
+      }
+    )
+    expect(result.character.xp).toBe(900)
+    expect(result.character.gold).toBe(500)
+    expect(result.character.level).toBe(10)
+    expect(result.companions).toEqual([{ id: 'kept' }])
+    expect(result.stats.fastestQuestTime).toBe(30)
+  })
+
+  it('keeps the current companions when the import has none', () => {
+    const result = mergeImportData(
+      {
+        character: { name: 'Current' },
+        badges: [],
+        companions: [{ id: 'kept' }],
+        stats: {},
+      },
+      {
+        version: '1.0.0',
+        exportedAt: '2026-01-01',
+        character: { name: 'Imported' },
+        completedQuests: [],
+        badges: [],
+        companions: [],
+        stats: {},
+      }
+    )
+    expect(result.companions).toEqual([{ id: 'kept' }])
   })
 })

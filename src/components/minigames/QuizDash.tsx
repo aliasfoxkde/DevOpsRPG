@@ -13,7 +13,8 @@ interface QuizDashProps {
 }
 
 // Generate quiz questions from the quiz data
-function generateQuizQuestions(count: number): QuizQuestion[] {
+// eslint-disable-next-line react-refresh/only-export-components -- exported so tests can replay the exact dealt deck
+export function generateQuizQuestions(count: number): QuizQuestion[] {
   // We'll generate placeholder questions since we don't have direct quiz access
   // In production, this would pull from the actual quiz data
   const sampleQuestions: Omit<QuizQuestion, 'id'>[] = [

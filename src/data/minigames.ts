@@ -123,8 +123,8 @@ export const codePuzzles: CodePuzzle[] = [
     id: 'css_prop',
     title: 'CSS Property',
     description: 'Which property changes text color?',
-    code: 'color: ___;',
-    answer: 'red',
+    code: '___: blue;',
+    answer: 'color',
     options: ['color', 'background', 'font', 'text'],
   },
   {
@@ -141,6 +141,7 @@ export const codePuzzles: CodePuzzle[] = [
     description: 'Which command stages all changes?',
     code: '___ .',
     answer: 'git add',
+    options: ['git add', 'git commit', 'git push', 'git status'],
   },
   {
     id: 'docker_img',
@@ -164,6 +165,7 @@ export const codePuzzles: CodePuzzle[] = [
     description: 'Create a list with items 1, 2, 3',
     code: 'my_list = [___, 2, 3]',
     answer: '1',
+    options: ['1', '0', 'first', 'item'],
   },
   {
     id: 'yaml_bool',

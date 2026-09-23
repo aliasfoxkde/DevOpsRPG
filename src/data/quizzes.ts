@@ -2593,45 +2593,6 @@ export function generateQuizzes(): Record<string, QuizQuestion[]> {
       }
     ],
 
-    // GitOps Quizzes
-    gitops_intro: [
-      {
-        id: 'gitops_intro_q1',
-        topicId: 'gitops_intro',
-        question: 'What is the core principle of GitOps?',
-        options: ['Code is law', 'Git is the source of truth', 'Automation is key', 'Containers only'],
-        correctIndex: 1,
-        explanation: 'GitOps uses Git repositories as the single source of truth for declarative infrastructure and applications.'
-      },
-      {
-        id: 'gitops_intro_q2',
-        topicId: 'gitops_intro',
-        question: 'What tool is commonly used for GitOps with Kubernetes?',
-        options: ['Docker', 'Argo CD', 'Jenkins', 'Maven'],
-        correctIndex: 1,
-        explanation: 'Argo CD is a declarative, GitOps continuous delivery tool for Kubernetes.'
-      }
-    ],
-
-    gitops_argocd: [
-      {
-        id: 'gitops_argocd_q1',
-        topicId: 'gitops_argocd',
-        question: 'What does Argo CD sync?',
-        options: ['Only code', 'Application state to Kubernetes', 'Docker images', 'CI pipelines'],
-        correctIndex: 1,
-        explanation: 'Argo CD syncs the desired application state in Git with the actual state running in Kubernetes.'
-      },
-      {
-        id: 'gitops_argocd_q2',
-        topicId: 'gitops_argocd',
-        question: 'What is Argo CD\'s deployment strategy?',
-        options: ['Manual only', 'GitOps automated', 'Scheduled', 'Manual approval required'],
-        correctIndex: 1,
-        explanation: 'Argo CD automatically deploys changes when Git repository is updated, following GitOps principles.'
-      }
-    ],
-
     // MLOps Quizzes
     ml_mlops: [
       {
