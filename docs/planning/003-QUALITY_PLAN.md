@@ -322,7 +322,7 @@ deliberately deferred, sized by measurement rather than intuition.
 | Aegis scan                | 6053 findings; 3 "critical" all false positives (example URLs in teaching content); true classes: console noise; `react-missing-key-prop` hits are pattern noise (keys verified present) | baseline-gated: new findings fail CI             |
 | Accessibility             | WCAG 2.1 AA: 0 violations on 6 routes × 2 themes                                                                                                                                         | AAA pass + more routes                           |
 | GitForge CI               | gateway healthy `:42780`; CLI unauthenticated (401) — interactive `gitforge auth --login <user>` is the user-only credential step                                                        | pipeline created + first green run               |
-| Scripts                   | `deep-audit.mjs` hardcodes `localhost:5173`, writes `audit-report.json` (unignored)                                                                                                      | env-configurable, artifacts ignored              |
+| Scripts                   | `deep-audit.mjs` honors `AUDIT_URL`; `audit-report.json` gitignored                                                                                                                      | closed                                           |
 
 ### 4.2 Phases
 
@@ -361,6 +361,20 @@ locked by B's tests before each split.
 `gitforge auth --login <user>` runs: `gitforge repo --create aliasfoxkde/DevOpsRPG`,
 register the pipeline (lint → typecheck → test → e2e → build), push both remotes,
 webhook trigger. The GitHub `ci.yml` remains the mirror.
+
+Verified state (2026-09-24): gateway healthy (`:42780` returns 200 on `/health`),
+git-http up (`:42782`), CLI present at `~/.local/bin/gitforge` but unauthenticated,
+and the checkout has no `gitforge` remote yet. The pipeline definition already exists
+(`.gitforce.yml`, mirrored into `ci.yml`). Exact remaining steps, all requiring the
+user's interactive credential session:
+
+```bash
+gitforge auth login <username>                 # user-only credential path (ADR-0001)
+git remote add gitforge http://localhost:42782/<username>/DevOpsRPG.git
+gitforge pipeline --create .gitforce.yml       # registers the checked-in pipeline
+git push gitforge main                         # trigger_on: push fires the pipeline
+gitforge pipeline --list && gitforge pipeline --watch <run-id>
+```
 
 **Phase F — Release cadence.** Gates → CHANGELOG 0.1.3 → tag + GitHub release →
 wrangler deploy with existing env vars → byte-verify production.
@@ -442,13 +456,13 @@ the same acceptance gates: scoped vitest run green, `eslint --max-warnings 0`,
 
 Coverage results (v8, before → after, statements / branches / functions):
 
-| Scope (agent)                        | Files                                                                                     | Result                                        |
-| ------------------------------------ | ----------------------------------------------------------------------------------------- | --------------------------------------------- |
-| ui batch 1                           | RealmCompletionModal, QuickMiniGame, CelebrationOverlay, OnboardingWizard, CelebrationToast, TreasureChest, Confetti, MentorChat | 0-17% → **98.1 stmts / 93.2 branch / 100 funcs** (137 tests) |
-| ui batch 2 + hooks                   | VoiceSettings, Quiz, VictoryModal, useSoundEffects, useVoiceNarration, useKeyboardShortcuts, achievementCardGenerator | 12-53% → **96.7 stmts / 94.3 branch / 100 funcs** (201 tests) |
-| data + GameContext                   | badges, collectibles, milestones, communityChallenges, quizzes, GameContext                | 12-58% → **93-100 stmts; GameContext 97.5 / 91.0** (78 action tests) |
-| pages + App                          | SettingsPage, BattleArenaPage, FeedbackPage, RewardsPage, PVPArenaPage, MarketplacePage, App (all 30 routes) | 43-67% → 72-100% (95 tests)                   |
-| worker (direct)                      | index.ts router                                                                            | 18 tests: CORS, auth, merge semantics, leaderboard, routing |
+| Scope (agent)      | Files                                                                                                                            | Result                                                               |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| ui batch 1         | RealmCompletionModal, QuickMiniGame, CelebrationOverlay, OnboardingWizard, CelebrationToast, TreasureChest, Confetti, MentorChat | 0-17% → **98.1 stmts / 93.2 branch / 100 funcs** (137 tests)         |
+| ui batch 2 + hooks | VoiceSettings, Quiz, VictoryModal, useSoundEffects, useVoiceNarration, useKeyboardShortcuts, achievementCardGenerator            | 12-53% → **96.7 stmts / 94.3 branch / 100 funcs** (201 tests)        |
+| data + GameContext | badges, collectibles, milestones, communityChallenges, quizzes, GameContext                                                      | 12-58% → **93-100 stmts; GameContext 97.5 / 91.0** (78 action tests) |
+| pages + App        | SettingsPage, BattleArenaPage, FeedbackPage, RewardsPage, PVPArenaPage, MarketplacePage, App (all 30 routes)                     | 43-67% → 72-100% (95 tests)                                          |
+| worker (direct)    | index.ts router                                                                                                                  | 18 tests: CORS, auth, merge semantics, leaderboard, routing          |
 
 Real defects found by writing the tests (all fixed with regression tests):
 
