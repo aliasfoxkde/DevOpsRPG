@@ -6,11 +6,7 @@ import { MemoryRouter } from 'react-router-dom'
 
 // Test wrapper that provides router context
 function wrapper({ children }: { children: React.ReactNode }) {
-  return (
-    <MemoryRouter initialEntries={['/']}>
-      {children}
-    </MemoryRouter>
-  )
+  return <MemoryRouter initialEntries={['/']}>{children}</MemoryRouter>
 }
 
 describe('useKeyboardShortcuts', () => {

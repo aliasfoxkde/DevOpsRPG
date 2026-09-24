@@ -45,7 +45,7 @@ describe('Icon', () => {
         data-testid="shield-icon"
         style={{ color: 'rgb(251, 191, 36)' }}
         strokeWidth={1.5}
-      />
+      />,
     )
     const svg = container.querySelector('svg') as SVGSVGElement
     expect(svg).toHaveAttribute('data-testid', 'shield-icon')
@@ -59,15 +59,76 @@ describe('Icon', () => {
 
   it('renders a path for every icon name', () => {
     const names = [
-      'home', 'quests', 'map', 'challenges', 'career', 'leaderboard', 'character',
-      'settings', 'chevronRight', 'chevronLeft', 'close', 'menu', 'sun', 'moon',
-      'computer', 'volume', 'volumeOff', 'search', 'filter', 'sort', 'check', 'x',
-      'plus', 'minus', 'edit', 'delete', 'share', 'copy', 'download', 'upload',
-      'external', 'info', 'help', 'warning', 'error', 'success', 'star', 'starFilled',
-      'heart', 'heartFilled', 'bookmark', 'bookmarkFilled', 'flag', 'trophy', 'medal',
-      'badge', 'crown', 'fire', 'lightning', 'shield', 'sword', 'target', 'clock',
-      'calendar', 'user', 'users', 'mail', 'chat', 'bell', 'gear', 'link', 'unlink',
-      'globe', 'mapPin', 'code', 'terminal', 'database', 'server', 'cloud', 'storage',
+      'home',
+      'quests',
+      'map',
+      'challenges',
+      'career',
+      'leaderboard',
+      'character',
+      'settings',
+      'chevronRight',
+      'chevronLeft',
+      'close',
+      'menu',
+      'sun',
+      'moon',
+      'computer',
+      'volume',
+      'volumeOff',
+      'search',
+      'filter',
+      'sort',
+      'check',
+      'x',
+      'plus',
+      'minus',
+      'edit',
+      'delete',
+      'share',
+      'copy',
+      'download',
+      'upload',
+      'external',
+      'info',
+      'help',
+      'warning',
+      'error',
+      'success',
+      'star',
+      'starFilled',
+      'heart',
+      'heartFilled',
+      'bookmark',
+      'bookmarkFilled',
+      'flag',
+      'trophy',
+      'medal',
+      'badge',
+      'crown',
+      'fire',
+      'lightning',
+      'shield',
+      'sword',
+      'target',
+      'clock',
+      'calendar',
+      'user',
+      'users',
+      'mail',
+      'chat',
+      'bell',
+      'gear',
+      'link',
+      'unlink',
+      'globe',
+      'mapPin',
+      'code',
+      'terminal',
+      'database',
+      'server',
+      'cloud',
+      'storage',
     ] as const
 
     for (const name of names) {
@@ -86,10 +147,7 @@ describe('Icon', () => {
 
   it('renders the known menu glyph path', () => {
     const { container } = render(<Icon name="menu" />)
-    expect(container.querySelector('path')).toHaveAttribute(
-      'd',
-      'M4 6h16M4 12h16M4 18h16'
-    )
+    expect(container.querySelector('path')).toHaveAttribute('d', 'M4 6h16M4 12h16M4 18h16')
   })
 
   it('fills filled variants with currentColor instead of none', () => {

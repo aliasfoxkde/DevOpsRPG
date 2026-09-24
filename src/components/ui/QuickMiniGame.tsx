@@ -9,40 +9,64 @@ interface TriviaQuestion {
 
 const TRIVIA_QUESTIONS: TriviaQuestion[] = [
   {
-    question: "What does CI/CD stand for?",
-    options: ["Continuous Integration/Continuous Deployment", "Code Input/Code Output", "Central Integration/Delivery", "Container Interface/Container Data"],
+    question: 'What does CI/CD stand for?',
+    options: [
+      'Continuous Integration/Continuous Deployment',
+      'Code Input/Code Output',
+      'Central Integration/Delivery',
+      'Container Interface/Container Data',
+    ],
     correctIndex: 0,
-    devopsTip: "CI/CD pipelines automate the process of integrating code changes and deploying them to production!"
+    devopsTip:
+      'CI/CD pipelines automate the process of integrating code changes and deploying them to production!',
   },
   {
-    question: "Which tool is commonly used for containerization?",
-    options: ["Docker", "Git", "Jenkins", "Kubernetes"],
+    question: 'Which tool is commonly used for containerization?',
+    options: ['Docker', 'Git', 'Jenkins', 'Kubernetes'],
     correctIndex: 0,
-    devopsTip: "Docker containers package applications with their dependencies for consistent deployment across environments."
+    devopsTip:
+      'Docker containers package applications with their dependencies for consistent deployment across environments.',
   },
   {
-    question: "What is the main benefit of Infrastructure as Code?",
-    options: ["Reproducible infrastructure", "Faster computers", "Better coffee", "More meetings"],
+    question: 'What is the main benefit of Infrastructure as Code?',
+    options: ['Reproducible infrastructure', 'Faster computers', 'Better coffee', 'More meetings'],
     correctIndex: 0,
-    devopsTip: "IaC allows you to version control your infrastructure and deploy it consistently!"
+    devopsTip: 'IaC allows you to version control your infrastructure and deploy it consistently!',
   },
   {
     question: "What does 'git merge' do?",
-    options: ["Combines branch histories", "Deletes a branch", "Creates a new repository", "Pushes code to remote"],
+    options: [
+      'Combines branch histories',
+      'Deletes a branch',
+      'Creates a new repository',
+      'Pushes code to remote',
+    ],
     correctIndex: 0,
-    devopsTip: "Merging integrates changes from one branch into another, preserving the commit history!"
+    devopsTip:
+      'Merging integrates changes from one branch into another, preserving the commit history!',
   },
   {
     question: "What is a 'pull request' used for?",
-    options: ["Propose and review code changes", "Download repositories", "Delete branches", "Create containers"],
+    options: [
+      'Propose and review code changes',
+      'Download repositories',
+      'Delete branches',
+      'Create containers',
+    ],
     correctIndex: 0,
-    devopsTip: "Pull requests let team members review, discuss, and approve code changes before merging!"
+    devopsTip:
+      'Pull requests let team members review, discuss, and approve code changes before merging!',
   },
   {
-    question: "Which is a benefit of microservices architecture?",
-    options: ["Independent scaling of services", "Single large application", "No network communication needed", "One deployment for everything"],
+    question: 'Which is a benefit of microservices architecture?',
+    options: [
+      'Independent scaling of services',
+      'Single large application',
+      'No network communication needed',
+      'One deployment for everything',
+    ],
     correctIndex: 0,
-    devopsTip: "Microservices can be scaled independently, allowing better resource utilization!"
+    devopsTip: 'Microservices can be scaled independently, allowing better resource utilization!',
   },
 ]
 
@@ -53,22 +77,22 @@ interface MatchingPair {
 
 const MATCHING_GAMES: MatchingPair[][] = [
   [
-    { term: "Docker", definition: "Container platform" },
-    { term: "Kubernetes", definition: "Container orchestrator" },
-    { term: "Jenkins", definition: "CI/CD automation" },
-    { term: "Git", definition: "Version control" },
+    { term: 'Docker', definition: 'Container platform' },
+    { term: 'Kubernetes', definition: 'Container orchestrator' },
+    { term: 'Jenkins', definition: 'CI/CD automation' },
+    { term: 'Git', definition: 'Version control' },
   ],
   [
-    { term: "API", definition: "Application Programming Interface" },
-    { term: "DNS", definition: "Domain Name System" },
-    { term: "HTTP", definition: "Hypertext Transfer Protocol" },
-    { term: "SSH", definition: "Secure Shell" },
+    { term: 'API', definition: 'Application Programming Interface' },
+    { term: 'DNS', definition: 'Domain Name System' },
+    { term: 'HTTP', definition: 'Hypertext Transfer Protocol' },
+    { term: 'SSH', definition: 'Secure Shell' },
   ],
   [
-    { term: "HTML", definition: "HyperText Markup Language" },
-    { term: "CSS", definition: "Cascading Style Sheets" },
-    { term: "JS", definition: "JavaScript" },
-    { term: "SQL", definition: "Structured Query Language" },
+    { term: 'HTML', definition: 'HyperText Markup Language' },
+    { term: 'CSS', definition: 'Cascading Style Sheets' },
+    { term: 'JS', definition: 'JavaScript' },
+    { term: 'SQL', definition: 'Structured Query Language' },
   ],
 ]
 
@@ -80,7 +104,7 @@ interface QuickMiniGameProps {
 type GameType = 'trivia' | 'matching'
 
 export default function QuickMiniGame({ onComplete, onSkip }: QuickMiniGameProps) {
-  const [gameType] = useState<GameType>(() => Math.random() > 0.5 ? 'trivia' : 'matching')
+  const [gameType] = useState<GameType>(() => (Math.random() > 0.5 ? 'trivia' : 'matching'))
   const [xpBonus] = useState(() => Math.floor(Math.random() * 15) + 10)
 
   if (gameType === 'trivia') {
@@ -89,8 +113,18 @@ export default function QuickMiniGame({ onComplete, onSkip }: QuickMiniGameProps
   return <MatchingGame onComplete={onComplete} onSkip={onSkip} xpBonus={xpBonus} />
 }
 
-function TriviaGame({ onComplete, onSkip, xpBonus }: { onComplete: (s: boolean, x: number) => void; onSkip: () => void; xpBonus: number }) {
-  const [question] = useState(() => TRIVIA_QUESTIONS[Math.floor(Math.random() * TRIVIA_QUESTIONS.length)])
+function TriviaGame({
+  onComplete,
+  onSkip,
+  xpBonus,
+}: {
+  onComplete: (s: boolean, x: number) => void
+  onSkip: () => void
+  xpBonus: number
+}) {
+  const [question] = useState(
+    () => TRIVIA_QUESTIONS[Math.floor(Math.random() * TRIVIA_QUESTIONS.length)],
+  )
   const [selected, setSelected] = useState<number | null>(null)
   const [showResult, setShowResult] = useState(false)
 
@@ -108,7 +142,9 @@ function TriviaGame({ onComplete, onSkip, xpBonus }: { onComplete: (s: boolean, 
       }
     }
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
   }, [onSkip, showResult, question.correctIndex])
 
   const handleAnswer = (index: number) => {
@@ -139,7 +175,9 @@ function TriviaGame({ onComplete, onSkip, xpBonus }: { onComplete: (s: boolean, 
               </button>
             </div>
           </div>
-          <p className="text-purple-300 text-sm mt-1">Answer correctly for bonus XP! (N=auto solve, Esc=skip)</p>
+          <p className="text-purple-300 text-sm mt-1">
+            Answer correctly for bonus XP! (N=auto solve, Esc=skip)
+          </p>
         </div>
 
         <div className="p-6">
@@ -159,7 +197,9 @@ function TriviaGame({ onComplete, onSkip, xpBonus }: { onComplete: (s: boolean, 
               return (
                 <button
                   key={idx}
-                  onClick={() => !showResult && handleAnswer(idx)}
+                  onClick={() => {
+                    if (!showResult) handleAnswer(idx)
+                  }}
                   disabled={showResult}
                   className={`w-full text-left p-3 rounded-lg border transition-all ${bgClass}`}
                 >
@@ -171,8 +211,12 @@ function TriviaGame({ onComplete, onSkip, xpBonus }: { onComplete: (s: boolean, 
 
           {showResult && (
             <div className="mt-4">
-              <div className={`p-3 rounded-lg mb-4 ${selected === question.correctIndex ? 'bg-green-900/50 border border-green-600' : 'bg-amber-900/50 border border-amber-600'}`}>
-                <p className={`font-bold ${selected === question.correctIndex ? 'text-green-300' : 'text-amber-300'}`}>
+              <div
+                className={`p-3 rounded-lg mb-4 ${selected === question.correctIndex ? 'bg-green-900/50 border border-green-600' : 'bg-amber-900/50 border border-amber-600'}`}
+              >
+                <p
+                  className={`font-bold ${selected === question.correctIndex ? 'text-green-300' : 'text-amber-300'}`}
+                >
                   {selected === question.correctIndex ? '🎉 Correct!' : '❌ Not quite!'}
                 </p>
                 <p className="text-slate-300 text-sm mt-1">{question.devopsTip}</p>
@@ -198,7 +242,15 @@ function TriviaGame({ onComplete, onSkip, xpBonus }: { onComplete: (s: boolean, 
   )
 }
 
-function MatchingGame({ onComplete, onSkip, xpBonus }: { onComplete: (s: boolean, x: number) => void; onSkip: () => void; xpBonus: number }) {
+function MatchingGame({
+  onComplete,
+  onSkip,
+  xpBonus,
+}: {
+  onComplete: (s: boolean, x: number) => void
+  onSkip: () => void
+  xpBonus: number
+}) {
   const [pairs] = useState(() => MATCHING_GAMES[Math.floor(Math.random() * MATCHING_GAMES.length)])
   const [termOrder] = useState(() => [...pairs].sort(() => Math.random() - 0.5))
   const [defOrder] = useState(() => [...pairs].sort(() => Math.random() - 0.5))
@@ -222,11 +274,15 @@ function MatchingGame({ onComplete, onSkip, xpBonus }: { onComplete: (s: boolean
         }
         setMatchedPairs(allMatched)
         setSelectedTermIdx(null)
-        setTimeout(() => onComplete(true, xpBonus), 300)
+        setTimeout(() => {
+          onComplete(true, xpBonus)
+        }, 300)
       }
     }
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
   }, [onSkip, onComplete, xpBonus, pairs.length])
 
   const handleTermClick = (termIdx: number) => {
@@ -250,12 +306,16 @@ function MatchingGame({ onComplete, onSkip, xpBonus }: { onComplete: (s: boolean
       setSelectedTermIdx(null)
 
       if (newMatched.size === pairs.length * 2) {
-        setTimeout(() => onComplete(true, xpBonus), 500)
+        setTimeout(() => {
+          onComplete(true, xpBonus)
+        }, 500)
       }
     } else {
       // Wrong match
       setWrongDefIdx(defIdx)
-      setTimeout(() => setWrongDefIdx(null), 800)
+      setTimeout(() => {
+        setWrongDefIdx(null)
+      }, 800)
     }
   }
 
@@ -281,7 +341,9 @@ function MatchingGame({ onComplete, onSkip, xpBonus }: { onComplete: (s: boolean
               </button>
             </div>
           </div>
-          <p className="text-blue-300 text-sm mt-1">Match all pairs to earn bonus XP! (N=auto solve, Esc=skip)</p>
+          <p className="text-blue-300 text-sm mt-1">
+            Match all pairs to earn bonus XP! (N=auto solve, Esc=skip)
+          </p>
         </div>
 
         <div className="p-6">
@@ -296,12 +358,16 @@ function MatchingGame({ onComplete, onSkip, xpBonus }: { onComplete: (s: boolean
                   return (
                     <button
                       key={idx}
-                      onClick={() => handleTermClick(idx)}
+                      onClick={() => {
+                        handleTermClick(idx)
+                      }}
                       disabled={isMatched}
                       className={`w-full p-3 rounded-lg border transition-all text-center font-medium ${
-                        isMatched ? 'bg-green-900/50 border-green-600 text-green-300 opacity-50' :
-                        isSelected ? 'bg-amber-900/50 border-amber-500 text-amber-300' :
-                        'bg-slate-700 hover:bg-slate-600 border-slate-600 text-slate-200'
+                        isMatched
+                          ? 'bg-green-900/50 border-green-600 text-green-300 opacity-50'
+                          : isSelected
+                            ? 'bg-amber-900/50 border-amber-500 text-amber-300'
+                            : 'bg-slate-700 hover:bg-slate-600 border-slate-600 text-slate-200'
                       }`}
                     >
                       {pair.term}
@@ -321,12 +387,16 @@ function MatchingGame({ onComplete, onSkip, xpBonus }: { onComplete: (s: boolean
                   return (
                     <button
                       key={idx}
-                      onClick={() => handleDefClick(idx)}
+                      onClick={() => {
+                        handleDefClick(idx)
+                      }}
                       disabled={isMatched}
                       className={`w-full p-3 rounded-lg border transition-all text-center text-sm ${
-                        isMatched ? 'bg-green-900/50 border-green-600 text-green-300 opacity-50' :
-                        isWrong ? 'bg-red-900/50 border-red-500 animate-shake' :
-                        'bg-slate-700 hover:bg-slate-600 border-slate-600 text-slate-200'
+                        isMatched
+                          ? 'bg-green-900/50 border-green-600 text-green-300 opacity-50'
+                          : isWrong
+                            ? 'bg-red-900/50 border-red-500 animate-shake'
+                            : 'bg-slate-700 hover:bg-slate-600 border-slate-600 text-slate-200'
                       }`}
                     >
                       {pair.definition}
@@ -343,7 +413,9 @@ function MatchingGame({ onComplete, onSkip, xpBonus }: { onComplete: (s: boolean
             {matchedPairs.size / 2} / {pairs.length} matched
           </p>
           <button
-            onClick={() => onComplete(false, 0)}
+            onClick={() => {
+              onComplete(false, 0)
+            }}
             className="text-slate-500 hover:text-slate-300 text-sm"
           >
             Give up

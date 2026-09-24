@@ -13,13 +13,9 @@ describe('MilestonesPage', () => {
   it('renders the milestones header and progress summary', () => {
     renderSeededPage(<MilestonesPage />, { route: '/milestones', url: '/milestones' })
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Milestones/ }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /Milestones/ })).toBeInTheDocument()
     expect(screen.getByText('Milestone Progress')).toBeInTheDocument()
-    expect(
-      screen.getByText(`0 of ${MILESTONES.length} milestones achieved`),
-    ).toBeInTheDocument()
+    expect(screen.getByText(`0 of ${MILESTONES.length} milestones achieved`)).toBeInTheDocument()
   })
 
   it('summarises the player stats used by milestone triggers', () => {

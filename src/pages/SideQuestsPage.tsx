@@ -6,21 +6,21 @@ import EmptyState from '../components/ui/EmptyState'
 export default function SideQuestsPage() {
   const { game, claimSideQuest } = useGame()
 
-  const dailyQuests = game.sideQuests.filter(q => q.type === 'daily')
-  const weeklyQuests = game.sideQuests.filter(q => q.type === 'weekly')
-  const secretQuests = game.sideQuests.filter(q => q.type === 'secret')
+  const dailyQuests = game.sideQuests.filter((q) => q.type === 'daily')
+  const weeklyQuests = game.sideQuests.filter((q) => q.type === 'weekly')
+  const secretQuests = game.sideQuests.filter((q) => q.type === 'secret')
 
   const handleClaim = (questId: string) => {
     claimSideQuest(questId)
   }
 
-  const getProgressPercentage = (quest: typeof game.sideQuests[0]) => {
+  const getProgressPercentage = (quest: (typeof game.sideQuests)[0]) => {
     if (quest.completed) return 100
     const progress = Math.min(100, (quest.progress / quest.requirement.count) * 100)
     return progress
   }
 
-  const QuestCard = ({ quest }: { quest: typeof game.sideQuests[0] }) => {
+  const QuestCard = ({ quest }: { quest: (typeof game.sideQuests)[0] }) => {
     const expired = isQuestExpired(quest)
     const canClaim = quest.progress >= quest.requirement.count && !quest.completed && !expired
 
@@ -30,8 +30,8 @@ export default function SideQuestsPage() {
           quest.completed
             ? 'bg-green-900/30 border-green-500/50'
             : expired
-            ? 'bg-slate-800/30 border-slate-700'
-            : 'bg-card border-border'
+              ? 'bg-slate-800/30 border-slate-700'
+              : 'bg-card border-border'
         }`}
       >
         <div className="flex items-start gap-4">
@@ -40,7 +40,9 @@ export default function SideQuestsPage() {
           </div>
           <div className="flex-1">
             <div className="flex justify-between items-start">
-              <h3 className={`font-bold ${quest.completed ? 'text-slate-400 line-through' : 'text-white'}`}>
+              <h3
+                className={`font-bold ${quest.completed ? 'text-slate-400 line-through' : 'text-white'}`}
+              >
                 {quest.title}
               </h3>
               {quest.completed && <span className="text-green-400 text-sm">✓ Claimed</span>}
@@ -72,16 +74,16 @@ export default function SideQuestsPage() {
             <div className="flex gap-4 text-sm">
               <span className="text-amber-400">+{quest.rewards.xp} XP</span>
               <span className="text-orange-400">+{quest.rewards.gold} Gold</span>
-              {quest.rewards.badge && (
-                <span className="text-blue-400">+ Badge</span>
-              )}
+              {quest.rewards.badge && <span className="text-blue-400">+ Badge</span>}
             </div>
           </div>
 
           {/* Claim button */}
           {canClaim && (
             <button
-              onClick={() => handleClaim(quest.id)}
+              onClick={() => {
+                handleClaim(quest.id)
+              }}
               className="py-2 px-4 bg-green-600 hover:bg-green-500 rounded-lg font-bold text-sm whitespace-nowrap"
             >
               CLAIM
@@ -104,12 +106,12 @@ export default function SideQuestsPage() {
         <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
           <span>📅</span> Daily Quests
           <span className="text-sm font-normal text-slate-400">
-            ({dailyQuests.filter(q => q.completed).length}/{dailyQuests.length} complete)
+            ({dailyQuests.filter((q) => q.completed).length}/{dailyQuests.length} complete)
           </span>
         </h2>
         {dailyQuests.length > 0 ? (
           <div className="space-y-4">
-            {dailyQuests.map(quest => (
+            {dailyQuests.map((quest) => (
               <QuestCard key={quest.id} quest={quest} />
             ))}
           </div>
@@ -120,9 +122,7 @@ export default function SideQuestsPage() {
             description="Daily quests reset at midnight. Complete regular quests to make progress and check back tomorrow!"
           />
         )}
-        <p className="text-xs text-slate-500 mt-2">
-          Resets at midnight
-        </p>
+        <p className="text-xs text-slate-500 mt-2">Resets at midnight</p>
       </div>
 
       {/* Weekly Quests */}
@@ -130,12 +130,12 @@ export default function SideQuestsPage() {
         <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
           <span>📆</span> Weekly Quests
           <span className="text-sm font-normal text-slate-400">
-            ({weeklyQuests.filter(q => q.completed).length}/{weeklyQuests.length} complete)
+            ({weeklyQuests.filter((q) => q.completed).length}/{weeklyQuests.length} complete)
           </span>
         </h2>
         {weeklyQuests.length > 0 ? (
           <div className="space-y-4">
-            {weeklyQuests.map(quest => (
+            {weeklyQuests.map((quest) => (
               <QuestCard key={quest.id} quest={quest} />
             ))}
           </div>
@@ -146,9 +146,7 @@ export default function SideQuestsPage() {
             description="Weekly quests reset every Monday. Keep playing and completing daily quests to unlock more challenges!"
           />
         )}
-        <p className="text-xs text-slate-500 mt-2">
-          Resets every Monday
-        </p>
+        <p className="text-xs text-slate-500 mt-2">Resets every Monday</p>
       </div>
 
       {/* Secret Quests */}
@@ -156,12 +154,12 @@ export default function SideQuestsPage() {
         <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
           <span>🔮</span> Secret Quests
           <span className="text-sm font-normal text-slate-400">
-            ({secretQuests.filter(q => q.completed).length}/{secretQuests.length} discovered)
+            ({secretQuests.filter((q) => q.completed).length}/{secretQuests.length} discovered)
           </span>
         </h2>
         {secretQuests.length > 0 ? (
           <div className="space-y-4">
-            {secretQuests.map(quest => (
+            {secretQuests.map((quest) => (
               <QuestCard key={quest.id} quest={quest} />
             ))}
           </div>

@@ -34,16 +34,20 @@ function TitleCard({ title, isUnlocked, isEquipped, onEquip }: TitleCardProps) {
           <h3 className="font-bold text-white">{title.name}</h3>
           <p className="text-sm text-slate-400">{title.description}</p>
           <div className="mt-2 flex items-center justify-between">
-            <span className={`text-xs px-2 py-1 rounded ${
-              title.rarity === 'legendary' ? 'bg-amber-600' :
-              title.rarity === 'epic' ? 'bg-purple-600' :
-              title.rarity === 'rare' ? 'bg-blue-600' : 'bg-slate-600'
-            }`}>
+            <span
+              className={`text-xs px-2 py-1 rounded ${
+                title.rarity === 'legendary'
+                  ? 'bg-amber-600'
+                  : title.rarity === 'epic'
+                    ? 'bg-purple-600'
+                    : title.rarity === 'rare'
+                      ? 'bg-blue-600'
+                      : 'bg-slate-600'
+              }`}
+            >
               {title.rarity}
             </span>
-            {!isUnlocked && (
-              <span className="text-xs text-slate-500">{title.requirement}</span>
-            )}
+            {!isUnlocked && <span className="text-xs text-slate-500">{title.requirement}</span>}
           </div>
         </div>
       </div>
@@ -60,7 +64,7 @@ function TitleCard({ title, isUnlocked, isEquipped, onEquip }: TitleCardProps) {
 }
 
 interface FrameCardProps {
-  frame: typeof FRAMES[0]
+  frame: (typeof FRAMES)[0]
   isUnlocked: boolean
   isEquipped: boolean
   onEquip: () => void
@@ -100,16 +104,20 @@ function FrameCard({ frame, isUnlocked, isEquipped, onEquip }: FrameCardProps) {
           <h3 className="font-bold text-white">{frame.name}</h3>
           <p className="text-sm text-slate-400">{frame.description}</p>
           <div className="mt-2 flex items-center justify-between">
-            <span className={`text-xs px-2 py-1 rounded ${
-              frame.rarity === 'legendary' ? 'bg-amber-600' :
-              frame.rarity === 'epic' ? 'bg-purple-600' :
-              frame.rarity === 'rare' ? 'bg-blue-600' : 'bg-slate-600'
-            }`}>
+            <span
+              className={`text-xs px-2 py-1 rounded ${
+                frame.rarity === 'legendary'
+                  ? 'bg-amber-600'
+                  : frame.rarity === 'epic'
+                    ? 'bg-purple-600'
+                    : frame.rarity === 'rare'
+                      ? 'bg-blue-600'
+                      : 'bg-slate-600'
+              }`}
+            >
               {frame.rarity}
             </span>
-            {!isUnlocked && (
-              <span className="text-xs text-slate-500">{frame.requirement}</span>
-            )}
+            {!isUnlocked && <span className="text-xs text-slate-500">{frame.requirement}</span>}
           </div>
         </div>
       </div>
@@ -135,28 +143,34 @@ export default function TitlesFramesPage() {
     checkAndUnlockTitlesFrames()
   }, [checkAndUnlockTitlesFrames])
 
-  const titlesByRarity = useMemo(() => ({
-    legendary: TITLES.filter(t => t.rarity === 'legendary'),
-    epic: TITLES.filter(t => t.rarity === 'epic'),
-    rare: TITLES.filter(t => t.rarity === 'rare'),
-    common: TITLES.filter(t => t.rarity === 'common'),
-  }), [])
+  const titlesByRarity = useMemo(
+    () => ({
+      legendary: TITLES.filter((t) => t.rarity === 'legendary'),
+      epic: TITLES.filter((t) => t.rarity === 'epic'),
+      rare: TITLES.filter((t) => t.rarity === 'rare'),
+      common: TITLES.filter((t) => t.rarity === 'common'),
+    }),
+    [],
+  )
 
-  const framesByRarity = useMemo(() => ({
-    legendary: FRAMES.filter(f => f.rarity === 'legendary'),
-    epic: FRAMES.filter(f => f.rarity === 'epic'),
-    rare: FRAMES.filter(f => f.rarity === 'rare'),
-    common: FRAMES.filter(f => f.rarity === 'common'),
-  }), [])
+  const framesByRarity = useMemo(
+    () => ({
+      legendary: FRAMES.filter((f) => f.rarity === 'legendary'),
+      epic: FRAMES.filter((f) => f.rarity === 'epic'),
+      rare: FRAMES.filter((f) => f.rarity === 'rare'),
+      common: FRAMES.filter((f) => f.rarity === 'common'),
+    }),
+    [],
+  )
 
-  const equippedTitleData = TITLES.find(t => t.id === equippedTitle)
-  const equippedFrameData = FRAMES.find(f => f.id === equippedFrame)
+  const equippedTitleData = TITLES.find((t) => t.id === equippedTitle)
+  const equippedFrameData = FRAMES.find((f) => f.id === equippedFrame)
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-2">🏅 Titles & Frames</h1>
-        <p className="text-slate-400">Customize your hero's identity</p>
+        <p className="text-slate-400">Customize your hero&apos;s identity</p>
       </div>
 
       {/* Currently Equipped */}
@@ -220,24 +234,28 @@ export default function TitlesFramesPage() {
 
       {/* Titles Section */}
       <div className="mb-12">
-        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-          📜 Titles
-        </h2>
+        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">📜 Titles</h2>
 
-        {(['legendary', 'epic', 'rare', 'common'] as const).map(rarity => (
+        {(['legendary', 'epic', 'rare', 'common'] as const).map((rarity) => (
           <div key={rarity} className="mb-8">
-            <h3 className={`text-lg font-bold mb-4 flex items-center gap-2 ${
-              rarity === 'legendary' ? 'text-amber-400' :
-              rarity === 'epic' ? 'text-purple-400' :
-              rarity === 'rare' ? 'text-blue-400' : 'text-slate-400'
-            }`}>
+            <h3
+              className={`text-lg font-bold mb-4 flex items-center gap-2 ${
+                rarity === 'legendary'
+                  ? 'text-amber-400'
+                  : rarity === 'epic'
+                    ? 'text-purple-400'
+                    : rarity === 'rare'
+                      ? 'text-blue-400'
+                      : 'text-slate-400'
+              }`}
+            >
               {rarity === 'legendary' && '🐉 Legendary'}
               {rarity === 'epic' && '⭐ Epic'}
               {rarity === 'rare' && '💎 Rare'}
               {rarity === 'common' && '📦 Common'}
             </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {titlesByRarity[rarity].map(title => (
+              {titlesByRarity[rarity].map((title) => (
                 <TitleCard
                   key={title.id}
                   title={title}
@@ -253,24 +271,28 @@ export default function TitlesFramesPage() {
 
       {/* Frames Section */}
       <div>
-        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-          🖼️ Frames
-        </h2>
+        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">🖼️ Frames</h2>
 
-        {(['legendary', 'epic', 'rare', 'common'] as const).map(rarity => (
+        {(['legendary', 'epic', 'rare', 'common'] as const).map((rarity) => (
           <div key={rarity} className="mb-8">
-            <h3 className={`text-lg font-bold mb-4 flex items-center gap-2 ${
-              rarity === 'legendary' ? 'text-amber-400' :
-              rarity === 'epic' ? 'text-purple-400' :
-              rarity === 'rare' ? 'text-blue-400' : 'text-slate-400'
-            }`}>
+            <h3
+              className={`text-lg font-bold mb-4 flex items-center gap-2 ${
+                rarity === 'legendary'
+                  ? 'text-amber-400'
+                  : rarity === 'epic'
+                    ? 'text-purple-400'
+                    : rarity === 'rare'
+                      ? 'text-blue-400'
+                      : 'text-slate-400'
+              }`}
+            >
               {rarity === 'legendary' && '💎 Legendary'}
               {rarity === 'epic' && '⭐ Epic'}
               {rarity === 'rare' && '💎 Rare'}
               {rarity === 'common' && '📦 Common'}
             </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {framesByRarity[rarity].map(frame => (
+              {framesByRarity[rarity].map((frame) => (
                 <FrameCard
                   key={frame.id}
                   frame={frame}

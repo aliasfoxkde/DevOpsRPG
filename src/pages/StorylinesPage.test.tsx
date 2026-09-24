@@ -12,24 +12,16 @@ describe('StorylinesPage', () => {
 
   it('renders the story quests header and intro', () => {
     renderSeededPage(<StorylinesPage />)
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Story Quests/ }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', { name: '🎭 Learning Storylines' }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /Story Quests/ })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '🎭 Learning Storylines' })).toBeInTheDocument()
   })
 
   it('shows the player level and completed quest count from game state', () => {
     const { character, completedQuests } = seedDefaultGame()
     renderSeededPage(<StorylinesPage />)
 
-    expect(
-      screen.getByText(`✨ Level ${character.level} Quest Seeker`),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText(`🏆 ${completedQuests.length} Quests Completed`),
-    ).toBeInTheDocument()
+    expect(screen.getByText(`✨ Level ${character.level} Quest Seeker`)).toBeInTheDocument()
+    expect(screen.getByText(`🏆 ${completedQuests.length} Quests Completed`)).toBeInTheDocument()
   })
 
   it('renders every story arc with its chapter count', () => {
@@ -39,7 +31,7 @@ describe('StorylinesPage', () => {
       expect(screen.getByText(arc.subtitle)).toBeInTheDocument()
     }
     // Several arcs share a chapter count, so compare against the full set
-    const chapterCounts = STORY_ARCS.map(arc => `${arc.episodes.length} Chapters`)
+    const chapterCounts = STORY_ARCS.map((arc) => `${arc.episodes.length} Chapters`)
     for (const count of chapterCounts) {
       expect(screen.getAllByText(count).length).toBeGreaterThan(0)
     }

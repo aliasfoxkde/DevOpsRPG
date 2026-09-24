@@ -58,8 +58,8 @@ function getBreadcrumbs(pathname: string): BreadcrumbItem[] {
   } else if (pathname.startsWith('/worldmap')) {
     breadcrumbs.push(BREADCRUMB_MAP['/worldmap'])
   } else {
-    // Try to find exact match
-    const exactMatch = BREADCRUMB_MAP[pathname]
+    // Try to find exact match; unknown paths have no breadcrumb entry
+    const exactMatch = pathname in BREADCRUMB_MAP ? BREADCRUMB_MAP[pathname] : undefined
     if (exactMatch && exactMatch.path !== '/') {
       breadcrumbs.push(exactMatch)
     }
@@ -78,10 +78,7 @@ export default function Breadcrumbs() {
   }
 
   return (
-    <nav
-      aria-label="Breadcrumb"
-      className="bg-slate-800/50 border-b border-slate-700 px-4 py-2"
-    >
+    <nav aria-label="Breadcrumb" className="bg-slate-800/50 border-b border-slate-700 px-4 py-2">
       <div className="max-w-7xl mx-auto">
         <ol className="flex items-center gap-2 text-sm">
           {breadcrumbs.map((crumb, index) => {
@@ -95,10 +92,7 @@ export default function Breadcrumbs() {
                   </span>
                 )}
                 {isLast ? (
-                  <span
-                    className="text-amber-400 font-medium"
-                    aria-current="page"
-                  >
+                  <span className="text-amber-400 font-medium" aria-current="page">
                     {crumb.icon && <span className="mr-1">{crumb.icon}</span>}
                     {crumb.label}
                   </span>

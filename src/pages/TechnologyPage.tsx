@@ -5,9 +5,21 @@ import { w3schoolsContent } from '../data/w3schools-content'
 import { Button } from '@/components/ui'
 import { Check } from 'lucide-react'
 
+// Route params are untrusted: look the technology up so an unknown slug yields
+// undefined instead of pretending every key exists.
+function lookupTechnology(id: string | undefined) {
+  if (!id) return undefined
+  return id in technologies ? technologies[id] : undefined
+}
+
+function lookupTechnologyContent(id: string | undefined) {
+  if (!id) return undefined
+  return id in w3schoolsContent.technologies ? w3schoolsContent.technologies[id] : undefined
+}
+
 export default function TechnologyPage() {
   const { technology } = useParams()
-  const tech = technologies[technology as keyof typeof technologies]
+  const tech = lookupTechnology(technology)
   const { completeLearningTopic, isLearningTopicCompleted, game } = useGame()
 
   if (!tech) {
@@ -21,18 +33,16 @@ export default function TechnologyPage() {
     )
   }
 
-  const content = w3schoolsContent.technologies[technology as keyof typeof w3schoolsContent.technologies]
+  const content = lookupTechnologyContent(technology)
 
   const handleMarkComplete = (topicId: string) => {
     /* istanbul ignore next - technology is always defined when this is called */
     completeLearningTopic(topicId, technology ?? '', tech.xpPerTopic)
   }
 
-  const completedTopics = game.completedTopics.map(t => t.topicId)
+  const completedTopics = game.completedTopics.map((t) => t.topicId)
 
-  /* istanbul ignore next - content always exists for valid technologies */
-  const completedCount = content?.topics.filter(t => completedTopics.includes(t.id)).length ?? 0
-  /* istanbul ignore next - content always exists for valid technologies */
+  const completedCount = content?.topics.filter((t) => completedTopics.includes(t.id)).length ?? 0
   const totalCount = content?.topics.length ?? 0
 
   return (
@@ -46,7 +56,9 @@ export default function TechnologyPage() {
       </Link>
 
       <header className="flex items-center gap-4 mb-8">
-        <span className="text-4xl" aria-hidden="true">{tech.icon}</span>
+        <span className="text-4xl" aria-hidden="true">
+          {tech.icon}
+        </span>
         <div>
           <h1 className="text-3xl font-bold">{tech.name}</h1>
           <p className="text-muted-foreground">{tech.description}</p>
@@ -57,7 +69,9 @@ export default function TechnologyPage() {
         className="mb-8 bg-card rounded-lg border border-border p-4"
         aria-labelledby="progress-heading"
       >
-        <h2 id="progress-heading" className="sr-only">Technology Progress</h2>
+        <h2 id="progress-heading" className="sr-only">
+          Technology Progress
+        </h2>
         <div className="flex justify-between items-center mb-2">
           <span className="text-sm font-medium">Technology Progress</span>
           <span className="text-sm text-muted-foreground" aria-live="polite">
@@ -97,7 +111,10 @@ export default function TechnologyPage() {
                     <h3 id={`topic-${topic.id}`} className="text-xl font-semibold mb-4">
                       {topic.name}
                       {isCompleted && (
-                        <span className="ml-2 text-green-400 text-sm font-normal" aria-label="Completed">
+                        <span
+                          className="ml-2 text-green-400 text-sm font-normal"
+                          aria-label="Completed"
+                        >
                           Completed
                         </span>
                       )}
@@ -127,7 +144,9 @@ export default function TechnologyPage() {
 
                 <div className="mt-6 flex items-center gap-4">
                   <Button
-                    onClick={() => handleMarkComplete(topic.id)}
+                    onClick={() => {
+                      handleMarkComplete(topic.id)
+                    }}
                     disabled={isCompleted}
                     variant={isCompleted ? 'secondary' : 'primary'}
                     aria-describedby={isCompleted ? undefined : `topic-${topic.id}-desc`}

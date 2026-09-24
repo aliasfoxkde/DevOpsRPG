@@ -70,7 +70,9 @@ export function HUD() {
           <Link
             to="/"
             className="flex items-center gap-2 text-amber-400 hover:text-amber-300 transition-colors"
-            onClick={() => setMobileMenuOpen(false)}
+            onClick={() => {
+              setMobileMenuOpen(false)
+            }}
           >
             <span className="text-xl">⚔️</span>
             <span className="font-bold text-lg hidden sm:inline">DevOpsQuest</span>
@@ -91,11 +93,19 @@ export function HUD() {
               <span className={character.streakDays > 0 ? 'text-orange-400' : 'text-slate-500'}>
                 {character.streakDays > 3 ? '🔥' : '📅'}
               </span>
-              <span className="text-sm font-medium text-slate-300 hidden sm:inline">{character.streakDays}</span>
+              <span className="text-sm font-medium text-slate-300 hidden sm:inline">
+                {character.streakDays}
+              </span>
               {/* Tooltip - desktop only (mobile uses title attribute) */}
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 hidden md:block">
                 🔥 {character.streakDays} day streak
-                <div className="text-xs text-slate-500">{character.streakDays >= 7 ? 'Legendary!' : character.streakDays >= 3 ? 'Great progress!' : 'Keep going!'}</div>
+                <div className="text-xs text-slate-500">
+                  {character.streakDays >= 7
+                    ? 'Legendary!'
+                    : character.streakDays >= 3
+                      ? 'Great progress!'
+                      : 'Keep going!'}
+                </div>
               </div>
             </div>
 
@@ -105,7 +115,9 @@ export function HUD() {
               title={`💰 ${character.gold} gold - Spend it in the Shop!`}
             >
               <span className="text-yellow-400">💰</span>
-              <span className="text-sm font-medium text-slate-300 hidden sm:inline">{character.gold}</span>
+              <span className="text-sm font-medium text-slate-300 hidden sm:inline">
+                {character.gold}
+              </span>
               {/* Tooltip - desktop only (mobile uses title attribute) */}
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 hidden md:block">
                 💰 {character.gold} gold
@@ -120,7 +132,9 @@ export function HUD() {
                 title={`✨ ${character.xpMultiplier}x XP boost active!`}
               >
                 <span className="text-green-400">✨</span>
-                <span className="text-sm font-medium text-green-400 hidden sm:inline">{character.xpMultiplier}x</span>
+                <span className="text-sm font-medium text-green-400 hidden sm:inline">
+                  {character.xpMultiplier}x
+                </span>
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 hidden md:block">
                   ✨ {character.xpMultiplier}x XP boost
                   <div className="text-xs text-slate-500">Active until next quest!</div>
@@ -135,7 +149,9 @@ export function HUD() {
               title={`Theme: ${themeLabels[theme]} (${resolvedTheme}) - Click to change`}
               aria-label={`Current theme: ${themeLabels[theme]}. Click to change.`}
             >
-              <span className="text-lg" aria-hidden="true">{themeIcons[theme]}</span>
+              <span className="text-lg" aria-hidden="true">
+                {themeIcons[theme]}
+              </span>
             </button>
 
             {/* Sound Toggle */}
@@ -143,9 +159,15 @@ export function HUD() {
               onClick={toggleMute}
               className="flex items-center justify-center w-11 h-11 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500"
               title={isMuted ? 'Sound: OFF - Click to enable' : 'Sound: ON - Click to mute'}
-              aria-label={isMuted ? 'Sound is muted. Click to enable sound.' : 'Sound is enabled. Click to mute.'}
+              aria-label={
+                isMuted
+                  ? 'Sound is muted. Click to enable sound.'
+                  : 'Sound is enabled. Click to mute.'
+              }
             >
-              <span className="text-lg" aria-hidden="true">{isMuted ? '🔇' : '🔊'}</span>
+              <span className="text-lg" aria-hidden="true">
+                {isMuted ? '🔇' : '🔊'}
+              </span>
             </button>
 
             {/* Avatar - Desktop */}
@@ -163,7 +185,9 @@ export function HUD() {
 
             {/* Mobile Menu Button */}
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              onClick={() => {
+                setMobileMenuOpen(!mobileMenuOpen)
+              }}
               className="md:hidden flex items-center justify-center w-11 h-11 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
               aria-label="Toggle menu"
             >
@@ -181,17 +205,23 @@ export function HUD() {
               <div className="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-green-500 to-emerald-400 transition-all duration-500"
-                  style={{ width: `${totalQuests > 0 ? (completedCount / totalQuests) * 100 : 0}%` }}
+                  style={{
+                    width: `${totalQuests > 0 ? (completedCount / totalQuests) * 100 : 0}%`,
+                  }}
                 />
               </div>
-              <span className="text-slate-300">{completedCount}/{totalQuests}</span>
+              <span className="text-slate-300">
+                {completedCount}/{totalQuests}
+              </span>
             </div>
           </div>
 
           {/* Primary Nav Links */}
           <nav className="hidden lg:flex items-center gap-1" aria-label="Primary navigation">
             {PRIMARY_NAV.map((item) => {
-              const isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to))
+              const isActive =
+                location.pathname === item.to ||
+                (item.to !== '/' && location.pathname.startsWith(item.to))
               return (
                 <Link
                   key={item.to}
@@ -203,7 +233,9 @@ export function HUD() {
                   }`}
                   aria-current={isActive ? 'page' : undefined}
                 >
-                  <span className="mr-1" aria-hidden="true">{item.icon}</span>
+                  <span className="mr-1" aria-hidden="true">
+                    {item.icon}
+                  </span>
                   <span>{item.label}</span>
                 </Link>
               )
@@ -217,7 +249,9 @@ export function HUD() {
         <div className="md:hidden py-2 border-t border-slate-700/50">
           <div className="flex items-center justify-between text-sm mb-2">
             <span className="text-slate-400">Progress:</span>
-            <span className="text-slate-300">{completedCount}/{totalQuests} quests</span>
+            <span className="text-slate-300">
+              {completedCount}/{totalQuests} quests
+            </span>
           </div>
           <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
             <div
@@ -233,12 +267,16 @@ export function HUD() {
             {/* Primary Nav - 2 column grid */}
             <nav className="grid grid-cols-2 gap-2">
               {PRIMARY_NAV.map((item) => {
-                const isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to))
+                const isActive =
+                  location.pathname === item.to ||
+                  (item.to !== '/' && location.pathname.startsWith(item.to))
                 return (
                   <Link
                     key={item.to}
                     to={item.to}
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={() => {
+                      setMobileMenuOpen(false)
+                    }}
                     className={`flex flex-col items-center gap-1 p-3 rounded-lg transition-colors ${
                       isActive
                         ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/30'
@@ -258,12 +296,16 @@ export function HUD() {
             {/* Secondary Nav - 2 column grid */}
             <nav className="grid grid-cols-2 gap-2">
               {SECONDARY_NAV.map((item) => {
-                const isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to))
+                const isActive =
+                  location.pathname === item.to ||
+                  (item.to !== '/' && location.pathname.startsWith(item.to))
                 return (
                   <Link
                     key={item.to}
                     to={item.to}
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={() => {
+                      setMobileMenuOpen(false)
+                    }}
                     className={`flex flex-col items-center gap-1 p-3 rounded-lg transition-colors ${
                       isActive
                         ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/30'
@@ -311,7 +353,9 @@ function MoreDropdown() {
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
   }, [])
 
   // Keyboard navigation - Escape to close
@@ -323,19 +367,25 @@ function MoreDropdown() {
       }
     }
     document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
   }, [isOpen])
 
   // Close on route change
   useEffect(() => {
-    queueMicrotask(() => setIsOpen(false))
+    queueMicrotask(() => {
+      setIsOpen(false)
+    })
   }, [location.pathname])
 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
         ref={buttonRef}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen)
+        }}
         onKeyDown={(e) => {
           if (e.key === 'ArrowDown' && !isOpen) {
             e.preventDefault()
@@ -363,11 +413,16 @@ function MoreDropdown() {
         >
           {SECONDARY_GROUPS.map((group) => (
             <div key={group.label}>
-              <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wide" role="presentation">
+              <div
+                className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wide"
+                role="presentation"
+              >
                 {group.label}
               </div>
               {group.items.map((item) => {
-                const isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to))
+                const isActive =
+                  location.pathname === item.to ||
+                  (item.to !== '/' && location.pathname.startsWith(item.to))
                 return (
                   <Link
                     key={item.to}

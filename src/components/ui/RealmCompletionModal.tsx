@@ -33,7 +33,7 @@ function Particles() {
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {particles.map(p => (
+      {particles.map((p) => (
         <div
           key={p.id}
           className="absolute animate-particle-fall text-2xl"
@@ -56,22 +56,27 @@ export function RealmCompletionModal({ realmId, onClose }: RealmCompletionModalP
   const [count, setCount] = useState(5)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
-  const realm = realms[realmId]
+  // realmId is untrusted input, so the record lookup can legitimately miss
+  const realm = realmId in realms ? realms[realmId] : undefined
   const realmStory = realmStories[realmId]
   const completedQuests = useMemo(() => {
-    return game.completedQuests.filter(q => {
+    return game.completedQuests.filter((q) => {
       const quest = allQuests.find((qq: { id: string }) => qq.id === q.questId)
       return quest?.realmId === realmId
     })
   }, [game.completedQuests, realmId])
 
   // Get badges earned for this realm
-  const realmBadges = BADGES.filter(b => b.requirement.type === 'realm_complete' && b.requirement.value === Object.keys(realms).indexOf(realmId) + 1)
+  const realmBadges = BADGES.filter(
+    (b) =>
+      b.requirement.type === 'realm_complete' &&
+      b.requirement.value === Object.keys(realms).indexOf(realmId) + 1,
+  )
 
   useEffect(() => {
     // Start countdown
     timerRef.current = setInterval(() => {
-      setCount(prev => {
+      setCount((prev) => {
         if (prev <= 1) {
           if (timerRef.current) clearInterval(timerRef.current)
           onClose()
@@ -94,7 +99,9 @@ export function RealmCompletionModal({ realmId, onClose }: RealmCompletionModalP
       }
     }
     window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
+    return () => {
+      window.removeEventListener('keydown', handleKey)
+    }
   }, [onClose])
 
   if (!realm) return null
@@ -113,12 +120,8 @@ export function RealmCompletionModal({ realmId, onClose }: RealmCompletionModalP
 
           <div className="relative">
             <div className="text-7xl mb-4 animate-bounce">🏆</div>
-            <h1 className="text-4xl font-bold text-white drop-shadow-lg mb-2">
-              REALM COMPLETE!
-            </h1>
-            <h2 className="text-2xl font-bold text-amber-200">
-              {realm.name}
-            </h2>
+            <h1 className="text-4xl font-bold text-white drop-shadow-lg mb-2">REALM COMPLETE!</h1>
+            <h2 className="text-2xl font-bold text-amber-200">{realm.name}</h2>
           </div>
         </div>
 
@@ -128,7 +131,7 @@ export function RealmCompletionModal({ realmId, onClose }: RealmCompletionModalP
           {realmStory && (
             <div className="text-center">
               <p className="text-slate-300 italic text-sm leading-relaxed">
-                "{realmStory}"
+                &quot;{realmStory}&quot;
               </p>
             </div>
           )}
@@ -142,7 +145,7 @@ export function RealmCompletionModal({ realmId, onClose }: RealmCompletionModalP
               </div>
               <div>
                 <div className="text-3xl font-bold text-orange-400">
-                  {game.character.xp - (game.completedQuests.length * 50)}
+                  {game.character.xp - game.completedQuests.length * 50}
                 </div>
                 <div className="text-xs text-slate-400">Total XP Earned</div>
               </div>
@@ -154,8 +157,11 @@ export function RealmCompletionModal({ realmId, onClose }: RealmCompletionModalP
             <div className="text-center">
               <h3 className="text-lg font-bold text-white mb-3">🎖️ Badge Earned!</h3>
               <div className="flex justify-center gap-4">
-                {realmBadges.map(badge => (
-                  <div key={badge.id} className="p-3 bg-green-900/30 rounded-lg border border-green-500/50">
+                {realmBadges.map((badge) => (
+                  <div
+                    key={badge.id}
+                    className="p-3 bg-green-900/30 rounded-lg border border-green-500/50"
+                  >
                     <div className="text-4xl mb-1">{badge.icon}</div>
                     <div className="text-sm font-bold text-green-400">{badge.name}</div>
                   </div>
@@ -174,7 +180,8 @@ export function RealmCompletionModal({ realmId, onClose }: RealmCompletionModalP
           {Object.keys(realms).indexOf(realmId) < Object.keys(realms).length - 1 && (
             <div className="text-center p-3 bg-slate-800/50 rounded-lg border border-slate-600">
               <p className="text-slate-400 text-sm">
-                Next realm unlocks at level {Object.values(realms)[Object.keys(realms).indexOf(realmId) + 1]?.requiredLevel}
+                Next realm unlocks at level{' '}
+                {Object.values(realms)[Object.keys(realms).indexOf(realmId) + 1]?.requiredLevel}
               </p>
             </div>
           )}
@@ -189,7 +196,8 @@ export function RealmCompletionModal({ realmId, onClose }: RealmCompletionModalP
 
           {/* Skip hint */}
           <div className="text-center text-xs text-slate-500">
-            Press <kbd className="px-2 py-1 bg-slate-700 rounded text-slate-300">N</kbd> or <kbd className="px-2 py-1 bg-slate-700 rounded text-slate-300">ESC</kbd> to continue
+            Press <kbd className="px-2 py-1 bg-slate-700 rounded text-slate-300">N</kbd> or{' '}
+            <kbd className="px-2 py-1 bg-slate-700 rounded text-slate-300">ESC</kbd> to continue
           </div>
         </div>
       </div>

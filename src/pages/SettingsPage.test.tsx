@@ -33,9 +33,7 @@ describe('SettingsPage', () => {
   it('renders the settings heading and every section', () => {
     renderSeededPage(<SettingsPage />, { route: '/settings', url: '/settings' })
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Settings/ }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /Settings/ })).toBeInTheDocument()
     for (const section of [
       '🎨 Appearance',
       '🔊 Sound',
@@ -99,7 +97,10 @@ describe('SettingsPage', () => {
     expect(screen.getByRole('button', { name: 'Enabled' })).toBeInTheDocument()
     // Turning narration on reveals the test-voice controls
     expect(screen.getByText('Test Voice')).toBeInTheDocument()
-    expect(JSON.parse(localStorage.getItem('devopsquest_voice_settings')!)).toMatchObject({
+    const storedVoiceSettings: unknown = JSON.parse(
+      localStorage.getItem('devopsquest_voice_settings') ?? '{}',
+    )
+    expect(storedVoiceSettings).toMatchObject({
       enabled: true,
     })
   })
@@ -108,15 +109,11 @@ describe('SettingsPage', () => {
     const user = userEvent.setup()
     renderSeededPage(<SettingsPage />, { route: '/settings', url: '/settings' })
 
-    expect(
-      screen.queryByPlaceholderText('Paste your backup JSON here...'),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByPlaceholderText('Paste your backup JSON here...')).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /Import/ }))
 
-    expect(
-      screen.getByPlaceholderText('Paste your backup JSON here...'),
-    ).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Paste your backup JSON here...')).toBeInTheDocument()
     // Empty input means there is nothing valid to restore yet
     expect(screen.getByRole('button', { name: 'Restore Backup' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()

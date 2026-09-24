@@ -42,20 +42,18 @@ describe('TechnologyCollectionPage', () => {
     // Every card reports 0 of its required quests done
     const progressTexts = screen.getAllByText(/^\d+\/\d+ quests$/)
     expect(progressTexts).toHaveLength(TECHNOLOGY_COLLECTION.length)
-    expect(
-      progressTexts.every(el => el.textContent?.startsWith('0/')),
-    ).toBe(true)
+    expect(progressTexts.every((el) => el.textContent.startsWith('0/'))).toBe(true)
   })
 
   it('groups cards by named category', () => {
     renderSeededPage(<TechnologyCollectionPage />)
-    const categories = [...new Set(TECHNOLOGY_COLLECTION.map(card => card.category))]
+    const categories = [...new Set(TECHNOLOGY_COLLECTION.map((card) => card.category))]
     for (const category of categories) {
       // Some category names double as card names (e.g. "Security"), so allow repeats
       expect(screen.getAllByText(CATEGORY_NAMES[category]).length).toBeGreaterThan(0)
     }
-    expect(
-      screen.getAllByRole('heading', { level: 2 }).length,
-    ).toBeGreaterThanOrEqual(categories.length)
+    expect(screen.getAllByRole('heading', { level: 2 }).length).toBeGreaterThanOrEqual(
+      categories.length,
+    )
   })
 })

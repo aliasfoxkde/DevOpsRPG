@@ -24,7 +24,7 @@ export default function SocialPage() {
   const [giftSentMessage, setGiftSentMessage] = useState<string | null>(null)
 
   // Online friends count
-  const onlineCount = friends.filter(f => f.isOnline).length
+  const onlineCount = friends.filter((f) => f.isOnline).length
 
   // Send a gift to a friend
   const sendGift = (friend: Friend, gift: Gift) => {
@@ -34,22 +34,24 @@ export default function SocialPage() {
       giftId: gift.id,
       sentAt: new Date().toISOString(),
     }
-    setSentGifts(prev => [...prev, sentGift])
+    setSentGifts((prev) => [...prev, sentGift])
     setSelectedFriend(null)
     setGiftSentMessage(`You sent ${gift.icon} ${gift.name} to ${friend.name}!`)
-    setTimeout(() => setGiftSentMessage(null), 3000)
+    setTimeout(() => {
+      setGiftSentMessage(null)
+    }, 3000)
   }
 
   // Get remaining cooldown for a gift
   const getGiftCooldown = (giftId: string): number | null => {
-    const relevantGifts = sentGifts.filter(g => g.giftId === giftId)
+    const relevantGifts = sentGifts.filter((g) => g.giftId === giftId)
     if (relevantGifts.length === 0) return null
 
-    const lastSent = relevantGifts.sort((a, b) =>
-      new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime()
+    const lastSent = relevantGifts.sort(
+      (a, b) => new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime(),
     )[0]
 
-    const gift = AVAILABLE_GIFTS.find(g => g.id === giftId)
+    const gift = AVAILABLE_GIFTS.find((g) => g.id === giftId)
     if (!gift) return null
 
     const cooldownMs = gift.cooldownDays * 24 * 60 * 60 * 1000
@@ -71,16 +73,19 @@ export default function SocialPage() {
   }
 
   // Current player stats for leaderboard
-  const playerStats = useMemo(() => ({
-    rank: 0,
-    id: 'player',
-    name: character.name,
-    avatar: character.avatar,
-    level: character.level,
-    totalXP: character.xp,
-    streakDays: character.streakDays,
-    isFriend: false,
-  }), [character])
+  const playerStats = useMemo(
+    () => ({
+      rank: 0,
+      id: 'player',
+      name: character.name,
+      avatar: character.avatar,
+      level: character.level,
+      totalXP: character.xp,
+      streakDays: character.streakDays,
+      isFriend: false,
+    }),
+    [character],
+  )
 
   // Combined leaderboard with player
   const fullLeaderboard = useMemo(() => {
@@ -129,10 +134,12 @@ export default function SocialPage() {
           { id: 'friends' as Tab, label: '👥 Friends', icon: '👥' },
           { id: 'leaderboard' as Tab, label: '🏆 Leaderboard', icon: '🏆' },
           { id: 'gifts' as Tab, label: '🎁 Send Gifts', icon: '🎁' },
-        ].map(tab => (
+        ].map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => {
+              setActiveTab(tab.id)
+            }}
             className={`px-4 py-2 rounded-lg font-medium transition-all ${
               activeTab === tab.id
                 ? 'bg-amber-600 text-white'
@@ -147,16 +154,18 @@ export default function SocialPage() {
       {/* Friends Tab */}
       {activeTab === 'friends' && (
         <div className="space-y-4">
-          {friends.map(friend => (
+          {friends.map((friend) => (
             <div
               key={friend.id}
               className="bg-card rounded-xl border border-border p-4 flex items-center gap-4"
             >
               {/* Avatar */}
               <div className="relative">
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center text-3xl ${
-                  friend.isOnline ? 'bg-green-900/50' : 'bg-slate-800'
-                }`}>
+                <div
+                  className={`w-16 h-16 rounded-full flex items-center justify-center text-3xl ${
+                    friend.isOnline ? 'bg-green-900/50' : 'bg-slate-800'
+                  }`}
+                >
                   {friend.avatar}
                 </div>
                 {friend.isOnline && (
@@ -169,7 +178,9 @@ export default function SocialPage() {
                 <div className="flex items-center gap-2">
                   <h3 className="font-bold text-white">{friend.name}</h3>
                   {friend.isOnline && (
-                    <span className="text-xs px-2 py-0.5 bg-green-600/30 text-green-400 rounded">Online</span>
+                    <span className="text-xs px-2 py-0.5 bg-green-600/30 text-green-400 rounded">
+                      Online
+                    </span>
                   )}
                 </div>
                 <p className="text-sm text-slate-400">
@@ -209,9 +220,7 @@ export default function SocialPage() {
               'from-slate-400 to-slate-300', // 2nd
               'from-orange-600 to-orange-500', // 3rd
             ]
-            const rankBg = index < 3
-              ? `bg-gradient-to-r ${rankColors[index]}`
-              : 'bg-slate-800'
+            const rankBg = index < 3 ? `bg-gradient-to-r ${rankColors[index]}` : 'bg-slate-800'
 
             return (
               <div
@@ -220,16 +229,30 @@ export default function SocialPage() {
                   isPlayer
                     ? 'border-amber-500 bg-amber-900/20'
                     : entry.isFriend
-                    ? 'border-blue-500/50 bg-blue-900/10'
-                    : 'border-slate-700 bg-card'
+                      ? 'border-blue-500/50 bg-blue-900/10'
+                      : 'border-slate-700 bg-card'
                 }`}
               >
                 <div className={`p-4 flex items-center gap-4 ${rankBg} rounded-xl`}>
                   {/* Rank */}
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${
-                    index === 0 ? 'text-2xl' : index === 1 ? 'text-2xl' : index === 2 ? 'text-2xl' : 'bg-slate-700 text-white'
-                  }`}>
-                    {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${entry.rank}`}
+                  <div
+                    className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${
+                      index === 0
+                        ? 'text-2xl'
+                        : index === 1
+                          ? 'text-2xl'
+                          : index === 2
+                            ? 'text-2xl'
+                            : 'bg-slate-700 text-white'
+                    }`}
+                  >
+                    {index === 0
+                      ? '🥇'
+                      : index === 1
+                        ? '🥈'
+                        : index === 2
+                          ? '🥉'
+                          : `#${entry.rank}`}
                   </div>
 
                   {/* Avatar & Name */}
@@ -241,10 +264,14 @@ export default function SocialPage() {
                           {entry.name}
                         </span>
                         {entry.isFriend && !isPlayer && (
-                          <span className="text-xs px-2 py-0.5 bg-blue-600/30 text-blue-400 rounded">Friend</span>
+                          <span className="text-xs px-2 py-0.5 bg-blue-600/30 text-blue-400 rounded">
+                            Friend
+                          </span>
                         )}
                         {isPlayer && (
-                          <span className="text-xs px-2 py-0.5 bg-amber-600/30 text-amber-400 rounded">You</span>
+                          <span className="text-xs px-2 py-0.5 bg-amber-600/30 text-amber-400 rounded">
+                            You
+                          </span>
                         )}
                       </div>
                       <p className="text-sm text-slate-400">Level {entry.level}</p>
@@ -253,7 +280,9 @@ export default function SocialPage() {
 
                   {/* Stats */}
                   <div className="text-right">
-                    <div className="text-lg font-bold text-amber-400">{entry.totalXP.toLocaleString()} XP</div>
+                    <div className="text-lg font-bold text-amber-400">
+                      {entry.totalXP.toLocaleString()} XP
+                    </div>
                     <div className="text-sm text-slate-400">🔥 {entry.streakDays} streak</div>
                   </div>
                 </div>
@@ -274,10 +303,12 @@ export default function SocialPage() {
           <div className="mb-6">
             <h3 className="text-lg font-bold mb-3">Select a Friend</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {friends.map(friend => (
+              {friends.map((friend) => (
                 <button
                   key={friend.id}
-                  onClick={() => setSelectedFriend(friend)}
+                  onClick={() => {
+                        setSelectedFriend(friend)
+                      }}
                   className={`p-3 rounded-lg border-2 transition-all text-left ${
                     selectedFriend?.id === friend.id
                       ? 'border-amber-500 bg-amber-900/30'
@@ -303,14 +334,18 @@ export default function SocialPage() {
                 Select a Gift for {selectedFriend.avatar} {selectedFriend.name}
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
-                {AVAILABLE_GIFTS.map(gift => {
+                {AVAILABLE_GIFTS.map((gift) => {
                   const onCooldown = !canSendGift(gift.id)
                   const cooldownHours = getGiftCooldown(gift.id)
 
                   return (
                     <button
                       key={gift.id}
-                      onClick={() => !onCooldown && sendGift(selectedFriend, gift)}
+                      onClick={() => {
+                          if (!onCooldown) {
+                            sendGift(selectedFriend, gift)
+                          }
+                        }}
                       disabled={onCooldown}
                       className={`p-4 rounded-xl border-2 transition-all text-left ${
                         onCooldown

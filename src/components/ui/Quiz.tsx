@@ -4,22 +4,6 @@ import { getRandomEncouragement } from '../../data/milestones'
 import { useSoundEffects } from '../../hooks/useSoundEffects'
 import { useGame } from '../../contexts/GameContext'
 
-export type QuestionType = 'multiple_choice' | 'true_false' | 'fill_blank' | 'code_challenge'
-
-export interface QuizQuestion {
-  id: string
-  topicId: string
-  question: string
-  type?: QuestionType
-  options?: string[]
-  correctIndex?: number
-  correctAnswer?: string
-  explanation: string
-  codeTemplate?: string
-  expectedOutput?: string
-  hint?: string
-}
-
 interface QuizProps {
   topicId: string
   onPass: (isPerfect: boolean, wrongAnswers: number, passedWith80: boolean) => void
@@ -33,7 +17,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   const { game, consumeCollectible } = useGame()
 
   // Check if player has unused hint scroll
-  const hasHintScroll = game.collectibles.some(c => c.id === 'hint_scroll' && !c.used)
+  const hasHintScroll = game.collectibles.some((c) => c.id === 'hint_scroll' && !c.used)
 
   // ALL hooks must be called unconditionally - React rules
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -74,59 +58,69 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
   // Track component mount state to prevent state updates after unmount
   useEffect(() => {
     isMountedRef.current = true
-    return () => { isMountedRef.current = false }
+    return () => {
+      isMountedRef.current = false
+    }
   }, [])
 
   // Safety timeout: if isFinishing gets stuck for >2s, auto-complete anyway
   useEffect(() => {
     if (!isFinishing) return
     const safetyTimeout = setTimeout(() => {
-      if (isFinishing) {
-        console.warn('Quiz completion timed out, forcing completion')
-        onSkip()
-      }
+      // The effect only runs while isFinishing is true and is torn down as soon
+      // as it changes, so reaching this callback means it is still stuck.
+      console.warn('Quiz completion timed out, forcing completion')
+      onSkip()
     }, 2000)
-    return () => clearTimeout(safetyTimeout)
+    return () => {
+      clearTimeout(safetyTimeout)
+    }
   }, [isFinishing, onSkip])
 
-  // currentQuestion is guaranteed non-null when hasQuestions is true
-  // because we return early in the render when !hasQuestions
-  const currentQuestion = allQuestions[currentIndex]
+  // Array indexing is typed as always present, but an out-of-range index does
+  // yield undefined at runtime, so the bounds are checked explicitly and every
+  // access below guards the question.
+  const currentQuestion =
+    currentIndex >= 0 && currentIndex < allQuestions.length ? allQuestions[currentIndex] : undefined
   const questionType = currentQuestion?.type || 'multiple_choice'
   const isMultipleChoice = questionType === 'multiple_choice'
   const isTrueFalse = questionType === 'true_false'
   const isFillBlank = questionType === 'fill_blank'
   const isCodeChallenge = questionType === 'code_challenge'
 
-  const handleSelect = useCallback((index: number) => {
-    if (showExplanation || !currentQuestion) return
-    setSelectedIndex(index)
-    setShowExplanation(true)
-    const isCorrect = index === currentQuestion.correctIndex
-    setLocalCorrect(isCorrect)
-    if (isCorrect) {
-      setCorrectCount(c => c + 1)
-      playSound('correct')
-    } else {
-      setWrongCount(c => c + 1)
-      playSound('incorrect')
-    }
-  }, [showExplanation, currentQuestion, playSound])
+  const handleSelect = useCallback(
+    (index: number) => {
+      if (showExplanation || !currentQuestion) return
+      setSelectedIndex(index)
+      setShowExplanation(true)
+      const isCorrect = index === currentQuestion.correctIndex
+      setLocalCorrect(isCorrect)
+      if (isCorrect) {
+        setCorrectCount((c) => c + 1)
+        playSound('correct')
+      } else {
+        setWrongCount((c) => c + 1)
+        playSound('incorrect')
+      }
+    },
+    [showExplanation, currentQuestion, playSound],
+  )
 
   const handleTextSubmit = useCallback(() => {
     if (showExplanation || !textAnswer.trim() || !currentQuestion) return
     setShowExplanation(true)
     const normalizedInput = textAnswer.trim().toLowerCase()
     const normalizedCorrect = (currentQuestion.correctAnswer || '').toLowerCase()
-    const isCorrect = normalizedInput === normalizedCorrect ||
+    const isCorrect =
+      normalizedInput === normalizedCorrect ||
       normalizedCorrect.includes(normalizedInput) ||
       normalizedInput.includes(normalizedCorrect)
     setLocalCorrect(isCorrect)
     if (isCorrect) {
-      setCorrectCount(c => c + 1)
+      setCorrectCount((c) => c + 1)
       playSound('correct')
     } else {
-      setWrongCount(c => c + 1)
+      setWrongCount((c) => c + 1)
       playSound('incorrect')
     }
   }, [showExplanation, textAnswer, currentQuestion, playSound])
@@ -142,10 +136,10 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
     const isCorrect = code.includes(expected) || expected.includes(code.trim())
     setLocalCorrect(isCorrect)
     if (isCorrect) {
-      setCorrectCount(c => c + 1)
+      setCorrectCount((c) => c + 1)
       playSound('correct')
     } else {
-      setWrongCount(c => c + 1)
+      setWrongCount((c) => c + 1)
       playSound('incorrect')
     }
   }, [showExplanation, codeAnswer, currentQuestion, playSound])
@@ -155,7 +149,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
     // This allows handleFinish to be called again for the new quiz state
     finishHandledRef.current = false
     if (currentIndex < allQuestions.length - 1) {
-      setCurrentIndex(i => i + 1)
+      setCurrentIndex((i) => i + 1)
       setSelectedIndex(null)
       setTextAnswer('')
       setCodeAnswer('')
@@ -183,11 +177,9 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
     const passThreshold = Math.ceil(allQuestionsLengthRef.current * 0.6)
     const isPerfect = correctCountRef.current === allQuestionsLengthRef.current
     const passedWith80 = correctCountRef.current >= Math.ceil(allQuestionsLengthRef.current * 0.8)
-    console.log(`handleFinish: correct=${correctCountRef.current}, threshold=${passThreshold}, passed=${correctCountRef.current >= passThreshold}`)
     if (correctCountRef.current >= passThreshold) {
       onPass(isPerfect, wrongCountRef.current, passedWith80)
     } else {
-      console.log('handleFinish: not passed, calling onSkip')
       onSkip()
     }
   }, [hasQuestions, onPass, onSkip])
@@ -198,33 +190,38 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
       if (e.key.toLowerCase() !== 'n') return
       e.preventDefault()
 
-      console.log(`n key: quizComplete=${quizComplete}, showExplanation=${showExplanation}, questionIndex=${currentIndex}`)
-
       if (quizComplete) {
         // Final press - complete the quest
-        console.log('n key: calling handleFinish')
         handleFinish()
       } else if (showExplanation) {
         // Move to next question
-        console.log('n key: calling handleNext')
         handleNext()
       } else if (currentQuestion) {
         // Auto-answer the question
-        console.log('n key: auto-answering')
         if (currentQuestion.correctIndex !== undefined) {
           handleSelect(currentQuestion.correctIndex)
         } else if (currentQuestion.correctAnswer) {
           setTextAnswer(currentQuestion.correctAnswer)
           setShowExplanation(true)
           setLocalCorrect(true)
-          setCorrectCount(c => c + 1)
+          setCorrectCount((c) => c + 1)
         }
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [currentQuestion, currentIndex, showExplanation, quizComplete, handleFinish, handleNext, handleSelect])
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [
+    currentQuestion,
+    currentIndex,
+    showExplanation,
+    quizComplete,
+    handleFinish,
+    handleNext,
+    handleSelect,
+  ])
 
   // Handle empty quiz case - AFTER all hooks
   // User must still prove they've engaged with the material
@@ -252,12 +249,8 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
               if (takeawayError) setTakeawayError('')
             }}
           />
-          {takeawayError && (
-            <p className="text-red-400 text-sm mb-4">{takeawayError}</p>
-          )}
-          <p className="text-purple-400 text-sm mb-4">
-            ✨ Complete this quest to earn XP!
-          </p>
+          {takeawayError && <p className="text-red-400 text-sm mb-4">{takeawayError}</p>}
+          <p className="text-purple-400 text-sm mb-4">✨ Complete this quest to earn XP!</p>
           <button
             onClick={() => {
               if (takeawayText.trim().length < 10) {
@@ -277,9 +270,14 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
 
   const getQuestionTypeLabel = () => {
     switch (questionType) {
-      case 'true_false': return 'True or False'
-      case 'fill_blank': return 'Fill in the Blank'
-      default: return 'Multiple Choice'
+      case 'multiple_choice':
+        return 'Multiple Choice'
+      case 'true_false':
+        return 'True or False'
+      case 'fill_blank':
+        return 'Fill in the Blank'
+      case 'code_challenge':
+        return 'Code Challenge'
     }
   }
 
@@ -292,9 +290,7 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
     return (
       <div className="bg-slate-800/80 rounded-xl border border-slate-700 overflow-hidden">
         <div className="bg-gradient-to-r from-amber-900/30 via-slate-800 to-amber-900/30 px-6 py-4 border-b border-slate-700">
-          <h2 className="text-lg font-bold text-slate-100">
-            Quiz Complete
-          </h2>
+          <h2 className="text-lg font-bold text-slate-100">Quiz Complete</h2>
         </div>
         <div className="p-6 text-center">
           <h3 className="text-2xl font-bold text-white mb-2">
@@ -304,13 +300,15 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
             You got {correctCount} out of {allQuestions.length} questions correct ({percentage}%)
           </p>
           {passed ? (
-            <p className="text-green-400 mb-4">Great job! You've demonstrated your knowledge.</p>
+            <p className="text-green-400 mb-4">
+              Great job! You&apos;ve demonstrated your knowledge.
+            </p>
           ) : (
             <div className="mb-4">
               <p className="text-amber-400 mb-2">
                 Review the material and try again. You need {passThreshold} correct to pass.
               </p>
-              <p className="text-purple-300 text-sm italic">"{encouragement}"</p>
+              <p className="text-purple-300 text-sm italic">&quot;{encouragement}&quot;</p>
             </div>
           )}
           <div className="flex items-center justify-center gap-4">
@@ -329,24 +327,26 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
     )
   }
 
-  // At this point, currentQuestion is guaranteed to exist
-  const q = currentQuestion!
+  // hasQuestions guarantees at least one question and handleNext keeps the
+  // index in range; this guard only covers an out-of-range index defensively.
+  if (!currentQuestion) return null
+  const q = currentQuestion
 
   return (
     <div className="bg-slate-800/80 rounded-xl border border-amber-600/50 overflow-hidden">
       <div className="bg-gradient-to-r from-amber-900/30 via-slate-800 to-amber-900/30 px-6 py-4 border-b border-slate-700">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h2 className="text-lg font-bold text-slate-100">
-              Knowledge Check
-            </h2>
+            <h2 className="text-lg font-bold text-slate-100">Knowledge Check</h2>
             <span className="text-xs px-2 py-1 bg-amber-600/30 text-amber-400 rounded">
               {getQuestionTypeLabel()}
             </span>
           </div>
           <div className="flex items-center gap-4 text-sm">
             <span className="text-green-400 font-medium">{correctCount} correct</span>
-            <span className="text-slate-400">{currentIndex + 1}/{allQuestions.length}</span>
+            <span className="text-slate-400">
+              {currentIndex + 1}/{allQuestions.length}
+            </span>
           </div>
         </div>
       </div>
@@ -375,7 +375,9 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
               return (
                 <button
                   key={index}
-                  onClick={() => handleSelect(index)}
+                  onClick={() => {
+                    handleSelect(index)
+                  }}
                   disabled={showExplanation}
                   className={`w-full text-left p-4 rounded-lg border transition-all ${bgClass}`}
                   role="radio"
@@ -407,7 +409,9 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
               return (
                 <button
                   key={index}
-                  onClick={() => handleSelect(index)}
+                  onClick={() => {
+                    handleSelect(index)
+                  }}
                   disabled={showExplanation}
                   className={`p-6 rounded-lg border transition-all text-center text-lg font-bold ${bgClass}`}
                   role="radio"
@@ -427,7 +431,9 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
             <input
               type="text"
               value={textAnswer}
-              onChange={(e) => setTextAnswer(e.target.value)}
+              onChange={(e) => {
+                setTextAnswer(e.target.value)
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !showExplanation) handleTextSubmit()
               }}
@@ -472,8 +478,12 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
                     setHintMessage(null)
                   } else {
                     // Show message that hint scroll is needed
-                    setHintMessage('You need a Hint Scroll to reveal the hint! Visit the Shop to buy one.')
-                    setTimeout(() => setHintMessage(null), 3000)
+                    setHintMessage(
+                      'You need a Hint Scroll to reveal the hint! Visit the Shop to buy one.',
+                    )
+                    setTimeout(() => {
+                      setHintMessage(null)
+                    }, 3000)
                   }
                 }}
                 className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1"
@@ -496,7 +506,9 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
             </pre>
             <textarea
               value={codeAnswer}
-              onChange={(e) => setCodeAnswer(e.target.value)}
+              onChange={(e) => {
+                setCodeAnswer(e.target.value)
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'Tab') {
                   e.preventDefault()
@@ -508,7 +520,8 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
                     e.currentTarget.selectionStart = e.currentTarget.selectionEnd = start + 2
                   }, 0)
                 }
-                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !showExplanation) handleCodeSubmit()
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !showExplanation)
+                  handleCodeSubmit()
               }}
               disabled={showExplanation}
               placeholder="// Type your code here..."
@@ -557,7 +570,8 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
             )}
             {!localCorrect && q.correctIndex !== undefined && q.options && (
               <p className="text-slate-300 mb-2">
-                Correct answer: <span className="text-green-400 font-bold">{q.options[q.correctIndex]}</span>
+                Correct answer:{' '}
+                <span className="text-green-400 font-bold">{q.options[q.correctIndex]}</span>
               </p>
             )}
             <p className="text-slate-300">{q.explanation}</p>
@@ -570,7 +584,9 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
             <button
               onClick={handleNext}
               className="btn btn-secondary"
-              aria-label={currentIndex < allQuestions.length - 1 ? 'Go to next question' : 'See quiz results'}
+              aria-label={
+                currentIndex < allQuestions.length - 1 ? 'Go to next question' : 'See quiz results'
+              }
             >
               {currentIndex < allQuestions.length - 1 ? 'Next Question' : 'See Results'} (N)
             </button>

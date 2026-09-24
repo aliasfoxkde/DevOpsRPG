@@ -28,9 +28,7 @@ export default function SettingsPage() {
 
       {/* Theme Selection */}
       <div className="bg-card rounded-xl border border-border p-6 mb-6">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          🎨 Appearance
-        </h2>
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">🎨 Appearance</h2>
 
         <div className="space-y-3">
           <label className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg cursor-pointer hover:bg-slate-700/50 transition-colors">
@@ -45,7 +43,9 @@ export default function SettingsPage() {
               type="radio"
               name="theme"
               checked={theme === 'dark'}
-              onChange={() => handleThemeChange('dark')}
+              onChange={() => {
+                handleThemeChange('dark')
+              }}
               className="w-5 h-5 text-amber-400"
             />
           </label>
@@ -62,7 +62,9 @@ export default function SettingsPage() {
               type="radio"
               name="theme"
               checked={theme === 'light'}
-              onChange={() => handleThemeChange('light')}
+              onChange={() => {
+                handleThemeChange('light')
+              }}
               className="w-5 h-5 text-amber-400"
             />
           </label>
@@ -79,7 +81,9 @@ export default function SettingsPage() {
               type="radio"
               name="theme"
               checked={theme === 'system'}
-              onChange={() => handleThemeChange('system')}
+              onChange={() => {
+                handleThemeChange('system')
+              }}
               className="w-5 h-5 text-amber-400"
             />
           </label>
@@ -92,9 +96,7 @@ export default function SettingsPage() {
 
       {/* Sound Settings */}
       <div className="bg-card rounded-xl border border-border p-6 mb-6">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          🔊 Sound
-        </h2>
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">🔊 Sound</h2>
 
         <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-lg">
           <div className="flex items-center gap-3">
@@ -132,9 +134,7 @@ export default function SettingsPage() {
 
       {/* Game Stats */}
       <div className="bg-card rounded-xl border border-border p-6 mb-6">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          📊 Game Statistics
-        </h2>
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">📊 Game Statistics</h2>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-slate-800/50 rounded-lg p-4 text-center">
@@ -154,7 +154,9 @@ export default function SettingsPage() {
             <div className="text-xs text-slate-400">Quests</div>
           </div>
           <div className="bg-slate-800/50 rounded-lg p-4 text-center">
-            <div className="text-2xl font-bold text-green-400">{game.badges.filter(b => b.unlockedAt).length}</div>
+            <div className="text-2xl font-bold text-green-400">
+              {game.badges.filter((b) => b.unlockedAt).length}
+            </div>
             <div className="text-xs text-slate-400">Badges</div>
           </div>
           <div className="bg-slate-800/50 rounded-lg p-4 text-center">
@@ -166,9 +168,7 @@ export default function SettingsPage() {
 
       {/* Data Management */}
       <div className="bg-card rounded-xl border border-border p-6 mb-6">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          💾 Data Management
-        </h2>
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">💾 Data Management</h2>
 
         <div className="space-y-4">
           {/* Export */}
@@ -198,7 +198,9 @@ export default function SettingsPage() {
                 <div className="text-xs text-slate-400">Restore from a backup file</div>
               </div>
               <button
-                onClick={() => setShowImport(!showImport)}
+                onClick={() => {
+                  setShowImport(!showImport)
+                }}
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors"
               >
                 {showImport ? 'Cancel' : '📤 Import'}
@@ -209,7 +211,9 @@ export default function SettingsPage() {
               <div className="mt-3">
                 <textarea
                   value={importText}
-                  onChange={(e) => setImportText(e.target.value)}
+                  onChange={(e) => {
+                    setImportText(e.target.value)
+                  }}
                   placeholder="Paste your backup JSON here..."
                   className="w-full h-32 px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 text-sm font-mono focus:outline-none focus:border-amber-500"
                 />
@@ -237,7 +241,9 @@ export default function SettingsPage() {
                     Restore Backup
                   </button>
                   {importStatus === 'success' && (
-                    <span className="text-green-400 text-sm">✓ Import successful! Reloading...</span>
+                    <span className="text-green-400 text-sm">
+                      ✓ Import successful! Reloading...
+                    </span>
                   )}
                   {importStatus === 'error' && (
                     <span className="text-red-400 text-sm">✗ Invalid backup file</span>
@@ -262,8 +268,16 @@ export default function SettingsPage() {
           </div>
           <button
             onClick={() => {
-              if (window.confirm('Are you sure? This will reset ALL your progress and cannot be undone!')) {
-                if (window.confirm('Really? You will lose everything - all XP, badges, companions, everything!')) {
+              if (
+                window.confirm(
+                  'Are you sure? This will reset ALL your progress and cannot be undone!',
+                )
+              ) {
+                if (
+                  window.confirm(
+                    'Really? You will lose everything - all XP, badges, companions, everything!',
+                  )
+                ) {
                   playSound('click')
                   localStorage.clear()
                   window.location.reload()
@@ -279,13 +293,11 @@ export default function SettingsPage() {
 
       {/* Submit Feedback */}
       <div className="mt-8 bg-slate-800/50 rounded-xl border border-slate-700 p-6">
-        <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
-          📝 Submit Feedback
-        </h2>
+        <h2 className="text-lg font-bold mb-3 flex items-center gap-2">📝 Submit Feedback</h2>
         <p className="text-sm text-slate-400 mb-4">
-          Found a bug? Have a feature request? Want to see something changed?
-          Submit feedback directly from the app and our AI agents will automatically
-          review, prioritize, and implement improvements.
+          Found a bug? Have a feature request? Want to see something changed? Submit feedback
+          directly from the app and our AI agents will automatically review, prioritize, and
+          implement improvements.
         </p>
         <a
           href="/feedback"

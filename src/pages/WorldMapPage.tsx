@@ -9,7 +9,8 @@ const SECRET_LOCATIONS: MapLocation[] = [
   {
     id: 'lost_library',
     name: 'Lost Library of Code',
-    description: 'An ancient library containing the wisdom of DevOps masters. Here you can review previously failed questions and strengthen your knowledge.',
+    description:
+      'An ancient library containing the wisdom of DevOps masters. Here you can review previously failed questions and strengthen your knowledge.',
     icon: '📚',
     position: { x: 12, y: 45 },
     type: 'secret',
@@ -19,8 +20,9 @@ const SECRET_LOCATIONS: MapLocation[] = [
   },
   {
     id: 'dragon_lair',
-    name: 'Elder Dragon\'s Lair',
-    description: 'The legendary lair where ancient dragonsguard DevOps secrets. Only those who have mastered multiple companions may enter.',
+    name: "Elder Dragon's Lair",
+    description:
+      'The legendary lair where ancient dragonsguard DevOps secrets. Only those who have mastered multiple companions may enter.',
     icon: '🐲',
     position: { x: 75, y: 35 },
     type: 'secret',
@@ -31,7 +33,8 @@ const SECRET_LOCATIONS: MapLocation[] = [
   {
     id: 'phoenix_nest',
     name: 'Phoenix Nest',
-    description: 'A mystical nest where Phoenix companions are reborn. Complete a 30-day streak to discover this hidden location.',
+    description:
+      'A mystical nest where Phoenix companions are reborn. Complete a 30-day streak to discover this hidden location.',
     icon: '🔥',
     position: { x: 88, y: 65 },
     type: 'secret',
@@ -42,7 +45,8 @@ const SECRET_LOCATIONS: MapLocation[] = [
   {
     id: 'code_shrine',
     name: 'Shrine of Clean Code',
-    description: 'A sacred shrine where developers pray for code clarity. Complete 100 quests with no mistakes to unlock.',
+    description:
+      'A sacred shrine where developers pray for code clarity. Complete 100 quests with no mistakes to unlock.',
     icon: '⛩️',
     position: { x: 45, y: 75 },
     type: 'secret',
@@ -53,14 +57,24 @@ const SECRET_LOCATIONS: MapLocation[] = [
 ]
 
 // Konami code sequence
-const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a']
+const KONAMI_CODE = [
+  'ArrowUp',
+  'ArrowUp',
+  'ArrowDown',
+  'ArrowDown',
+  'ArrowLeft',
+  'ArrowRight',
+  'ArrowLeft',
+  'ArrowRight',
+  'b',
+  'a',
+]
 
 // Realm theme colors
 // Return a dark text color when the fill is too light for white text (WCAG AA
 // needs 4.5:1; luminance > 0.1833 is where white drops below that).
 function readableTextColor(hex: string): string {
-  const lin = (c: number) =>
-    c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
+  const lin = (c: number) => (c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4))
   const r = lin(parseInt(hex.slice(1, 3), 16) / 255)
   const g = lin(parseInt(hex.slice(3, 5), 16) / 255)
   const b = lin(parseInt(hex.slice(5, 7), 16) / 255)
@@ -68,7 +82,14 @@ function readableTextColor(hex: string): string {
   return luminance > 0.1833 ? '#0f172a' : '#ffffff'
 }
 
-const REALM_COLORS: Record<string, { primary: string; secondary: string; glow: string }> = {
+interface RealmColor {
+  primary: string
+  secondary: string
+  glow: string
+}
+
+// Indexed by arbitrary realm ids from map data, so lookups can miss.
+const REALM_COLORS: Record<string, RealmColor | undefined> = {
   foundations: { primary: '#22c55e', secondary: '#16a34a', glow: 'rgba(34, 197, 94, 0.5)' },
   scripts: { primary: '#f59e0b', secondary: '#d97706', glow: 'rgba(245, 158, 11, 0.5)' },
   frameworks: { primary: '#8b5cf6', secondary: '#7c3aed', glow: 'rgba(139, 92, 246, 0.5)' },
@@ -78,11 +99,11 @@ const REALM_COLORS: Record<string, { primary: string; secondary: string; glow: s
 }
 
 // Pre-generated star positions for atmosphere
-const STARS = [...Array(50)].map(() => ({
+const STARS = Array.from({ length: 50 }, () => ({
   left: Math.random() * 100,
   top: Math.random() * 40,
   delay: Math.random() * 3,
-  opacity: Math.random() * 0.5 + 0.2
+  opacity: Math.random() * 0.5 + 0.2,
 }))
 
 // Map terrain decorations
@@ -135,44 +156,92 @@ const TERRAIN_DECORATIONS = [
 // Trail control points for winding paths
 const TRAIL_PATHS = [
   // Village to Forest
-  { from: 'village_center', to: 'forest_entrance', cp: [
-    { x: 50, y: 85 }, { x: 55, y: 83 }, { x: 62, y: 80 }, { x: 68, y: 75 },
-    { x: 72, y: 70 }, { x: 75, y: 65 }, { x: 75, y: 60 }
-  ]},
+  {
+    from: 'village_center',
+    to: 'forest_entrance',
+    cp: [
+      { x: 50, y: 85 },
+      { x: 55, y: 83 },
+      { x: 62, y: 80 },
+      { x: 68, y: 75 },
+      { x: 72, y: 70 },
+      { x: 75, y: 65 },
+      { x: 75, y: 60 },
+    ],
+  },
   // Forest to Castle
-  { from: 'forest_entrance', to: 'castle_grounds', cp: [
-    { x: 75, y: 60 }, { x: 70, y: 56 }, { x: 64, y: 52 }, { x: 58, y: 48 },
-    { x: 54, y: 44 }, { x: 50, y: 40 }
-  ]},
+  {
+    from: 'forest_entrance',
+    to: 'castle_grounds',
+    cp: [
+      { x: 75, y: 60 },
+      { x: 70, y: 56 },
+      { x: 64, y: 52 },
+      { x: 58, y: 48 },
+      { x: 54, y: 44 },
+      { x: 50, y: 40 },
+    ],
+  },
   // Castle to Cloud
-  { from: 'castle_grounds', to: 'cloud_base_camp', cp: [
-    { x: 50, y: 40 }, { x: 46, y: 44 }, { x: 40, y: 48 }, { x: 34, y: 51 },
-    { x: 28, y: 53 }, { x: 25, y: 55 }
-  ]},
+  {
+    from: 'castle_grounds',
+    to: 'cloud_base_camp',
+    cp: [
+      { x: 50, y: 40 },
+      { x: 46, y: 44 },
+      { x: 40, y: 48 },
+      { x: 34, y: 51 },
+      { x: 28, y: 53 },
+      { x: 25, y: 55 },
+    ],
+  },
   // Cloud to Citadel
-  { from: 'cloud_base_camp', to: 'citadel_entrance', cp: [
-    { x: 25, y: 55 }, { x: 28, y: 50 }, { x: 32, y: 45 }, { x: 36, y: 40 },
-    { x: 42, y: 35 }, { x: 48, y: 30 }, { x: 50, y: 25 }
-  ]},
+  {
+    from: 'cloud_base_camp',
+    to: 'citadel_entrance',
+    cp: [
+      { x: 25, y: 55 },
+      { x: 28, y: 50 },
+      { x: 32, y: 45 },
+      { x: 36, y: 40 },
+      { x: 42, y: 35 },
+      { x: 48, y: 30 },
+      { x: 50, y: 25 },
+    ],
+  },
   // Citadel to AI Nexus
-  { from: 'citadel_entrance', to: 'ai_nexus', cp: [
-    { x: 50, y: 25 }, { x: 50, y: 22 }, { x: 50, y: 18 }, { x: 50, y: 15 }, { x: 50, y: 10 }
-  ]},
+  {
+    from: 'citadel_entrance',
+    to: 'ai_nexus',
+    cp: [
+      { x: 50, y: 25 },
+      { x: 50, y: 22 },
+      { x: 50, y: 18 },
+      { x: 50, y: 15 },
+      { x: 50, y: 10 },
+    ],
+  },
   // AI Nexus to Summit
-  { from: 'ai_nexus', to: 'summit', cp: [
-    { x: 50, y: 10 }, { x: 50, y: 6 }, { x: 50, y: 2 }
-  ]},
+  {
+    from: 'ai_nexus',
+    to: 'summit',
+    cp: [
+      { x: 50, y: 10 },
+      { x: 50, y: 6 },
+      { x: 50, y: 2 },
+    ],
+  },
 ]
 
 // Terrain SVG Components
 const MountainSVG = ({ scale = 1, color = '#475569' }: { scale?: number; color?: string }) => (
   <svg width={`${80 * scale}`} height={`${60 * scale}`} viewBox="0 0 80 60" fill="none">
-    <path d="M5 55 L25 15 L40 35 L55 10 L75 55 Z" fill={color} opacity="0.9"/>
-    <path d="M5 55 L25 15 L40 35 L55 10 L75 55 Z" fill="url(#snowGrad)" opacity="0.4"/>
+    <path d="M5 55 L25 15 L40 35 L55 10 L75 55 Z" fill={color} opacity="0.9" />
+    <path d="M5 55 L25 15 L40 35 L55 10 L75 55 Z" fill="url(#snowGrad)" opacity="0.4" />
     <defs>
       <linearGradient id="snowGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stopColor="white"/>
-        <stop offset="100%" stopColor="transparent"/>
+        <stop offset="0%" stopColor="white" />
+        <stop offset="100%" stopColor="transparent" />
       </linearGradient>
     </defs>
   </svg>
@@ -180,120 +249,144 @@ const MountainSVG = ({ scale = 1, color = '#475569' }: { scale?: number; color?:
 
 const HillSVG = ({ scale = 1 }: { scale?: number }) => (
   <svg width={`${100 * scale}`} height={`${40 * scale}`} viewBox="0 0 100 40" fill="none">
-    <ellipse cx="50" cy="35" rx="48" ry="20" fill="#374151" opacity="0.8"/>
-    <ellipse cx="50" cy="32" rx="45" ry="18" fill="#4b5563" opacity="0.6"/>
+    <ellipse cx="50" cy="35" rx="48" ry="20" fill="#374151" opacity="0.8" />
+    <ellipse cx="50" cy="32" rx="45" ry="18" fill="#4b5563" opacity="0.6" />
   </svg>
 )
 
 const ForestSVG = ({ scale = 1 }: { scale?: number }) => (
   <svg width={`${80 * scale}`} height={`${70 * scale}`} viewBox="0 0 80 70" fill="none">
     {/* Tree 1 */}
-    <polygon points="15,65 25,20 35,65" fill="#166534"/>
-    <polygon points="18,55 25,28 32,55" fill="#15803d"/>
-    <rect x="22" y="65" width="6" height="8" fill="#78350f"/>
+    <polygon points="15,65 25,20 35,65" fill="#166534" />
+    <polygon points="18,55 25,28 32,55" fill="#15803d" />
+    <rect x="22" y="65" width="6" height="8" fill="#78350f" />
     {/* Tree 2 */}
-    <polygon points="35,65 48,10 61,65" fill="#14532d"/>
-    <polygon points="38,55 48,20 58,55" fill="#166534"/>
-    <polygon points="42,45 48,25 54,45" fill="#15803d"/>
-    <rect x="45" y="65" width="7" height="8" fill="#92400e"/>
+    <polygon points="35,65 48,10 61,65" fill="#14532d" />
+    <polygon points="38,55 48,20 58,55" fill="#166534" />
+    <polygon points="42,45 48,25 54,45" fill="#15803d" />
+    <rect x="45" y="65" width="7" height="8" fill="#92400e" />
     {/* Tree 3 */}
-    <polygon points="55,65 65,25 75,65" fill="#166534"/>
-    <polygon points="58,55 65,32 72,55" fill="#15803d"/>
-    <rect x="62" y="65" width="5" height="8" fill="#78350f"/>
+    <polygon points="55,65 65,25 75,65" fill="#166534" />
+    <polygon points="58,55 65,32 72,55" fill="#15803d" />
+    <rect x="62" y="65" width="5" height="8" fill="#78350f" />
   </svg>
 )
 
 const LakeSVG = ({ scale = 1 }: { scale?: number }) => (
   <svg width={`${120 * scale}`} height={`${40 * scale}`} viewBox="0 0 120 40" fill="none">
-    <ellipse cx="60" cy="25" rx="55" ry="18" fill="#0369a1" opacity="0.6"/>
-    <ellipse cx="60" cy="23" rx="50" ry="15" fill="#0ea5e9" opacity="0.4"/>
-    <ellipse cx="55" cy="20" rx="20" ry="6" fill="#38bdf8" opacity="0.3"/>
+    <ellipse cx="60" cy="25" rx="55" ry="18" fill="#0369a1" opacity="0.6" />
+    <ellipse cx="60" cy="23" rx="50" ry="15" fill="#0ea5e9" opacity="0.4" />
+    <ellipse cx="55" cy="20" rx="20" ry="6" fill="#38bdf8" opacity="0.3" />
   </svg>
 )
 
 const TowerSVG = ({ scale = 1 }: { scale?: number }) => (
   <svg width={`${40 * scale}`} height={`${80 * scale}`} viewBox="0 0 40 80" fill="none">
-    <rect x="10" y="20" width="20" height="55" fill="#6b7280"/>
-    <rect x="8" y="15" width="24" height="10" fill="#4b5563"/>
-    <polygon points="5,15 20,0 35,15" fill="#374151"/>
-    <rect x="15" y="60" width="10" height="15" fill="#1f2937"/>
-    <rect x="14" y="35" width="6" height="8" fill="#fbbf24" opacity="0.6"/>
-    <rect x="24" y="35" width="6" height="8" fill="#fbbf24" opacity="0.6"/>
+    <rect x="10" y="20" width="20" height="55" fill="#6b7280" />
+    <rect x="8" y="15" width="24" height="10" fill="#4b5563" />
+    <polygon points="5,15 20,0 35,15" fill="#374151" />
+    <rect x="15" y="60" width="10" height="15" fill="#1f2937" />
+    <rect x="14" y="35" width="6" height="8" fill="#fbbf24" opacity="0.6" />
+    <rect x="24" y="35" width="6" height="8" fill="#fbbf24" opacity="0.6" />
   </svg>
 )
 
 const WindmillSVG = ({ scale = 1 }: { scale?: number }) => (
   <svg width={`${60 * scale}`} height={`${80 * scale}`} viewBox="0 0 60 80" fill="none">
-    <rect x="22" y="30" width="16" height="45" fill="#9ca3af"/>
-    <circle cx="30" cy="25" r="20" fill="#d1d5db" opacity="0.3"/>
+    <rect x="22" y="30" width="16" height="45" fill="#9ca3af" />
+    <circle cx="30" cy="25" r="20" fill="#d1d5db" opacity="0.3" />
     {/* Blades */}
-    <rect x="28" y="5" width="4" height="40" fill="#e5e7eb" transform="rotate(0 30 25)"/>
-    <rect x="28" y="5" width="4" height="40" fill="#e5e7eb" transform="rotate(90 30 25)"/>
-    <rect x="28" y="5" width="4" height="40" fill="#e5e7eb" transform="rotate(180 30 25)"/>
-    <rect x="28" y="5" width="4" height="40" fill="#e5e7eb" transform="rotate(270 30 25)"/>
-    <circle cx="30" cy="25" r="5" fill="#6b7280"/>
-    <rect x="26" y="70" width="8" height="10" fill="#78350f"/>
+    <rect x="28" y="5" width="4" height="40" fill="#e5e7eb" transform="rotate(0 30 25)" />
+    <rect x="28" y="5" width="4" height="40" fill="#e5e7eb" transform="rotate(90 30 25)" />
+    <rect x="28" y="5" width="4" height="40" fill="#e5e7eb" transform="rotate(180 30 25)" />
+    <rect x="28" y="5" width="4" height="40" fill="#e5e7eb" transform="rotate(270 30 25)" />
+    <circle cx="30" cy="25" r="5" fill="#6b7280" />
+    <rect x="26" y="70" width="8" height="10" fill="#78350f" />
   </svg>
 )
 
 const CastleSmallSVG = ({ scale = 1 }: { scale?: number }) => (
   <svg width={`${70 * scale}`} height={`${60 * scale}`} viewBox="0 0 70 60" fill="none">
-    <rect x="10" y="25" width="50" height="35" fill="#6b7280"/>
-    <rect x="5" y="20" width="12" height="40" fill="#4b5563"/>
-    <rect x="53" y="20" width="12" height="40" fill="#4b5563"/>
-    <rect x="5" y="10" width="12" height="15" fill="#374151"/>
-    <rect x="53" y="10" width="12" height="15" fill="#374151"/>
+    <rect x="10" y="25" width="50" height="35" fill="#6b7280" />
+    <rect x="5" y="20" width="12" height="40" fill="#4b5563" />
+    <rect x="53" y="20" width="12" height="40" fill="#4b5563" />
+    <rect x="5" y="10" width="12" height="15" fill="#374151" />
+    <rect x="53" y="10" width="12" height="15" fill="#374151" />
     {/* Battlements */}
-    {[0,1,2].map(i => <rect key={i} x={`${8 + i*4}`} y="5" width="3" height="10" fill="#4b5563"/>) }
-    {[0,1,2].map(i => <rect key={i} x={`${55 + i*4}`} y="5" width="3" height="10" fill="#4b5563"/>) }
-    <rect x="28" y="45" width="14" height="15" fill="#1f2937"/>
-    <rect x="25" y="30" width="6" height="6" fill="#fbbf24" opacity="0.5"/>
-    <rect x="39" y="30" width="6" height="6" fill="#fbbf24" opacity="0.5"/>
+    {[0, 1, 2].map((i) => (
+      <rect key={i} x={`${8 + i * 4}`} y="5" width="3" height="10" fill="#4b5563" />
+    ))}
+    {[0, 1, 2].map((i) => (
+      <rect key={i} x={`${55 + i * 4}`} y="5" width="3" height="10" fill="#4b5563" />
+    ))}
+    <rect x="28" y="45" width="14" height="15" fill="#1f2937" />
+    <rect x="25" y="30" width="6" height="6" fill="#fbbf24" opacity="0.5" />
+    <rect x="39" y="30" width="6" height="6" fill="#fbbf24" opacity="0.5" />
   </svg>
 )
 
 const TreeSVG = ({ scale = 1 }: { scale?: number }) => (
   <svg width={`${50 * scale}`} height={`${70 * scale}`} viewBox="0 0 50 70" fill="none">
-    <polygon points="25,5 40,40 10,40" fill="#15803d"/>
-    <polygon points="25,15 38,45 12,45" fill="#166534"/>
-    <rect x="20" y="40" width="10" height="25" fill="#78350f"/>
+    <polygon points="25,5 40,40 10,40" fill="#15803d" />
+    <polygon points="25,15 38,45 12,45" fill="#166534" />
+    <rect x="20" y="40" width="10" height="25" fill="#78350f" />
   </svg>
 )
 
 const RockSVG = ({ scale = 1 }: { scale?: number }) => (
   <svg width={`${40 * scale}`} height={`${30 * scale}`} viewBox="0 0 40 30" fill="none">
-    <path d="M5 28 L12 10 L20 20 L28 8 L35 28 Z" fill="#6b7280"/>
-    <path d="M8 26 L14 14 L22 22 L30 12 L33 26 Z" fill="#9ca3af"/>
+    <path d="M5 28 L12 10 L20 20 L28 8 L35 28 Z" fill="#6b7280" />
+    <path d="M8 26 L14 14 L22 22 L30 12 L33 26 Z" fill="#9ca3af" />
   </svg>
 )
 
 const CloudSVG = ({ scale = 1 }: { scale?: number }) => (
-  <svg width={`${100 * scale}`} height={`${50 * scale}`} viewBox="0 0 100 50" fill="none" className="animate-drift">
-    <ellipse cx="30" cy="30" rx="25" ry="15" fill="#e2e8f0" opacity="0.6"/>
-    <ellipse cx="55" cy="25" rx="30" ry="18" fill="#f1f5f9" opacity="0.5"/>
-    <ellipse cx="75" cy="30" rx="20" ry="12" fill="#e2e8f0" opacity="0.6"/>
-    <ellipse cx="45" cy="35" rx="20" ry="10" fill="#f8fafc" opacity="0.4"/>
+  <svg
+    width={`${100 * scale}`}
+    height={`${50 * scale}`}
+    viewBox="0 0 100 50"
+    fill="none"
+    className="animate-drift"
+  >
+    <ellipse cx="30" cy="30" rx="25" ry="15" fill="#e2e8f0" opacity="0.6" />
+    <ellipse cx="55" cy="25" rx="30" ry="18" fill="#f1f5f9" opacity="0.5" />
+    <ellipse cx="75" cy="30" rx="20" ry="12" fill="#e2e8f0" opacity="0.6" />
+    <ellipse cx="45" cy="35" rx="20" ry="10" fill="#f8fafc" opacity="0.4" />
   </svg>
 )
 
 const CompassSVG = () => (
   <svg width="60" height="60" viewBox="0 0 60 60" className="drop-shadow-lg">
-    <circle cx="30" cy="30" r="28" fill="#1e293b" stroke="#475569" strokeWidth="2"/>
-    <circle cx="30" cy="30" r="24" fill="none" stroke="#334155" strokeWidth="1"/>
+    <circle cx="30" cy="30" r="28" fill="#1e293b" stroke="#475569" strokeWidth="2" />
+    <circle cx="30" cy="30" r="24" fill="none" stroke="#334155" strokeWidth="1" />
     {/* Cardinal directions */}
-    <text x="30" y="12" textAnchor="middle" fill="#f59e0b" fontSize="10" fontWeight="bold">N</text>
-    <text x="30" y="52" textAnchor="middle" fill="#94a3b8" fontSize="10">S</text>
-    <text x="10" y="33" textAnchor="middle" fill="#94a3b8" fontSize="10">W</text>
-    <text x="50" y="33" textAnchor="middle" fill="#94a3b8" fontSize="10">E</text>
+    <text x="30" y="12" textAnchor="middle" fill="#f59e0b" fontSize="10" fontWeight="bold">
+      N
+    </text>
+    <text x="30" y="52" textAnchor="middle" fill="#94a3b8" fontSize="10">
+      S
+    </text>
+    <text x="10" y="33" textAnchor="middle" fill="#94a3b8" fontSize="10">
+      W
+    </text>
+    <text x="50" y="33" textAnchor="middle" fill="#94a3b8" fontSize="10">
+      E
+    </text>
     {/* Needle */}
-    <polygon points="30,10 33,28 30,25 27,28" fill="#ef4444"/>
-    <polygon points="30,50 33,32 30,35 27,32" fill="#e2e8f0"/>
-    <circle cx="30" cy="30" r="4" fill="#475569"/>
+    <polygon points="30,10 33,28 30,25 27,28" fill="#ef4444" />
+    <polygon points="30,50 33,32 30,35 27,32" fill="#e2e8f0" />
+    <circle cx="30" cy="30" r="4" fill="#475569" />
   </svg>
 )
 
 // Render terrain decoration based on type
-function TerrainDecoration({ decoration, layerIndex }: { decoration: typeof TERRAIN_DECORATIONS[0]; layerIndex: number }) {
+function TerrainDecoration({
+  decoration,
+  layerIndex,
+}: {
+  decoration: (typeof TERRAIN_DECORATIONS)[0]
+  layerIndex: number
+}) {
   const style: React.CSSProperties = {
     position: 'absolute',
     left: `${decoration.x}%`,
@@ -306,25 +399,71 @@ function TerrainDecoration({ decoration, layerIndex }: { decoration: typeof TERR
 
   switch (decoration.type) {
     case 'mountain':
-      return <div style={style}><MountainSVG scale={decoration.scale} /></div>
+      return (
+        <div style={style}>
+          <MountainSVG scale={decoration.scale} />
+        </div>
+      )
     case 'hill':
-      return <div style={style}><HillSVG scale={decoration.scale} /></div>
+      return (
+        <div style={style}>
+          <HillSVG scale={decoration.scale} />
+        </div>
+      )
     case 'forest':
-      return <div style={style}><ForestSVG scale={decoration.scale} /></div>
+      return (
+        <div style={style}>
+          <ForestSVG scale={decoration.scale} />
+        </div>
+      )
     case 'lake':
-      return <div style={style}><LakeSVG scale={decoration.scale} /></div>
+      return (
+        <div style={style}>
+          <LakeSVG scale={decoration.scale} />
+        </div>
+      )
     case 'tower':
-      return <div style={style}><TowerSVG scale={decoration.scale} /></div>
+      return (
+        <div style={style}>
+          <TowerSVG scale={decoration.scale} />
+        </div>
+      )
     case 'windmill':
-      return <div style={style}><WindmillSVG scale={decoration.scale} /></div>
+      return (
+        <div style={style}>
+          <WindmillSVG scale={decoration.scale} />
+        </div>
+      )
     case 'castle_small':
-      return <div style={style}><CastleSmallSVG scale={decoration.scale} /></div>
+      return (
+        <div style={style}>
+          <CastleSmallSVG scale={decoration.scale} />
+        </div>
+      )
     case 'tree':
-      return <div style={style}><TreeSVG scale={decoration.scale} /></div>
+      return (
+        <div style={style}>
+          <TreeSVG scale={decoration.scale} />
+        </div>
+      )
     case 'rock':
-      return <div style={style}><RockSVG scale={decoration.scale} /></div>
+      return (
+        <div style={style}>
+          <RockSVG scale={decoration.scale} />
+        </div>
+      )
     case 'cloud':
-      return <div style={{ ...style, animation: `drift ${15 + decoration.x % 10}s linear infinite`, animationDelay: `${decoration.x % 5}s` }}><CloudSVG scale={decoration.scale} /></div>
+      return (
+        <div
+          style={{
+            ...style,
+            animation: `drift ${15 + (decoration.x % 10)}s linear infinite`,
+            animationDelay: `${decoration.x % 5}s`,
+          }}
+        >
+          <CloudSVG scale={decoration.scale} />
+        </div>
+      )
     default:
       return null
   }
@@ -344,13 +483,16 @@ export default function WorldMapPage() {
 
   const { character, completedQuests, stats } = game
 
-  const isLocationUnlocked = useCallback((location: MapLocation) => {
-    if (location.type === 'sdlc' && !showSDLC) return false
-    if (location.unlocksAtLevel) {
-      return character.level >= location.unlocksAtLevel
-    }
-    return true
-  }, [character.level, showSDLC])
+  const isLocationUnlocked = useCallback(
+    (location: MapLocation) => {
+      if (location.type === 'sdlc' && !showSDLC) return false
+      if (location.unlocksAtLevel) {
+        return character.level >= location.unlocksAtLevel
+      }
+      return true
+    },
+    [character.level, showSDLC],
+  )
 
   // Animate locations appearing
   useEffect(() => {
@@ -358,12 +500,14 @@ export default function WorldMapPage() {
       worldMapLocations.forEach((loc, index) => {
         if (isLocationUnlocked(loc)) {
           setTimeout(() => {
-            setAnimatedLocations(prev => new Set([...prev, loc.id]))
+            setAnimatedLocations((prev) => new Set([...prev, loc.id]))
           }, index * 80)
         }
       })
     }, 200)
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+    }
   }, [character.level, isLocationUnlocked, showSDLC])
 
   // Check for secret location unlocks
@@ -374,7 +518,11 @@ export default function WorldMapPage() {
       newDiscoveries.add('lost_library')
     }
     // Elder Dragon's Lair: 50+ quests and 2+ companions
-    if (completedQuests.length >= 50 && game.companions.length >= 2 && !discoveredSecrets.has('dragon_lair')) {
+    if (
+      completedQuests.length >= 50 &&
+      game.companions.length >= 2 &&
+      !discoveredSecrets.has('dragon_lair')
+    ) {
       newDiscoveries.add('dragon_lair')
     }
     // Phoenix Nest: 30+ day streak
@@ -386,9 +534,17 @@ export default function WorldMapPage() {
       newDiscoveries.add('code_shrine')
     }
     if (newDiscoveries.size > 0) {
-      queueMicrotask(() => setDiscoveredSecrets(prev => new Set([...prev, ...newDiscoveries])))
+      queueMicrotask(() => {
+        setDiscoveredSecrets((prev) => new Set([...prev, ...newDiscoveries]))
+      })
     }
-  }, [completedQuests.length, character.streakDays, stats.perfectQuestCount, game.companions.length, discoveredSecrets])
+  }, [
+    completedQuests.length,
+    character.streakDays,
+    stats.perfectQuestCount,
+    game.companions.length,
+    discoveredSecrets,
+  ])
 
   // Konami code detection
   useEffect(() => {
@@ -398,7 +554,9 @@ export default function WorldMapPage() {
         if (konamiIndexRef.current === KONAMI_CODE.length) {
           konamiIndexRef.current = 0
           setShowKonamiReward(true)
-          setTimeout(() => setShowKonamiReward(false), 5000)
+          setTimeout(() => {
+            setShowKonamiReward(false)
+          }, 5000)
           // Grant a bonus XP boost (just for show - would need proper state update in production)
         }
       } else {
@@ -406,28 +564,32 @@ export default function WorldMapPage() {
       }
     }
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
   }, [])
 
   // Animate paths periodically
   useEffect(() => {
     const interval = setInterval(() => {
-      setPathAnimKey(k => k + 1)
+      setPathAnimKey((k) => k + 1)
     }, 3000)
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(interval)
+    }
   }, [])
 
   const getLocationStatus = (location: MapLocation) => {
     if (location.type === 'realm' && location.realmId) {
-      const realmQuests = allQuests.filter(q => q.realmId === location.realmId)
-      const completed = realmQuests.filter(q =>
-        completedQuests.some(cp => cp.topicId === q.topicId && cp.completed)
+      const realmQuests = allQuests.filter((q) => q.realmId === location.realmId)
+      const completed = realmQuests.filter((q) =>
+        completedQuests.some((cp) => cp.topicId === q.topicId && cp.completed),
       ).length
       return { completed, total: realmQuests.length }
     }
     if (location.type === 'milestone') {
       const totalQuests = allQuests.length
-      const completedCount = completedQuests.filter(cp => cp.completed).length
+      const completedCount = completedQuests.filter((cp) => cp.completed).length
       return { completed: completedCount, total: totalQuests }
     }
     return null
@@ -441,22 +603,28 @@ export default function WorldMapPage() {
   const handleTravel = () => {
     if (!selectedLocation) return
     if (selectedLocation.type === 'realm' && selectedLocation.realmId) {
-      navigate('/quests', { state: { realmId: selectedLocation.realmId } })
+      void navigate('/quests', { state: { realmId: selectedLocation.realmId } })
     } else if (selectedLocation.type === 'milestone') {
-      navigate('/rewards')
+      void navigate('/rewards')
     }
     setSelectedLocation(null)
   }
 
-  const completedCount = completedQuests.filter(cp => cp.completed).length
-  const totalProgress = allQuests.length > 0
-    ? Math.round((completedCount / allQuests.length) * 100)
-    : 0
+  const completedCount = completedQuests.filter((cp) => cp.completed).length
+  const totalProgress =
+    allQuests.length > 0 ? Math.round((completedCount / allQuests.length) * 100) : 0
 
   // Get realm color
   const getRealmColor = (realmId?: string) => {
-    if (!realmId) return { primary: '#6366f1', secondary: '#4f46e5', glow: 'rgba(99, 102, 241, 0.5)' }
-    return REALM_COLORS[realmId] || { primary: '#6366f1', secondary: '#4f46e5', glow: 'rgba(99, 102, 241, 0.5)' }
+    if (!realmId)
+      return { primary: '#6366f1', secondary: '#4f46e5', glow: 'rgba(99, 102, 241, 0.5)' }
+    return (
+      REALM_COLORS[realmId] ?? {
+        primary: '#6366f1',
+        secondary: '#4f46e5',
+        glow: 'rgba(99, 102, 241, 0.5)',
+      }
+    )
   }
 
   // Generate smooth path using bezier curves
@@ -475,8 +643,16 @@ export default function WorldMapPage() {
   }
 
   // Animated trail path component
-  const TrailPath = ({ trail, isHighlighted, color, animKey }: {
-    trail: typeof TRAIL_PATHS[0]; isHighlighted: boolean; color: string; animKey: number
+  const TrailPath = ({
+    trail,
+    isHighlighted,
+    color,
+    animKey,
+  }: {
+    trail: (typeof TRAIL_PATHS)[0]
+    isHighlighted: boolean
+    color: string
+    animKey: number
   }) => {
     const [dashOffset, setDashOffset] = useState(() => Math.random() * 20)
     useEffect(() => {
@@ -527,10 +703,10 @@ export default function WorldMapPage() {
   }
 
   // Get location by id helper
-  const getLocationById = (id: string) => worldMapLocations.find(l => l.id === id)
+  const getLocationById = (id: string) => worldMapLocations.find((l) => l.id === id)
 
   // Check if trail is highlighted
-  const isTrailHighlighted = (trail: typeof TRAIL_PATHS[0]) => {
+  const isTrailHighlighted = (trail: (typeof TRAIL_PATHS)[0]) => {
     return hoveredLocation === trail.from || hoveredLocation === trail.to
   }
 
@@ -555,7 +731,9 @@ export default function WorldMapPage() {
               </h1>
             </div>
             <button
-              onClick={() => setShowSDLC(!showSDLC)}
+              onClick={() => {
+                setShowSDLC(!showSDLC)
+              }}
               className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${
                 showSDLC
                   ? 'bg-gradient-to-r from-green-600 to-emerald-500 text-white shadow-lg shadow-green-600/30'
@@ -598,15 +776,17 @@ export default function WorldMapPage() {
         <div className="max-w-7xl mx-auto px-4 py-2.5">
           <div className="flex items-center gap-2 overflow-x-auto pb-1">
             <span className="text-xs text-slate-500 font-medium whitespace-nowrap">SDLC:</span>
-            {sdlcPhases.map(phase => (
+            {sdlcPhases.map((phase) => (
               <button
                 key={phase.id}
-                onClick={() => setShowSDLC(!showSDLC)}
+                onClick={() => {
+                  setShowSDLC(!showSDLC)
+                }}
                 className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all hover:scale-105"
                 style={{
                   backgroundColor: `${phase.color}25`,
                   color: phase.textColor,
-                  border: `1px solid ${phase.color}40`
+                  border: `1px solid ${phase.color}40`,
                 }}
               >
                 <span className="text-sm">{phase.icon}</span>
@@ -632,7 +812,7 @@ export default function WorldMapPage() {
                 left: `${star.left}%`,
                 top: `${star.top}%`,
                 animationDelay: `${star.delay}s`,
-                opacity: star.opacity
+                opacity: star.opacity,
               }}
             />
           ))}
@@ -640,14 +820,16 @@ export default function WorldMapPage() {
 
         {/* Layer 1: Background mountains */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {TERRAIN_DECORATIONS.filter(d => ['mountain', 'cloud'].includes(d.type)).map(dec => (
+          {TERRAIN_DECORATIONS.filter((d) => ['mountain', 'cloud'].includes(d.type)).map((dec) => (
             <TerrainDecoration key={dec.id} decoration={dec} layerIndex={1} />
           ))}
         </div>
 
         {/* Layer 2: Mid-ground terrain (hills, forests, lakes) */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {TERRAIN_DECORATIONS.filter(d => ['hill', 'forest', 'lake', 'tower', 'windmill', 'castle_small'].includes(d.type)).map(dec => (
+          {TERRAIN_DECORATIONS.filter((d) =>
+            ['hill', 'forest', 'lake', 'tower', 'windmill', 'castle_small'].includes(d.type),
+          ).map((dec) => (
             <TerrainDecoration key={dec.id} decoration={dec} layerIndex={2} />
           ))}
         </div>
@@ -667,16 +849,16 @@ export default function WorldMapPage() {
             </linearGradient>
             {/* Glow filter */}
             <filter id="trailGlow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+              <feGaussianBlur stdDeviation="3" result="coloredBlur" />
               <feMerge>
-                <feMergeNode in="coloredBlur"/>
-                <feMergeNode in="SourceGraphic"/>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
           </defs>
 
           {/* Draw realm trails */}
-          {TRAIL_PATHS.map(trail => {
+          {TRAIL_PATHS.map((trail) => {
             const fromLoc = getLocationById(trail.from)
             const toLoc = getLocationById(trail.to)
             if (!fromLoc || !toLoc) return null
@@ -702,7 +884,8 @@ export default function WorldMapPage() {
           const unlocked = isLocationUnlocked(location)
           const animated = animatedLocations.has(location.id)
           const status = getLocationStatus(location)
-          const isHighlighted = hoveredLocation === location.id || selectedLocation?.id === location.id
+          const isHighlighted =
+            hoveredLocation === location.id || selectedLocation?.id === location.id
           const realmColor = getRealmColor(location.realmId)
           const isRealm = location.type === 'realm'
           const isMilestone = location.type === 'milestone'
@@ -717,13 +900,19 @@ export default function WorldMapPage() {
                 left: `${location.position.x}%`,
                 top: `${location.position.y}%`,
                 transitionDelay: `${index * 50}ms`,
-                zIndex: isHighlighted ? 30 : 10
+                zIndex: isHighlighted ? 30 : 10,
               }}
-              onMouseEnter={() => setHoveredLocation(location.id)}
-              onMouseLeave={() => setHoveredLocation(null)}
+              onMouseEnter={() => {
+                setHoveredLocation(location.id)
+              }}
+              onMouseLeave={() => {
+                setHoveredLocation(null)
+              }}
             >
               <button
-                onClick={() => handleLocationClick(location)}
+                onClick={() => {
+                  handleLocationClick(location)
+                }}
                 className={`relative group transition-transform duration-300 ${
                   !unlocked ? 'filter grayscale opacity-40' : ''
                 } ${isHighlighted ? 'scale-125' : 'hover:scale-110'}`}
@@ -755,7 +944,7 @@ export default function WorldMapPage() {
                     boxShadow: isHighlighted
                       ? `0 0 30px ${realmColor.glow}, 0 0 60px ${realmColor.glow}`
                       : `0 4px 20px rgba(0,0,0,0.5)`,
-                    borderColor: isRealm && unlocked ? realmColor.primary : undefined
+                    borderColor: isRealm && unlocked ? realmColor.primary : undefined,
                   }}
                 >
                   <span className="text-2xl drop-shadow-lg">{location.icon}</span>
@@ -764,7 +953,10 @@ export default function WorldMapPage() {
                   {status && status.total > 0 && (
                     <div
                       className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold shadow-lg"
-                      style={{ backgroundColor: realmColor.primary, color: readableTextColor(realmColor.primary) }}
+                      style={{
+                        backgroundColor: realmColor.primary,
+                        color: readableTextColor(realmColor.primary),
+                      }}
                     >
                       <span>{Math.round((status.completed / status.total) * 100)}%</span>
                     </div>
@@ -792,7 +984,9 @@ export default function WorldMapPage() {
                       </p>
                     )}
                     {location.unlocksAtLevel && character.level < location.unlocksAtLevel && (
-                      <p className="text-xs text-slate-400">Unlocks at Level {location.unlocksAtLevel}</p>
+                      <p className="text-xs text-slate-400">
+                        Unlocks at Level {location.unlocksAtLevel}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -800,9 +994,18 @@ export default function WorldMapPage() {
                 {/* Connection dots when highlighted */}
                 {unlocked && isHighlighted && (
                   <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
-                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <div
+                      className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce"
+                      style={{ animationDelay: '0ms' }}
+                    />
+                    <div
+                      className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce"
+                      style={{ animationDelay: '150ms' }}
+                    />
+                    <div
+                      className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce"
+                      style={{ animationDelay: '300ms' }}
+                    />
                   </div>
                 )}
               </button>
@@ -815,7 +1018,8 @@ export default function WorldMapPage() {
           const discovered = discoveredSecrets.has(location.id)
           const unlocked = isLocationUnlocked(location) || discovered
           const animated = animatedLocations.has(location.id) || discovered
-          const isHighlighted = hoveredLocation === location.id || selectedLocation?.id === location.id
+          const isHighlighted =
+            hoveredLocation === location.id || selectedLocation?.id === location.id
 
           if (!discovered && !unlocked) return null
 
@@ -828,19 +1032,23 @@ export default function WorldMapPage() {
               style={{
                 left: `${location.position.x}%`,
                 top: `${location.position.y}%`,
-                zIndex: isHighlighted ? 30 : 15
+                zIndex: isHighlighted ? 30 : 15,
               }}
-              onMouseEnter={() => setHoveredLocation(location.id)}
-              onMouseLeave={() => setHoveredLocation(null)}
+              onMouseEnter={() => {
+                setHoveredLocation(location.id)
+              }}
+              onMouseLeave={() => {
+                setHoveredLocation(null)
+              }}
             >
               <button
                 onClick={() => {
                   if (location.id === 'lost_library') {
                     // Navigate to review mode
-                    navigate('/quests', { state: { filter: 'review' } })
+                    void navigate('/quests', { state: { filter: 'review' } })
                   } else if (location.id === 'dragon_lair' || location.id === 'phoenix_nest') {
                     // Grant bonus XP
-                    navigate('/rewards')
+                    void navigate('/rewards')
                   } else if (location.id === 'code_shrine') {
                     // Show stats
                     setSelectedLocation(location)
@@ -854,7 +1062,8 @@ export default function WorldMapPage() {
                 <div
                   className="absolute inset-0 rounded-full animate-pulse"
                   style={{
-                    background: 'radial-gradient(circle, rgba(236, 72, 153, 0.4) 0%, transparent 70%)',
+                    background:
+                      'radial-gradient(circle, rgba(236, 72, 153, 0.4) 0%, transparent 70%)',
                     transform: 'scale(2)',
                     animation: 'pulse 2s ease-in-out infinite',
                   }}
@@ -888,7 +1097,7 @@ export default function WorldMapPage() {
 
         {/* Layer 5: Foreground elements (trees, rocks) */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {TERRAIN_DECORATIONS.filter(d => ['tree', 'rock'].includes(d.type)).map(dec => (
+          {TERRAIN_DECORATIONS.filter((d) => ['tree', 'rock'].includes(d.type)).map((dec) => (
             <TerrainDecoration key={dec.id} decoration={dec} layerIndex={5} />
           ))}
         </div>
@@ -901,9 +1110,7 @@ export default function WorldMapPage() {
               <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400 mb-2">
                 KONAMI CODE ACTIVATED!
               </h2>
-              <p className="text-pink-300 text-lg mb-4">
-                You discovered a secret power-up!
-              </p>
+              <p className="text-pink-300 text-lg mb-4">You discovered a secret power-up!</p>
               <div className="bg-slate-800/80 rounded-lg px-4 py-2 inline-block">
                 <span className="text-amber-400 font-bold">+1 XP Boost Added to Inventory!</span>
               </div>
@@ -917,14 +1124,20 @@ export default function WorldMapPage() {
         </div>
 
         {/* Map UI: Title Cartouche (mobile) */}
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 md:hidden" style={{ zIndex: 15 }}>
+        <div
+          className="absolute top-4 left-1/2 transform -translate-x-1/2 md:hidden"
+          style={{ zIndex: 15 }}
+        >
           <div className="bg-slate-900/90 px-4 py-2 rounded-lg border border-amber-600/30 shadow-xl">
             <h1 className="text-lg font-bold text-amber-400">🗺️ Realm of DevOps</h1>
           </div>
         </div>
 
         {/* Character Position Card */}
-        <div className="absolute bottom-4 left-4 bg-slate-900/95 backdrop-blur-lg rounded-xl px-4 py-3 border border-amber-600/30 shadow-2xl shadow-amber-900/20" style={{ zIndex: 15 }}>
+        <div
+          className="absolute bottom-4 left-4 bg-slate-900/95 backdrop-blur-lg rounded-xl px-4 py-3 border border-amber-600/30 shadow-2xl shadow-amber-900/20"
+          style={{ zIndex: 15 }}
+        >
           <div className="flex items-center gap-3">
             <div className="relative">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center text-2xl shadow-lg shadow-amber-600/30">
@@ -941,10 +1154,15 @@ export default function WorldMapPage() {
         </div>
 
         {/* Realm Legend */}
-        <div className="absolute bottom-4 right-4 bg-slate-900/95 backdrop-blur-lg rounded-xl p-4 border border-slate-700/50 shadow-2xl max-w-xs" style={{ zIndex: 15 }}>
-          <p className="text-slate-400 text-xs mb-3 font-semibold uppercase tracking-wider">Realms</p>
+        <div
+          className="absolute bottom-4 right-4 bg-slate-900/95 backdrop-blur-lg rounded-xl p-4 border border-slate-700/50 shadow-2xl max-w-xs"
+          style={{ zIndex: 15 }}
+        >
+          <p className="text-slate-400 text-xs mb-3 font-semibold uppercase tracking-wider">
+            Realms
+          </p>
           <div className="space-y-2">
-            {Object.values(realms).map(realm => {
+            {Object.values(realms).map((realm) => {
               const isUnlocked = character.level >= realm.requiredLevel
               const color = getRealmColor(realm.id)
               return (
@@ -956,7 +1174,9 @@ export default function WorldMapPage() {
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: isUnlocked ? color.primary : '#4b5563' }}
                   />
-                  <span className={`${isUnlocked ? 'text-slate-200' : 'text-slate-500'}`}>{realm.name}</span>
+                  <span className={isUnlocked ? 'text-slate-200' : 'text-slate-500'}>
+                    {realm.name}
+                  </span>
                   <span className="text-slate-500 text-xs ml-auto">Lv{realm.requiredLevel}</span>
                 </div>
               )
@@ -969,16 +1189,20 @@ export default function WorldMapPage() {
       {selectedLocation && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn"
-          onClick={() => setSelectedLocation(null)}
+          onClick={() => {
+            setSelectedLocation(null)
+          }}
         >
           <div
             className="bg-slate-900 rounded-2xl border border-slate-700 shadow-2xl max-w-md w-full overflow-hidden animate-scaleIn"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation()
+            }}
           >
             <div
               className="px-6 py-5 border-b border-slate-800"
               style={{
-                background: `linear-gradient(135deg, ${getRealmColor(selectedLocation.realmId).primary}20 0%, transparent 50%)`
+                background: `linear-gradient(135deg, ${getRealmColor(selectedLocation.realmId).primary}20 0%, transparent 50%)`,
               }}
             >
               <div className="flex items-center justify-between">
@@ -987,7 +1211,7 @@ export default function WorldMapPage() {
                     className="w-16 h-16 rounded-xl flex items-center justify-center text-4xl shadow-lg"
                     style={{
                       background: `linear-gradient(135deg, ${getRealmColor(selectedLocation.realmId).primary}30 0%, ${getRealmColor(selectedLocation.realmId).secondary}30 100%)`,
-                      border: `2px solid ${getRealmColor(selectedLocation.realmId).primary}50`
+                      border: `2px solid ${getRealmColor(selectedLocation.realmId).primary}50`,
                     }}
                   >
                     {selectedLocation.icon}
@@ -998,12 +1222,15 @@ export default function WorldMapPage() {
                       className="text-sm font-medium capitalize"
                       style={{ color: getRealmColor(selectedLocation.realmId).primary }}
                     >
-                      {selectedLocation.type} {selectedLocation.sdlcPhase && `• Phase ${selectedLocation.sdlcPhase}`}
+                      {selectedLocation.type}{' '}
+                      {selectedLocation.sdlcPhase && `• Phase ${selectedLocation.sdlcPhase}`}
                     </p>
                   </div>
                 </div>
                 <button
-                  onClick={() => setSelectedLocation(null)}
+                  onClick={() => {
+                    setSelectedLocation(null)
+                  }}
                   className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors flex items-center justify-center"
                 >
                   ✕
@@ -1014,38 +1241,41 @@ export default function WorldMapPage() {
             <div className="p-6">
               <p className="text-slate-300 mb-6 leading-relaxed">{selectedLocation.description}</p>
 
-              {selectedLocation.type === 'realm' && (() => {
-                const locationStatus = getLocationStatus(selectedLocation)
-                const completed = locationStatus?.completed ?? 0
-                const total = locationStatus?.total ?? 0
-                const progressPercent = total > 0 ? (completed / total) * 100 : 0
-                return (
-                  <div className="mb-6">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-slate-400 text-sm font-medium">Quest Progress</span>
-                      <span
-                        className="text-sm font-bold"
-                        style={{ color: getRealmColor(selectedLocation.realmId).primary }}
-                      >
-                        {completed}/{total}
-                      </span>
+              {selectedLocation.type === 'realm' &&
+                (() => {
+                  const locationStatus = getLocationStatus(selectedLocation)
+                  const completed = locationStatus?.completed ?? 0
+                  const total = locationStatus?.total ?? 0
+                  const progressPercent = total > 0 ? (completed / total) * 100 : 0
+                  return (
+                    <div className="mb-6">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-slate-400 text-sm font-medium">Quest Progress</span>
+                        <span
+                          className="text-sm font-bold"
+                          style={{ color: getRealmColor(selectedLocation.realmId).primary }}
+                        >
+                          {completed}/{total}
+                        </span>
+                      </div>
+                      <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-700"
+                          style={{
+                            width: `${progressPercent}%`,
+                            background: `linear-gradient(90deg, ${getRealmColor(selectedLocation.realmId).primary} 0%, ${getRealmColor(selectedLocation.realmId).secondary} 100%)`,
+                          }}
+                        />
+                      </div>
                     </div>
-                    <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-700"
-                        style={{
-                          width: `${progressPercent}%`,
-                          background: `linear-gradient(90deg, ${getRealmColor(selectedLocation.realmId).primary} 0%, ${getRealmColor(selectedLocation.realmId).secondary} 100%)`
-                        }}
-                      />
-                    </div>
-                  </div>
-                )
-              })()}
+                  )
+                })()}
 
               {selectedLocation.type === 'sdlc' && selectedLocation.sdlcPhase && (
                 <div className="mb-6">
-                  <span className="text-slate-400 text-sm font-medium block mb-3">SDLC Pipeline</span>
+                  <span className="text-slate-400 text-sm font-medium block mb-3">
+                    SDLC Pipeline
+                  </span>
                   <div className="flex items-center gap-2">
                     {sdlcPhases.map((phase, idx) => (
                       <div key={phase.id} className="flex items-center">
@@ -1053,7 +1283,7 @@ export default function WorldMapPage() {
                           className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg transition-all ${
                             phase.id === selectedLocation.sdlcPhase
                               ? 'ring-2 ring-white shadow-lg scale-110'
-                              : phase.id < selectedLocation.sdlcPhase!
+                              : phase.id < (selectedLocation.sdlcPhase ?? -1)
                                 ? 'opacity-100'
                                 : 'opacity-30 grayscale'
                           }`}
@@ -1065,7 +1295,7 @@ export default function WorldMapPage() {
                         {idx < sdlcPhases.length - 1 && (
                           <div
                             className={`w-8 h-0.5 ${
-                              phase.id < selectedLocation.sdlcPhase! ? '' : 'opacity-30'
+                              phase.id < (selectedLocation.sdlcPhase ?? -1) ? '' : 'opacity-30'
                             }`}
                             style={{ backgroundColor: phase.color }}
                           />
@@ -1090,19 +1320,22 @@ export default function WorldMapPage() {
 
               <div className="flex gap-3">
                 <button
-                  onClick={() => setSelectedLocation(null)}
+                  onClick={() => {
+                    setSelectedLocation(null)
+                  }}
                   className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl transition-colors"
                 >
                   Close
                 </button>
-                {selectedLocation.type === 'realm' && character.level >= (selectedLocation.unlocksAtLevel || 1) && (
-                  <button
-                    onClick={handleTravel}
-                    className="flex-1 py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-xl transition-all shadow-lg shadow-amber-600/30 hover:shadow-amber-500/50"
-                  >
-                    ⚔️ Enter Realm
-                  </button>
-                )}
+                {selectedLocation.type === 'realm' &&
+                  character.level >= (selectedLocation.unlocksAtLevel || 1) && (
+                    <button
+                      onClick={handleTravel}
+                      className="flex-1 py-3 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold rounded-xl transition-all shadow-lg shadow-amber-600/30 hover:shadow-amber-500/50"
+                    >
+                      ⚔️ Enter Realm
+                    </button>
+                  )}
                 {selectedLocation.type === 'milestone' && (
                   <button
                     onClick={handleTravel}

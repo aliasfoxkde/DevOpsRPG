@@ -30,7 +30,11 @@ describe('Modal', () => {
 
   describe('conditional rendering', () => {
     it('renders nothing when closed', () => {
-      const { container } = render(<Modal isOpen={false} onClose={onClose} title="Hi">body</Modal>)
+      const { container } = render(
+        <Modal isOpen={false} onClose={onClose} title="Hi">
+          body
+        </Modal>,
+      )
       expect(container).toBeEmptyDOMElement()
       expect(screen.queryByRole('dialog')).toBeNull()
     })
@@ -39,7 +43,7 @@ describe('Modal', () => {
       const { container } = render(
         <Modal isOpen onClose={onClose} title="Quest Details">
           <p>Modal body</p>
-        </Modal>
+        </Modal>,
       )
       expect(container).toBeEmptyDOMElement()
       const dialog = screen.getByRole('dialog')
@@ -52,7 +56,7 @@ describe('Modal', () => {
       render(
         <Modal isOpen onClose={onClose} title="Quest Details">
           <p>Modal body</p>
-        </Modal>
+        </Modal>,
       )
       expect(screen.getByRole('heading', { level: 2, name: 'Quest Details' })).toBeInTheDocument()
       expect(screen.getByText('Modal body')).toBeInTheDocument()
@@ -62,7 +66,7 @@ describe('Modal', () => {
       render(
         <Modal isOpen onClose={onClose} title="Quest Details">
           body
-        </Modal>
+        </Modal>,
       )
       const dialog = screen.getByRole('dialog')
       expect(dialog).toHaveAttribute('aria-modal', 'true')
@@ -70,7 +74,11 @@ describe('Modal', () => {
     })
 
     it('omits aria-labelledby when there is no title', () => {
-      render(<Modal isOpen onClose={onClose}>body</Modal>)
+      render(
+        <Modal isOpen onClose={onClose}>
+          body
+        </Modal>,
+      )
       expect(screen.getByRole('dialog')).not.toHaveAttribute('aria-labelledby')
       expect(document.getElementById('modal-title')).toBeNull()
     })
@@ -79,7 +87,7 @@ describe('Modal', () => {
       render(
         <Modal isOpen onClose={onClose} title="Titled" showCloseButton={false}>
           body
-        </Modal>
+        </Modal>,
       )
       expect(screen.queryByRole('button', { name: 'Close modal' })).toBeNull()
       // Title still renders on its own
@@ -88,14 +96,24 @@ describe('Modal', () => {
 
     it('applies size and variant classes to the dialog box', () => {
       const { rerender } = render(
-        <Modal isOpen onClose={onClose}>body</Modal>
+        <Modal isOpen onClose={onClose}>
+          body
+        </Modal>,
       )
       expect(screen.getByRole('dialog')).toHaveClass('max-w-lg')
 
-      rerender(<Modal isOpen onClose={onClose} size="xl">body</Modal>)
+      rerender(
+        <Modal isOpen onClose={onClose} size="xl">
+          body
+        </Modal>,
+      )
       expect(screen.getByRole('dialog')).toHaveClass('max-w-4xl')
 
-      rerender(<Modal isOpen onClose={onClose} variant="victory">body</Modal>)
+      rerender(
+        <Modal isOpen onClose={onClose} variant="victory">
+          body
+        </Modal>,
+      )
       expect(screen.getByRole('dialog')).toHaveClass('border-amber-500')
     })
   })
@@ -103,27 +121,47 @@ describe('Modal', () => {
   describe('closing interactions', () => {
     it('calls onClose when the close button is clicked', async () => {
       const user = userEvent.setup()
-      render(<Modal isOpen onClose={onClose}>body</Modal>)
+      render(
+        <Modal isOpen onClose={onClose}>
+          body
+        </Modal>,
+      )
       await user.click(screen.getByRole('button', { name: 'Close modal' }))
       expect(onClose).toHaveBeenCalledTimes(1)
     })
 
     it('calls onClose when Escape is pressed', () => {
-      render(<Modal isOpen onClose={onClose}>body</Modal>)
+      render(
+        <Modal isOpen onClose={onClose}>
+          body
+        </Modal>,
+      )
       fireEvent.keyDown(document, { key: 'Escape' })
       expect(onClose).toHaveBeenCalledTimes(1)
     })
 
     it('ignores Escape while closed (listener must not leak into the page)', () => {
-      render(<Modal isOpen={false} onClose={onClose}>body</Modal>)
+      render(
+        <Modal isOpen={false} onClose={onClose}>
+          body
+        </Modal>,
+      )
       fireEvent.keyDown(document, { key: 'Escape' })
       expect(onClose).not.toHaveBeenCalled()
     })
 
     it('does not wire a second Escape handler when onClose identity changes', () => {
-      const { rerender } = render(<Modal isOpen onClose={onClose}>body</Modal>)
+      const { rerender } = render(
+        <Modal isOpen onClose={onClose}>
+          body
+        </Modal>,
+      )
       const next = vi.fn()
-      rerender(<Modal isOpen onClose={next}>body</Modal>)
+      rerender(
+        <Modal isOpen onClose={next}>
+          body
+        </Modal>,
+      )
       fireEvent.keyDown(document, { key: 'Escape' })
       expect(next).toHaveBeenCalledTimes(1)
       expect(onClose).not.toHaveBeenCalled()
@@ -133,7 +171,7 @@ describe('Modal', () => {
       render(
         <Modal isOpen onClose={onClose}>
           <button>Inside</button>
-        </Modal>
+        </Modal>,
       )
       const overlay = screen.getByRole('dialog').parentElement as HTMLElement
 
@@ -198,15 +236,27 @@ describe('Modal', () => {
 
   describe('body scroll lock', () => {
     it('locks body scroll while open and releases it on close', () => {
-      const { rerender } = render(<Modal isOpen onClose={onClose}>body</Modal>)
+      const { rerender } = render(
+        <Modal isOpen onClose={onClose}>
+          body
+        </Modal>,
+      )
       expect(document.body).toHaveStyle({ overflow: 'hidden' })
 
-      rerender(<Modal isOpen={false} onClose={onClose}>body</Modal>)
+      rerender(
+        <Modal isOpen={false} onClose={onClose}>
+          body
+        </Modal>,
+      )
       expect(document.body.style.overflow).toBe('')
     })
 
     it('releases the scroll lock when the modal unmounts', () => {
-      const { unmount } = render(<Modal isOpen onClose={onClose}>body</Modal>)
+      const { unmount } = render(
+        <Modal isOpen onClose={onClose}>
+          body
+        </Modal>,
+      )
       expect(document.body).toHaveStyle({ overflow: 'hidden' })
 
       act(() => {

@@ -1,10 +1,12 @@
 /**
  * W3Schools Content Scraper
  *
- * This script scrapes W3Schools content and generates static JSON data.
+ * This script scrapes W3Schools content and generates static TypeScript data.
  * Run with: node scripts/scrape-w3schools.js
  *
- * The scraped content is stored in src/data/w3schools-content.ts
+ * The scraped content is stored in src/data/w3schools-content.ts and matches
+ * the W3SchoolsData schema consumed by the app (Section { heading, content },
+ * codeExamples: string[]).
  */
 
 import { writeFileSync } from 'fs'
@@ -107,55 +109,188 @@ const TECHNOLOGIES = {
 
 const BASE_URL = 'https://www.w3schools.com'
 
+/**
+ * @typedef {Object} Section
+ * @property {string} heading
+ * @property {string} content
+ */
+
+/**
+ * @typedef {Object} TopicContent
+ * @property {string} id
+ * @property {string} name
+ * @property {Section[]} sections
+ * @property {string[]} codeExamples
+ */
+
+/**
+ * @typedef {Object} TechnologyContent
+ * @property {string} name
+ * @property {string} icon
+ * @property {string} description
+ * @property {TopicContent[]} topics
+ */
+
+/** Minimal HTML entity decoding for text extracted from scraped pages. */
+/**
+ * @param {string} text
+ * @returns {string}
+ */
+function decodeEntities(text) {
+  return text
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ')
+}
+
+/** Removes tags, decodes entities and collapses whitespace. */
+/**
+ * @param {string} html
+ * @returns {string}
+ */
+function textOf(html) {
+  return decodeEntities(html.replace(/<[^>]*>/g, ' '))
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+/** Extracts the page's main content column, or the whole document as fallback. */
+/**
+ * @param {string} html
+ * @returns {string}
+ */
+function mainRegion(html) {
+  const start = html.indexOf('id="main"')
+  if (start === -1) return html
+  const end = html.indexOf('id="footer"', start)
+  return html.slice(start, end === -1 ? undefined : end)
+}
+
+/**
+ * Fetches and parses one W3Schools topic page into the app's TopicContent shape.
+ * @param {string} technology
+ * @param {string} topic
+ * @returns {Promise<TopicContent>}
+ */
 async function scrapePage(technology, topic) {
   const url = `${BASE_URL}/${technology}/${topic}.asp`
   console.log(`Scraping: ${url}`)
 
-  // This would normally fetch and parse the page
-  // For now, return placeholder structure
-  return {
-    id: topic,
-    name: topic.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()),
-    sections: [],
-    codeExamples: [],
+  const response = await fetch(url, {
+    headers: { 'User-Agent': 'devopsquest-content-scraper/2.0' },
+  })
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status} while fetching ${url}`)
   }
+  const html = await response.text()
+
+  const main = mainRegion(html)
+  const h1 = /<h1[^>]*>([\s\S]*?)<\/h1>/.exec(main)
+  const name = h1 ? textOf(h1[1]) : topic.replace(/_/g, ' ')
+
+  // Split the main region into sections on <h2> boundaries; the preamble
+  // (before the first <h2>) becomes the first section named after the topic.
+  const chunks = main.split(/<h2[^>]*>/)
+  /** @type {Section[]} */
+  const sections = []
+  if (chunks[0]) {
+    const intro = textOf(chunks[0].replace(/<h1[\s\S]*?<\/h1>/, ''))
+    if (intro) sections.push({ heading: name, content: intro })
+  }
+  for (const chunk of chunks.slice(1)) {
+    const headingEnd = chunk.indexOf('</h2>')
+    if (headingEnd === -1) continue
+    const heading = textOf(chunk.slice(0, headingEnd))
+    const body = textOf(chunk.slice(headingEnd + 5))
+    if (heading && body) sections.push({ heading, content: body })
+  }
+
+  const codeExamples = [...main.matchAll(/<pre[^>]*>([\s\S]*?)<\/pre>/g)]
+    .map((m) => decodeEntities(m[1].replace(/<[^>]*>/g, '')).trim())
+    .filter((code) => code.length > 0)
+
+  if (sections.length === 0) {
+    throw new Error(`No readable content extracted from ${url}`)
+  }
+
+  return { id: topic, name, sections, codeExamples }
 }
 
 async function scrapeAll() {
   console.log('Starting W3Schools content scrape...')
 
   const data = {
-    version: '1.0.0',
+    version: '2.0.0',
     lastUpdated: new Date().toISOString().split('T')[0],
+    /** @type {Record<string, TechnologyContent>} */
     technologies: {},
   }
 
   for (const [techKey, techInfo] of Object.entries(TECHNOLOGIES)) {
     console.log(`\nScraping ${techInfo.name}...`)
+    /** @type {TopicContent[]} */
+    const topics = []
+
+    for (const topic of techInfo.topics) {
+      try {
+        topics.push(await scrapePage(techKey, topic))
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error)
+        console.error(`Error scraping ${topic}: ${message}`)
+      }
+    }
+
     data.technologies[techKey] = {
       name: techInfo.name,
       icon: techInfo.icon,
       description: techInfo.description,
-      topics: [],
-    }
-
-    for (const topic of techInfo.topics) {
-      try {
-        const content = await scrapePage(techKey, topic)
-        data.technologies[techKey].topics.push(content)
-      } catch (error) {
-        console.error(`Error scraping ${topic}: ${error.message}`)
-      }
+      topics,
     }
   }
 
-  // Write to file
-  const outputPath = resolve(__dirname, '../src/data/w3schools-content-generated.ts')
-  const content = `// Auto-generated W3Schools content\n// Generated: ${data.lastUpdated}\n\nexport const w3schoolsContent = ${JSON.stringify(data, null, 2)} as const\n`
+  // Write to file using the exact schema the app imports.
+  const outputPath = resolve(__dirname, '../src/data/w3schools-content.ts')
+  const content = `// Auto-generated W3Schools content - stored as static data
+// Generated by scripts/scrape-w3schools.js on ${data.lastUpdated}
+// Regenerate with: npm run scrape
+
+interface Section {
+  heading: string
+  content: string
+}
+
+interface TopicContent {
+  id: string
+  name: string
+  sections: Section[]
+  codeExamples: string[]
+}
+
+interface TechnologyContent {
+  name: string
+  icon: string
+  description: string
+  topics: TopicContent[]
+}
+
+export interface W3SchoolsData {
+  version: string
+  lastUpdated: string
+  technologies: Record<string, TechnologyContent>
+}
+
+export const w3schoolsContent: W3SchoolsData = ${JSON.stringify(data, null, 2)}
+`
 
   writeFileSync(outputPath, content)
   console.log(`\nContent saved to: ${outputPath}`)
   console.log('Done!')
 }
 
-scrapeAll().catch(console.error)
+scrapeAll().catch((/** @type {unknown} */ error) => {
+  console.error(error)
+  process.exitCode = 1
+})

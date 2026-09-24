@@ -12,7 +12,7 @@ function seedGame(character: Record<string, unknown>) {
     JSON.stringify({
       character,
       badges: [], // required by the provider's save validation
-    })
+    }),
   )
 }
 
@@ -20,7 +20,7 @@ function renderXpBar(props: { compact?: boolean } = {}) {
   return render(
     <GameProvider>
       <XPBar {...props} />
-    </GameProvider>
+    </GameProvider>,
   )
 }
 
@@ -97,7 +97,7 @@ describe('XPBar', () => {
       rerender(
         <GameProvider>
           <XPBar />
-        </GameProvider>
+        </GameProvider>,
       )
       bar = screen.getByRole('progressbar', { name: 'Experience progress' })
       expect(bar).toHaveAttribute('aria-valuemin', '0')

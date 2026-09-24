@@ -13,9 +13,7 @@ describe('TitlesFramesPage', () => {
     const { character } = seedDefaultGame()
     renderSeededPage(<TitlesFramesPage />, { route: '/titles-frames', url: '/titles-frames' })
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Titles & Frames/ }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /Titles & Frames/ })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Currently Equipped' })).toBeInTheDocument()
     expect(screen.getAllByText('DevOps Novice').length).toBeGreaterThan(0)
     expect(character.equippedTitle).toBe('novice-devops')

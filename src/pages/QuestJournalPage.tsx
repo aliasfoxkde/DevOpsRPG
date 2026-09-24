@@ -9,7 +9,16 @@ type SortBy = 'level' | 'xp' | 'difficulty' | 'name'
 type FilterDifficulty = 1 | 2 | 3 | 4 | 5 | 'all'
 
 export default function QuestJournalPage() {
-  const { game, isQuestCompleted, getNextQuest, getRealmProgress, completedCount, totalQuests, getWeakTopics, getTopicsDueForReview } = useGame()
+  const {
+    game,
+    isQuestCompleted,
+    getNextQuest,
+    getRealmProgress,
+    completedCount,
+    totalQuests,
+    getWeakTopics,
+    getTopicsDueForReview,
+  } = useGame()
   const { character } = game
   const encouragement = getRandomEncouragement()
 
@@ -23,7 +32,7 @@ export default function QuestJournalPage() {
 
   // Get unique technologies
   const technologies = useMemo(() => {
-    const techs = new Set(allQuests.map(q => q.technologyId))
+    const techs = new Set(allQuests.map((q) => q.technologyId))
     return Array.from(techs).sort()
   }, [])
 
@@ -31,7 +40,7 @@ export default function QuestJournalPage() {
 
   // Get unique realms for filtering
   const realmOptions = useMemo(() => {
-    return Object.values(realms).map(r => ({ id: r.id, name: r.name }))
+    return Object.values(realms).map((r) => ({ id: r.id, name: r.name }))
   }, [])
 
   const [filterRealm, setFilterRealm] = useState<string>('all')
@@ -42,33 +51,34 @@ export default function QuestJournalPage() {
 
     // Filter by status
     if (filterStatus === 'available') {
-      quests = quests.filter(q => !isQuestCompleted(q.id))
+      quests = quests.filter((q) => !isQuestCompleted(q.id))
     } else if (filterStatus === 'completed') {
-      quests = quests.filter(q => isQuestCompleted(q.id))
+      quests = quests.filter((q) => isQuestCompleted(q.id))
     }
 
     // Filter by difficulty
     if (filterDifficulty !== 'all') {
-      quests = quests.filter(q => q.difficulty === filterDifficulty)
+      quests = quests.filter((q) => q.difficulty === filterDifficulty)
     }
 
     // Filter by technology
     if (filterTech !== 'all') {
-      quests = quests.filter(q => q.technologyId === filterTech)
+      quests = quests.filter((q) => q.technologyId === filterTech)
     }
 
     // Filter by realm
     if (filterRealm !== 'all') {
-      quests = quests.filter(q => q.realmId === filterRealm)
+      quests = quests.filter((q) => q.realmId === filterRealm)
     }
 
     // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
-      quests = quests.filter(q =>
-        q.title.toLowerCase().includes(query) ||
-        q.description.toLowerCase().includes(query) ||
-        q.technologyId.toLowerCase().includes(query)
+      quests = quests.filter(
+        (q) =>
+          q.title.toLowerCase().includes(query) ||
+          q.description.toLowerCase().includes(query) ||
+          q.technologyId.toLowerCase().includes(query),
       )
     }
 
@@ -84,7 +94,8 @@ export default function QuestJournalPage() {
         case 'level':
         default: {
           // Sort by realm order then by order in realm
-          const realmOrder = Object.keys(realms).indexOf(a.realmId) - Object.keys(realms).indexOf(b.realmId)
+          const realmOrder =
+            Object.keys(realms).indexOf(a.realmId) - Object.keys(realms).indexOf(b.realmId)
           if (realmOrder !== 0) return realmOrder
           return a.order - b.order
         }
@@ -92,7 +103,15 @@ export default function QuestJournalPage() {
     })
 
     return quests
-  }, [filterStatus, filterDifficulty, filterTech, filterRealm, searchQuery, sortBy, isQuestCompleted])
+  }, [
+    filterStatus,
+    filterDifficulty,
+    filterTech,
+    filterRealm,
+    searchQuery,
+    sortBy,
+    isQuestCompleted,
+  ])
 
   const difficultyColors: Record<number, string> = {
     1: 'text-green-400 bg-green-900/30',
@@ -107,12 +126,8 @@ export default function QuestJournalPage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-r from-amber-900/30 via-slate-900 to-purple-900/30 border-b border-slate-700">
         <div className="max-w-4xl mx-auto px-4 py-8 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold text-amber-400 mb-2">
-            Quest Journal
-          </h1>
-          <p className="text-slate-400 mb-4">
-            Your journey to become a DevOps Master awaits
-          </p>
+          <h1 className="text-3xl md:text-4xl font-bold text-amber-400 mb-2">Quest Journal</h1>
+          <p className="text-slate-400 mb-4">Your journey to become a DevOps Master awaits</p>
 
           {/* Current Quest CTA */}
           {nextQuest && (
@@ -150,7 +165,9 @@ export default function QuestJournalPage() {
                 type="text"
                 placeholder="🔍 Search quests..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                setSearchQuery(e.target.value)
+              }}
                 className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-amber-500"
               />
             </div>
@@ -159,7 +176,9 @@ export default function QuestJournalPage() {
             <select
               aria-label="Filter quests by status"
               value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
+              onChange={(e) => {
+                setFilterStatus(e.target.value as FilterStatus)
+              }}
               className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
             >
               <option value="all">All Status</option>
@@ -172,12 +191,16 @@ export default function QuestJournalPage() {
             <select
               aria-label="Filter quests by realm"
               value={filterRealm}
-              onChange={(e) => setFilterRealm(e.target.value)}
+              onChange={(e) => {
+                setFilterRealm(e.target.value)
+              }}
               className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
             >
               <option value="all">All Realms</option>
-              {realmOptions.map(r => (
-                <option key={r.id} value={r.id}>{r.name}</option>
+              {realmOptions.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name}
+                </option>
               ))}
             </select>
 
@@ -185,12 +208,16 @@ export default function QuestJournalPage() {
             <select
               aria-label="Filter quests by technology"
               value={filterTech}
-              onChange={(e) => setFilterTech(e.target.value)}
+              onChange={(e) => {
+                setFilterTech(e.target.value)
+              }}
               className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
             >
               <option value="all">All Technologies</option>
-              {technologies.map(t => (
-                <option key={t} value={t}>{t.toUpperCase()}</option>
+              {technologies.map((t) => (
+                <option key={t} value={t}>
+                  {t.toUpperCase()}
+                </option>
               ))}
             </select>
 
@@ -198,7 +225,9 @@ export default function QuestJournalPage() {
             <select
               aria-label="Filter quests by difficulty"
               value={filterDifficulty}
-              onChange={(e) => setFilterDifficulty(e.target.value as FilterDifficulty)}
+              onChange={(e) => {
+                setFilterDifficulty(e.target.value as FilterDifficulty)
+              }}
               className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
             >
               <option value="all">All Difficulties</option>
@@ -213,7 +242,9 @@ export default function QuestJournalPage() {
             <select
               aria-label="Sort quests"
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortBy)}
+              onChange={(e) => {
+                setSortBy(e.target.value as SortBy)
+              }}
               className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
             >
               <option value="level">Sort: Realm Order</option>
@@ -250,7 +281,7 @@ export default function QuestJournalPage() {
 
         // Get recommended quests based on weak topics
         const recommendedQuests = allQuests
-          .filter(q => {
+          .filter((q) => {
             // Filter to available quests that aren't completed
             if (isQuestCompleted(q.id)) return false
             const questRealm = realms[q.realmId]
@@ -262,7 +293,7 @@ export default function QuestJournalPage() {
             }
 
             // If no due topics, recommend based on low mastery
-            const weakMatch = weakTopics.find(w => w.topicId === q.topicId)
+            const weakMatch = weakTopics.find((w) => w.topicId === q.topicId)
             return weakMatch && weakMatch.masteryLevel < 2
           })
           .slice(0, 3)
@@ -275,11 +306,9 @@ export default function QuestJournalPage() {
               <h3 className="text-lg font-bold text-purple-300 mb-3 flex items-center gap-2">
                 🎯 Smart Recommendations
               </h3>
-              <p className="text-sm text-slate-400 mb-4">
-                Based on your weak areas, we recommend:
-              </p>
+              <p className="text-sm text-slate-400 mb-4">Based on your weak areas, we recommend:</p>
               <div className="grid gap-2">
-                {recommendedQuests.map(quest => {
+                {recommendedQuests.map((quest) => {
                   const questRealm = realms[quest.realmId]
                   return (
                     <Link
@@ -291,7 +320,9 @@ export default function QuestJournalPage() {
                         <span className="text-2xl">{questRealm.icon}</span>
                         <div>
                           <div className="font-medium text-white">{quest.title}</div>
-                          <div className="text-xs text-slate-400">{quest.technologyId.toUpperCase()}</div>
+                          <div className="text-xs text-slate-400">
+                            {quest.technologyId.toUpperCase()}
+                          </div>
                         </div>
                       </div>
                       <div className="text-amber-400 font-bold">{quest.xpReward} XP</div>
@@ -307,7 +338,7 @@ export default function QuestJournalPage() {
       {/* Quest List */}
       <section className="max-w-6xl mx-auto px-4 py-4">
         <div className="grid gap-3">
-          {filteredQuests.map(quest => {
+          {filteredQuests.map((quest) => {
             const isCompleted = isQuestCompleted(quest.id)
             const questRealm = realms[quest.realmId]
             const isUnlocked = character.level >= questRealm.requiredLevel
@@ -320,26 +351,36 @@ export default function QuestJournalPage() {
                   !isUnlocked
                     ? 'bg-slate-900/50 border-slate-700/50 opacity-50 cursor-not-allowed'
                     : isCompleted
-                    ? 'bg-green-900/20 border-green-700/50 hover:border-green-500'
-                    : 'bg-slate-800/80 border-slate-600 hover:border-amber-500/50'
+                      ? 'bg-green-900/20 border-green-700/50 hover:border-green-500'
+                      : 'bg-slate-800/80 border-slate-600 hover:border-amber-500/50'
                 }`}
-                onClick={(e) => !isUnlocked && e.preventDefault()}
+                onClick={(e) => {
+                  if (!isUnlocked) {
+                    e.preventDefault()
+                  }
+                }}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl ${
-                      isCompleted ? 'bg-green-900/50' : 'bg-slate-700'
-                    }`}>
+                    <div
+                      className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl ${
+                        isCompleted ? 'bg-green-900/50' : 'bg-slate-700'
+                      }`}
+                    >
                       {isCompleted ? '✓' : questRealm.icon}
                     </div>
                     <div>
-                      <h3 className={`font-bold ${
-                        isCompleted ? 'text-green-400 line-through' : 'text-white'
-                      }`}>
+                      <h3
+                        className={`font-bold ${
+                          isCompleted ? 'text-green-400 line-through' : 'text-white'
+                        }`}
+                      >
                         {quest.title}
                       </h3>
                       <div className="flex items-center gap-3 text-xs text-slate-400">
-                        <span className={`px-2 py-0.5 rounded ${difficultyColors[quest.difficulty]}`}>
+                        <span
+                          className={`px-2 py-0.5 rounded ${difficultyColors[quest.difficulty]}`}
+                        >
                           {'⭐'.repeat(quest.difficulty)}
                         </span>
                         <span>{quest.technologyId.toUpperCase()}</span>
@@ -349,12 +390,12 @@ export default function QuestJournalPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className={`font-bold ${isCompleted ? 'text-green-400' : 'text-amber-400'}`}>
+                    <div
+                      className={`font-bold ${isCompleted ? 'text-green-400' : 'text-amber-400'}`}
+                    >
                       {quest.xpReward} XP
                     </div>
-                    <div className="text-xs text-slate-500">
-                      ~{quest.estimatedMinutes} min
-                    </div>
+                    <div className="text-xs text-slate-500">~{quest.estimatedMinutes} min</div>
                   </div>
                 </div>
               </Link>
@@ -391,11 +432,14 @@ export default function QuestJournalPage() {
         <div className="space-y-6">
           {Object.values(realms).map((realm, index) => {
             const progress = getRealmProgress(realm.id)
-            const realmQuests = allQuests.filter(q => q.realmId === realm.id)
+            const realmQuests = allQuests.filter((q) => q.realmId === realm.id)
             const prevRealm = index > 0 ? Object.values(realms)[index - 1] : null
-            const prevRealmComplete = prevRealm && getRealmProgress(prevRealm.id).completed === getRealmProgress(prevRealm.id).total
-            const isUnlocked = character.level >= realm.requiredLevel ||
-              (index === 0) ||
+            const prevRealmComplete =
+              prevRealm &&
+              getRealmProgress(prevRealm.id).completed === getRealmProgress(prevRealm.id).total
+            const isUnlocked =
+              character.level >= realm.requiredLevel ||
+              index === 0 ||
               (prevRealm && prevRealmComplete)
             const isCurrentRealm = currentRealm?.id === realm.id
 
@@ -418,10 +462,13 @@ export default function QuestJournalPage() {
                       <h3 className="text-xl font-bold text-slate-100 flex items-center gap-2">
                         {realm.name}
                         {!isUnlocked && <span className="text-sm text-slate-500">🔒</span>}
-                        {isCurrentRealm && <span className="text-sm text-amber-400 animate-pulse">▶️</span>}
+                        {isCurrentRealm && (
+                          <span className="text-sm text-amber-400 animate-pulse">▶️</span>
+                        )}
                       </h3>
                       <p className="text-sm text-slate-400">
-                        Requires Level {realm.requiredLevel} • {realm.technologies.length} Technologies
+                        Requires Level {realm.requiredLevel} • {realm.technologies.length}{' '}
+                        Technologies
                       </p>
                     </div>
                   </div>
@@ -437,7 +484,9 @@ export default function QuestJournalPage() {
                 <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden mb-4">
                   <div
                     className="h-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all duration-500"
-                    style={{ width: `${progress.total > 0 ? (progress.completed / progress.total) * 100 : 0}%` }}
+                    style={{
+                      width: `${progress.total > 0 ? (progress.completed / progress.total) * 100 : 0}%`,
+                    }}
                   />
                 </div>
 
@@ -446,9 +495,9 @@ export default function QuestJournalPage() {
 
                 {/* Technologies */}
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {realm.technologies.map(techId => {
-                    const techQuests = realmQuests.filter(q => q.technologyId === techId)
-                    const techCompleted = techQuests.filter(q => isQuestCompleted(q.id)).length
+                  {realm.technologies.map((techId) => {
+                    const techQuests = realmQuests.filter((q) => q.technologyId === techId)
+                    const techCompleted = techQuests.filter((q) => isQuestCompleted(q.id)).length
                     const totalTechQuests = techQuests.length
 
                     return (
@@ -515,7 +564,7 @@ export default function QuestJournalPage() {
 
           {/* Daily Encouragement */}
           <div className="mt-8 p-4 bg-gradient-to-r from-purple-900/30 via-slate-800 to-blue-900/30 rounded-xl border border-purple-500/30 max-w-lg mx-auto">
-            <p className="text-purple-300 italic text-lg">"{encouragement}"</p>
+            <p className="text-purple-300 italic text-lg">&quot;{encouragement}&quot;</p>
             <p className="text-slate-500 text-sm mt-2">Keep going, hero! ⚔️</p>
           </div>
         </div>

@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { getRandomEncouragement } from '../../data/milestones'
+import { useState, useEffect, useRef } from 'react'
 
 interface CelebrationToastProps {
   message: string
@@ -9,7 +8,7 @@ interface CelebrationToastProps {
   onDismiss: () => void
 }
 
-export function CelebrationToast({ message, type, icon, xpGained, onDismiss }: CelebrationToastProps) {
+function CelebrationToast({ message, type, icon, xpGained, onDismiss }: CelebrationToastProps) {
   const [exiting, setExiting] = useState(false)
   const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -51,7 +50,9 @@ export function CelebrationToast({ message, type, icon, xpGained, onDismiss }: C
         exiting ? 'opacity-0 translate-y-[-20px]' : 'opacity-100 translate-y-0'
       }`}
     >
-      <div className={`${bgClass} border-2 rounded-xl shadow-2xl p-4 max-w-sm mx-auto backdrop-blur-sm`}>
+      <div
+        className={`${bgClass} border-2 rounded-xl shadow-2xl p-4 max-w-sm mx-auto backdrop-blur-sm`}
+      >
         <div className="flex items-start gap-3">
           <div className="text-3xl">{icon || defaultIcon}</div>
           <div className="flex-1">
@@ -90,38 +91,18 @@ export function ToastManager({ toasts, onRemove }: ToastManagerProps) {
   return (
     <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2">
       {toasts.map((toast, index) => (
-        <div
-          key={toast.id}
-          style={{ marginTop: index * 10 }}
-        >
+        <div key={toast.id} style={{ marginTop: index * 10 }}>
           <CelebrationToast
             message={toast.message}
             type={toast.type}
             icon={toast.icon}
             xpGained={toast.xpGained}
-            onDismiss={() => onRemove(toast.id)}
+            onDismiss={() => {
+              onRemove(toast.id)
+            }}
           />
         </div>
       ))}
     </div>
   )
-}
-
-/* eslint-disable react-refresh/only-export-components */
-// Hook for managing encouragement messages
-export function useEncouragement() {
-  const [lastEncouragement, setLastEncouragement] = useState<string | null>(null)
-  const [nextEncouragementIn] = useState<number>(0)
-
-  // Show encouragement every 3 quests or so
-  const checkShowEncouragement = useCallback((questCount: number) => {
-    if (questCount > 0 && questCount % 3 === 0) {
-      const msg = getRandomEncouragement()
-      setLastEncouragement(msg)
-      return msg
-    }
-    return null
-  }, [])
-
-  return { lastEncouragement, nextEncouragementIn, checkShowEncouragement }
 }

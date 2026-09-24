@@ -13,8 +13,8 @@ export default function StorylinesPage() {
   const getArcProgress = (arc: StoryArc) => {
     let completed = 0
     for (const episode of arc.episodes) {
-      const allQuestsDone = episode.questIds.every(qId =>
-        completedQuests.some(q => q.questId === qId || q.technologyId === qId)
+      const allQuestsDone = episode.questIds.every((qId) =>
+        completedQuests.some((q) => q.questId === qId || q.technologyId === qId),
       )
       if (allQuestsDone) completed++
     }
@@ -26,16 +26,16 @@ export default function StorylinesPage() {
     if (episodeIndex === 0) return true
     // Previous episode must be completed
     const prevEpisode = arc.episodes[episodeIndex - 1]
-    return prevEpisode.questIds.every(qId =>
-      completedQuests.some(q => q.questId === qId || q.technologyId === qId)
+    return prevEpisode.questIds.every((qId) =>
+      completedQuests.some((q) => q.questId === qId || q.technologyId === qId),
     )
   }
 
   // Check if an episode is completed
   const isEpisodeCompleted = (arc: StoryArc, episodeIndex: number) => {
     const episode = arc.episodes[episodeIndex]
-    return episode.questIds.every(qId =>
-      completedQuests.some(q => q.questId === qId || q.technologyId === qId)
+    return episode.questIds.every((qId) =>
+      completedQuests.some((q) => q.questId === qId || q.technologyId === qId),
     )
   }
 
@@ -70,22 +70,19 @@ export default function StorylinesPage() {
         <div className="bg-gradient-to-r from-purple-900/30 via-slate-800 to-blue-900/30 rounded-xl border border-purple-600/50 p-6 mb-6">
           <h2 className="text-2xl font-bold text-white mb-2">🎭 Learning Storylines</h2>
           <p className="text-slate-400 mb-4">
-            Embark on epic narrative-driven quests! Follow story arcs through interconnected challenges
-            with real-world scenarios. Each storyline has multiple chapters that unlock as you progress.
+            Embark on epic narrative-driven quests! Follow story arcs through interconnected
+            challenges with real-world scenarios. Each storyline has multiple chapters that unlock
+            as you progress.
           </p>
           <div className="flex items-center gap-4 text-sm">
-            <span className="text-slate-400">
-              ✨ Level {character.level} Quest Seeker
-            </span>
-            <span className="text-amber-400">
-              🏆 {completedQuests.length} Quests Completed
-            </span>
+            <span className="text-slate-400">✨ Level {character.level} Quest Seeker</span>
+            <span className="text-amber-400">🏆 {completedQuests.length} Quests Completed</span>
           </div>
         </div>
 
         {/* Story Arcs */}
         <div className="space-y-6">
-          {STORY_ARCS.map(arc => {
+          {STORY_ARCS.map((arc) => {
             const progress = getArcProgress(arc)
             const progressPercent = Math.round((progress.completed / progress.total) * 100)
             const difficulty = DIFFICULTY_CONFIG[arc.difficulty]
@@ -96,14 +93,14 @@ export default function StorylinesPage() {
               <div
                 key={arc.id}
                 className={`bg-slate-800/80 rounded-xl border overflow-hidden ${
-                  isComplete
-                    ? 'border-green-600/50'
-                    : 'border-slate-700 hover:border-purple-600/50'
+                  isComplete ? 'border-green-600/50' : 'border-slate-700 hover:border-purple-600/50'
                 } transition-all`}
               >
                 {/* Arc Header */}
                 <button
-                  onClick={() => setSelectedArc(selectedArc?.id === arc.id ? null : arc)}
+                  onClick={() => {
+                  setSelectedArc(selectedArc?.id === arc.id ? null : arc)
+                }}
                   className="w-full p-6 text-left"
                 >
                   <div className="flex items-start justify-between">
@@ -112,8 +109,10 @@ export default function StorylinesPage() {
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="text-xl font-bold text-white">{arc.title}</h3>
-                          <span className={`px-2 py-0.5 rounded text-xs ${difficulty.bg}`}
-                                style={{ color: difficulty.color }}>
+                          <span
+                            className={`px-2 py-0.5 rounded text-xs ${difficulty.bg}`}
+                            style={{ color: difficulty.color }}
+                          >
                             {difficulty.label}
                           </span>
                           {isComplete && (
@@ -132,11 +131,15 @@ export default function StorylinesPage() {
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-2">
-                      <span className={`text-2xl ${selectedArc?.id === arc.id ? 'rotate-90' : ''} transition-transform`}>
+                      <span
+                        className={`text-2xl ${selectedArc?.id === arc.id ? 'rotate-90' : ''} transition-transform`}
+                      >
                         ▶
                       </span>
                       <div className="text-right">
-                        <div className="text-sm text-slate-400">{progress.completed}/{progress.total}</div>
+                        <div className="text-sm text-slate-400">
+                          {progress.completed}/{progress.total}
+                        </div>
                         <div className="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
                           <div
                             className={`h-full transition-all ${isComplete ? 'bg-green-500' : 'bg-purple-500'}`}
@@ -172,24 +175,30 @@ export default function StorylinesPage() {
                             }`}
                           >
                             <div className="flex items-start gap-3">
-                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                                completed
-                                  ? 'bg-green-600 text-white'
-                                  : unlocked
-                                    ? isNext
-                                      ? 'bg-amber-600 text-white animate-pulse'
-                                      : 'bg-purple-600 text-white'
-                                    : 'bg-slate-700 text-slate-400'
-                              }`}>
+                              <div
+                                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                                  completed
+                                    ? 'bg-green-600 text-white'
+                                    : unlocked
+                                      ? isNext
+                                        ? 'bg-amber-600 text-white animate-pulse'
+                                        : 'bg-purple-600 text-white'
+                                      : 'bg-slate-700 text-slate-400'
+                                }`}
+                              >
                                 {completed ? '✓' : index + 1}
                               </div>
                               <div className="flex-1">
                                 <div className="flex items-center justify-between">
-                                  <h5 className={`font-medium ${completed ? 'text-green-400' : unlocked ? 'text-white' : 'text-slate-400'}`}>
+                                  <h5
+                                    className={`font-medium ${completed ? 'text-green-400' : unlocked ? 'text-white' : 'text-slate-400'}`}
+                                  >
                                     {episode.title}
                                   </h5>
                                   {isNext && (
-                                    <span className="text-xs text-amber-400 animate-pulse">▶ Next Up</span>
+                                    <span className="text-xs text-amber-400 animate-pulse">
+                                      ▶ Next Up
+                                    </span>
                                   )}
                                 </div>
                                 <p className="text-sm text-slate-400 mt-1">{episode.description}</p>
@@ -214,10 +223,14 @@ export default function StorylinesPage() {
 
                     {/* Arc Rewards */}
                     <div className="mt-6 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
-                      <h5 className="text-sm font-medium text-slate-400 mb-2">Complete Arc Rewards</h5>
+                      <h5 className="text-sm font-medium text-slate-400 mb-2">
+                        Complete Arc Rewards
+                      </h5>
                       <div className="flex items-center gap-6">
                         <span className="text-green-400 font-bold">+{arc.rewards.xpBonus} XP</span>
-                        <span className="text-amber-400 font-bold">+{arc.rewards.goldBonus} Gold</span>
+                        <span className="text-amber-400 font-bold">
+                          +{arc.rewards.goldBonus} Gold
+                        </span>
                         {arc.rewards.badgeId && (
                           <span className="text-purple-400 font-bold">🏅 Special Badge</span>
                         )}

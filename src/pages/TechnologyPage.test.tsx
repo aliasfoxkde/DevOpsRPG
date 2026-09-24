@@ -12,7 +12,7 @@ function renderWithRouter(entries = ['/learn/html']) {
           <Route path="/learn/:technology" element={<TechnologyPage />} />
         </Routes>
       </GameProvider>
-    </MemoryRouter>
+    </MemoryRouter>,
   )
 }
 
@@ -43,10 +43,10 @@ describe('TechnologyPage', () => {
     expect(buttons.length).toBeGreaterThan(0)
   })
 
-  it('can click mark complete button', async () => {
+  it('can click mark complete button', () => {
     renderWithRouter()
     const buttons = screen.getAllByText('Mark as Complete (+75 XP)')
-    await act(async () => {
+    act(() => {
       buttons[0].click()
     })
     // After clicking, button should show "Completed"

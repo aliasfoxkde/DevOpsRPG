@@ -44,7 +44,7 @@ describe('LevelUpEffect', () => {
 
     const divByText = (text: string) =>
       Array.from(container.querySelectorAll('div')).find(
-        (node) => node.textContent === text
+        (node) => node.textContent === text,
       ) as HTMLElement
 
     const levelUpText = divByText('LEVEL UP!')
@@ -115,9 +115,7 @@ describe('AnimatedXPBar', () => {
   })
 
   it('counts up towards the new xp while animating', async () => {
-    const { container, rerender } = render(
-      <AnimatedXPBar xp={0} maxXp={100} showAnimation />
-    )
+    const { container, rerender } = render(<AnimatedXPBar xp={0} maxXp={100} showAnimation />)
     expect(fillOf(container)).toHaveStyle({ width: '0%' })
 
     rerender(<AnimatedXPBar xp={100} maxXp={100} showAnimation />)

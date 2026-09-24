@@ -40,7 +40,7 @@ export function ProgressBar({
             'bg-green-500': color === 'success',
             'bg-yellow-500': color === 'warning',
             'bg-red-500': color === 'error',
-          }
+          },
         )}
         style={{ width: `${percentage}%` }}
       />

@@ -15,13 +15,9 @@ describe('ProfilePage', () => {
     const { character } = seedDefaultGame()
     renderSeededPage(<ProfilePage />, { route: '/profile', url: '/profile' })
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Hero Profile/ }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /Hero Profile/ })).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 2, name: character.name })).toBeInTheDocument()
-    expect(
-      screen.getByText(`Level ${character.level} ${character.class}`),
-    ).toBeInTheDocument()
+    expect(screen.getByText(`Level ${character.level} ${character.class}`)).toBeInTheDocument()
   })
 
   it('summarises quest, badge, milestone and collectible counts', () => {

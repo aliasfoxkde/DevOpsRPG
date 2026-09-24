@@ -40,7 +40,7 @@ function fireInstallAvailable(prompt: () => void) {
       Object.assign(new Event('beforeinstallprompt'), {
         prompt,
         userChoice: Promise.resolve({ outcome: 'accepted' }),
-      })
+      }),
     )
   })
 }
@@ -84,7 +84,9 @@ describe('OfflineIndicator', () => {
     const { unmount } = render(<OfflineIndicator />)
     unmount()
 
-    expect(() => fireWindowEvent('offline')).not.toThrow()
+    expect(() => {
+      fireWindowEvent('offline')
+    }).not.toThrow()
     expect(screen.queryByText("You're offline")).toBeNull()
   })
 })
@@ -101,9 +103,7 @@ describe('InstallPrompt', () => {
     fireInstallAvailable(() => {})
 
     expect(screen.getByText('Install DevOpsQuest')).toBeInTheDocument()
-    expect(
-      screen.getByText('Add to home screen for the best experience!')
-    ).toBeInTheDocument()
+    expect(screen.getByText('Add to home screen for the best experience!')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Install' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Later' })).toBeInTheDocument()
   })

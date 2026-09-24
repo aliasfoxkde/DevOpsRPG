@@ -39,7 +39,7 @@ function renderHud(initialPath = '/quests') {
           <HUD />
         </ThemeProvider>
       </GameProvider>
-    </MemoryRouter>
+    </MemoryRouter>,
   )
 }
 
@@ -71,7 +71,7 @@ describe('HUD', () => {
       const links = screen.getAllByRole('link', { name: new RegExp(`${label}$`) })
       expect(
         links.some((link) => link.getAttribute('href') === href),
-        `${label} should link to ${href}`
+        `${label} should link to ${href}`,
       ).toBe(true)
     }
   })
@@ -79,10 +79,7 @@ describe('HUD', () => {
   it('marks the active route and leaves the rest unmarked', () => {
     renderHud('/quests')
 
-    expect(screen.getByRole('link', { name: /Quests$/ })).toHaveAttribute(
-      'aria-current',
-      'page'
-    )
+    expect(screen.getByRole('link', { name: /Quests$/ })).toHaveAttribute('aria-current', 'page')
     expect(screen.getByRole('link', { name: /Home$/ })).not.toHaveAttribute('aria-current')
   })
 
@@ -104,9 +101,10 @@ describe('HUD', () => {
     renderHud()
 
     expect(screen.getByText('LV 1')).toBeInTheDocument()
-    expect(
-      screen.getByRole('progressbar', { name: 'Experience progress' })
-    ).toHaveAttribute('aria-valuenow', '0')
+    expect(screen.getByRole('progressbar', { name: 'Experience progress' })).toHaveAttribute(
+      'aria-valuenow',
+      '0',
+    )
   })
 
   it('hides the XP multiplier badge while no boost is active', () => {
@@ -121,17 +119,19 @@ describe('HUD', () => {
     const toggle = screen.getByRole('button', { name: 'Current theme: Dark. Click to change.' })
     await user.click(toggle)
     expect(
-      screen.getByRole('button', { name: 'Current theme: System. Click to change.' })
+      screen.getByRole('button', { name: 'Current theme: System. Click to change.' }),
     ).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Current theme: System. Click to change.' }))
+    await user.click(
+      screen.getByRole('button', { name: 'Current theme: System. Click to change.' }),
+    )
     expect(
-      screen.getByRole('button', { name: 'Current theme: Light. Click to change.' })
+      screen.getByRole('button', { name: 'Current theme: Light. Click to change.' }),
     ).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Current theme: Light. Click to change.' }))
     expect(
-      screen.getByRole('button', { name: 'Current theme: Dark. Click to change.' })
+      screen.getByRole('button', { name: 'Current theme: Dark. Click to change.' }),
     ).toBeInTheDocument()
     expect(localStorage.getItem('theme')).toBe('dark')
   })
@@ -151,7 +151,7 @@ describe('HUD', () => {
 
     await user.click(enabled)
     expect(
-      screen.getByRole('button', { name: 'Sound is muted. Click to enable sound.' })
+      screen.getByRole('button', { name: 'Sound is muted. Click to enable sound.' }),
     ).toBeInTheDocument()
     expect(localStorage.getItem('soundEnabled')).toBe('false')
   })
@@ -171,11 +171,9 @@ describe('HUD', () => {
       expect(more).toHaveAttribute('aria-expanded', 'true')
       // Each menu item is an emoji decoration followed by the destination label
       const labels = Array.from(menu.querySelectorAll('[role="menuitem"]')).map(
-        (item) => item.lastElementChild?.textContent ?? ''
+        (item) => item.lastElementChild?.textContent ?? '',
       )
-      expect(labels).toEqual(
-        expect.arrayContaining(['Skills', 'Settings', 'Social'])
-      )
+      expect(labels).toEqual(expect.arrayContaining(['Skills', 'Settings', 'Social']))
       expect(menu.querySelectorAll('[role="menuitem"]')).toHaveLength(15)
     })
 
@@ -187,19 +185,15 @@ describe('HUD', () => {
       expect(screen.getByRole('menu')).toBeInTheDocument()
 
       // Move focus elsewhere to prove the handler actively restores it
-      screen
-        .getByRole('button', { name: 'Current theme: Dark. Click to change.' })
-        .focus()
+      screen.getByRole('button', { name: 'Current theme: Dark. Click to change.' }).focus()
       expect(
-        screen.getByRole('button', { name: 'Current theme: Dark. Click to change.' })
+        screen.getByRole('button', { name: 'Current theme: Dark. Click to change.' }),
       ).toHaveFocus()
 
       fireEvent.keyDown(document, { key: 'Escape' })
 
       expect(screen.queryByRole('menu')).toBeNull()
-      expect(
-        screen.getByRole('button', { name: 'More navigation options' })
-      ).toHaveFocus()
+      expect(screen.getByRole('button', { name: 'More navigation options' })).toHaveFocus()
     })
 
     it('closes on a click outside the menu', async () => {

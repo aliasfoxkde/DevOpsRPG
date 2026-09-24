@@ -36,7 +36,9 @@ export default function CelebrationOverlay() {
   useEffect(() => {
     // Clear after animation
     timerRef.current = setTimeout(() => {
-      requestAnimationFrame(() => setConfetti([]))
+      requestAnimationFrame(() => {
+        setConfetti([])
+      })
     }, 4000)
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
@@ -59,43 +61,10 @@ export default function CelebrationOverlay() {
             backgroundColor: piece.color,
             transform: `rotate(${piece.rotation}deg)`,
             animationDelay: `${piece.delay}s`,
-            borderRadius: piece.id % 3 === 0 ? '50%' : '2px'
+            borderRadius: piece.id % 3 === 0 ? '50%' : '2px',
           }}
         />
       ))}
-    </div>
-  )
-}
-
-// XP Popup that floats up and fades
-interface XPPopupProps {
-  amount: number
-  onComplete: () => void
-  x?: number
-  y?: number
-}
-
-export function XPPopup({ amount, onComplete, x, y }: XPPopupProps) {
-  const [visible, setVisible] = useState(true)
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setVisible(false)
-      onComplete()
-    }, 1500)
-    return () => clearTimeout(timer)
-  }, [onComplete])
-
-  if (!visible) return null
-
-  return (
-    <div
-      className="fixed z-50 animate-float-up pointer-events-none"
-      style={x !== undefined && y !== undefined ? { left: x, top: y } : undefined}
-    >
-      <div className="px-4 py-2 bg-gradient-to-r from-amber-600 to-amber-500 rounded-full shadow-lg border-2 border-amber-400">
-        <span className="text-lg font-bold text-white">+{amount} XP</span>
-      </div>
     </div>
   )
 }
@@ -110,12 +79,8 @@ export function StreakBonus({ streak }: StreakBonusProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm pointer-events-none">
       <div className="text-center animate-bounce-in">
         <div className="text-8xl">🔥</div>
-        <div className="text-4xl font-bold text-orange-400 mt-4">
-          {streak} Day Streak!
-        </div>
-        <div className="text-xl text-amber-400 mt-2">
-          +{streak * 5} Bonus XP!
-        </div>
+        <div className="text-4xl font-bold text-orange-400 mt-4">{streak} Day Streak!</div>
+        <div className="text-xl text-amber-400 mt-2">+{streak * 5} Bonus XP!</div>
       </div>
     </div>
   )
@@ -138,7 +103,9 @@ export function MilestonePopup({ icon, title, message, xpBonus, onComplete }: Mi
       setVisible(false)
       setTimeout(onComplete, 300)
     }, 3500)
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+    }
   }, [onComplete])
 
   if (!visible) return null
@@ -157,64 +124,6 @@ export function MilestonePopup({ icon, title, message, xpBonus, onComplete }: Mi
           <span className="text-xl font-bold text-white">+{xpBonus} XP BONUS!</span>
         </div>
         <p className="text-slate-500 text-sm mt-4">Auto-closing...</p>
-      </div>
-    </div>
-  )
-}
-
-// Round completion bonus (big finale reward)
-interface RoundBonusProps {
-  completedQuests: number
-  xpBonus: number
-  goldBonus: number
-  badge?: { id: string; name: string; icon: string }
-  onComplete: () => void
-}
-
-export function RoundBonus({ completedQuests, xpBonus, goldBonus, badge, onComplete }: RoundBonusProps) {
-  const [visible, setVisible] = useState(true)
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setVisible(false)
-      setTimeout(onComplete, 500)
-    }, 5000)
-    return () => clearTimeout(timer)
-  }, [onComplete])
-
-  if (!visible) return null
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-      <div className="text-center animate-bounce-in max-w-lg">
-        <div className="text-8xl mb-4">🏆</div>
-        <h2 className="text-4xl font-bold text-amber-400 mb-2">Round Complete!</h2>
-        <p className="text-slate-300 text-lg mb-6">
-          You completed {completedQuests} quests in this round!
-        </p>
-
-        <div className="flex items-center justify-center gap-6 mb-6">
-          <div className="px-6 py-3 bg-gradient-to-r from-purple-900/50 to-purple-800/50 rounded-xl border border-purple-500/50">
-            <div className="text-2xl font-bold text-purple-300">+{xpBonus}</div>
-            <div className="text-purple-400 text-sm">XP Bonus</div>
-          </div>
-          <div className="px-6 py-3 bg-gradient-to-r from-yellow-900/50 to-yellow-800/50 rounded-xl border border-yellow-500/50">
-            <div className="text-2xl font-bold text-yellow-300">+{goldBonus}</div>
-            <div className="text-yellow-400 text-sm">Gold Bonus</div>
-          </div>
-        </div>
-
-        {badge && (
-          <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-amber-900/50 to-orange-900/50 rounded-xl border border-amber-500/50 mb-6">
-            <span className="text-4xl">{badge.icon}</span>
-            <div className="text-left">
-              <div className="text-amber-400 text-sm">Badge Earned!</div>
-              <div className="text-white font-bold">{badge.name}</div>
-            </div>
-          </div>
-        )}
-
-        <div className="text-slate-500 text-sm mt-6">Get ready for the next round...</div>
       </div>
     </div>
   )

@@ -25,183 +25,145 @@ const mentorResponses: MentorResponse[] = [
   {
     keywords: ['hello', 'hi', 'hey', 'greetings'],
     responses: [
-      "Greetings, brave adventurer! Your journey into DevOps mastery begins now!",
-      "Welcome back, hero! The realm of knowledge awaits your exploration!",
-      "Well met! Ready to defeat some quests and level up your skills?"
-    ]
+      'Greetings, brave adventurer! Your journey into DevOps mastery begins now!',
+      'Welcome back, hero! The realm of knowledge awaits your exploration!',
+      'Well met! Ready to defeat some quests and level up your skills?',
+    ],
   },
   {
     keywords: ['help', 'stuck', 'confused', 'how do i'],
     responses: [
-      "Every master was once a beginner! Check the Quest Journal for your next adventure.",
-      "Need guidance? Visit the World Map to see which realms are within your reach!",
-      "Don't worry - even the strongest heroes need to consult their maps. Try the Quest Journal!"
-    ]
+      'Every master was once a beginner! Check the Quest Journal for your next adventure.',
+      'Need guidance? Visit the World Map to see which realms are within your reach!',
+      "Don't worry - even the strongest heroes need to consult their maps. Try the Quest Journal!",
+    ],
   },
   {
     keywords: ['xp', 'points', 'level', 'progress'],
     responses: [
-      "XP is earned by completing quests! The harder the battle, the greater the reward!",
-      "Complete quizzes to earn XP and watch your character grow stronger!",
-      "Each quest conquered brings you closer to true DevOps mastery. Keep grinding!"
-    ]
+      'XP is earned by completing quests! The harder the battle, the greater the reward!',
+      'Complete quizzes to earn XP and watch your character grow stronger!',
+      'Each quest conquered brings you closer to true DevOps mastery. Keep grinding!',
+    ],
   },
   {
     keywords: ['quiz', 'question', 'answer', 'study'],
     responses: [
       "Quiz time! Study the material first, then test your knowledge. You've got this!",
       "When taking a quiz, press 'N' to speed through - it auto-answers for you!",
-      "Knowledge is power! Each correct answer brings you closer to victory."
-    ]
+      'Knowledge is power! Each correct answer brings you closer to victory.',
+    ],
   },
   {
     keywords: ['hard', 'difficult', 'too hard', 'impossible'],
     responses: [
-      "The greatest victories come from the toughest battles! You can do this!",
-      "Even the tallest mountains can be conquered step by step. Keep trying!",
-      "Remember: every expert was once a beginner. Persist, and you shall prevail!"
-    ]
+      'The greatest victories come from the toughest battles! You can do this!',
+      'Even the tallest mountains can be conquered step by step. Keep trying!',
+      'Remember: every expert was once a beginner. Persist, and you shall prevail!',
+    ],
   },
   {
     keywords: ['easy', 'simple', 'too easy'],
     responses: [
-      "Feeling confident? Try a harder realm or tackle the boss battles!",
+      'Feeling confident? Try a harder realm or tackle the boss battles!',
       "Excellent! Perhaps it's time to challenge the Cloud Mountains or beyond!",
-      "You've mastered the basics! The path to mastery continues ever onward."
-    ]
+      "You've mastered the basics! The path to mastery continues ever onward.",
+    ],
   },
   {
     keywords: ['complete', 'finish', 'done', 'finished'],
     responses: [
-      "Excellent work! Your dedication is inspiring. What quest shall we tackle next?",
-      "Victory is yours! Your progress has been noted in the chronicles of heroes!",
-      "Another quest conquered! Your legend grows stronger with each battle."
-    ]
+      'Excellent work! Your dedication is inspiring. What quest shall we tackle next?',
+      'Victory is yours! Your progress has been noted in the chronicles of heroes!',
+      'Another quest conquered! Your legend grows stronger with each battle.',
+    ],
   },
   {
     keywords: ['map', 'world', 'explore', 'where'],
     responses: [
-      "The World Map shows your epic journey through all the DevOps realms!",
+      'The World Map shows your epic journey through all the DevOps realms!',
       "Explore the world map to see which areas you've unlocked and what's ahead!",
-      "From the Village of Foundations to the AI Nexus, your adventure awaits!"
-    ]
+      'From the Village of Foundations to the AI Nexus, your adventure awaits!',
+    ],
   },
   {
     keywords: ['level', 'level up', 'leveling'],
     responses: [
-      "Level up by earning XP! Each level unlocks new realms and challenges!",
-      "The higher your level, the more powerful you become. Keep questing!",
-      "Level progression opens doors to previously locked territories!"
-    ]
+      'Level up by earning XP! Each level unlocks new realms and challenges!',
+      'The higher your level, the more powerful you become. Keep questing!',
+      'Level progression opens doors to previously locked territories!',
+    ],
   },
   {
     keywords: ['badges', 'achievements', 'collect', 'reward'],
     responses: [
-      "Collect badges and achievements as you prove your DevOps prowess!",
-      "Rare collectibles await those who explore every corner of this realm!",
-      "Achievement hunting! I love your enthusiasm, brave hero!"
-    ]
+      'Collect badges and achievements as you prove your DevOps prowess!',
+      'Rare collectibles await those who explore every corner of this realm!',
+      'Achievement hunting! I love your enthusiasm, brave hero!',
+    ],
   },
   {
     keywords: ['skill', 'ability', 'power', 'strength'],
     responses: [
-      "Your skills grow with each quest completed. The DevOps arts require dedication!",
-      "Power comes from knowledge! Master all the technologies to become unstoppable!",
-      "Each technology you learn adds new abilities to your heroic arsenal!"
-    ]
+      'Your skills grow with each quest completed. The DevOps arts require dedication!',
+      'Power comes from knowledge! Master all the technologies to become unstoppable!',
+      'Each technology you learn adds new abilities to your heroic arsenal!',
+    ],
   },
   {
     keywords: ['sad', 'frustrated', 'angry', 'annoyed'],
     responses: [
       "Even heroes face setbacks! Take a deep breath - you've got this!",
-      "Frustration is the precursor to achievement. Keep pushing forward!",
-      "The path of a hero is never easy, but the rewards are worth it!"
-    ]
+      'Frustration is the precursor to achievement. Keep pushing forward!',
+      'The path of a hero is never easy, but the rewards are worth it!',
+    ],
   },
   {
     keywords: ['happy', 'excited', 'awesome', 'amazing'],
     responses: [
-      "Your enthusiasm lights the way! Onward to victory!",
+      'Your enthusiasm lights the way! Onward to victory!',
       "I love your energy! Let's channel it into conquering more quests!",
-      "The joy of learning is one of the greatest treasures. Keep that spark alive!"
-    ]
+      'The joy of learning is one of the greatest treasures. Keep that spark alive!',
+    ],
   },
   {
     keywords: ['thank', 'thanks', 'appreciate'],
     responses: [
-      "Your gratitude warms my heroic heart! Now go forth and conquer!",
-      "The best heroes are those who appreciate the journey. Well said!",
-      "Together we shall achieve greatness! Onward!"
-    ]
-  }
+      'Your gratitude warms my heroic heart! Now go forth and conquer!',
+      'The best heroes are those who appreciate the journey. Well said!',
+      'Together we shall achieve greatness! Onward!',
+    ],
+  },
 ]
 
 // Default responses when no keyword matches
 const defaultResponses = [
-  "Interesting question! The path of DevOps mastery has many facets. Keep exploring!",
-  "Hmm, let me think... The best approach is often to just dive in and try!",
+  'Interesting question! The path of DevOps mastery has many facets. Keep exploring!',
+  'Hmm, let me think... The best approach is often to just dive in and try!',
   "The ancient scrolls say: 'Knowledge shared is knowledge multiplied.' Keep asking questions!",
-  "A wise hero knows when to consult the codex. Check the Quest Journal for guidance!",
-  "Every interaction is a learning opportunity. What aspect of DevOps intrigues you most?",
+  'A wise hero knows when to consult the codex. Check the Quest Journal for guidance!',
+  'Every interaction is a learning opportunity. What aspect of DevOps intrigues you most?',
   "The realm of DevOps is vast! Tell me more about what you're exploring.",
   "Curiosity is the hero's greatest tool. What would you like to discover next?",
-  "The answer lies in practice and persistence. Which quest calls to you?"
+  'The answer lies in practice and persistence. Which quest calls to you?',
 ]
 
-/* eslint-disable react-refresh/only-export-components */
-// Encouragement messages based on game events
-export const encouragementMessages = {
-  questComplete: [
-    "Dazzling work! Another quest falls before your prowess!",
-    "Victory! Your dedication to learning is inspiring!",
-    "Excellent effort! Each quest completed makes you stronger!"
-  ],
-  levelUp: [
-    "LEVEL UP! Your power grows ever stronger!",
-    "A new milestone reached! Your legend expands!",
-    "Level achieved! The realms bow to your growing power!"
-  ],
-  quizPassed: [
-    "Brilliant! Your knowledge proves your worth!",
-    "Quiz conquered! Your mind is a weapon!",
-    "Correct answers all! Your study has paid off!"
-  ],
-  quizFailed: [
-    "Not quite! But every failure teaches. Try again!",
-    "The path to mastery has obstacles. Push through!",
-    "Incorrect, but not defeated! Review and retry!"
-  ],
-  streakMilestone: [
-    "INCREDIBLE STREAK! Your dedication is legendary!",
-    "A chain of victories! Your commitment is admirable!",
-    "Streak of champions! Keep the momentum going!"
-  ],
-  realmUnlocked: [
-    "A NEW REALM UNLOCKED! Adventure awaits!",
-    "The path opens to new territories! Explore wisely!",
-    "New challenges emerge! Prepare yourself, hero!"
-  ],
-  noQuest: [
-    "The path ahead is clear - all quests conquered! A true master!",
-    "You've vanquished every challenge! Return daily for more adventures!",
-    "A moment of respite, champion. New quests emerge each day!"
-  ],
-  dailyReward: [
-    "Daily treasure acquired! Your dedication is rewarded!",
-    "A gift for returning hero! Fortune favors the persistent!",
-    "Daily login bonus! The adventurer's diligence pays off!"
-  ]
-}
-
-function getContextualResponse(userMessage: string, game: {
-  character: { level: number; xp: number; streakDays: number }
-  completedQuests: { questId: string }[]
-  stats: { quizCount: number; minigameCount: number }
-}): string {
+function getContextualResponse(
+  userMessage: string,
+  game: {
+    character: { level: number; xp: number; streakDays: number }
+    completedQuests: { questId: string }[]
+    stats: { quizCount: number; minigameCount: number }
+  },
+): string {
   const lowerMessage = userMessage.toLowerCase()
 
   // Context-aware responses based on game state
-  if (lowerMessage.includes('progress') || lowerMessage.includes('stat') || lowerMessage.includes('how am i')) {
+  if (
+    lowerMessage.includes('progress') ||
+    lowerMessage.includes('stat') ||
+    lowerMessage.includes('how am i')
+  ) {
     const completed = game.completedQuests.length
     const level = game.character.level
     const streak = game.character.streakDays
@@ -219,7 +181,11 @@ function getContextualResponse(userMessage: string, game: {
     }
   }
 
-  if (lowerMessage.includes('next') || lowerMessage.includes('where') || lowerMessage.includes('should i go')) {
+  if (
+    lowerMessage.includes('next') ||
+    lowerMessage.includes('where') ||
+    lowerMessage.includes('should i go')
+  ) {
     const completed = game.completedQuests.length
     if (completed === 0) {
       return "Start your adventure in the Village of Foundations! Look for quests with 💀 difficulty 1 - they're perfect for beginners. You can do this!"
@@ -230,7 +196,11 @@ function getContextualResponse(userMessage: string, game: {
     }
   }
 
-  if (lowerMessage.includes('xp') || lowerMessage.includes('points') || lowerMessage.includes('level up')) {
+  if (
+    lowerMessage.includes('xp') ||
+    lowerMessage.includes('points') ||
+    lowerMessage.includes('level up')
+  ) {
     return `You currently have ${game.character.xp} XP at Level ${game.character.level}! Complete quests, pass quizzes, and play mini-games to earn more. The formula is simple: more action = more XP!`
   }
 
@@ -248,10 +218,14 @@ function getContextualResponse(userMessage: string, game: {
   }
 
   if (lowerMessage.includes('quiz') || lowerMessage.includes('study')) {
-    return "Quizzes test your knowledge and award bonus XP when you pass! Score 80%+ to earn the Quiz Master badge. Study the topic material first for best results!"
+    return 'Quizzes test your knowledge and award bonus XP when you pass! Score 80%+ to earn the Quiz Master badge. Study the topic material first for best results!'
   }
 
-  if (lowerMessage.includes('help') || lowerMessage.includes('stuck') || lowerMessage.includes('confused')) {
+  if (
+    lowerMessage.includes('help') ||
+    lowerMessage.includes('stuck') ||
+    lowerMessage.includes('confused')
+  ) {
     return "Every expert was once a beginner! If you're stuck: 1) Check the Quest Journal for available quests, 2) Review topic content before taking quizzes, 3) Don't skip the study material! Need specific help? Just ask!"
   }
 
@@ -271,12 +245,14 @@ function getContextualResponse(userMessage: string, game: {
 export default function MentorChat() {
   const { game } = useGame()
   const [isOpen, setIsOpen] = useState(false)
-  const [messages, setMessages] = useState<Message[]>(() => [{
-    id: '1',
-    text: `Welcome, brave adventurer! I'm your DevOps mentor. Currently at Level ${game.character.level} with ${game.character.xp} XP. How can I guide you today?`,
-    isUser: false,
-    timestamp: new Date()
-  }])
+  const [messages, setMessages] = useState<Message[]>(() => [
+    {
+      id: '1',
+      text: `Welcome, brave adventurer! I'm your DevOps mentor. Currently at Level ${game.character.level} with ${game.character.xp} XP. How can I guide you today?`,
+      isUser: false,
+      timestamp: new Date(),
+    },
+  ])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -293,29 +269,32 @@ export default function MentorChat() {
       id: Date.now().toString(),
       text: input.trim(),
       isUser: true,
-      timestamp: new Date()
+      timestamp: new Date(),
     }
 
-    setMessages(prev => [...prev, userMessage])
+    setMessages((prev) => [...prev, userMessage])
     setInput('')
     setIsTyping(true)
 
     // Simulate mentor thinking and response
-    setTimeout(() => {
-      const response = getContextualResponse(userMessage.text, {
-        character: game.character,
-        completedQuests: game.completedQuests,
-        stats: game.stats
-      })
-      const mentorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: response,
-        isUser: false,
-        timestamp: new Date()
-      }
-      setMessages(prev => [...prev, mentorMessage])
-      setIsTyping(false)
-    }, 800 + Math.random() * 400)
+    setTimeout(
+      () => {
+        const response = getContextualResponse(userMessage.text, {
+          character: game.character,
+          completedQuests: game.completedQuests,
+          stats: game.stats,
+        })
+        const mentorMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: response,
+          isUser: false,
+          timestamp: new Date(),
+        }
+        setMessages((prev) => [...prev, mentorMessage])
+        setIsTyping(false)
+      },
+      800 + Math.random() * 400,
+    )
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -329,7 +308,9 @@ export default function MentorChat() {
     <>
       {/* Floating Mentor Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen)
+        }}
         aria-label={isOpen ? 'Close mentor chat' : 'Open mentor chat'}
         aria-expanded={isOpen}
         className={`fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl transition-all transform hover:scale-110 ${
@@ -354,11 +335,15 @@ export default function MentorChat() {
           <div className="bg-gradient-to-r from-amber-900/50 to-purple-900/50 px-4 py-3 border-b border-slate-700 flex items-center gap-3">
             <div className="text-3xl">🧙‍♂️</div>
             <div>
-              <h3 id="mentor-chat-title" className="font-bold text-amber-400">DevOps Mentor</h3>
+              <h3 id="mentor-chat-title" className="font-bold text-amber-400">
+                DevOps Mentor
+              </h3>
               <p className="text-xs text-slate-400">Your guide to mastery</p>
             </div>
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                setIsOpen(false)
+              }}
               aria-label="Close chat"
               className="ml-auto text-slate-400 hover:text-white text-xl"
             >
@@ -374,7 +359,12 @@ export default function MentorChat() {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3" role="log" aria-live="polite" aria-label="Chat messages">
+          <div
+            className="flex-1 overflow-y-auto p-4 space-y-3"
+            role="log"
+            aria-live="polite"
+            aria-label="Chat messages"
+          >
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -387,9 +377,7 @@ export default function MentorChat() {
                       : 'bg-slate-700 text-slate-200 rounded-bl-sm'
                   }`}
                 >
-                  {!message.isUser && (
-                    <div className="text-xs mb-1">🧙‍♂️ Mentor</div>
-                  )}
+                  {!message.isUser && <div className="text-xs mb-1">🧙‍♂️ Mentor</div>}
                   <p className="text-sm">{escapeHtml(message.text)}</p>
                 </div>
               </div>
@@ -400,9 +388,18 @@ export default function MentorChat() {
               <div className="flex justify-start">
                 <div className="bg-slate-700 text-slate-200 rounded-2xl rounded-bl-sm px-4 py-3">
                   <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <div
+                      className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"
+                      style={{ animationDelay: '0ms' }}
+                    />
+                    <div
+                      className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"
+                      style={{ animationDelay: '150ms' }}
+                    />
+                    <div
+                      className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"
+                      style={{ animationDelay: '300ms' }}
+                    />
                   </div>
                 </div>
               </div>
@@ -414,12 +411,16 @@ export default function MentorChat() {
           {/* Input */}
           <div className="p-3 border-t border-slate-700">
             <div className="flex gap-2">
-              <label htmlFor="mentor-input" className="sr-only">Type your question</label>
+              <label htmlFor="mentor-input" className="sr-only">
+                Type your question
+              </label>
               <input
                 id="mentor-input"
                 type="text"
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => {
+                  setInput(e.target.value)
+                }}
                 onKeyDown={handleKeyPress}
                 placeholder="Ask your mentor..."
                 className="flex-1 bg-slate-700 border border-slate-600 rounded-full px-4 py-2 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-amber-500"
@@ -439,21 +440,27 @@ export default function MentorChat() {
             </div>
             <div className="mt-2 flex flex-wrap gap-1">
               <button
-                onClick={() => setInput('How do I earn XP?')}
+                onClick={() => {
+                  setInput('How do I earn XP?')
+                }}
                 aria-label="Ask about XP"
                 className="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-full"
               >
                 XP Help
               </button>
               <button
-                onClick={() => setInput('Where should I go next?')}
+                onClick={() => {
+                  setInput('Where should I go next?')
+                }}
                 aria-label="Ask for guidance"
                 className="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-full"
               >
                 Guidance
               </button>
               <button
-                onClick={() => setInput('Show me my progress')}
+                onClick={() => {
+                  setInput('Show me my progress')
+                }}
                 aria-label="Show my progress"
                 className="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-full"
               >

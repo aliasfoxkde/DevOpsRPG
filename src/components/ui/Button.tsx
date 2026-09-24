@@ -1,7 +1,7 @@
 import { ButtonHTMLAttributes, forwardRef } from 'react'
 import { clsx } from 'clsx'
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost'
   size?: 'sm' | 'md' | 'lg'
 }
@@ -19,7 +19,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           'disabled:opacity-50 disabled:cursor-not-allowed',
           {
             'bg-amber-600 text-white hover:bg-amber-500 active:bg-amber-700': variant === 'primary',
-            'bg-slate-700 text-white hover:bg-slate-600 active:bg-slate-800': variant === 'secondary',
+            'bg-slate-700 text-white hover:bg-slate-600 active:bg-slate-800':
+              variant === 'secondary',
             'border border-slate-600 bg-transparent hover:bg-slate-800': variant === 'outline',
             'bg-transparent hover:bg-slate-800 text-slate-300': variant === 'ghost',
           },
@@ -28,12 +29,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             'px-4 py-2 text-base': size === 'md',
             'px-6 py-3 text-lg': size === 'lg',
           },
-          className
+          className,
         )}
         {...props}
       />
     )
-  }
+  },
 )
 
 Button.displayName = 'Button'

@@ -18,29 +18,41 @@ const TYPE_LABELS: Record<FilterType, string> = {
 
 function getMilestoneCategory(milestone: Milestone): FilterType {
   switch (milestone.trigger.type) {
-    case 'quest_count': return 'quest'
-    case 'streak': return 'streak'
-    case 'level': return 'level'
-    case 'realm_complete': return 'realm'
-    case 'technology_complete': return 'realm'
+    case 'quest_count':
+      return 'quest'
+    case 'streak':
+      return 'streak'
+    case 'level':
+      return 'level'
+    case 'realm_complete':
+      return 'realm'
+    case 'technology_complete':
+      return 'realm'
     case 'quiz_streak':
-    case 'perfect_quiz': return 'quiz'
-    case 'minigame_complete': return 'minigame'
+    case 'perfect_quiz':
+      return 'quiz'
+    case 'minigame_complete':
+      return 'minigame'
     case 'first_boss':
-    case 'speed_quest': return 'quest'
-    default: return 'quest'
+    case 'speed_quest':
+      return 'quest'
+    default:
+      return 'quest'
   }
 }
 
-function getMilestoneProgress(milestone: Milestone, stats: {
-  questCount: number
-  streakDays: number
-  level: number
-  realmCompleted: string[]
-  quizStreak: number
-  minigameCount: number
-  hasDefeatedBoss: boolean
-}): { current: number; target: number; percent: number } {
+function getMilestoneProgress(
+  milestone: Milestone,
+  stats: {
+    questCount: number
+    streakDays: number
+    level: number
+    realmCompleted: string[]
+    quizStreak: number
+    minigameCount: number
+    hasDefeatedBoss: boolean
+  },
+): { current: number; target: number; percent: number } {
   const { trigger } = milestone
 
   switch (trigger.type) {
@@ -48,61 +60,61 @@ function getMilestoneProgress(milestone: Milestone, stats: {
       return {
         current: stats.questCount,
         target: trigger.count,
-        percent: Math.min(100, (stats.questCount / trigger.count) * 100)
+        percent: Math.min(100, (stats.questCount / trigger.count) * 100),
       }
     case 'streak':
       return {
         current: stats.streakDays,
         target: trigger.days,
-        percent: Math.min(100, (stats.streakDays / trigger.days) * 100)
+        percent: Math.min(100, (stats.streakDays / trigger.days) * 100),
       }
     case 'level':
       return {
         current: stats.level,
         target: trigger.level,
-        percent: Math.min(100, (stats.level / trigger.level) * 100)
+        percent: Math.min(100, (stats.level / trigger.level) * 100),
       }
     case 'realm_complete':
       return {
         current: stats.realmCompleted.includes(trigger.realm) ? 1 : 0,
         target: 1,
-        percent: stats.realmCompleted.includes(trigger.realm) ? 100 : 0
+        percent: stats.realmCompleted.includes(trigger.realm) ? 100 : 0,
       }
     case 'quiz_streak':
       return {
         current: stats.quizStreak,
         target: trigger.count,
-        percent: Math.min(100, (stats.quizStreak / trigger.count) * 100)
+        percent: Math.min(100, (stats.quizStreak / trigger.count) * 100),
       }
     case 'minigame_complete':
       return {
         current: stats.minigameCount,
         target: trigger.count,
-        percent: Math.min(100, (stats.minigameCount / trigger.count) * 100)
+        percent: Math.min(100, (stats.minigameCount / trigger.count) * 100),
       }
     case 'first_boss':
       return {
         current: stats.hasDefeatedBoss ? 1 : 0,
         target: 1,
-        percent: stats.hasDefeatedBoss ? 100 : 0
+        percent: stats.hasDefeatedBoss ? 100 : 0,
       }
     case 'perfect_quiz':
       return {
         current: 0,
         target: 1,
-        percent: 0
+        percent: 0,
       }
     case 'speed_quest':
       return {
         current: 0,
         target: 1,
-        percent: 0
+        percent: 0,
       }
     case 'technology_complete':
       return {
         current: 0,
         target: 1,
-        percent: 0
+        percent: 0,
       }
     default:
       return { current: 0, target: 1, percent: 0 }
@@ -112,17 +124,28 @@ function getMilestoneProgress(milestone: Milestone, stats: {
 function getRequirementLabel(milestone: Milestone): string {
   const { trigger } = milestone
   switch (trigger.type) {
-    case 'quest_count': return `Complete ${trigger.count} quests`
-    case 'streak': return `${trigger.days} day streak`
-    case 'level': return `Reach level ${trigger.level}`
-    case 'realm_complete': return `Complete ${trigger.realm} realm`
-    case 'technology_complete': return `Master ${trigger.tech}`
-    case 'quiz_streak': return `${trigger.count} perfect quizzes in a row`
-    case 'perfect_quiz': return 'Get 100% on a quiz'
-    case 'minigame_complete': return `Complete ${trigger.count} mini-games`
-    case 'first_boss': return 'Defeat your first boss'
-    case 'speed_quest': return `Complete a quest in under ${trigger.minutes} minutes`
-    default: return 'Complete the challenge'
+    case 'quest_count':
+      return `Complete ${trigger.count} quests`
+    case 'streak':
+      return `${trigger.days} day streak`
+    case 'level':
+      return `Reach level ${trigger.level}`
+    case 'realm_complete':
+      return `Complete ${trigger.realm} realm`
+    case 'technology_complete':
+      return `Master ${trigger.tech}`
+    case 'quiz_streak':
+      return `${trigger.count} perfect quizzes in a row`
+    case 'perfect_quiz':
+      return 'Get 100% on a quiz'
+    case 'minigame_complete':
+      return `Complete ${trigger.count} mini-games`
+    case 'first_boss':
+      return 'Defeat your first boss'
+    case 'speed_quest':
+      return `Complete a quest in under ${trigger.minutes} minutes`
+    default:
+      return 'Complete the challenge'
   }
 }
 
@@ -135,24 +158,32 @@ export default function MilestonesPage() {
   const [selectedMilestone, setSelectedMilestone] = useState<Milestone | null>(null)
 
   // Calculate player stats
-  const playerStats = useMemo(() => ({
-    questCount: completedQuests.length,
-    streakDays: character.streakDays,
-    level: character.level,
-    realmCompleted: game.completedRealms || [],
-    quizStreak: 0, // Not tracked
-    minigameCount: 0, // Not tracked
-    hasDefeatedBoss: completedQuests.some(q => q.topicId.includes('boss') || q.technologyId.includes('boss')),
-  }), [completedQuests, character.streakDays, character.level, game.completedRealms])
+  const playerStats = useMemo(
+    () => ({
+      questCount: completedQuests.length,
+      streakDays: character.streakDays,
+      level: character.level,
+      realmCompleted: game.completedRealms,
+      quizStreak: 0, // Not tracked
+      minigameCount: 0, // Not tracked
+      hasDefeatedBoss: completedQuests.some(
+        (q) => q.topicId.includes('boss') || q.technologyId.includes('boss'),
+      ),
+    }),
+    [completedQuests, character.streakDays, character.level, game.completedRealms],
+  )
 
   // Check if milestone is unlocked
-  const isUnlocked = useCallback((milestone: Milestone) => {
-    return milestone.unlocked || milestones.some(m => m.id === milestone.id && m.unlocked)
-  }, [milestones])
+  const isUnlocked = useCallback(
+    (milestone: Milestone) => {
+      return milestone.unlocked || milestones.some((m) => m.id === milestone.id && m.unlocked)
+    },
+    [milestones],
+  )
 
   // Filter milestones
   const filteredMilestones = useMemo(() => {
-    return MILESTONES.filter(m => {
+    return MILESTONES.filter((m) => {
       if (filterStatus === 'unlocked' && !isUnlocked(m)) return false
       if (filterStatus === 'locked' && isUnlocked(m)) return false
       if (filterType !== 'all' && getMilestoneCategory(m) !== filterType) return false
@@ -169,7 +200,7 @@ export default function MilestonesPage() {
     })
   }, [filterStatus, filterType, playerStats, isUnlocked])
 
-  const unlockedCount = milestones.filter(m => m.unlocked).length
+  const unlockedCount = milestones.filter((m) => m.unlocked).length
   const totalCount = MILESTONES.length
   const completionPercent = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0
 
@@ -197,7 +228,9 @@ export default function MilestonesPage() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-center sm:text-left">
               <p className="text-amber-400 font-bold text-lg">Milestone Progress</p>
-              <p className="text-slate-400 text-sm">{unlockedCount} of {totalCount} milestones achieved</p>
+              <p className="text-slate-400 text-sm">
+                {unlockedCount} of {totalCount} milestones achieved
+              </p>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-center">
@@ -228,7 +261,7 @@ export default function MilestonesPage() {
             </div>
             <div className="text-center p-3 bg-slate-900/50 rounded-lg">
               <p className="text-xs text-slate-500">Realms Done</p>
-              <p className="font-bold text-blue-400">{game.completedRealms?.length || 0}</p>
+              <p className="font-bold text-blue-400">{game.completedRealms.length}</p>
             </div>
           </div>
         </div>
@@ -237,10 +270,12 @@ export default function MilestonesPage() {
         <div className="flex flex-wrap gap-2 mb-6">
           {/* Status filter */}
           <div className="flex gap-1 bg-slate-800/80 rounded-lg p-1">
-            {(['all', 'unlocked', 'locked'] as FilterStatus[]).map(status => (
+            {(['all', 'unlocked', 'locked'] as FilterStatus[]).map((status) => (
               <button
                 key={status}
-                onClick={() => setFilterStatus(status)}
+                onClick={() => {
+                  setFilterStatus(status)
+                }}
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
                   filterStatus === status
                     ? 'bg-green-600 text-white'
@@ -257,11 +292,11 @@ export default function MilestonesPage() {
             {Object.entries(TYPE_LABELS).map(([key, label]) => (
               <button
                 key={key}
-                onClick={() => setFilterType(key as FilterType)}
+                onClick={() => {
+                  setFilterType(key as FilterType)
+                }}
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
-                  filterType === key
-                    ? 'bg-amber-600 text-white'
-                    : 'text-slate-400 hover:text-white'
+                  filterType === key ? 'bg-amber-600 text-white' : 'text-slate-400 hover:text-white'
                 }`}
               >
                 {label}
@@ -272,14 +307,16 @@ export default function MilestonesPage() {
 
         {/* Milestones Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredMilestones.map(milestone => {
+          {filteredMilestones.map((milestone) => {
             const unlocked = isUnlocked(milestone)
             const progress = getMilestoneProgress(milestone, playerStats)
 
             return (
               <button
                 key={milestone.id}
-                onClick={() => setSelectedMilestone(milestone)}
+                onClick={() => {
+                  setSelectedMilestone(milestone)
+                }}
                 className={`relative p-5 rounded-xl border text-left transition-all hover:scale-[1.02] ${
                   unlocked
                     ? 'bg-gradient-to-br from-amber-900/40 to-slate-900 border-amber-600/50'
@@ -291,7 +328,9 @@ export default function MilestonesPage() {
                     {milestone.icon}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className={`font-bold mb-1 ${unlocked ? 'text-amber-400' : 'text-slate-200'}`}>
+                    <h3
+                      className={`font-bold mb-1 ${unlocked ? 'text-amber-400' : 'text-slate-200'}`}
+                    >
                       {milestone.title}
                     </h3>
                     <p className={`text-sm ${unlocked ? 'text-slate-300' : 'text-slate-500'}`}>
@@ -332,9 +371,7 @@ export default function MilestonesPage() {
                 </div>
 
                 {/* Unlocked badge */}
-                {unlocked && (
-                  <div className="absolute top-3 right-3 text-green-400 text-lg">✓</div>
-                )}
+                {unlocked && <div className="absolute top-3 right-3 text-green-400 text-lg">✓</div>}
               </button>
             )
           })}
@@ -353,14 +390,20 @@ export default function MilestonesPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
           <div className="bg-slate-800 rounded-2xl border border-slate-600 shadow-2xl max-w-sm w-full overflow-hidden">
             <div className="p-6 text-center border-b border-slate-700 bg-gradient-to-b from-amber-900/30 to-slate-900">
-              <div className={`text-7xl mb-4 ${!isUnlocked(selectedMilestone) && 'grayscale opacity-50'}`}>
+              <div
+                className={`text-7xl mb-4 ${!isUnlocked(selectedMilestone) && 'grayscale opacity-50'}`}
+              >
                 {selectedMilestone.icon}
               </div>
-              <h2 className={`text-2xl font-bold ${isUnlocked(selectedMilestone) ? 'text-amber-400' : 'text-white'}`}>
+              <h2
+                className={`text-2xl font-bold ${isUnlocked(selectedMilestone) ? 'text-amber-400' : 'text-white'}`}
+              >
                 {selectedMilestone.title}
               </h2>
               <p className="text-slate-300 mt-2">
-                {isUnlocked(selectedMilestone) ? selectedMilestone.message : getRequirementLabel(selectedMilestone)}
+                {isUnlocked(selectedMilestone)
+                  ? selectedMilestone.message
+                  : getRequirementLabel(selectedMilestone)}
               </p>
             </div>
 
@@ -371,13 +414,16 @@ export default function MilestonesPage() {
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-slate-400">Progress</span>
                     <span className="text-amber-400">
-                      {getMilestoneProgress(selectedMilestone, playerStats).current} / {getMilestoneProgress(selectedMilestone, playerStats).target}
+                      {getMilestoneProgress(selectedMilestone, playerStats).current} /{' '}
+                      {getMilestoneProgress(selectedMilestone, playerStats).target}
                     </span>
                   </div>
                   <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all"
-                      style={{ width: `${getMilestoneProgress(selectedMilestone, playerStats).percent}%` }}
+                      style={{
+                        width: `${getMilestoneProgress(selectedMilestone, playerStats).percent}%`,
+                      }}
                     />
                   </div>
                 </div>
@@ -394,13 +440,17 @@ export default function MilestonesPage() {
               {/* Trigger Info */}
               <div className="flex justify-between text-sm">
                 <span className="text-slate-500">Type</span>
-                <span className="text-slate-300">{TYPE_LABELS[getMilestoneCategory(selectedMilestone)]}</span>
+                <span className="text-slate-300">
+                  {TYPE_LABELS[getMilestoneCategory(selectedMilestone)]}
+                </span>
               </div>
 
               {/* Status */}
               <div className="flex justify-between text-sm">
                 <span className="text-slate-500">Status</span>
-                <span className={isUnlocked(selectedMilestone) ? 'text-green-400' : 'text-slate-300'}>
+                <span
+                  className={isUnlocked(selectedMilestone) ? 'text-green-400' : 'text-slate-300'}
+                >
                   {isUnlocked(selectedMilestone) ? 'Achieved!' : 'Pending'}
                 </span>
               </div>
@@ -417,7 +467,9 @@ export default function MilestonesPage() {
 
             <div className="px-6 py-4 bg-slate-900/50 border-t border-slate-700">
               <button
-                onClick={() => setSelectedMilestone(null)}
+                onClick={() => {
+                  setSelectedMilestone(null)
+                }}
                 className="w-full py-2 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors"
               >
                 Close

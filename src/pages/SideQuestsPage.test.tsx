@@ -10,12 +10,8 @@ describe('SideQuestsPage', () => {
 
   it('renders the page heading and intro copy', () => {
     renderSeededPage(<SideQuestsPage />)
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Side Quests/ }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText('Complete bonus objectives for extra rewards!'),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /Side Quests/ })).toBeInTheDocument()
+    expect(screen.getByText('Complete bonus objectives for extra rewards!')).toBeInTheDocument()
   })
 
   it('renders the daily, weekly and secret quest sections', () => {
@@ -28,7 +24,7 @@ describe('SideQuestsPage', () => {
 
   it('renders freshly generated daily quests with their rewards', () => {
     const { sideQuests } = seedDefaultGame()
-    const daily = sideQuests.filter(quest => quest.type === 'daily')
+    const daily = sideQuests.filter((quest) => quest.type === 'daily')
 
     renderSeededPage(<SideQuestsPage />)
 

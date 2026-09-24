@@ -7,25 +7,25 @@ const CLASSES: { id: CharacterClass; icon: string; description: string; strength
     id: 'Cloud Knight',
     icon: '☁️',
     description: 'Masters cloud infrastructure and deployment',
-    strength: 'Cloud & DevOps'
+    strength: 'Cloud & DevOps',
   },
   {
     id: 'Script Warrior',
     icon: '⚔️',
     description: 'Automates everything with powerful scripts',
-    strength: 'Bash & Python'
+    strength: 'Bash & Python',
   },
   {
     id: 'Data Mage',
     icon: '🔮',
     description: 'Commands databases and data pipelines',
-    strength: 'SQL & Data'
+    strength: 'SQL & Data',
   },
   {
     id: 'DevOps Sage',
     icon: '🧙',
     description: 'Knows all, builds all, deploys all',
-    strength: 'Full Stack'
+    strength: 'Full Stack',
   },
 ]
 
@@ -52,15 +52,11 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
       <div className="w-full max-w-lg">
         {/* Progress dots */}
         <div className="flex justify-center gap-2 mb-8">
-          {[0, 1, 2].map(i => (
+          {[0, 1, 2].map((i) => (
             <div
               key={i}
               className={`w-3 h-3 rounded-full transition-all ${
-                i === step
-                  ? 'bg-amber-500 scale-125'
-                  : i < step
-                  ? 'bg-green-500'
-                  : 'bg-slate-600'
+                i === step ? 'bg-amber-500 scale-125' : i < step ? 'bg-green-500' : 'bg-slate-600'
               }`}
             />
           ))}
@@ -80,7 +76,9 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
               <input
                 type="text"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  setName(e.target.value)
+                }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && canProceed) {
                     if (name.trim().length < 2) return
@@ -94,7 +92,9 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
             </div>
 
             <button
-              onClick={() => name.trim().length >= 2 && setStep(1)}
+              onClick={() => {
+                if (name.trim().length >= 2) setStep(1)
+              }}
               disabled={!canProceed}
               className={`w-full py-3 rounded-lg font-bold text-lg transition-all ${
                 canProceed
@@ -119,7 +119,9 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
               {CLASSES.map((cls) => (
                 <button
                   key={cls.id}
-                  onClick={() => setSelectedClass(cls.id)}
+                  onClick={() => {
+                    setSelectedClass(cls.id)
+                  }}
                   className={`p-4 rounded-xl border text-left transition-all ${
                     selectedClass === cls.id
                       ? 'bg-amber-900/40 border-amber-500'
@@ -127,7 +129,9 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
                   }`}
                 >
                   <div className="text-3xl mb-2">{cls.icon}</div>
-                  <div className={`font-bold ${selectedClass === cls.id ? 'text-amber-400' : 'text-white'}`}>
+                  <div
+                    className={`font-bold ${selectedClass === cls.id ? 'text-amber-400' : 'text-white'}`}
+                  >
                     {cls.id}
                   </div>
                   <div className="text-xs text-slate-400 mb-1">{cls.description}</div>
@@ -138,13 +142,17 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
 
             <div className="flex gap-3">
               <button
-                onClick={() => setStep(0)}
+                onClick={() => {
+                  setStep(0)
+                }}
                 className="flex-1 py-3 rounded-lg font-bold bg-slate-700 hover:bg-slate-600 text-white transition-colors"
               >
                 ← Back
               </button>
               <button
-                onClick={() => setStep(2)}
+                onClick={() => {
+                  setStep(2)
+                }}
                 className="flex-1 py-3 rounded-lg font-bold bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white transition-all"
               >
                 Continue →
@@ -157,7 +165,13 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
         {step === 2 && (
           <div className="bg-slate-800/90 rounded-2xl border border-slate-700 p-8 text-center">
             <div className="text-6xl mb-4">
-              {selectedClass === 'Cloud Knight' ? '☁️' : selectedClass === 'Script Warrior' ? '⚔️' : selectedClass === 'Data Mage' ? '🔮' : '🧙'}
+              {selectedClass === 'Cloud Knight'
+                ? '☁️'
+                : selectedClass === 'Script Warrior'
+                  ? '⚔️'
+                  : selectedClass === 'Data Mage'
+                    ? '🔮'
+                    : '🧙'}
             </div>
             <h2 className="text-2xl font-bold text-amber-400 mb-2">All Ready!</h2>
             <p className="text-slate-300 mb-6">
@@ -180,12 +194,18 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
             </div>
 
             <div className="text-sm text-slate-400 mb-6">
-              💡 <em>Tip: Press <kbd className="px-2 py-1 bg-slate-700 rounded text-white">N</kbd> to quickly advance through quizzes!</em>
+              💡{' '}
+              <em>
+                Tip: Press <kbd className="px-2 py-1 bg-slate-700 rounded text-white">N</kbd> to
+                quickly advance through quizzes!
+              </em>
             </div>
 
             <div className="flex gap-3">
               <button
-                onClick={() => setStep(1)}
+                onClick={() => {
+                  setStep(1)
+                }}
                 className="flex-1 py-3 rounded-lg font-bold bg-slate-700 hover:bg-slate-600 text-white transition-colors"
               >
                 ← Back

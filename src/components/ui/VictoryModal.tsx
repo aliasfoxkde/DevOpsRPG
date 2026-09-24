@@ -29,7 +29,7 @@ function Particles({ show }: { show: boolean }) {
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {particles.map(p => (
+      {particles.map((p) => (
         <div
           key={p.id}
           className="absolute animate-float-up text-xl"
@@ -60,7 +60,9 @@ export function VictoryModal() {
     if (game.showVictory && game.lastVictory && !victoryShownRef.current) {
       victoryShownRef.current = true
       setShowParticles(true)
-      particleTimerRef.current = setTimeout(() => setShowParticles(false), 3000)
+      particleTimerRef.current = setTimeout(() => {
+        setShowParticles(false)
+      }, 3000)
 
       // Play appropriate sound effects
       if (game.lastVictory.levelUp) {
@@ -117,7 +119,9 @@ export function VictoryModal() {
 
       <div
         className="relative w-full max-w-md bg-gradient-to-b from-amber-900/95 to-amber-950/95 border-2 border-amber-500 rounded-xl shadow-2xl overflow-hidden animate-[victory-scale_0.5s_ease-out]"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation()
+        }}
       >
         {/* Victory Header */}
         <div className="relative bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 py-8 text-center">
@@ -125,8 +129,18 @@ export function VictoryModal() {
 
           {/* Animated stars */}
           <div className="absolute top-2 left-4 text-2xl animate-pulse">⭐</div>
-          <div className="absolute top-4 right-6 text-xl animate-pulse" style={{ animationDelay: '0.5s' }}>✨</div>
-          <div className="absolute bottom-2 left-8 text-xl animate-pulse" style={{ animationDelay: '1s' }}>💫</div>
+          <div
+            className="absolute top-4 right-6 text-xl animate-pulse"
+            style={{ animationDelay: '0.5s' }}
+          >
+            ✨
+          </div>
+          <div
+            className="absolute bottom-2 left-8 text-xl animate-pulse"
+            style={{ animationDelay: '1s' }}
+          >
+            💫
+          </div>
 
           <div className="relative">
             <div className="text-6xl mb-3 animate-bounce">⚔️</div>
@@ -156,9 +170,7 @@ export function VictoryModal() {
               <div className="text-xl font-bold text-purple-200">
                 {milestone.icon} {milestone.title}
               </div>
-              <div className="text-purple-400 text-sm mt-1">
-                +{milestone.xpBonus} XP Bonus!
-              </div>
+              <div className="text-purple-400 text-sm mt-1">+{milestone.xpBonus} XP Bonus!</div>
             </div>
           )}
 
@@ -192,24 +204,20 @@ export function VictoryModal() {
           {levelUp && (
             <div className="text-center p-4 bg-gradient-to-r from-blue-900/50 via-blue-800/50 to-blue-900/50 rounded-lg border border-blue-500/50">
               <div className="text-blue-300 text-sm mb-1">⭐ NEW TITLE EARNED</div>
-              <div className="text-2xl font-bold text-blue-200">
-                {game.character.title}
-              </div>
-              <div className="text-blue-400 text-sm mt-1">
-                Welcome to Level {newLevel}!
-              </div>
+              <div className="text-2xl font-bold text-blue-200">{game.character.title}</div>
+              <div className="text-blue-400 text-sm mt-1">Welcome to Level {newLevel}!</div>
             </div>
           )}
 
           {/* Encouragement message */}
           <div className="text-center text-sm text-slate-400 italic">
             {game.completedQuests.length === 1
-              ? "Great start! Keep going, hero! 🚀"
+              ? 'Great start! Keep going, hero! 🚀'
               : game.completedQuests.length < 10
-              ? "You're finding your stride! 💪"
-              : game.completedQuests.length < 50
-              ? "Incredible progress! Keep it up! ⭐"
-              : "You're on fire! 🔥"}
+                ? "You're finding your stride! 💪"
+                : game.completedQuests.length < 50
+                  ? 'Incredible progress! Keep it up! ⭐'
+                  : "You're on fire! 🔥"}
           </div>
 
           {/* Continue Button */}
@@ -222,7 +230,8 @@ export function VictoryModal() {
 
           {/* Hint for keyboard shortcut */}
           <div className="text-center text-xs text-slate-500">
-            Press <kbd className="px-2 py-1 bg-slate-700 rounded text-slate-300">N</kbd> to continue quickly
+            Press <kbd className="px-2 py-1 bg-slate-700 rounded text-slate-300">N</kbd> to continue
+            quickly
           </div>
         </div>
       </div>

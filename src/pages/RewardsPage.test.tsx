@@ -22,9 +22,7 @@ describe('RewardsPage', () => {
   it('renders the rewards hub with the seven daily reward slots', () => {
     renderSeededPage(<RewardsPage />, { route: '/rewards', url: '/rewards' })
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Rewards Hub/ }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /Rewards Hub/ })).toBeInTheDocument()
     expect(screen.getByText('Daily Rewards')).toBeInTheDocument()
     for (let day = 1; day <= DAILY_REWARDS.length; day += 1) {
       expect(screen.getByText(`Day ${day}`)).toBeInTheDocument()
@@ -40,9 +38,7 @@ describe('RewardsPage', () => {
     await user.click(screen.getByRole('button', { name: 'CLAIM!' }))
 
     expect(screen.getByText('✓')).toBeInTheDocument()
-    expect(
-      screen.queryByRole('button', { name: 'CLAIM!' }),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'CLAIM!' })).not.toBeInTheDocument()
   })
 
   it('shows the streak calendar with its milestones', () => {
@@ -109,8 +105,6 @@ describe('RewardsPage', () => {
       expect(within(card).getByText(`${expected}%`)).toBeInTheDocument()
     }
     // No pack is complete, so no claim button is offered yet
-    expect(
-      screen.queryByRole('button', { name: /CLAIM PACK/ }),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /CLAIM PACK/ })).not.toBeInTheDocument()
   })
 })

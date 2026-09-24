@@ -8,7 +8,7 @@ import KeyboardShortcutsHelp from './KeyboardShortcutsHelp'
 function pressKey(key: string, init: KeyboardEventInit = {}, target: EventTarget = window) {
   act(() => {
     target.dispatchEvent(
-      new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...init })
+      new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...init }),
     )
   })
 }
@@ -18,9 +18,10 @@ describe('KeyboardShortcutsHelp', () => {
     render(<KeyboardShortcutsHelp />)
 
     expect(screen.queryByRole('dialog')).toBeNull()
-    expect(
-      screen.getByRole('button', { name: 'Show keyboard shortcuts' })
-    ).toHaveAttribute('title', 'Keyboard Shortcuts (?)')
+    expect(screen.getByRole('button', { name: 'Show keyboard shortcuts' })).toHaveAttribute(
+      'title',
+      'Keyboard Shortcuts (?)',
+    )
   })
 
   it('opens the dialog from the floating button', async () => {
@@ -33,7 +34,7 @@ describe('KeyboardShortcutsHelp', () => {
     expect(dialog).toHaveAttribute('aria-modal', 'true')
     expect(dialog).toHaveAttribute('aria-labelledby', 'keyboard-shortcuts-title')
     expect(
-      screen.getByRole('heading', { level: 2, name: /Keyboard Shortcuts/ })
+      screen.getByRole('heading', { level: 2, name: /Keyboard Shortcuts/ }),
     ).toBeInTheDocument()
   })
 
@@ -65,7 +66,7 @@ describe('KeyboardShortcutsHelp', () => {
           <input />
         </label>
         <KeyboardShortcutsHelp />
-      </>
+      </>,
     )
     const input = screen.getByRole('textbox')
     input.focus()
@@ -101,9 +102,7 @@ describe('KeyboardShortcutsHelp', () => {
 
     expect(screen.queryByRole('dialog')).toBeNull()
     // The floating button comes back so help can be reopened
-    expect(
-      screen.getByRole('button', { name: 'Show keyboard shortcuts' })
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Show keyboard shortcuts' })).toBeInTheDocument()
   })
 
   it('closes on a backdrop click but not on a click inside the panel', async () => {

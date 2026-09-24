@@ -12,12 +12,8 @@ describe('QuestJournalPage', () => {
 
   it('renders the journal heading and tagline', () => {
     renderSeededPage(<QuestJournalPage />)
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Quest Journal' }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText('Your journey to become a DevOps Master awaits'),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: 'Quest Journal' })).toBeInTheDocument()
+    expect(screen.getByText('Your journey to become a DevOps Master awaits')).toBeInTheDocument()
   })
 
   it('points a new player at the first quest of the first realm', () => {
@@ -49,7 +45,9 @@ describe('QuestJournalPage', () => {
       // Realm names also appear in the realm filter dropdown
       expect(screen.getAllByText(realm.name).length).toBeGreaterThan(0)
       expect(
-        screen.getByText(`Requires Level ${realm.requiredLevel} • ${realm.technologies.length} Technologies`),
+        screen.getByText(
+          `Requires Level ${realm.requiredLevel} • ${realm.technologies.length} Technologies`,
+        ),
       ).toBeInTheDocument()
     }
   })
@@ -60,9 +58,7 @@ describe('QuestJournalPage', () => {
 
     await user.type(screen.getByPlaceholderText(/Search quests/), 'HTML Introduction')
 
-    expect(
-      screen.getByText(`Showing 1 of ${allQuests.length} quests`),
-    ).toBeInTheDocument()
+    expect(screen.getByText(`Showing 1 of ${allQuests.length} quests`)).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Clear filters' }))
     expect(

@@ -6,7 +6,9 @@ interface LevelUpEffectProps {
 }
 
 export function LevelUpEffect({ level, onComplete }: LevelUpEffectProps) {
-  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; angle: number }>>([])
+  const [particles, setParticles] = useState<
+    Array<{ id: number; x: number; y: number; angle: number }>
+  >([])
   const [showText, setShowText] = useState(false)
   const [showLevel, setShowLevel] = useState(false)
 
@@ -16,14 +18,22 @@ export function LevelUpEffect({ level, onComplete }: LevelUpEffectProps) {
       id: i,
       x: 50 + (Math.random() - 0.5) * 30,
       y: 50 + (Math.random() - 0.5) * 30,
-      angle: (Math.random() * 360),
+      angle: Math.random() * 360,
     }))
-    queueMicrotask(() => setParticles(newParticles))
+    queueMicrotask(() => {
+      setParticles(newParticles)
+    })
 
     // Stagger animations
-    setTimeout(() => setShowText(true), 200)
-    setTimeout(() => setShowLevel(true), 600)
-    setTimeout(() => onComplete(), 2500)
+    setTimeout(() => {
+      setShowText(true)
+    }, 200)
+    setTimeout(() => {
+      setShowLevel(true)
+    }, 600)
+    setTimeout(() => {
+      onComplete()
+    }, 2500)
   }, [onComplete])
 
   return (
@@ -90,7 +100,11 @@ export function LevelUpEffect({ level, onComplete }: LevelUpEffectProps) {
 }
 
 // XP Bar animation component
-export function AnimatedXPBar({ xp, maxXp, showAnimation = false }: {
+export function AnimatedXPBar({
+  xp,
+  maxXp,
+  showAnimation = false,
+}: {
   xp: number
   maxXp: number
   showAnimation?: boolean
@@ -110,16 +124,24 @@ export function AnimatedXPBar({ xp, maxXp, showAnimation = false }: {
         step++
         current += increment
         if (step >= steps) {
-          queueMicrotask(() => setDisplayXp(xp))
+          queueMicrotask(() => {
+            setDisplayXp(xp)
+          })
           clearInterval(interval)
         } else {
-          queueMicrotask(() => setDisplayXp(Math.round(current)))
+          queueMicrotask(() => {
+            setDisplayXp(Math.round(current))
+          })
         }
       }, 30)
 
-      return () => clearInterval(interval)
+      return () => {
+        clearInterval(interval)
+      }
     } else {
-      queueMicrotask(() => setDisplayXp(xp))
+      queueMicrotask(() => {
+        setDisplayXp(xp)
+      })
     }
   }, [xp, showAnimation, displayXp])
 
@@ -132,10 +154,7 @@ export function AnimatedXPBar({ xp, maxXp, showAnimation = false }: {
         style={{ width: `${percentage}%` }}
       />
       {showAnimation && (
-        <div
-          className="absolute top-0 h-full bg-white/50 animate-ping"
-          style={{ width: '20%' }}
-        />
+        <div className="absolute top-0 h-full bg-white/50 animate-ping" style={{ width: '20%' }} />
       )}
     </div>
   )

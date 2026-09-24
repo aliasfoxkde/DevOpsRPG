@@ -10,16 +10,12 @@ describe('EmptyState', () => {
         icon="🗺️"
         title="No quests yet"
         description="Complete your first quest to start your journey."
-      />
+      />,
     )
 
     expect(screen.getByText('🗺️')).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', { level: 3, name: 'No quests yet' })
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText('Complete your first quest to start your journey.')
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: 'No quests yet' })).toBeInTheDocument()
+    expect(screen.getByText('Complete your first quest to start your journey.')).toBeInTheDocument()
   })
 
   it('does not render an action button without an action', () => {
@@ -36,14 +32,14 @@ describe('EmptyState', () => {
         title="Empty"
         description="Nothing here."
         action={{ label: 'Browse quests', onClick: onAction }}
-      />
+      />,
     )
 
     const button = screen.getByRole('button', { name: 'Browse quests' })
     await user.click(button)
     expect(onAction).toHaveBeenCalledTimes(1)
     // React hands the click event straight through to the caller's handler
-    expect(onAction.mock.calls[0][0].type).toBe('click')
+    expect(onAction).toHaveBeenCalledWith(expect.objectContaining({ type: 'click' }))
   })
 
   it('activates the action with the keyboard (Enter)', async () => {
@@ -55,7 +51,7 @@ describe('EmptyState', () => {
         title="Empty"
         description="Nothing here."
         action={{ label: 'Browse quests', onClick: onAction }}
-      />
+      />,
     )
 
     const button = screen.getByRole('button', { name: 'Browse quests' })
@@ -73,7 +69,7 @@ describe('EmptyState', () => {
         title="Empty"
         description="Nothing here."
         action={{ label: 'Browse quests', onClick: onAction }}
-      />
+      />,
     )
 
     const button = screen.getByRole('button', { name: 'Browse quests' })

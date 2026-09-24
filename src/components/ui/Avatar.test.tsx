@@ -9,7 +9,11 @@ describe('Avatar', () => {
   })
 
   it('renders image when src provided', () => {
-    render(<Avatar src="https://example.com/avatar.png" fallback="JD">John Doe</Avatar>)
+    render(
+      <Avatar src="https://example.com/avatar.png" fallback="JD">
+        John Doe
+      </Avatar>,
+    )
     const img = document.querySelector('img')
     expect(img).toBeInTheDocument()
     expect(img).toHaveAttribute('src', 'https://example.com/avatar.png')
@@ -22,14 +26,22 @@ describe('Avatar', () => {
 
   it('renders different sizes', () => {
     const sizes = ['sm', 'md', 'lg'] as const
-    sizes.forEach(size => {
-      const { container } = render(<Avatar size={size} fallback="JD">John Doe</Avatar>)
+    sizes.forEach((size) => {
+      const { container } = render(
+        <Avatar size={size} fallback="JD">
+          John Doe
+        </Avatar>,
+      )
       expect(container.firstChild).toBeInTheDocument()
     })
   })
 
   it('applies custom className', () => {
-    const { container } = render(<Avatar className="custom-avatar" fallback="JD">John Doe</Avatar>)
+    const { container } = render(
+      <Avatar className="custom-avatar" fallback="JD">
+        John Doe
+      </Avatar>,
+    )
     expect(container.firstChild).toHaveClass('custom-avatar')
   })
 })

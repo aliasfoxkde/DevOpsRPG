@@ -8,14 +8,7 @@ export interface AvatarProps extends HTMLAttributes<HTMLDivElement> {
   size?: 'sm' | 'md' | 'lg'
 }
 
-export function Avatar({
-  src,
-  alt = '',
-  fallback,
-  size = 'md',
-  className,
-  ...props
-}: AvatarProps) {
+export function Avatar({ src, alt = '', fallback, size = 'md', className, ...props }: AvatarProps) {
   return (
     <div
       className={clsx(
@@ -25,20 +18,14 @@ export function Avatar({
           'w-10 h-10 text-sm': size === 'md',
           'w-12 h-12 text-base': size === 'lg',
         },
-        className
+        className,
       )}
       {...props}
     >
       {src ? (
-        <img
-          src={src}
-          alt={alt}
-          className="w-full h-full object-cover"
-        />
+        <img src={src} alt={alt} className="w-full h-full object-cover" />
       ) : (
-        <span className="font-medium text-muted-foreground">
-          {fallback || '?'}
-        </span>
+        <span className="font-medium text-muted-foreground">{fallback || '?'}</span>
       )}
     </div>
   )

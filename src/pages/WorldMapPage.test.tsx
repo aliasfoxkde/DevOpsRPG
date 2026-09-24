@@ -15,9 +15,7 @@ describe('WorldMapPage', () => {
     const { character, completedQuests } = seedDefaultGame()
     renderSeededPage(<WorldMapPage />, { route: '/worldmap', url: '/worldmap' })
 
-    expect(
-      screen.getByRole('heading', { name: 'Realm of DevOps' }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Realm of DevOps' })).toBeInTheDocument()
     expect(screen.getByText('Overall Journey Progress')).toBeInTheDocument()
     expect(screen.getByText(`${completedQuests.length} quests completed`)).toBeInTheDocument()
     expect(screen.getByText(`Level ${character.level}`)).toBeInTheDocument()
@@ -30,9 +28,7 @@ describe('WorldMapPage', () => {
     for (const realm of Object.values(realms)) {
       // Realm names double as map location names, so allow repeats
       expect(screen.getAllByText(realm.name).length).toBeGreaterThan(0)
-      expect(
-        screen.getAllByText(`Lv${realm.requiredLevel}`).length,
-      ).toBeGreaterThan(0)
+      expect(screen.getAllByText(`Lv${realm.requiredLevel}`).length).toBeGreaterThan(0)
     }
   })
 
@@ -66,7 +62,7 @@ describe('WorldMapPage', () => {
 
     const village = screen
       .getAllByRole('button', { name: /Village of Foundations/ })
-      .find(button => !button.hasAttribute('disabled'))
+      .find((button) => !button.hasAttribute('disabled'))
     expect(village).toBeDefined()
     await user.click(village as HTMLElement)
 

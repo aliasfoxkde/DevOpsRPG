@@ -20,13 +20,17 @@ describe('ProgressBar', () => {
 
   it('clamps value above max to 100%', () => {
     const { container } = render(<ProgressBar value={150} max={100} />)
-    const innerBar = container.querySelector('.bg-primary, .bg-green-500, .bg-yellow-500, .bg-red-500')
+    const innerBar = container.querySelector(
+      '.bg-primary, .bg-green-500, .bg-yellow-500, .bg-red-500',
+    )
     expect(innerBar?.getAttribute('style')).toContain('width: 100%')
   })
 
   it('clamps negative value to 0%', () => {
     const { container } = render(<ProgressBar value={-10} />)
-    const innerBar = container.querySelector('.bg-primary, .bg-green-500, .bg-yellow-500, .bg-red-500')
+    const innerBar = container.querySelector(
+      '.bg-primary, .bg-green-500, .bg-yellow-500, .bg-red-500',
+    )
     expect(innerBar?.getAttribute('style')).toContain('width: 0%')
   })
 

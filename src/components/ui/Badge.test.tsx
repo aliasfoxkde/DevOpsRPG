@@ -11,9 +11,14 @@ describe('Badge', () => {
 
   it('renders all variants', () => {
     const variants: Array<'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error'> = [
-      'default', 'primary', 'secondary', 'success', 'warning', 'error'
+      'default',
+      'primary',
+      'secondary',
+      'success',
+      'warning',
+      'error',
     ]
-    variants.forEach(variant => {
+    variants.forEach((variant) => {
       const { container } = render(<Badge variant={variant}>{variant}</Badge>)
       expect(container.firstChild).toBeInTheDocument()
     })
@@ -63,7 +68,7 @@ describe('Badge', () => {
     render(
       <Badge data-testid="xp-badge" title="Experience" aria-label="500 experience">
         500 XP
-      </Badge>
+      </Badge>,
     )
 
     const badge = screen.getByTestId('xp-badge')
@@ -78,7 +83,7 @@ describe('Badge', () => {
     render(
       <Badge onClick={onClick} role="button">
         Filter: docker
-      </Badge>
+      </Badge>,
     )
 
     await user.click(screen.getByText('Filter: docker'))
@@ -91,7 +96,7 @@ describe('Badge', () => {
       <div>
         <Badge>Active</Badge>
         <span>Quest complete</span>
-      </div>
+      </div>,
     )
 
     expect(screen.getByText('Active')).toBeInTheDocument()

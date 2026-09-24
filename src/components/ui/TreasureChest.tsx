@@ -63,7 +63,11 @@ interface TreasureChestProps {
   onChestOpen?: (loot: LootDrop) => void
 }
 
-export default function TreasureChest({ questDifficulty = 1, preGeneratedLoot, onChestOpen }: TreasureChestProps) {
+export default function TreasureChest({
+  questDifficulty = 1,
+  preGeneratedLoot,
+  onChestOpen,
+}: TreasureChestProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [loot, setLoot] = useState<LootDrop | null>(null)
   const [isAnimating, setIsAnimating] = useState(false)
@@ -135,15 +139,22 @@ export default function TreasureChest({ questDifficulty = 1, preGeneratedLoot, o
       {/* Loot popup */}
       {isOpen && loot && (
         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 -translate-y-full z-20 animate-bounce-in">
-          <div className={`bg-gradient-to-b ${rarityColors[loot.rarity]} p-1 rounded-xl shadow-2xl border-2`}>
+          <div
+            className={`bg-gradient-to-b ${rarityColors[loot.rarity]} p-1 rounded-xl shadow-2xl border-2`}
+          >
             <div className="bg-slate-900 rounded-lg p-4 text-center">
               <div className="text-4xl mb-2">{loot.icon}</div>
-              <p className={`text-sm font-bold ${
-                loot.rarity === 'legendary' ? 'text-amber-400' :
-                loot.rarity === 'epic' ? 'text-purple-400' :
-                loot.rarity === 'rare' ? 'text-blue-400' :
-                'text-slate-300'
-              }`}>
+              <p
+                className={`text-sm font-bold ${
+                  loot.rarity === 'legendary'
+                    ? 'text-amber-400'
+                    : loot.rarity === 'epic'
+                      ? 'text-purple-400'
+                      : loot.rarity === 'rare'
+                        ? 'text-blue-400'
+                        : 'text-slate-300'
+                }`}
+              >
                 {loot.name}
               </p>
               <p className="text-xs text-slate-500 capitalize">{loot.rarity} Loot!</p>

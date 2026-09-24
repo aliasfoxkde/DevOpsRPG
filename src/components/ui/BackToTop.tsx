@@ -8,7 +8,9 @@ export function BackToTop() {
       setVisible(window.scrollY > 400)
     }
     window.addEventListener('scroll', toggleVisibility, { passive: true })
-    return () => window.removeEventListener('scroll', toggleVisibility)
+    return () => {
+      window.removeEventListener('scroll', toggleVisibility)
+    }
   }, [])
 
   const scrollToTop = () => {

@@ -1,7 +1,3 @@
 export { Button } from './Button'
-export { Card } from './Card'
 export { ProgressBar } from './ProgressBar'
-export { Badge } from './Badge'
-export { Avatar } from './Avatar'
-export { LoadingSpinner, LoadingPage } from './LoadingSpinner'
 export { StreakTracker } from './StreakTracker'

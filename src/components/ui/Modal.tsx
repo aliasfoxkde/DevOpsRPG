@@ -44,7 +44,9 @@ export function Modal({
       }
     }
     document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
   }, [isOpen, onClose])
 
   // Restore focus to the trigger element when the modal closes
@@ -52,7 +54,7 @@ export function Modal({
     if (!isOpen) return
     const previouslyFocused = document.activeElement as HTMLElement | null
     return () => {
-      previouslyFocused?.focus?.()
+      previouslyFocused?.focus()
     }
   }, [isOpen])
 
@@ -60,11 +62,11 @@ export function Modal({
   useEffect(() => {
     if (!isOpen) return
 
-    const focusableElements = contentRef.current?.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    const focusableElements = contentRef.current?.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
     )
-    const firstElement = focusableElements?.[0] as HTMLElement
-    const lastElement = focusableElements?.[focusableElements.length - 1] as HTMLElement
+    const firstElement = focusableElements?.[0]
+    const lastElement = focusableElements?.[focusableElements.length - 1]
 
     const handleTab = (e: KeyboardEvent) => {
       if (e.key !== 'Tab') return
@@ -85,7 +87,9 @@ export function Modal({
     document.addEventListener('keydown', handleTab)
     firstElement?.focus()
 
-    return () => document.removeEventListener('keydown', handleTab)
+    return () => {
+      document.removeEventListener('keydown', handleTab)
+    }
   }, [isOpen])
 
   // Prevent body scroll when modal is open

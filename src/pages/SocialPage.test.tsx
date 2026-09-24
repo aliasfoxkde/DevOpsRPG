@@ -5,7 +5,7 @@ import SocialPage from './SocialPage'
 import { MOCK_FRIENDS, MOCK_LEADERBOARD, AVAILABLE_GIFTS } from '@/data/social'
 import { renderSeededPage, seedDefaultGame } from './test-utils'
 
-const onlineFriends = MOCK_FRIENDS.filter(friend => friend.isOnline)
+const onlineFriends = MOCK_FRIENDS.filter((friend) => friend.isOnline)
 
 // The counter value sits in the sibling div directly above its label
 function statValue(label: string): string | null {
@@ -20,9 +20,7 @@ describe('SocialPage', () => {
   it('renders the social hub header and friend statistics', () => {
     renderSeededPage(<SocialPage />, { route: '/social', url: '/social' })
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Social Hub/ }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /Social Hub/ })).toBeInTheDocument()
     expect(statValue('Friends Online')).toBe(String(onlineFriends.length))
     expect(statValue('Total Friends')).toBe(String(MOCK_FRIENDS.length))
     expect(statValue('Gifts Sent')).toBe('0')
@@ -33,19 +31,15 @@ describe('SocialPage', () => {
 
     for (const friend of MOCK_FRIENDS) {
       expect(screen.getByText(friend.name)).toBeInTheDocument()
-      expect(
-        screen.getByText(`Level ${friend.level} • ${friend.title}`),
-      ).toBeInTheDocument()
-      expect(
-        screen.getByText(`🔥 ${friend.streakDays} day streak`),
-      ).toBeInTheDocument()
+      expect(screen.getByText(`Level ${friend.level} • ${friend.title}`)).toBeInTheDocument()
+      expect(screen.getByText(`🔥 ${friend.streakDays} day streak`)).toBeInTheDocument()
     }
     expect(screen.getAllByText('Online')).toHaveLength(onlineFriends.length)
     // Each friend row offers a gift shortcut (exact match so the "Send Gifts"
     // tab button is not counted as well)
-    expect(
-      screen.getAllByRole('button', { name: '🎁 Send Gift' }),
-    ).toHaveLength(MOCK_FRIENDS.length)
+    expect(screen.getAllByRole('button', { name: '🎁 Send Gift' })).toHaveLength(
+      MOCK_FRIENDS.length,
+    )
   })
 
   it('sends a gift to a chosen friend and confirms it', async () => {
@@ -67,15 +61,11 @@ describe('SocialPage', () => {
     await user.click(screen.getByRole('button', { name: new RegExp(firstGift.name) }))
 
     expect(
-      screen.getByText(
-        `You sent ${firstGift.icon} ${firstGift.name} to ${firstFriend.name}!`,
-      ),
+      screen.getByText(`You sent ${firstGift.icon} ${firstGift.name} to ${firstFriend.name}!`),
     ).toBeInTheDocument()
     // The gift is counted and the friend selection is reset
     expect(statValue('Gifts Sent')).toBe('1')
-    expect(
-      screen.getByText('Select a friend above to send them a gift!'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('Select a friend above to send them a gift!')).toBeInTheDocument()
   })
 
   it('requires picking a friend before gifts become available', async () => {
@@ -85,9 +75,7 @@ describe('SocialPage', () => {
     await user.click(screen.getByRole('button', { name: '🎁 Send Gifts' }))
 
     expect(screen.getByText('Select a Friend')).toBeInTheDocument()
-    expect(
-      screen.getByText('Select a friend above to send them a gift!'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('Select a friend above to send them a gift!')).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: new RegExp(AVAILABLE_GIFTS[0].name) }),
     ).not.toBeInTheDocument()

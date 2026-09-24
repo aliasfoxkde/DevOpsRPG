@@ -99,7 +99,7 @@ describe('Button', () => {
     render(
       <Button onClick={onClick} disabled>
         Locked
-      </Button>
+      </Button>,
     )
 
     await user.click(screen.getByRole('button', { name: 'Locked' }))
@@ -128,7 +128,7 @@ describe('Button', () => {
 
   it('exposes the forwarded ref pointing at the real button element', () => {
     const ref = createRef<HTMLButtonElement>()
-    render(<Button ref={ref}>Ref'd</Button>)
+    render(<Button ref={ref}>Ref&apos;d</Button>)
     expect(ref.current).toBeInstanceOf(HTMLButtonElement)
     expect(ref.current?.textContent).toBe("Ref'd")
   })

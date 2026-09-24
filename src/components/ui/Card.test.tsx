@@ -34,7 +34,7 @@ describe('Card', () => {
         <h2>Title</h2>
         <p>Paragraph</p>
         <button>Button</button>
-      </Card>
+      </Card>,
     )
 
     expect(screen.getByText('Title')).toBeInTheDocument()
@@ -70,7 +70,7 @@ describe('Card', () => {
     render(
       <Card id="quest-card" data-testid="quest-card" aria-label="Quest details">
         Content
-      </Card>
+      </Card>,
     )
 
     const card = screen.getByTestId('quest-card')

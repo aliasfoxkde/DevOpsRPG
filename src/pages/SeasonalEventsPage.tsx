@@ -9,7 +9,12 @@ import {
   type SeasonalEvent,
 } from '../data/seasonalEvents'
 
-function EventCard({ event, isActive, isUpcoming, isCompleted }: {
+function EventCard({
+  event,
+  isActive,
+  isUpcoming,
+  isCompleted,
+}: {
   event: SeasonalEvent
   isActive: boolean
   isUpcoming: boolean
@@ -43,8 +48,8 @@ function EventCard({ event, isActive, isUpcoming, isCompleted }: {
         isActive
           ? 'border-amber-500 shadow-lg shadow-amber-500/20'
           : isUpcoming
-          ? 'border-slate-600'
-          : 'border-slate-700 opacity-60'
+            ? 'border-slate-600'
+            : 'border-slate-700 opacity-60'
       }`}
     >
       {/* Event banner */}
@@ -76,20 +81,16 @@ function EventCard({ event, isActive, isUpcoming, isCompleted }: {
         {/* Date range */}
         <div className="flex items-center gap-4 text-sm text-slate-400 mb-4">
           <div>
-            <span className="text-slate-500">Starts:</span>{' '}
-            {startDate.toLocaleDateString()}
+            <span className="text-slate-500">Starts:</span> {startDate.toLocaleDateString()}
           </div>
           <div>
-            <span className="text-slate-500">Ends:</span>{' '}
-            {endDate.toLocaleDateString()}
+            <span className="text-slate-500">Ends:</span> {endDate.toLocaleDateString()}
           </div>
         </div>
 
         {/* Bonus multiplier */}
         <div className="flex items-center gap-2 mb-4">
-          <span className="text-amber-400 font-bold text-lg">
-            {event.bonusMultiplier}x
-          </span>
+          <span className="text-amber-400 font-bold text-lg">{event.bonusMultiplier}x</span>
           <span className="text-slate-400">XP & Gold Bonus</span>
         </div>
 
@@ -145,16 +146,12 @@ function EventCard({ event, isActive, isUpcoming, isCompleted }: {
         {/* Status */}
         {!isActive && !isCompleted && isUpcoming && meetsRequirements && (
           <div className="text-center">
-            <div className="text-sm text-slate-400 mb-2">
-              Event starts in {daysUntilStart} days
-            </div>
+            <div className="text-sm text-slate-400 mb-2">Event starts in {daysUntilStart} days</div>
           </div>
         )}
 
         {!meetsRequirements && !isActive && (
-          <div className="text-center text-sm text-slate-500">
-            Requirements not met
-          </div>
+          <div className="text-center text-sm text-slate-500">Requirements not met</div>
         )}
       </div>
     </div>
@@ -179,13 +176,13 @@ export default function SeasonalEventsPage() {
   // Completed events (past events)
   const completedEvents = useMemo(() => {
     const now = new Date()
-    return sortedEvents.filter(e => new Date(e.endDate) < now)
+    return sortedEvents.filter((e) => new Date(e.endDate) < now)
   }, [sortedEvents])
 
   // Upcoming events (future events)
   const upcomingEvents = useMemo(() => {
     const now = new Date()
-    return sortedEvents.filter(e => new Date(e.startDate) > now)
+    return sortedEvents.filter((e) => new Date(e.startDate) > now)
   }, [sortedEvents])
 
   return (
@@ -241,11 +238,9 @@ export default function SeasonalEventsPage() {
       {/* Active Events */}
       {activeEvents.length > 0 && (
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-            🔥 Active Events
-          </h2>
+          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">🔥 Active Events</h2>
           <div className="grid md:grid-cols-2 gap-6">
-            {activeEvents.map(event => (
+            {activeEvents.map((event) => (
               <EventCard
                 key={event.id}
                 event={event}
@@ -261,11 +256,9 @@ export default function SeasonalEventsPage() {
       {/* Upcoming Events */}
       {upcomingEvents.length > 0 && (
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-            📅 Upcoming Events
-          </h2>
+          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">📅 Upcoming Events</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {upcomingEvents.slice(0, 6).map(event => (
+            {upcomingEvents.slice(0, 6).map((event) => (
               <EventCard
                 key={event.id}
                 event={event}
@@ -281,11 +274,9 @@ export default function SeasonalEventsPage() {
       {/* Past Events */}
       {completedEvents.length > 0 && (
         <div>
-          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-            ✅ Past Events
-          </h2>
+          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">✅ Past Events</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {completedEvents.slice(0, 6).map(event => (
+            {completedEvents.slice(0, 6).map((event) => (
               <EventCard
                 key={event.id}
                 event={event}

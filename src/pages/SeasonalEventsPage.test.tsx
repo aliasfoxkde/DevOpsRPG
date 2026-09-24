@@ -1,19 +1,15 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 import SeasonalEventsPage from './SeasonalEventsPage'
-import {
-  SEASONAL_EVENTS,
-  getCurrentSeason,
-  isEventActive,
-} from '@/data/seasonalEvents'
+import { SEASONAL_EVENTS, getCurrentSeason, isEventActive } from '@/data/seasonalEvents'
 import { renderSeededPage, seedDefaultGame } from './test-utils'
 
 const now = new Date()
-const pastEvents = SEASONAL_EVENTS.filter(e => new Date(e.endDate) < now)
-const upcomingEvents = SEASONAL_EVENTS.filter(e => new Date(e.startDate) > now)
+const pastEvents = SEASONAL_EVENTS.filter((e) => new Date(e.endDate) < now)
+const upcomingEvents = SEASONAL_EVENTS.filter((e) => new Date(e.startDate) > now)
 // Events that ask for more than the starting level 1 and are not running now
 const gatedEvents = SEASONAL_EVENTS.filter(
-  e => (e.requirements?.minLevel ?? 0) > 1 && !isEventActive(e.id),
+  (e) => (e.requirements?.minLevel ?? 0) > 1 && !isEventActive(e.id),
 )
 
 describe('SeasonalEventsPage', () => {
@@ -24,16 +20,10 @@ describe('SeasonalEventsPage', () => {
   it('renders the seasonal events header and the current season banner', () => {
     renderSeededPage(<SeasonalEventsPage />, { route: '/seasonal-events', url: '/seasonal-events' })
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Seasonal Events/ }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText('Limited-time challenges and exclusive rewards!'),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /Seasonal Events/ })).toBeInTheDocument()
+    expect(screen.getByText('Limited-time challenges and exclusive rewards!')).toBeInTheDocument()
     // The banner names the season we are currently in
-    expect(
-      screen.getByText(`${getCurrentSeason()} Season`),
-    ).toBeInTheDocument()
+    expect(screen.getByText(`${getCurrentSeason()} Season`)).toBeInTheDocument()
   })
 
   it('groups the calendar into active, upcoming and past sections', () => {
@@ -70,9 +60,7 @@ describe('SeasonalEventsPage', () => {
 
     expect(character.level).toBe(1)
     // Every event asking for more than level 1 is out of reach for a new hero
-    expect(screen.getAllByText('Requirements not met')).toHaveLength(
-      gatedEvents.length,
-    )
+    expect(screen.getAllByText('Requirements not met')).toHaveLength(gatedEvents.length)
     // Only some events hand out exclusive rewards
     expect(screen.getAllByText('Exclusive Rewards:').length).toBeGreaterThan(0)
   })

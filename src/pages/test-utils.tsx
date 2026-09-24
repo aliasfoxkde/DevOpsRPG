@@ -64,7 +64,11 @@ function captureDefaultGame(): GameState {
     return null
   }
 
-  const { unmount } = render(<GameProvider><GameStateProbe /></GameProvider>)
+  const { unmount } = render(
+    <GameProvider>
+      <GameStateProbe />
+    </GameProvider>,
+  )
   unmount()
 
   if (!captured) {
@@ -97,12 +101,6 @@ export function renderSeededPage(
   return { game, renderResult: renderPage(page, options) }
 }
 
-/** Wipes the game keys between tests so seeded state never leaks. */
-export function clearGameStorage(): void {
-  localStorage.removeItem(STORAGE_KEYS.GAME)
-  localStorage.removeItem(STORAGE_KEYS.BACKUP)
-}
-
 /**
  * Narrows an `Element.closest()` lookup to an `HTMLElement` so it can be fed
  * to Testing Library's `within()`. Throws a descriptive error instead of the
@@ -111,9 +109,7 @@ export function clearGameStorage(): void {
 export function closestContainer(from: Element, selector: string): HTMLElement {
   const container = from.closest(selector)
   if (!(container instanceof HTMLElement)) {
-    throw new Error(
-      `No element matching "${selector}" found around "${from.textContent}"`,
-    )
+    throw new Error(`No element matching "${selector}" found around "${from.textContent}"`)
   }
   return container
 }

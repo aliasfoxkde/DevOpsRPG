@@ -1,7 +1,7 @@
 import { HTMLAttributes, forwardRef } from 'react'
 import { clsx } from 'clsx'
 
-export interface CardProps extends HTMLAttributes<HTMLDivElement> {
+interface CardProps extends HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'bordered' | 'elevated'
 }
 
@@ -18,12 +18,12 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
             'border border-border bg-card': variant === 'bordered',
             'bg-card shadow-md': variant === 'elevated',
           },
-          className
+          className,
         )}
         {...props}
       />
     )
-  }
+  },
 )
 
 Card.displayName = 'Card'

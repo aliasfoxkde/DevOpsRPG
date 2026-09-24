@@ -21,7 +21,7 @@ function getLast7Days(): string[] {
 
 function getActivityFromQuests(completedQuests: { completedAt?: string }[]): Set<string> {
   const activityDays = new Set<string>()
-  completedQuests.forEach(q => {
+  completedQuests.forEach((q) => {
     if (q.completedAt) {
       const day = q.completedAt.split('T')[0]
       activityDays.add(day)
@@ -35,7 +35,10 @@ export function StreakTracker() {
   const { character } = game
 
   const last7Days = useMemo(() => getLast7Days(), [])
-  const activityDays = useMemo(() => getActivityFromQuests(game.completedQuests), [game.completedQuests])
+  const activityDays = useMemo(
+    () => getActivityFromQuests(game.completedQuests),
+    [game.completedQuests],
+  )
 
   const today = useMemo(() => new Date().toISOString().split('T')[0], [])
   const yesterday = useMemo(() => {
@@ -44,11 +47,12 @@ export function StreakTracker() {
     return d.toISOString().split('T')[0]
   }, [])
 
-  const isStreakAtRisk = character.lastActive !== today && character.lastActive !== yesterday && character.streakDays > 0
+  const isStreakAtRisk =
+    character.lastActive !== today && character.lastActive !== yesterday && character.streakDays > 0
   const hasActiveToday = character.lastActive === today
 
   // Calculate next milestone
-  const nextMilestone = STREAK_MILESTONES.find(m => m.days > character.streakDays)
+  const nextMilestone = STREAK_MILESTONES.find((m) => m.days > character.streakDays)
 
   const daysUntilNextMilestone = nextMilestone ? nextMilestone.days - character.streakDays : 0
 
@@ -65,8 +69,8 @@ export function StreakTracker() {
             {hasActiveToday
               ? "You've earned today's XP!"
               : isStreakAtRisk
-              ? "⚠️ Complete a quest to save your streak!"
-              : 'Complete a quest today to keep your streak!'}
+                ? '⚠️ Complete a quest to save your streak!'
+                : 'Complete a quest today to keep your streak!'}
           </p>
         </div>
         <div className="text-right">
@@ -91,7 +95,9 @@ export function StreakTracker() {
           {last7Days.map((day) => {
             const isActive = activityDays.has(day)
             const isToday = day === today
-            const dayName = new Date(day).toLocaleDateString('en-US', { weekday: 'short' }).charAt(0)
+            const dayName = new Date(day)
+              .toLocaleDateString('en-US', { weekday: 'short' })
+              .charAt(0)
 
             return (
               <div
@@ -100,8 +106,8 @@ export function StreakTracker() {
                   isActive
                     ? 'bg-green-600 text-white'
                     : isToday
-                    ? 'bg-amber-600/50 text-amber-200 border border-amber-500'
-                    : 'bg-slate-800 text-slate-500'
+                      ? 'bg-amber-600/50 text-amber-200 border border-amber-500'
+                      : 'bg-slate-800 text-slate-500'
                 }`}
               >
                 <span className="text-[10px]">{dayName}</span>
@@ -117,7 +123,9 @@ export function StreakTracker() {
         <div className="mb-4">
           <div className="flex justify-between text-sm mb-1">
             <span className="text-slate-400">Next milestone</span>
-            <span className="text-amber-400">{daysUntilNextMilestone} days to {nextMilestone.name}</span>
+            <span className="text-amber-400">
+              {daysUntilNextMilestone} days to {nextMilestone.name}
+            </span>
           </div>
           <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
             <div
@@ -145,8 +153,8 @@ export function StreakTracker() {
                 achieved
                   ? 'bg-amber-900/50 text-amber-400 border border-amber-500/50'
                   : isNext
-                  ? 'bg-slate-800 text-slate-400 border border-slate-600 animate-pulse'
-                  : 'bg-slate-800/50 text-slate-500 border border-slate-700'
+                    ? 'bg-slate-800 text-slate-400 border border-slate-600 animate-pulse'
+                    : 'bg-slate-800/50 text-slate-500 border border-slate-700'
               }`}
               title={`${milestone.name}: ${milestone.days} days streak - Reward: ${milestone.reward}`}
             >
@@ -162,12 +170,12 @@ export function StreakTracker() {
       <div className="mt-4 pt-4 border-t border-slate-700">
         <p className="text-xs text-slate-400">
           {character.streakDays === 0
-            ? "💡 Start your streak by completing a quest today!"
+            ? '💡 Start your streak by completing a quest today!'
             : character.streakDays < 7
-            ? `🔥 Just ${7 - character.streakDays} more days to reach Week Warrior status!`
-            : character.streakDays < 30
-            ? `💎 ${30 - character.streakDays} days to Monthly Master!`
-            : "🏆 You're a legendary learner! Keep it going!"}
+              ? `🔥 Just ${7 - character.streakDays} more days to reach Week Warrior status!`
+              : character.streakDays < 30
+                ? `💎 ${30 - character.streakDays} days to Monthly Master!`
+                : "🏆 You're a legendary learner! Keep it going!"}
         </p>
       </div>
     </div>

@@ -31,20 +31,25 @@ export default function KeyboardShortcutsHelp() {
   const [isOpen, setIsOpen] = useState(false)
   const [activeCategory, setActiveCategory] = useState<string>('All')
 
-  const categories = ['All', ...new Set(GAME_SHORTCUTS.map(s => s.category))]
+  const categories = ['All', ...new Set(GAME_SHORTCUTS.map((s) => s.category))]
 
-  const filteredShortcuts = activeCategory === 'All'
-    ? GAME_SHORTCUTS
-    : GAME_SHORTCUTS.filter(s => s.category === activeCategory)
+  const filteredShortcuts =
+    activeCategory === 'All'
+      ? GAME_SHORTCUTS
+      : GAME_SHORTCUTS.filter((s) => s.category === activeCategory)
 
   // Listen for '?' key to toggle help
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
         const target = e.target as HTMLElement
-        if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA' && !target.isContentEditable) {
+        if (
+          target.tagName !== 'INPUT' &&
+          target.tagName !== 'TEXTAREA' &&
+          !target.isContentEditable
+        ) {
           e.preventDefault()
-          setIsOpen(prev => !prev)
+          setIsOpen((prev) => !prev)
         }
       }
       if (e.key === 'Escape' && isOpen) {
@@ -52,38 +57,52 @@ export default function KeyboardShortcutsHelp() {
       }
     }
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
   }, [isOpen])
 
-  if (!isOpen) return (
-    <button
-      onClick={() => setIsOpen(true)}
-      className="fixed bottom-16 sm:bottom-4 left-4 z-40 w-12 h-12 rounded-full bg-slate-700 hover:bg-slate-600 text-slate-300 text-lg flex items-center justify-center shadow-lg transition-colors active:scale-95 touch-manipulation"
-      title="Keyboard Shortcuts (?)"
-      aria-label="Show keyboard shortcuts"
-    >
-      ⌨️
-    </button>
-  )
+  if (!isOpen)
+    return (
+      <button
+        onClick={() => {
+          setIsOpen(true)
+        }}
+        className="fixed bottom-16 sm:bottom-4 left-4 z-40 w-12 h-12 rounded-full bg-slate-700 hover:bg-slate-600 text-slate-300 text-lg flex items-center justify-center shadow-lg transition-colors active:scale-95 touch-manipulation"
+        title="Keyboard Shortcuts (?)"
+        aria-label="Show keyboard shortcuts"
+      >
+        ⌨️
+      </button>
+    )
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
-      onClick={() => setIsOpen(false)}
+      onClick={() => {
+        setIsOpen(false)
+      }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="keyboard-shortcuts-title"
     >
       <div
         className="bg-slate-800 rounded-xl border border-amber-600/50 shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation()
+        }}
       >
         <div className="bg-gradient-to-r from-amber-900/50 to-slate-800 px-6 py-4 border-b border-slate-700 flex items-center justify-between">
-          <h2 id="keyboard-shortcuts-title" className="text-lg font-bold text-amber-400 flex items-center gap-2">
+          <h2
+            id="keyboard-shortcuts-title"
+            className="text-lg font-bold text-amber-400 flex items-center gap-2"
+          >
             ⌨️ Keyboard Shortcuts
           </h2>
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={() => {
+              setIsOpen(false)
+            }}
             className="text-slate-400 hover:text-white text-xl transition-colors"
             aria-label="Close keyboard shortcuts"
           >
@@ -93,10 +112,12 @@ export default function KeyboardShortcutsHelp() {
 
         {/* Category tabs */}
         <div className="flex gap-2 px-6 pt-4 overflow-x-auto">
-          {categories.map(cat => (
+          {categories.map((cat) => (
             <button
               key={cat}
-              onClick={() => setActiveCategory(cat)}
+              onClick={() => {
+                setActiveCategory(cat)
+              }}
               className={`px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                 activeCategory === cat
                   ? 'bg-amber-600 text-white'
@@ -126,7 +147,11 @@ export default function KeyboardShortcutsHelp() {
 
         <div className="px-6 py-4 border-t border-slate-700 bg-slate-800/50">
           <p className="text-slate-500 text-sm text-center">
-            Press <kbd className="px-2 py-0.5 bg-slate-700 rounded text-amber-400 font-mono text-xs">?</kbd> to toggle this help
+            Press{' '}
+            <kbd className="px-2 py-0.5 bg-slate-700 rounded text-amber-400 font-mono text-xs">
+              ?
+            </kbd>{' '}
+            to toggle this help
           </p>
         </div>
       </div>

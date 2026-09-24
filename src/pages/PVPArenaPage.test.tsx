@@ -16,9 +16,7 @@ describe('PVPArenaPage', () => {
   it('renders the arena header, starting rank and every rank tier', () => {
     renderSeededPage(<PVPArenaPage />, { route: '/pvp-arena', url: '/pvp-arena' })
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: /PvP Arena/ }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /PvP Arena/ })).toBeInTheDocument()
     expect(screen.getByText('0 Points')).toBeInTheDocument()
     expect(screen.getByText('Wins')).toBeInTheDocument()
     expect(screen.getByText('Losses')).toBeInTheDocument()
@@ -34,12 +32,8 @@ describe('PVPArenaPage', () => {
     renderSeededPage(<PVPArenaPage />, { route: '/pvp-arena', url: '/pvp-arena' })
 
     expect(screen.getByText('Ready for Battle?')).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: /Find Match/ }),
-    ).toBeInTheDocument()
-    expect(
-      screen.queryByRole('button', { name: /Start Battle/ }),
-    ).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Find Match/ })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Start Battle/ })).not.toBeInTheDocument()
   })
 
   it('matches the player with an opponent after a short search', async () => {
@@ -73,14 +67,14 @@ describe('PVPArenaPage', () => {
     expect(screen.getByText(/⏱️/)).toBeInTheDocument()
     const options = screen
       .getAllByRole('button')
-      .filter(button => /^[ABCD]/.test(button.textContent ?? ''))
+      .filter((button) => /^[ABCD]/.test(button.textContent))
 
     // The question is drawn from the exported pool, so the right answer can be
     // looked up and picked on purpose instead of guessing a fixed index
     const questionText = screen.getByRole('heading', { level: 3 }).textContent
     const question = Object.values(PVP_QUESTIONS)
       .flat()
-      .find(entry => entry.question === questionText)
+      .find((entry) => entry.question === questionText)
     if (!question) throw new Error(`Unknown question rendered: ${questionText}`)
     expect(options).toHaveLength(question.options.length)
 

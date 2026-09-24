@@ -1,7 +1,7 @@
 import { useCallback, useState, useEffect } from 'react'
 
 // Sound effect types
-export type SoundType =
+type SoundType =
   | 'correct'
   | 'incorrect'
   | 'levelUp'
@@ -31,7 +31,7 @@ class SoundGenerator {
       // AudioContext requires user gesture to create - return null if not initialized
       if (this.needsInit) return null
       try {
-        this.audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
+        this.audioContext = new AudioContext()
       } catch {
         return null
       }
@@ -43,10 +43,10 @@ class SoundGenerator {
   initialize(): boolean {
     if (this.needsInit) {
       try {
-        this.audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
+        this.audioContext = new AudioContext()
         // Resume if suspended (browser autoplay policy)
         if (this.audioContext.state === 'suspended') {
-          this.audioContext.resume()
+          void this.audioContext.resume()
         }
         this.needsInit = false
         return true
@@ -93,7 +93,7 @@ class SoundGenerator {
           oscillator.frequency.setValueAtTime(523.25, now) // C5
           oscillator.frequency.setValueAtTime(659.25, now + 0.1) // E5
           oscillator.frequency.setValueAtTime(783.99, now + 0.2) // G5
-          oscillator.frequency.setValueAtTime(1046.50, now + 0.3) // C6
+          oscillator.frequency.setValueAtTime(1046.5, now + 0.3) // C6
           gainNode.gain.setValueAtTime(0.3, now)
           gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5)
           oscillator.start(now)
@@ -127,9 +127,9 @@ class SoundGenerator {
           oscillator.frequency.setValueAtTime(523.25, now) // C5
           oscillator.frequency.setValueAtTime(659.25, now + 0.1)
           oscillator.frequency.setValueAtTime(783.99, now + 0.2)
-          oscillator.frequency.setValueAtTime(1046.50, now + 0.3)
+          oscillator.frequency.setValueAtTime(1046.5, now + 0.3)
           oscillator.frequency.setValueAtTime(783.99, now + 0.4)
-          oscillator.frequency.setValueAtTime(1046.50, now + 0.5)
+          oscillator.frequency.setValueAtTime(1046.5, now + 0.5)
           gainNode.gain.setValueAtTime(0.3, now)
           gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.7)
           oscillator.start(now)
@@ -211,14 +211,17 @@ export function useSoundEffects(): UseSoundEffectsReturn {
     localStorage.setItem('soundEnabled', String(!isMuted))
   }, [isMuted])
 
-  const playSound = useCallback((sound: SoundType) => {
-    if (!isMuted) {
-      soundGenerator.play(sound)
-    }
-  }, [isMuted])
+  const playSound = useCallback(
+    (sound: SoundType) => {
+      if (!isMuted) {
+        soundGenerator.play(sound)
+      }
+    },
+    [isMuted],
+  )
 
   const toggleMute = useCallback(() => {
-    setIsMuted(prev => !prev)
+    setIsMuted((prev) => !prev)
   }, [])
 
   // Initialize audio on user interaction (required by browsers)
@@ -231,21 +234,6 @@ export function useSoundEffects(): UseSoundEffectsReturn {
     isMuted,
     toggleMute,
     setMuted: setIsMuted,
-    initAudio
+    initAudio,
   }
-}
-
-// Global sound instance for use outside of React components
-export const globalSound = {
-  play: (type: SoundType) => {
-    try {
-      const stored = localStorage.getItem('soundEnabled')
-      if (stored === 'false') return
-      soundGenerator.initialize() // Ensure audio context is ready
-      soundGenerator.play(type)
-    } catch {
-      // Silently fail
-    }
-  },
-  init: () => soundGenerator.initialize()
 }

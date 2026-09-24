@@ -73,7 +73,7 @@ export default function PVPArenaPage() {
     const newCorrectCount = correctCount + (isCorrect ? 1 : 0)
 
     if (isCorrect) {
-      setCorrectCount(prev => prev + 1)
+      setCorrectCount((prev) => prev + 1)
     }
 
     // Wait 1 second then move to next
@@ -81,7 +81,7 @@ export default function PVPArenaPage() {
       setSelectedAnswer(null)
 
       if (currentQuestionIndex < currentMatch.questions.length - 1) {
-        setCurrentQuestionIndex(prev => prev + 1)
+        setCurrentQuestionIndex((prev) => prev + 1)
       } else {
         // Match complete - pass correct count directly to avoid stale closure
         finishMatch(newCorrectCount)
@@ -90,37 +90,40 @@ export default function PVPArenaPage() {
   }
 
   // Finish the match
-  const finishMatch = useCallback((finalCorrectCount: number) => {
-    if (!currentMatch || !matchStartTime) return
+  const finishMatch = useCallback(
+    (finalCorrectCount: number) => {
+      if (!currentMatch || !matchStartTime) return
 
-    const timeSpent = Math.round((Date.now() - matchStartTime) / 1000)
-    const won = finalCorrectCount > currentMatch.questions.length / 2
+      const timeSpent = Math.round((Date.now() - matchStartTime) / 1000)
+      const won = finalCorrectCount > currentMatch.questions.length / 2
 
-    const result = calculatePVPRewards(
-      won,
-      currentMatch.difficulty,
-      finalCorrectCount,
-      currentMatch.questions.length,
-      currentRank
-    )
-    result.timeSpent = timeSpent
+      const result = calculatePVPRewards(
+        won,
+        currentMatch.difficulty,
+        finalCorrectCount,
+        currentMatch.questions.length,
+        currentRank,
+      )
+      result.timeSpent = timeSpent
 
-    // Apply rewards
-    if (won) {
-      addXP(result.xpEarned)
-      addGold(result.goldEarned)
-    }
+      // Apply rewards
+      if (won) {
+        addXP(result.xpEarned)
+        addGold(result.goldEarned)
+      }
 
-    setMatchResult(result)
-    setMatchState('result')
-  }, [currentMatch, matchStartTime, currentRank, addXP, addGold])
+      setMatchResult(result)
+      setMatchState('result')
+    },
+    [currentMatch, matchStartTime, currentRank, addXP, addGold],
+  )
 
   // Timer effect
   useEffect(() => {
     if (matchState !== 'battle') return
 
     const timer = setInterval(() => {
-      setTimeLeft(prev => {
+      setTimeLeft((prev) => {
         if (prev <= 1) {
           // Time's up - finish match
           finishMatch(correctCount)
@@ -130,7 +133,9 @@ export default function PVPArenaPage() {
       })
     }, 1000)
 
-    return () => clearInterval(timer)
+    return () => {
+      clearInterval(timer)
+    }
   }, [matchState, correctCount, finishMatch])
 
   const currentQuestion: PVPQuestion | null = currentMatch?.questions[currentQuestionIndex] || null
@@ -149,7 +154,10 @@ export default function PVPArenaPage() {
           <div className="flex items-center gap-4">
             <div
               className="w-16 h-16 rounded-full flex items-center justify-center text-3xl"
-              style={{ backgroundColor: `${currentRank.color}30`, border: `3px solid ${currentRank.color}` }}
+              style={{
+                backgroundColor: `${currentRank.color}30`,
+                border: `3px solid ${currentRank.color}`,
+              }}
             >
               {currentRank.icon}
             </div>
@@ -204,7 +212,8 @@ export default function PVPArenaPage() {
           <div className="text-6xl mb-6">⚔️</div>
           <h2 className="text-2xl font-bold mb-4">Ready for Battle?</h2>
           <p className="text-slate-400 mb-8">
-            Test your DevOps knowledge against other players!<br />
+            Test your DevOps knowledge against other players!
+            <br />
             Win to earn points and climb the ranks.
           </p>
           <button
@@ -230,11 +239,14 @@ export default function PVPArenaPage() {
             <div className="text-8xl mb-4">{currentMatch.opponentAvatar}</div>
             <h2 className="text-3xl font-bold mb-2">{currentMatch.opponentName}</h2>
             <p className="text-slate-400">
-              {currentMatch.difficulty === 'easy' ? '🥉 Easy' : currentMatch.difficulty === 'medium' ? '⚔️ Medium' : '🔥 Hard'} Match
+              {currentMatch.difficulty === 'easy'
+                ? '🥉 Easy'
+                : currentMatch.difficulty === 'medium'
+                  ? '⚔️ Medium'
+                  : '🔥 Hard'}{' '}
+              Match
             </p>
-            <div className="mt-2 text-amber-400">
-              {currentMatch.rewardMultiplier}x Rewards
-            </div>
+            <div className="mt-2 text-amber-400">{currentMatch.rewardMultiplier}x Rewards</div>
           </div>
           <button
             onClick={startBattle}
@@ -257,7 +269,9 @@ export default function PVPArenaPage() {
               <span className="text-slate-400">
                 Q {currentQuestionIndex + 1}/{currentMatch.questions.length}
               </span>
-              <span className={`px-3 py-1 rounded-full font-bold ${timeLeft <= 10 ? 'bg-red-600 animate-pulse' : 'bg-slate-700'}`}>
+              <span
+                className={`px-3 py-1 rounded-full font-bold ${timeLeft <= 10 ? 'bg-red-600 animate-pulse' : 'bg-slate-700'}`}
+              >
                 ⏱️ {timeLeft}s
               </span>
             </div>
@@ -267,7 +281,9 @@ export default function PVPArenaPage() {
           <div className="h-2 bg-slate-700 rounded-full mb-6 overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all"
-              style={{ width: `${((currentQuestionIndex + 1) / currentMatch.questions.length) * 100}%` }}
+              style={{
+                width: `${((currentQuestionIndex + 1) / currentMatch.questions.length) * 100}%`,
+              }}
             />
           </div>
 
@@ -294,7 +310,9 @@ export default function PVPArenaPage() {
                 return (
                   <button
                     key={index}
-                    onClick={() => handleAnswer(index)}
+                    onClick={() => {
+                      handleAnswer(index)
+                    }}
                     disabled={selectedAnswer !== null}
                     className={`p-4 rounded-lg text-left font-medium transition-all ${buttonClass}`}
                   >
@@ -310,8 +328,17 @@ export default function PVPArenaPage() {
 
           {/* Your Stats */}
           <div className="flex items-center justify-between text-sm text-slate-400 pt-4 border-t border-slate-700">
-            <span>Your Score: {correctCount}/{currentQuestionIndex + (selectedAnswer !== null ? 1 : 0)}</span>
-            <span>{currentMatch.difficulty === 'easy' ? '🥉' : currentMatch.difficulty === 'medium' ? '⚔️' : '🔥'} {currentMatch.difficulty}</span>
+            <span>
+              Your Score: {correctCount}/{currentQuestionIndex + (selectedAnswer !== null ? 1 : 0)}
+            </span>
+            <span>
+              {currentMatch.difficulty === 'easy'
+                ? '🥉'
+                : currentMatch.difficulty === 'medium'
+                  ? '⚔️'
+                  : '🔥'}{' '}
+              {currentMatch.difficulty}
+            </span>
           </div>
         </div>
       )}
@@ -321,21 +348,27 @@ export default function PVPArenaPage() {
           <div className={`text-8xl mb-6 ${matchResult.won ? 'animate-bounce' : ''}`}>
             {matchResult.won ? '🏆' : '💔'}
           </div>
-          <h2 className={`text-4xl font-bold mb-4 ${matchResult.won ? 'text-green-400' : 'text-red-400'}`}>
+          <h2
+            className={`text-4xl font-bold mb-4 ${matchResult.won ? 'text-green-400' : 'text-red-400'}`}
+          >
             {matchResult.won ? 'Victory!' : 'Defeat'}
           </h2>
 
           <div className="bg-card rounded-xl border border-border p-6 mb-8 max-w-md mx-auto">
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="text-center">
-                <div className={`text-3xl font-bold ${matchResult.won ? 'text-green-400' : 'text-red-400'}`}>
-                  {matchResult.won ? '+' : ''}{matchResult.correctAnswers}/{matchResult.totalQuestions}
+                <div
+                  className={`text-3xl font-bold ${matchResult.won ? 'text-green-400' : 'text-red-400'}`}
+                >
+                  {matchResult.won ? '+' : ''}
+                  {matchResult.correctAnswers}/{matchResult.totalQuestions}
                 </div>
                 <div className="text-xs text-slate-400">Correct Answers</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-amber-400">
-                  {matchResult.won ? '+' : '-'}{matchResult.pointsEarned || matchResult.pointsLost} pts
+                  {matchResult.won ? '+' : '-'}
+                  {matchResult.pointsEarned || matchResult.pointsLost} pts
                 </div>
                 <div className="text-xs text-slate-400">Points</div>
               </div>
@@ -347,7 +380,9 @@ export default function PVPArenaPage() {
                 <div className="text-xs text-slate-400">Experience</div>
               </div>
               <div className="bg-slate-800/50 rounded-lg p-3 text-center">
-                <div className="text-xl font-bold text-yellow-400">+{matchResult.goldEarned} Gold</div>
+                <div className="text-xl font-bold text-yellow-400">
+                  +{matchResult.goldEarned} Gold
+                </div>
                 <div className="text-xs text-slate-400">Gold</div>
               </div>
             </div>
@@ -370,14 +405,16 @@ export default function PVPArenaPage() {
       <div className="mt-12">
         <h2 className="text-xl font-bold mb-4 text-center">🏆 Rank Tiers</h2>
         <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
-          {PVP_RANKS.map(rank => (
+          {PVP_RANKS.map((rank) => (
             <div
               key={rank.id}
               className="text-center p-2 rounded-lg"
               style={{ backgroundColor: `${rank.color}20` }}
             >
               <div className="text-2xl mb-1">{rank.icon}</div>
-              <div className="text-xs font-medium" style={{ color: rank.color }}>{rank.name}</div>
+              <div className="text-xs font-medium" style={{ color: rank.color }}>
+                {rank.name}
+              </div>
             </div>
           ))}
         </div>

@@ -5,11 +5,25 @@ import { COLLECTIBLES_POOL, openMysteryBox, type Collectible } from '../data/col
 import { REWARD_TIERS } from '../data/milestones'
 
 export default function RewardsPage() {
-  const { game, claimDailyReward, spinWheel, consumeCollectible, getActiveCollectibles, completedCount, addXP, addGold, grantBadge } = useGame()
+  const {
+    game,
+    claimDailyReward,
+    spinWheel,
+    consumeCollectible,
+    getActiveCollectibles,
+    completedCount,
+    addXP,
+    addGold,
+    grantBadge,
+  } = useGame()
   const [wheelSpinning, setWheelSpinning] = useState(false)
   const [wheelResult, setWheelResult] = useState<{ label: string; icon: string } | null>(null)
   const [mysteryBoxToOpen, setMysteryBoxToOpen] = useState<Collectible | null>(null)
-  const [mysteryResult, setMysteryResult] = useState<{ type: string; value?: number; collectible?: Collectible } | null>(null)
+  const [mysteryResult, setMysteryResult] = useState<{
+    type: string
+    value?: number
+    collectible?: Collectible
+  } | null>(null)
   const [showMystery, setShowMystery] = useState(false)
   const [claimedTiers, setClaimedTiers] = useState<string[]>([])
 
@@ -19,29 +33,45 @@ export default function RewardsPage() {
   const dayOfWeek = new Date().getDay()
   const adjustedDay = dayOfWeek === 0 ? 7 : dayOfWeek // Sunday = 7 instead of 0
 
-  const getTierProgress = (tier: typeof REWARD_TIERS[0]) => {
+  const getTierProgress = (tier: (typeof REWARD_TIERS)[0]) => {
     switch (tier.requirement.type) {
-      case 'quests': return tier.requirement.value > 0 ? completedCount / tier.requirement.value : 0
-      case 'level': return tier.requirement.value > 0 ? game.character.level / tier.requirement.value : 0
-      case 'xp': return tier.requirement.value > 0 ? game.character.xp / tier.requirement.value : 0
-      default: return 0
+      case 'quests':
+        return tier.requirement.value > 0 ? completedCount / tier.requirement.value : 0
+      case 'level':
+        return tier.requirement.value > 0 ? game.character.level / tier.requirement.value : 0
+      case 'xp':
+        return tier.requirement.value > 0 ? game.character.xp / tier.requirement.value : 0
+      case 'streak':
+        return tier.requirement.value > 0 ? game.character.streakDays / tier.requirement.value : 0
+      default:
+        return 0
     }
   }
 
-  const isTierComplete = (tier: typeof REWARD_TIERS[0]) => {
+  const isTierComplete = (tier: (typeof REWARD_TIERS)[0]) => {
     switch (tier.requirement.type) {
-      case 'quests': return completedCount >= tier.requirement.value
-      case 'level': return game.character.level >= tier.requirement.value
-      case 'xp': return game.character.xp >= tier.requirement.value
-      default: return false
+      case 'quests':
+        return completedCount >= tier.requirement.value
+      case 'level':
+        return game.character.level >= tier.requirement.value
+      case 'xp':
+        return game.character.xp >= tier.requirement.value
+      case 'streak':
+        return game.character.streakDays >= tier.requirement.value
+      default:
+        return false
     }
   }
 
-  const canClaimTier = (tier: typeof REWARD_TIERS[0]) => {
-    return isTierComplete(tier) && !claimedTiers.includes(tier.id) && !game.collectibles.some(c => c.id === `tier_claimed_${tier.id}`)
+  const canClaimTier = (tier: (typeof REWARD_TIERS)[0]) => {
+    return (
+      isTierComplete(tier) &&
+      !claimedTiers.includes(tier.id) &&
+      !game.collectibles.some((c) => c.id === `tier_claimed_${tier.id}`)
+    )
   }
 
-  const handleClaimTier = (tier: typeof REWARD_TIERS[0]) => {
+  const handleClaimTier = (tier: (typeof REWARD_TIERS)[0]) => {
     if (!canClaimTier(tier)) return
     // Grant XP reward
     addXP(tier.rewards.xp)
@@ -108,7 +138,9 @@ export default function RewardsPage() {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-2">🎁 Rewards Hub</h1>
-        <p className="text-slate-400">Claim daily rewards, spin the wheel, and open mystery boxes!</p>
+        <p className="text-slate-400">
+          Claim daily rewards, spin the wheel, and open mystery boxes!
+        </p>
       </div>
 
       {/* Daily Rewards */}
@@ -129,8 +161,8 @@ export default function RewardsPage() {
                   isClaimed
                     ? 'bg-green-900/30 border-green-500/50'
                     : isToday
-                    ? 'bg-amber-900/30 border-amber-500/50 animate-glow-pulse'
-                    : 'bg-slate-800/50 border-slate-700'
+                      ? 'bg-amber-900/30 border-amber-500/50 animate-glow-pulse'
+                      : 'bg-slate-800/50 border-slate-700'
                 }`}
               >
                 <div className="text-xs text-slate-400 mb-1">Day {day}</div>
@@ -140,7 +172,8 @@ export default function RewardsPage() {
                   {reward.reward.type === 'gold' && `+${reward.reward.value} Gold`}
                   {reward.reward.type === 'collectible' && reward.reward.collectibleId && (
                     <span>
-                      {COLLECTIBLES_POOL.find(c => c.id === reward.reward.collectibleId)?.icon || '🎁'}
+                      {COLLECTIBLES_POOL.find((c) => c.id === reward.reward.collectibleId)?.icon ||
+                        '🎁'}
                     </span>
                   )}
                 </div>
@@ -149,7 +182,9 @@ export default function RewardsPage() {
                 )}
                 {isToday && !isClaimed && (
                   <button
-                    onClick={() => handleClaimDaily(day)}
+                    onClick={() => {
+                      handleClaimDaily(day)
+                    }}
                     className="mt-2 w-full py-1 px-2 bg-amber-600 hover:bg-amber-500 rounded text-xs font-bold"
                   >
                     CLAIM!
@@ -171,7 +206,9 @@ export default function RewardsPage() {
         </h2>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
-            <div className="text-4xl">{game.character.streakDays >= 7 ? '🔥' : game.character.streakDays >= 3 ? '⚡' : '💤'}</div>
+            <div className="text-4xl">
+              {game.character.streakDays >= 7 ? '🔥' : game.character.streakDays >= 3 ? '⚡' : '💤'}
+            </div>
             <div>
               <div className="text-3xl font-bold text-amber-400">{game.character.streakDays}</div>
               <div className="text-sm text-slate-400">Day Streak</div>
@@ -180,10 +217,15 @@ export default function RewardsPage() {
           <div className="text-right">
             <div className="text-sm text-slate-400">Current Streak</div>
             <div className="font-bold text-white">
-              {game.character.streakDays >= 30 ? '🏆 Legend' :
-               game.character.streakDays >= 14 ? '⭐ Master' :
-               game.character.streakDays >= 7 ? '⚔️ Warrior' :
-               game.character.streakDays >= 3 ? '🌱 Apprentice' : '👶 Beginner'}
+              {game.character.streakDays >= 30
+                ? '🏆 Legend'
+                : game.character.streakDays >= 14
+                  ? '⭐ Master'
+                  : game.character.streakDays >= 7
+                    ? '⚔️ Warrior'
+                    : game.character.streakDays >= 3
+                      ? '🌱 Apprentice'
+                      : '👶 Beginner'}
             </div>
           </div>
         </div>
@@ -206,11 +248,13 @@ export default function RewardsPage() {
                   }`}
                 >
                   <div className="text-xs text-slate-500 mb-1">{day}</div>
-                  <div className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center ${
-                    isActive && game.character.streakDays > 0
-                      ? 'bg-green-600 text-white'
-                      : 'bg-slate-700 text-slate-500'
-                  }`}>
+                  <div
+                    className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center ${
+                      isActive && game.character.streakDays > 0
+                        ? 'bg-green-600 text-white'
+                        : 'bg-slate-700 text-slate-500'
+                    }`}
+                  >
                     {isActive && game.character.streakDays > 0 ? '✓' : '○'}
                   </div>
                 </div>
@@ -221,39 +265,63 @@ export default function RewardsPage() {
 
         {/* Streak milestones */}
         <div className="grid grid-cols-4 gap-2 text-center">
-          <div className={`p-3 rounded-lg ${
-            game.character.streakDays >= 3 ? 'bg-green-900/30 border border-green-500/50' : 'bg-slate-800/50'
-          }`}>
+          <div
+            className={`p-3 rounded-lg ${
+              game.character.streakDays >= 3
+                ? 'bg-green-900/30 border border-green-500/50'
+                : 'bg-slate-800/50'
+            }`}
+          >
             <div className="text-xl mb-1">🌱</div>
             <div className="text-xs text-slate-400">3 Days</div>
-            <div className={`text-sm font-bold ${game.character.streakDays >= 3 ? 'text-green-400' : 'text-slate-500'}`}>
+            <div
+              className={`text-sm font-bold ${game.character.streakDays >= 3 ? 'text-green-400' : 'text-slate-500'}`}
+            >
               {game.character.streakDays >= 3 ? '✓' : '🔒'}
             </div>
           </div>
-          <div className={`p-3 rounded-lg ${
-            game.character.streakDays >= 7 ? 'bg-green-900/30 border border-green-500/50' : 'bg-slate-800/50'
-          }`}>
+          <div
+            className={`p-3 rounded-lg ${
+              game.character.streakDays >= 7
+                ? 'bg-green-900/30 border border-green-500/50'
+                : 'bg-slate-800/50'
+            }`}
+          >
             <div className="text-xl mb-1">⚔️</div>
             <div className="text-xs text-slate-400">7 Days</div>
-            <div className={`text-sm font-bold ${game.character.streakDays >= 7 ? 'text-green-400' : 'text-slate-500'}`}>
+            <div
+              className={`text-sm font-bold ${game.character.streakDays >= 7 ? 'text-green-400' : 'text-slate-500'}`}
+            >
               {game.character.streakDays >= 7 ? '✓' : '🔒'}
             </div>
           </div>
-          <div className={`p-3 rounded-lg ${
-            game.character.streakDays >= 14 ? 'bg-green-900/30 border border-green-500/50' : 'bg-slate-800/50'
-          }`}>
+          <div
+            className={`p-3 rounded-lg ${
+              game.character.streakDays >= 14
+                ? 'bg-green-900/30 border border-green-500/50'
+                : 'bg-slate-800/50'
+            }`}
+          >
             <div className="text-xl mb-1">⭐</div>
             <div className="text-xs text-slate-400">14 Days</div>
-            <div className={`text-sm font-bold ${game.character.streakDays >= 14 ? 'text-green-400' : 'text-slate-500'}`}>
+            <div
+              className={`text-sm font-bold ${game.character.streakDays >= 14 ? 'text-green-400' : 'text-slate-500'}`}
+            >
               {game.character.streakDays >= 14 ? '✓' : '🔒'}
             </div>
           </div>
-          <div className={`p-3 rounded-lg ${
-            game.character.streakDays >= 30 ? 'bg-green-900/30 border border-green-500/50' : 'bg-slate-800/50'
-          }`}>
+          <div
+            className={`p-3 rounded-lg ${
+              game.character.streakDays >= 30
+                ? 'bg-green-900/30 border border-green-500/50'
+                : 'bg-slate-800/50'
+            }`}
+          >
             <div className="text-xl mb-1">🏆</div>
             <div className="text-xs text-slate-400">30 Days</div>
-            <div className={`text-sm font-bold ${game.character.streakDays >= 30 ? 'text-green-400' : 'text-slate-500'}`}>
+            <div
+              className={`text-sm font-bold ${game.character.streakDays >= 30 ? 'text-green-400' : 'text-slate-500'}`}
+            >
               {game.character.streakDays >= 30 ? '✓' : '🔒'}
             </div>
           </div>
@@ -265,7 +333,9 @@ export default function RewardsPage() {
               <span className="text-2xl">🛡️</span>
               <div>
                 <div className="font-bold text-blue-400">Streak Shield Active</div>
-                <div className="text-xs text-slate-400">Your streak is protected for {game.character.streakShields} day(s)</div>
+                <div className="text-xs text-slate-400">
+                  Your streak is protected for {game.character.streakShields} day(s)
+                </div>
               </div>
             </div>
           </div>
@@ -300,7 +370,9 @@ export default function RewardsPage() {
 
           {wheelResult && (
             <div className="mb-4 p-3 bg-amber-900/50 rounded-lg border border-amber-500">
-              <div className="text-lg font-bold">You won: {wheelResult.icon} {wheelResult.label}</div>
+              <div className="text-lg font-bold">
+                You won: {wheelResult.icon} {wheelResult.label}
+              </div>
             </div>
           )}
 
@@ -322,7 +394,9 @@ export default function RewardsPage() {
       <div className="bg-card rounded-xl border border-border p-6 mb-8">
         <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
           <span>🎒</span> Collectibles
-          <span className="text-sm font-normal text-slate-400">({activeCollectibles.length} active)</span>
+          <span className="text-sm font-normal text-slate-400">
+            ({activeCollectibles.length} active)
+          </span>
         </h2>
 
         {activeCollectibles.length === 0 ? (
@@ -339,25 +413,32 @@ export default function RewardsPage() {
                   collectible.rarity === 'legendary'
                     ? 'bg-amber-900/30 border-amber-500'
                     : collectible.rarity === 'epic'
-                    ? 'bg-purple-900/30 border-purple-500'
-                    : collectible.rarity === 'rare'
-                    ? 'bg-blue-900/30 border-blue-500'
-                    : 'bg-slate-800/50 border-slate-700'
+                      ? 'bg-purple-900/30 border-purple-500'
+                      : collectible.rarity === 'rare'
+                        ? 'bg-blue-900/30 border-blue-500'
+                        : 'bg-slate-800/50 border-slate-700'
                 }`}
               >
                 <div className="text-4xl mb-2">{collectible.icon}</div>
                 <div className="font-medium text-sm">{collectible.name}</div>
                 <div className="text-xs text-slate-400 mb-2">{collectible.description}</div>
-                <div className={`text-xs ${
-                  collectible.rarity === 'legendary' ? 'text-amber-400'
-                    : collectible.rarity === 'epic' ? 'text-purple-400'
-                    : collectible.rarity === 'rare' ? 'text-blue-400'
-                    : 'text-slate-400'
-                }`}>
+                <div
+                  className={`text-xs ${
+                    collectible.rarity === 'legendary'
+                      ? 'text-amber-400'
+                      : collectible.rarity === 'epic'
+                        ? 'text-purple-400'
+                        : collectible.rarity === 'rare'
+                          ? 'text-blue-400'
+                          : 'text-slate-400'
+                  }`}
+                >
                   {collectible.rarity}
                 </div>
                 <button
-                  onClick={() => handleOpenMystery(collectible)}
+                  onClick={() => {
+                      handleOpenMystery(collectible)
+                    }}
                   className={`mt-2 w-full py-1 px-3 rounded text-sm font-bold ${
                     collectible.type === 'mystery_box'
                       ? 'bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400'
@@ -392,8 +473,8 @@ export default function RewardsPage() {
                   complete && !canClaim
                     ? 'bg-green-900/30 border-green-500/50'
                     : complete
-                    ? 'bg-amber-900/30 border-amber-500 animate-glow-pulse'
-                    : 'bg-slate-800/50 border-slate-700'
+                      ? 'bg-amber-900/30 border-amber-500 animate-glow-pulse'
+                      : 'bg-slate-800/50 border-slate-700'
                 }`}
               >
                 <div className="flex items-start gap-3">
@@ -426,15 +507,15 @@ export default function RewardsPage() {
                     <div className="flex gap-3 text-xs mb-2">
                       <span className="text-purple-400">+{tier.rewards.xp} XP</span>
                       <span className="text-orange-400">+{tier.rewards.gold} Gold</span>
-                      {tier.rewards.badge && (
-                        <span className="text-blue-400">+ Badge</span>
-                      )}
+                      {tier.rewards.badge && <span className="text-blue-400">+ Badge</span>}
                     </div>
 
                     {/* Claim button */}
                     {canClaim && (
                       <button
-                        onClick={() => handleClaimTier(tier)}
+                        onClick={() => {
+                        handleClaimTier(tier)
+                      }}
                         className="w-full py-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 rounded-lg font-bold text-sm text-white"
                       >
                         🎁 CLAIM PACK!
