@@ -10,6 +10,14 @@ interface VoiceSettings {
 
 const STORAGE_KEY = 'devopsquest_voice_settings'
 
+/** Whether the Web Speech API is present in the current runtime. Evaluated per
+ * hook call so both the voices effect and the exported flag agree, and so a
+ * browser without support skips the API entirely instead of throwing on
+ * mount. */
+function isSpeechSupported(): boolean {
+  return typeof window !== 'undefined' && 'speechSynthesis' in window
+}
+
 const DEFAULT_SETTINGS: VoiceSettings = {
   enabled: false,
   volume: 1,
@@ -41,6 +49,7 @@ function parseStoredSettings(stored: string): VoiceSettings {
 }
 
 export function useVoiceNarration() {
+  const isSupported = isSpeechSupported()
   const [settings, setSettings] = useState<VoiceSettings>(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem(STORAGE_KEY)
@@ -56,6 +65,7 @@ export function useVoiceNarration() {
 
   // Load available voices
   useEffect(() => {
+    if (!isSupported) return undefined
     const loadVoices = () => {
       const availableVoices = window.speechSynthesis.getVoices()
       setVoices(availableVoices)
@@ -74,7 +84,7 @@ export function useVoiceNarration() {
     return () => {
       window.speechSynthesis.onvoiceschanged = null
     }
-  }, [settings.voiceURI])
+  }, [isSupported, settings.voiceURI])
 
   // Save settings
   useEffect(() => {
@@ -139,6 +149,6 @@ export function useVoiceNarration() {
     stop,
     toggleEnabled,
     updateSettings,
-    isSupported: typeof window !== 'undefined' && 'speechSynthesis' in window,
+    isSupported,
   }
 }

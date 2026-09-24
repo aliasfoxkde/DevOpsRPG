@@ -11,6 +11,7 @@ export default function RewardsPage() {
     spinWheel,
     consumeCollectible,
     getActiveCollectibles,
+    grantCollectible,
     completedCount,
     addXP,
     addGold,
@@ -111,6 +112,12 @@ export default function RewardsPage() {
     try {
       setMysteryBoxToOpen(collectible)
       const result = openMysteryBox(collectible)
+      // Grant exactly what the popup is about to show the player
+      if (result.type === 'xp' && typeof result.value === 'number') addXP(result.value)
+      if (result.type === 'gold' && typeof result.value === 'number') addGold(result.value)
+      if (result.type === 'collectible' && result.collectible) {
+        grantCollectible(result.collectible)
+      }
       setMysteryResult(result)
       setShowMystery(true)
     } catch (err) {

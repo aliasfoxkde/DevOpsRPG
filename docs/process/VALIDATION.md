@@ -1,108 +1,79 @@
 # Validation Criteria - DevOpsQuest
 
-**Last Updated**: 2026-06-22
-**Status**: Ready for validation
+**Last Updated**: 2026-09-24
+**Status**: Active — gates are enforced in CI (`.gitforce.yml`, mirrored by `.github/workflows/ci.yml`)
 
 ---
 
-## Pre-Deployment Validation Checklist
+## Automated Gates (all must pass before merge/release)
 
-### Functional Requirements
+| Gate            | Command                 | Standard                                                             |
+| --------------- | ----------------------- | -------------------------------------------------------------------- |
+| Lint            | `npm run lint`          | typescript-eslint `strictTypeChecked`, 0 warnings allowed            |
+| Format          | `npm run format:check`  | Prettier (repo-wide, single style)                                   |
+| Dead code       | `npm run knip`          | 0 unused exports / files / dependencies                              |
+| Typecheck       | `npm run typecheck`     | `tsc --noEmit` × 3 projects (app, tooling, worker), strict           |
+| Unit/component  | `npm run test`          | Vitest, all green; coverage ratchet in `vite.config.ts`              |
+| Worker tests    | `npm run test:worker`   | Vitest over the KV API router                                        |
+| E2E             | `npm run test:e2e`      | Playwright, chromium/firefox/webkit                                  |
+| Secrets/pattern | `npm run audit:secrets` | Aegis production profile; fails only on findings not in the baseline |
+| Accessibility   | `npm run audit:a11y`    | axe-core over every route × both themes; AA violations fail the run  |
+| Build           | `npm run build`         | `tsc -b && vite build` must succeed                                  |
 
-- [ ] User can sign in with Google OAuth
-- [ ] User can sign in with GitHub OAuth
-- [ ] User can view technology catalog
-- [ ] User can navigate to W3Schools topics via iframe
-- [ ] User can mark topics as complete
-- [ ] XP is awarded on topic completion
-- [ ] Level increases based on XP thresholds
-- [ ] Achievements unlock correctly
-- [ ] Daily streak tracks correctly
-- [ ] Dark/Light/System theme modes work
-- [ ] Theme persists across sessions
-- [ ] PWA installs correctly
-- [ ] Offline mode shows cached content
+Release validation additionally byte-verifies the deployed site against `dist/`
+(see `docs/CHANGELOG.md` release entries for the procedure).
 
-### Performance Requirements
+---
 
-- [ ] Lighthouse PWA score ≥ 90
-- [ ] First Contentful Paint < 1.5s
+## Functional Requirements (manual spot-check per release)
+
+- [ ] Character creation flow offers the four classes and persists the choice
+- [ ] Quest completion awards XP; level-ups fire at `XP_THRESHOLDS` boundaries
+- [ ] Topic completion marks the quest chain and updates world-map realm progress
+- [ ] Achievements unlock and persist (`devopsquest_game`, fallback `devopsquest_backup`)
+- [ ] Daily reward streak increments once per calendar day
+- [ ] Theme (`light` / `dark` / `system`) applies immediately and persists
+- [ ] PWA installs; offline mode serves cached shell (production builds only —
+      the service worker is intentionally disabled in dev)
+- [ ] Worker API: `GET/POST /api/progress`, `GET /api/leaderboard`, `GET /api/health`
+      respond per contract (see `worker/src/index.test.ts`)
+
+## Performance Requirements
+
+- [ ] First Contentful Paint < 1.5s (production build, throttled)
 - [ ] Time to Interactive < 3s
-- [ ] Bundle size < 200KB gzipped
+- [ ] Routes are lazy-loaded (check the network tab, one chunk per page)
 
-### Security Requirements
+## Security Requirements
 
-- [ ] No credentials in client-side code
-- [ ] OAuth tokens stored securely (KV)
-- [ ] CSRF protection on API routes
-- [ ] Input sanitization on all forms
+- [ ] No credentials in client-side code (Aegis baseline gate)
+- [ ] Progress payloads sanitized on import (`src/utils/dataExport.ts`)
+- [ ] Worker CORS echoes only `ALLOWED_ORIGINS`
 
-### Accessibility Requirements
+## Accessibility Requirements
 
-- [ ] WCAG 2.1 AA compliance
-- [ ] Keyboard navigation works
-- [ ] Screen reader compatible
-- [ ] Color contrast ≥ 4.5:1
-
----
-
-## Test Coverage Requirements
-
-| Type        | Target              | Minimum            |
-| ----------- | ------------------- | ------------------ |
-| Unit        | 85%                 | 80%                |
-| Integration | 70%                 | 60%                |
-| E2E         | Critical paths 100% | Critical paths 90% |
-| Overall     | 80%                 | 75%                |
+- [ ] WCAG 2.1 AA: 0 critical/serious violations on every route, both themes
+      (`npm run audit:a11y`)
+- [ ] AAA progress tracked per route (`color-contrast-enhanced` ≥ 7:1, target size)
+- [ ] Keyboard navigation: skip link, focus states, Escape closes modals,
+      `?` opens the shortcut help overlay
 
 ---
 
-## Visual Checkpoints
+## Coverage Ratchet
 
-### Homepage (Logged Out)
-
-- Logo and tagline visible
-- Google/GitHub login buttons displayed
-- Theme switcher visible
-- PWA install prompt (if eligible)
-
-### Dashboard (Logged In)
-
-- User avatar and name displayed
-- XP and level prominently shown
-- Current streak displayed with fire animation
-- Recent achievements shown
-- Quick links to continue learning
-
-### Learning Page
-
-- Technology list organized by category
-- Progress indicators per technology
-- W3Schools iframe renders correctly
-- Mark Complete button functional
-- Next/Previous topic navigation works
-
-### Gamification Elements
-
-- XP pop animation on earn
-- Achievement unlock animation
-- Level-up celebration
-- Streak fire animation
+Thresholds live in `vite.config.ts` (`test.coverage.thresholds`) and only move up.
+Current measurement procedure: `npx vitest run --maxWorkers=1 --coverage`
+(single worker — parallel v8 coverage runs have been observed to drop test files).
+Numbers and history: `docs/planning/003-QUALITY_PLAN.md`.
 
 ---
 
-## Smoke Test Commands
+## Visual Checkpoints (per release, both themes)
 
-```bash
-# Unit tests
-npm run test
-
-# E2E tests
-npm run test:e2e
-
-# Coverage report
-npm run test:coverage
-
-# Lighthouse
-npx lighthouse http://localhost:3000 --output html --output-path ./lighthouse-report.html
-```
+- Homepage: hero, class selection entry point, HUD (level/XP/gold), quick game
+- Quest Journal: filter/search, current-quest card, world map realms with
+  `requiredLevel` gates
+- Battle Arena: quiz flow, HP bars, victory modal + XP award
+- Store/Marketplace: gold balances update on purchase, equipment equips
+- Settings: every toggle mutates persisted state (sound, narration, theme)

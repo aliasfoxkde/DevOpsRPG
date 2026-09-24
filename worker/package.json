@@ -8,10 +8,12 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "tail": "wrangler tail",
-    "dev:local": "wrangler dev --local"
+    "dev:local": "wrangler dev --local",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260702.1",
+    "vitest": "^4.1.11",
     "wrangler": "^3.60.0"
   }
 }

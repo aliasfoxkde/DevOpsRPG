@@ -292,7 +292,10 @@ function MatchingGame({
 
   const handleDefClick = (defIdx: number) => {
     if (selectedTermIdx === null) return
-    if (matchedPairs.has(defIdx)) return
+    // Definitions live in the upper half of the matched set so a term and a
+    // definition that share an index cannot collapse into a single entry.
+    const matchedDefIdx = pairs.length + defIdx
+    if (matchedPairs.has(matchedDefIdx)) return
 
     const selectedPair = termOrder[selectedTermIdx]
     const clickedPair = defOrder[defIdx]
@@ -301,7 +304,7 @@ function MatchingGame({
       // Match!
       const newMatched = new Set(matchedPairs)
       newMatched.add(selectedTermIdx)
-      newMatched.add(defIdx)
+      newMatched.add(matchedDefIdx)
       setMatchedPairs(newMatched)
       setSelectedTermIdx(null)
 
@@ -320,7 +323,7 @@ function MatchingGame({
   }
 
   const isTermMatched = (idx: number) => matchedPairs.has(idx)
-  const isDefMatched = (idx: number) => matchedPairs.has(idx)
+  const isDefMatched = (idx: number) => matchedPairs.has(pairs.length + idx)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">

@@ -1,12 +1,12 @@
 // Behavior tests for the core game state context: XP/level transitions,
 // quest completion, persistence with backup recovery, and cross-tab sync.
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { useEffect } from 'react'
-import { render, screen, act } from '@testing-library/react'
-import { GameProvider, useGame } from './GameContext'
+import { screen, act } from '@testing-library/react'
 import { STORAGE_KEYS, XP_PER_LEVEL, GOLD_XP_RATIO } from '@/utils/gameUtils'
 import { allQuests } from '@/data/quests'
 import { BADGES } from '@/data/badges'
+import { click, renderGame } from './test-utils'
+import { useGame } from './GameContext'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
@@ -133,32 +133,6 @@ function Harness() {
   )
 }
 
-function renderGame() {
-  // The newest context value is mirrored into `latest` from an effect:
-  // writing it during render trips react-hooks/globals.
-  const latest: { current?: ReturnType<typeof useGame> } = {}
-  function Capture() {
-    const game = useGame()
-    useEffect(() => {
-      latest.current = game
-    })
-    return <Harness />
-  }
-  render(
-    <GameProvider>
-      <Capture />
-    </GameProvider>,
-  )
-  return () => latest.current as ReturnType<typeof useGame>
-}
-
-function click(label: string): Promise<void> {
-  act(() => {
-    screen.getByText(label).click()
-  })
-  return Promise.resolve()
-}
-
 const firstQuest = allQuests.find((q) => q.id === 'quest_html_intro')
 if (!firstQuest) {
   throw new Error('quest_html_intro is missing from allQuests')
@@ -170,7 +144,7 @@ describe('GameContext fresh state', () => {
   })
 
   it('starts a new player at level 1 with the default character', () => {
-    renderGame()
+    renderGame(<Harness />)
     expect(screen.getByTestId('name')).toHaveTextContent('Hero')
     expect(screen.getByTestId('level')).toHaveTextContent('1')
     expect(screen.getByTestId('xp')).toHaveTextContent('0')
@@ -180,7 +154,7 @@ describe('GameContext fresh state', () => {
   })
 
   it('seeds the full badge and milestone catalogs', () => {
-    const getGame = renderGame()
+    const getGame = renderGame(<Harness />)
     expect(getGame().game.badges.map((b) => b.id)).toEqual(BADGES.map((b) => b.id))
     expect(getGame().game.milestones.every((m) => !m.unlocked)).toBe(true)
   })
@@ -192,30 +166,30 @@ describe('GameContext progression', () => {
   })
 
   it('levels up when XP crosses the threshold', async () => {
-    renderGame()
+    renderGame(<Harness />)
     await click('add-level-xp')
     expect(screen.getByTestId('level')).toHaveTextContent('2')
     expect(screen.getByTestId('xp')).toHaveTextContent(String(XP_PER_LEVEL))
   })
 
   it('accumulates gold', async () => {
-    renderGame()
+    renderGame(<Harness />)
     await click('add-gold')
     await click('add-gold')
     expect(screen.getByTestId('gold')).toHaveTextContent('84')
   })
 
   it('records onboarding choices on the character', async () => {
-    renderGame()
+    renderGame(<Harness />)
     await click('onboard')
     expect(screen.getByTestId('name')).toHaveTextContent('Ada')
-    const getGame = renderGame()
+    const getGame = renderGame(<Harness />)
     expect(getGame().game.character.class).toBe('Data Mage')
     expect(getGame().game.hasSeenOnboarding).toBe(true)
   })
 
   it('completes a quest once: awards XP, gold and shows victory', async () => {
-    renderGame()
+    renderGame(<Harness />)
     await click('complete-first-quest')
     expect(screen.getByTestId('quest-count')).toHaveTextContent('1')
     expect(screen.getByTestId('victory')).toHaveTextContent('true')
@@ -226,7 +200,7 @@ describe('GameContext progression', () => {
   })
 
   it('ignores repeated completion of the same quest', async () => {
-    renderGame()
+    renderGame(<Harness />)
     await click('complete-first-quest')
     await click('complete-first-quest')
     expect(screen.getByTestId('quest-count')).toHaveTextContent('1')
@@ -234,14 +208,14 @@ describe('GameContext progression', () => {
   })
 
   it('ignores unknown quest ids', async () => {
-    renderGame()
+    renderGame(<Harness />)
     await click('complete-missing-quest')
     expect(screen.getByTestId('quest-count')).toHaveTextContent('0')
     expect(screen.getByTestId('victory')).toHaveTextContent('false')
   })
 
   it('grants a known badge and queues the unlock notification once', async () => {
-    renderGame()
+    renderGame(<Harness />)
     await click('grant-badge')
     await click('grant-badge')
     expect(screen.getByTestId('badge-perfectionist')).toHaveTextContent(/^\d{4}-\d{2}-\d{2}T/)
@@ -249,20 +223,20 @@ describe('GameContext progression', () => {
   })
 
   it('does not grant unknown badge ids', async () => {
-    renderGame()
+    renderGame(<Harness />)
     await click('grant-bad-badge')
     expect(screen.getByTestId('recent-unlocks')).toHaveTextContent('0')
   })
 
   it('clears unlock notifications on dismiss', async () => {
-    renderGame()
+    renderGame(<Harness />)
     await click('grant-badge')
     await click('dismiss-unlocks')
     expect(screen.getByTestId('recent-unlocks')).toHaveTextContent('0')
   })
 
   it('consumes streak shields and reports when none are available', async () => {
-    renderGame()
+    renderGame(<Harness />)
     await click('use-shield')
     expect(screen.getByTestId('shield-result')).toHaveTextContent('false')
     await click('add-shield')
@@ -279,7 +253,7 @@ describe('GameContext learning topics and daily rewards', () => {
   })
 
   it('records a learning topic once with its XP', async () => {
-    const getGame = renderGame()
+    const getGame = renderGame(<Harness />)
     await click('learn-topic')
     expect(screen.getByTestId('learned')).toHaveTextContent('true')
     expect(screen.getByTestId('xp')).toHaveTextContent('30')
@@ -294,7 +268,7 @@ describe('GameContext learning topics and daily rewards', () => {
   })
 
   it('claims a daily reward once per cycle', async () => {
-    const getGame = renderGame()
+    const getGame = renderGame(<Harness />)
     await click('claim-daily')
     expect(screen.getByTestId('daily-claimed')).toHaveTextContent('1')
     expect(getGame().game.character.xp).toBeGreaterThan(0)
@@ -303,7 +277,7 @@ describe('GameContext learning topics and daily rewards', () => {
   })
 
   it('ignores unknown daily reward days', () => {
-    const getGame = renderGame()
+    const getGame = renderGame(<Harness />)
     const reward = getGame().claimDailyReward(99)
     expect(reward.type).toBe('xp')
     expect(getGame().game.dailyRewardsClaimed).toEqual([])
@@ -317,7 +291,7 @@ describe('GameContext persistence', () => {
   })
 
   it('persists state to the main and backup keys after an action', async () => {
-    renderGame()
+    renderGame(<Harness />)
     await click('add-level-xp')
     for (const key of [STORAGE_KEYS.GAME, STORAGE_KEYS.BACKUP]) {
       const raw = localStorage.getItem(key)
@@ -342,7 +316,7 @@ describe('GameContext persistence', () => {
       ],
     }
     localStorage.setItem(STORAGE_KEYS.GAME, JSON.stringify(saved))
-    renderGame()
+    renderGame(<Harness />)
     expect(screen.getByTestId('name')).toHaveTextContent('SavedHero')
     expect(screen.getByTestId('level')).toHaveTextContent('3')
     expect(screen.getByTestId('quest-count')).toHaveTextContent('1')
@@ -357,7 +331,7 @@ describe('GameContext persistence', () => {
       completedQuests: [],
     }
     localStorage.setItem(STORAGE_KEYS.BACKUP, JSON.stringify(saved))
-    renderGame()
+    renderGame(<Harness />)
     expect(screen.getByTestId('name')).toHaveTextContent('BackupHero')
     warn.mockRestore()
   })
@@ -365,7 +339,7 @@ describe('GameContext persistence', () => {
   it('starts fresh when neither key holds a valid save', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     localStorage.setItem(STORAGE_KEYS.GAME, JSON.stringify({ garbage: true }))
-    renderGame()
+    renderGame(<Harness />)
     expect(screen.getByTestId('name')).toHaveTextContent('Hero')
     expect(screen.getByTestId('level')).toHaveTextContent('1')
     expect(warn).toHaveBeenCalled()
@@ -373,7 +347,7 @@ describe('GameContext persistence', () => {
   })
 
   it('merges state pushed by another tab via the storage event', () => {
-    renderGame()
+    renderGame(<Harness />)
     const otherTab = {
       character: { name: 'TabTwo', xp: 55, level: 1 },
       badges: BADGES.slice(0, 3).map((b) => ({ ...b })),
@@ -392,7 +366,7 @@ describe('GameContext persistence', () => {
   })
 
   it('ignores storage events for unrelated keys', () => {
-    renderGame()
+    renderGame(<Harness />)
     act(() => {
       window.dispatchEvent(
         new StorageEvent('storage', {

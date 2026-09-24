@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import MarketplacePage from './MarketplacePage'
-import { renderSeededPage, seedDefaultGame } from './test-utils'
+import { renderPage, renderSeededPage, seedDefaultGame } from './test-utils'
+import { STORAGE_KEYS } from '@/utils/gameUtils'
 
 describe('MarketplacePage', () => {
   beforeEach(() => {
@@ -77,5 +78,72 @@ describe('MarketplacePage', () => {
 
     await user.click(screen.getAllByRole('button', { name: 'Close' })[0])
     expect(screen.queryByRole('heading', { name: 'Create New Listing' })).not.toBeInTheDocument()
+  })
+
+  it('shows how long ago each listing went up', () => {
+    seedDefaultGame()
+    renderPage(<MarketplacePage />, { route: '/marketplace', url: '/marketplace' })
+
+    // The three fixtures were listed 2h, 5h and 12h before load
+    expect(screen.getByText('2h ago')).toBeInTheDocument()
+    expect(screen.getByText('5h ago')).toBeInTheDocument()
+    expect(screen.getByText('12h ago')).toBeInTheDocument()
+    expect(screen.queryByText('Just now')).not.toBeInTheDocument()
+  })
+
+  it('keeps both badge listings with their rarity when filtering badges', async () => {
+    const user = userEvent.setup()
+    renderSeededPage(<MarketplacePage />, { route: '/marketplace', url: '/marketplace' })
+
+    await user.click(screen.getByRole('button', { name: '🏅 Badges' }))
+
+    expect(screen.getByText('Docker Expert')).toBeInTheDocument()
+    expect(screen.getByText('Kubernetes Guru')).toBeInTheDocument()
+    expect(screen.queryByText('Infrastructure Master')).not.toBeInTheDocument()
+    expect(screen.getByText('RARE')).toBeInTheDocument()
+    expect(screen.getByText('EPIC')).toBeInTheDocument()
+  })
+
+  it('offers an empty state for the collectible category', async () => {
+    const user = userEvent.setup()
+    renderSeededPage(<MarketplacePage />, { route: '/marketplace', url: '/marketplace' })
+
+    await user.click(screen.getByRole('button', { name: '💎 Collectibles' }))
+
+    expect(screen.getByText('No items listed')).toBeInTheDocument()
+    expect(screen.getByText('Be the first to list an item for sale!')).toBeInTheDocument()
+  })
+
+  it('confirms an affordable purchase and leaves the gold untouched', async () => {
+    const user = userEvent.setup()
+    const game = seedDefaultGame()
+    localStorage.setItem(
+      STORAGE_KEYS.GAME,
+      JSON.stringify({ ...game, character: { ...game.character, gold: 500 } }),
+    )
+    renderPage(<MarketplacePage />, { route: '/marketplace', url: '/marketplace' })
+
+    await user.click(screen.getByText('Docker Expert'))
+
+    const buyButton = screen.getByRole('button', { name: 'Confirm Purchase' })
+    expect(buyButton).toBeEnabled()
+    expect(screen.getAllByText('💰 500').length).toBeGreaterThan(0)
+
+    await user.click(buyButton)
+
+    // Trading is a placeholder: the offer is announced, no gold moves
+    expect(
+      screen.getByText(
+        'Would purchase "Docker Expert" from CloudNinja for 500 gold. (Requires backend)',
+      ),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Confirm Purchase' })).not.toBeInTheDocument()
+    // The balance banner still shows the full 500 gold
+    expect(screen.getByText('Your Gold').previousElementSibling).toHaveTextContent('💰 500')
+
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEYS.GAME) ?? '{}') as {
+      character: { gold: number }
+    }
+    expect(stored.character.gold).toBe(500)
   })
 })

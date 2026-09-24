@@ -319,6 +319,7 @@ interface GameContextType {
   }
   consumeCollectible: (collectibleId: string) => boolean
   getActiveCollectibles: () => Collectible[]
+  grantCollectible: (collectible: Collectible) => void
   checkAndUnlockBadges: () => Badge[]
   checkAndUnlockMilestones: () => Milestone[]
   refreshSideQuests: () => void
@@ -734,6 +735,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
       // Update streak
       let newStreak = prev.character.streakDays
+      // A shield spent here is charged to the character below, so a broken day
+      // costs exactly one shield instead of protecting the streak forever.
+      let shieldSpent = false
       if (prev.character.lastActive === yesterday) {
         newStreak += 1
       } else if (prev.character.lastActive !== today) {
@@ -742,6 +746,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           // Shield protects the streak - don't reset
           // Shield is consumed but streak is preserved
           newStreak = prev.character.streakDays // Keep current streak
+          shieldSpent = true
         } else {
           newStreak = 1
         }
@@ -917,6 +922,45 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const levelsGained = newLevel - prev.character.level
       const newSkillPoints = prev.character.skillPoints + levelsGained
 
+      // Companion bond system - increase bond level and check for evolution.
+      // The evolved form has a different id, so the active companion is read
+      // back from the updated roster (matching either form) instead of the
+      // pre-quest roster, which would leave a stale companion equipped.
+      const updatedCompanions = prev.activeCompanion
+        ? prev.companions.map((c) => {
+            if (c.id !== prev.activeCompanion?.id) return c
+            const newBondLevel = Math.min(c.bondLevel + 1, c.maxBondLevel)
+            const newTotalQuests = c.totalQuestsCompleted + 1
+            // Check if companion should evolve
+            if (
+              newBondLevel >= c.maxBondLevel &&
+              c.evolvedForm &&
+              !c.id.includes('_elder') &&
+              !c.id.includes('_shadow') &&
+              !c.id.includes('_legendary')
+            ) {
+              const evolvedCompanion = lookupRecordValue(EVOLVED_COMPANIONS, c.evolvedForm)
+              if (evolvedCompanion) {
+                return {
+                  ...evolvedCompanion,
+                  bondLevel: newBondLevel,
+                  totalQuestsCompleted: newTotalQuests,
+                }
+              }
+            }
+            return {
+              ...c,
+              bondLevel: newBondLevel,
+              totalQuestsCompleted: newTotalQuests,
+            }
+          })
+        : prev.companions
+      const activeCompanion = prev.activeCompanion
+        ? (updatedCompanions.find(
+            (c) => c.id === prev.activeCompanion?.id || c.id === prev.activeCompanion?.evolvedForm,
+          ) ?? null)
+        : null
+
       return {
         ...prev,
         character: {
@@ -926,6 +970,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
           xpToNextLevel: calculateXpToNextLevel(newLevel),
           title: getTitle(newLevel),
           streakDays: newStreak,
+          streakShields: shieldSpent
+            ? prev.character.streakShields - 1
+            : prev.character.streakShields,
           lastActive: today,
           gold: prev.character.gold + goldReward,
           skillPoints: newSkillPoints,
@@ -998,53 +1045,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
             : prev.stats.fastestQuestTime,
         },
         // Companion bond system - increase bond level and check for evolution
-        companions: prev.activeCompanion
-          ? prev.companions.map((c) => {
-              if (c.id !== prev.activeCompanion?.id) return c
-              const newBondLevel = Math.min(c.bondLevel + 1, c.maxBondLevel)
-              const newTotalQuests = c.totalQuestsCompleted + 1
-              // Check if companion should evolve
-              if (
-                newBondLevel >= c.maxBondLevel &&
-                c.evolvedForm &&
-                !c.id.includes('_elder') &&
-                !c.id.includes('_shadow') &&
-                !c.id.includes('_legendary')
-              ) {
-                const evolvedCompanion = lookupRecordValue(EVOLVED_COMPANIONS, c.evolvedForm)
-                if (evolvedCompanion) {
-                  return {
-                    ...evolvedCompanion,
-                    bondLevel: newBondLevel,
-                    totalQuestsCompleted: newTotalQuests,
-                  }
-                }
-              }
-              return {
-                ...c,
-                bondLevel: newBondLevel,
-                totalQuestsCompleted: newTotalQuests,
-              }
-            })
-          : prev.companions,
-        activeCompanion: prev.activeCompanion
-          ? (() => {
-              const updated = prev.companions.find((c) => c.id === prev.activeCompanion?.id)
-              // If evolved, switch to the evolved form
-              if (
-                updated &&
-                updated.bondLevel >= updated.maxBondLevel &&
-                updated.evolvedForm &&
-                !updated.id.includes('_elder') &&
-                !updated.id.includes('_shadow') &&
-                !updated.id.includes('_legendary')
-              ) {
-                const evolved = lookupRecordValue(EVOLVED_COMPANIONS, updated.evolvedForm)
-                return evolved ?? updated
-              }
-              return updated || null
-            })()
-          : null,
+        companions: updatedCompanions,
+        activeCompanion,
         // Daily Dash speedrun challenge - track quest completion
         dailyDash: (() => {
           if (!prev.dailyDash.active || !prev.dailyDash.startTime) return prev.dailyDash
@@ -1151,6 +1153,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
             ...prev.character,
             xp: newXp,
             level: newLevel,
+            xpToNextLevel: calculateXpToNextLevel(newLevel),
           },
         }
       })
@@ -1292,7 +1295,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
         collectibles: newCollectibles,
         character: {
           ...prev.character,
-          xp: prev.character.xp + (segment.reward.value || 0),
+          // Only xp segments pay xp; gold/collectible segments have their own
+          // handling below and must not grant bonus xp on the side.
+          xp: prev.character.xp + (segment.reward.type === 'xp' ? segment.reward.value || 0 : 0),
           gold:
             prev.character.gold + (segment.reward.type === 'gold' ? segment.reward.value || 0 : 0),
         },
@@ -1339,12 +1344,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
           case 'prevent_streak_loss':
             // Streak shield is handled in the daily reset logic
             break
-          case 'mystery_reward': {
-            // Mystery boxes give random rewards
-            const mysteryValue = collectible.effect.value * 50
-            characterUpdates.gold = prev.character.gold + Math.floor(mysteryValue * Math.random())
+          case 'mystery_reward':
+            // The box contents are rolled by openMysteryBox() and granted by the
+            // page that opened it, so consuming only marks the box as used.
+            // (It used to roll a second, unrelated gold amount here.)
             break
-          }
         }
         if (Object.keys(characterUpdates).length > 0) {
           updates.character = { ...prev.character, ...characterUpdates }
@@ -1366,6 +1370,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const getActiveCollectibles = useCallback((): Collectible[] => {
     return game.collectibles.filter((c) => !c.used)
   }, [game.collectibles])
+
+  // Grant a specific collectible (e.g. the contents of a mystery box)
+  const grantCollectible = useCallback((collectible: Collectible) => {
+    setGame((prev) => ({
+      ...prev,
+      collectibles: [...prev.collectibles, { ...collectible, used: false }],
+    }))
+  }, [])
 
   const checkAndUnlockBadges = useCallback((): Badge[] => {
     const newlyUnlocked: Badge[] = []
@@ -1827,6 +1839,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           ...prev.character,
           xp: newXp,
           level: newLevel,
+          xpToNextLevel: calculateXpToNextLevel(newLevel),
         },
       }
     })
@@ -2244,6 +2257,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         spinWheel,
         consumeCollectible,
         getActiveCollectibles,
+        grantCollectible,
         checkAndUnlockBadges,
         checkAndUnlockMilestones,
         refreshSideQuests,

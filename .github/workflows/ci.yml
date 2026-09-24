@@ -88,6 +88,12 @@ jobs:
       - name: Run tests
         run: npm run test
 
+      - name: Install worker dependencies
+        run: npm ci --prefix worker
+
+      - name: Run worker tests
+        run: npm run test:worker
+
   e2e:
     name: E2E (${{ matrix.browser }})
     runs-on: ubuntu-latest

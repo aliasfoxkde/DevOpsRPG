@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface LootDrop {
   type: 'xp' | 'gold' | 'badge' | 'collectible' | 'streak'
@@ -71,6 +71,15 @@ export default function TreasureChest({
   const [isOpen, setIsOpen] = useState(false)
   const [loot, setLoot] = useState<LootDrop | null>(null)
   const [isAnimating, setIsAnimating] = useState(false)
+  const openTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // The opening animation is on a timer; drop it with the chest so an
+  // unmounted chest can neither update state nor award its loot.
+  useEffect(() => {
+    return () => {
+      if (openTimerRef.current) clearTimeout(openTimerRef.current)
+    }
+  }, [])
 
   const openChest = () => {
     if (isOpen || isAnimating) return
@@ -79,8 +88,10 @@ export default function TreasureChest({
     // Use pre-generated loot if provided, otherwise generate random
     const droppedLoot = preGeneratedLoot || getRandomLoot(questDifficulty)
 
+    if (openTimerRef.current) clearTimeout(openTimerRef.current)
+
     // Delay to show chest opening animation
-    setTimeout(() => {
+    openTimerRef.current = setTimeout(() => {
       setLoot(droppedLoot)
       setIsOpen(true)
       setIsAnimating(false)

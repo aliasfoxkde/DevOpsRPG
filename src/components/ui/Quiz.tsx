@@ -512,12 +512,15 @@ export default function Quiz({ topicId, onPass, onSkip }: QuizProps) {
               onKeyDown={(e) => {
                 if (e.key === 'Tab') {
                   e.preventDefault()
-                  const start = e.currentTarget.selectionStart
-                  const end = e.currentTarget.selectionEnd
+                  // React nulls currentTarget once this handler returns, so the
+                  // element is captured for the deferred caret restore.
+                  const editor = e.currentTarget
+                  const start = editor.selectionStart
+                  const end = editor.selectionEnd
                   const newValue = codeAnswer.substring(0, start) + '  ' + codeAnswer.substring(end)
                   setCodeAnswer(newValue)
                   setTimeout(() => {
-                    e.currentTarget.selectionStart = e.currentTarget.selectionEnd = start + 2
+                    editor.selectionStart = editor.selectionEnd = start + 2
                   }, 0)
                 }
                 if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !showExplanation)

@@ -6,6 +6,42 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+Quality-infrastructure cycle: GitForge-first CI, a production worker CORS fix found by the
+new worker test suite, and a repo-wide strict type-aware lint campaign.
+
+### Added
+
+- GitForge CI pipeline (`.gitforce.yml`) as the primary CI/CD definition — lint/format/knip,
+  typecheck (app + tooling + worker), unit + worker tests, e2e, aegis security scan, and build;
+  the GitHub Actions workflow mirrors the same npm scripts so both platforms stay in lockstep
+- `npm run audit:secrets`: Aegis production-profile pattern scan with a committed baseline
+  ratchet (`aegis-baseline.json`, 198 triaged findings) — the gate fails only on findings that
+  are new relative to the baseline
+- `npm run test:worker` + `worker/vitest.config.ts`: 18 tests over the worker KV API router
+  (CORS preflight/echo, auth schemes, progress merge semantics, leaderboard happy/sad paths,
+  404 routing) using in-memory KV/D1 fakes with real get/put serialization semantics
+- Accessibility audit extended to all 30 routes in both themes with `wcag2a`/`wcag2aa`/`wcag21aa`/
+  `wcag2aaa` rule tagging and separate AA/AAA reporting (`--aaa-strict` promotes AAA
+  critical/serious to gate failures)
+- `npm run format:check` (prettier, repo-wide single style) and `npm run knip` (unused
+  exports/files/dependencies) gates in CI
+
+### Fixed
+
+- **Worker CORS bug (production-blocking)**: every JSON response hardcoded
+  `Access-Control-Allow-Origin: http://localhost:5173`, so the deployed API rejected browser
+  calls from the production Pages origin — JSON and preflight responses now resolve the origin
+  against `ALLOWED_ORIGINS` and echo the caller's; covered by regression tests
+- Strict type-aware lint campaign: typescript-eslint `strictTypeChecked` applied per-scope
+  (app / tooling / worker) resolving 1,165 reported errors to a zero-warning gate, including
+  removal of dead exports surfaced by the type-aware rules
+
+### Changed
+
+- `docs/process/VALIDATION.md` rewritten to document the actual 10-gate validation suite and
+  coverage-ratchet procedure (the previous text described OAuth flows, iframes and ports this
+  app does not have)
+
 ## [0.1.2] - 2026-09-23
 
 Quality hardening pass: accessibility driven to zero violations, strict linting enforced,

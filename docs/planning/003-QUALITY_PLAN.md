@@ -433,5 +433,60 @@ Work executed:
   numbers above are from a single-worker run. Use `--maxWorkers=1` for coverage runs
   until root-caused.
 
-Cycle 2 continues with Phase B (coverage), Phase C (AAA), Phase D (refactor), Phase E
-(GitForge, user-auth-gated) per §4.2.
+### 4.5 Phase B execution log — 2026-09-24 (coverage campaign)
+
+Four parallel test-writing agents plus direct work on the worker scope. Every agent was
+constrained to real behavioral tests (no snapshot-only suites, no mock-theater) and to
+the same acceptance gates: scoped vitest run green, `eslint --max-warnings 0`,
+`prettier --check`, and a full scoped regression run.
+
+Coverage results (v8, before → after, statements / branches / functions):
+
+| Scope (agent)                        | Files                                                                                     | Result                                        |
+| ------------------------------------ | ----------------------------------------------------------------------------------------- | --------------------------------------------- |
+| ui batch 1                           | RealmCompletionModal, QuickMiniGame, CelebrationOverlay, OnboardingWizard, CelebrationToast, TreasureChest, Confetti, MentorChat | 0-17% → **98.1 stmts / 93.2 branch / 100 funcs** (137 tests) |
+| ui batch 2 + hooks                   | VoiceSettings, Quiz, VictoryModal, useSoundEffects, useVoiceNarration, useKeyboardShortcuts, achievementCardGenerator | 12-53% → **96.7 stmts / 94.3 branch / 100 funcs** (201 tests) |
+| data + GameContext                   | badges, collectibles, milestones, communityChallenges, quizzes, GameContext                | 12-58% → **93-100 stmts; GameContext 97.5 / 91.0** (78 action tests) |
+| pages + App                          | SettingsPage, BattleArenaPage, FeedbackPage, RewardsPage, PVPArenaPage, MarketplacePage, App (all 30 routes) | 43-67% → 72-100% (95 tests)                   |
+| worker (direct)                      | index.ts router                                                                            | 18 tests: CORS, auth, merge semantics, leaderboard, routing |
+
+Real defects found by writing the tests (all fixed with regression tests):
+
+1. **Mystery box showed one reward and granted another** (RewardsPage displayed the roll
+   but never applied it; GameContext's `mystery_reward` reducer rolled a second unrelated
+   amount; collectible contents were silently dropped). New `grantCollectible` context
+   action; the UI now grants exactly what the popup shows.
+2. **Streak shields were never consumed** — a shield broke the day but `streakShields`
+   was left untouched (infinite shields).
+3. **`spinWheel` paid XP for gold and collectible segments** (reward value added to XP
+   unconditionally instead of gating on segment type).
+4. **`addXP`/`addGold` never updated `character.xpToNextLevel`** — the HUD XP bar
+   desynced from the level curve on every award path.
+5. **QuickMiniGame MatchingGame bonus XP unreachable** — term/definition pairs sharing an
+   index collapsed into one matched-pair entry; a fully solved game never paid its XP.
+6. **TreasureChest awarded loot after unmount** (800 ms timer not cancelled on teardown).
+7. **MentorChat double-escaped player text** (`escapeHtml` output re-escaped by React,
+   so `&` rendered as `&amp;`); XSS safety unchanged since React escapes text children.
+8. **Quiz code-challenge Tab handler crashed** (`e.currentTarget` read inside a deferred
+   `setTimeout` after React nulls it).
+9. **useVoiceNarration crashed on browsers without `speechSynthesis`** — the "not
+   supported" UI was unreachable.
+10. **Worker CORS bug (production-blocking)**: every JSON response hardcoded
+    `Access-Control-Allow-Origin: http://localhost:5173`; the production Pages origin
+    could not call the deployed API. Responses now echo the caller's allowed origin.
+
+Documented, deliberately unchanged (behavior-neutral or design decisions): wheel jackpot
+segment unreachable (largest segment pays 50 gold), `equipItem` accepts unknown ids
+(filtered by the bonus calculator), `useKeyboardShortcuts` lowercase-matching shadows the
+`G`/`g L`/`g C`/`g S` sequence entries, unreachable amber pre-answer highlight in Quiz,
+Marketplace's insufficient-gold branch unreachable from the UI (button renders disabled).
+
+Harness learnings recorded for future suites: React does not reliably eager-evaluate
+`setGame(prev => …)` updaters, so tests assert resulting state rather than return values;
+`vi.spyOn(Storage.prototype, 'setItem')` is required (spying the jsdom instance is a
+no-op); `loadAndValidateGame`'s `deepMerge` drops keys absent from defaults, so
+`weakTopics`/`skillXp` must be built through real actions; lazy route chunks need
+`findBy*(…, { timeout: 10_000 })` under parallel workers.
+
+Cycle 2 continues with Phase C (AAA), Phase D (refactor), Phase E (GitForge,
+user-auth-gated) per §4.2.

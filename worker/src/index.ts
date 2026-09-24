@@ -38,14 +38,14 @@ function corsHeaders(request: Request): Headers {
   return headers
 }
 
-function jsonResponse(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      'Content-Type': 'application/json',
-      ...Object.fromEntries(corsHeaders(new Request('http://localhost'))),
-    },
-  })
+function jsonResponse(data: unknown, status = 200, request?: Request): Response {
+  // Echo the caller's allowed origin so browsers can read responses from
+  // every deployed origin; requests without an Origin fall back to the
+  // first allowed origin.
+  const headers = corsHeaders(request ?? new Request('http://localhost'))
+  headers.set('Content-Type', 'application/json')
+
+  return new Response(JSON.stringify(data), { status, headers })
 }
 
 function handleOptions(request: Request): Response {
@@ -72,29 +72,33 @@ function getUserId(request: Request): string | null {
 async function getProgress(request: Request, env: Env): Promise<Response> {
   const userId = getUserId(request)
   if (!userId) {
-    return jsonResponse({ success: false, error: 'Unauthorized' }, 401)
+    return jsonResponse({ success: false, error: 'Unauthorized' }, 401, request)
   }
 
   try {
     const progress = await env.PROGRESS.get<UserProgress>(`progress:${userId}`, 'json')
 
     if (!progress) {
-      return jsonResponse({
-        success: true,
-        data: {
-          xp: 0,
-          level: 1,
-          streakDays: 0,
-          lastActive: new Date().toISOString().split('T')[0],
-          completedTopics: [],
+      return jsonResponse(
+        {
+          success: true,
+          data: {
+            xp: 0,
+            level: 1,
+            streakDays: 0,
+            lastActive: new Date().toISOString().split('T')[0],
+            completedTopics: [],
+          },
         },
-      })
+        200,
+        request,
+      )
     }
 
-    return jsonResponse({ success: true, data: progress })
+    return jsonResponse({ success: true, data: progress }, 200, request)
   } catch (error) {
     console.error('Error fetching progress:', error)
-    return jsonResponse({ success: false, error: 'Failed to fetch progress' }, 500)
+    return jsonResponse({ success: false, error: 'Failed to fetch progress' }, 500, request)
   }
 }
 
@@ -104,7 +108,7 @@ async function getProgress(request: Request, env: Env): Promise<Response> {
 async function updateProgress(request: Request, env: Env): Promise<Response> {
   const userId = getUserId(request)
   if (!userId) {
-    return jsonResponse({ success: false, error: 'Unauthorized' }, 401)
+    return jsonResponse({ success: false, error: 'Unauthorized' }, 401, request)
   }
 
   try {
@@ -128,17 +132,17 @@ async function updateProgress(request: Request, env: Env): Promise<Response> {
 
     await env.PROGRESS.put(`progress:${userId}`, JSON.stringify(updatedProgress))
 
-    return jsonResponse({ success: true, data: updatedProgress })
+    return jsonResponse({ success: true, data: updatedProgress }, 200, request)
   } catch (error) {
     console.error('Error updating progress:', error)
-    return jsonResponse({ success: false, error: 'Failed to update progress' }, 500)
+    return jsonResponse({ success: false, error: 'Failed to update progress' }, 500, request)
   }
 }
 
 /**
  * GET /api/leaderboard - Get top users
  */
-async function getLeaderboard(_request: Request, env: Env): Promise<Response> {
+async function getLeaderboard(request: Request, env: Env): Promise<Response> {
   // Check if D1 database is bound
   if (!env.DB) {
     return jsonResponse(
@@ -147,6 +151,7 @@ async function getLeaderboard(_request: Request, env: Env): Promise<Response> {
         error: 'Leaderboard is not available. D1 database is not configured.',
       },
       503,
+      request,
     )
   }
 
@@ -156,28 +161,36 @@ async function getLeaderboard(_request: Request, env: Env): Promise<Response> {
       'SELECT user_id, xp, level FROM users ORDER BY xp DESC LIMIT 100',
     ).all()
 
-    return jsonResponse({
-      success: true,
-      data: results.results,
-    })
+    return jsonResponse(
+      {
+        success: true,
+        data: results.results,
+      },
+      200,
+      request,
+    )
   } catch (error) {
     console.error('Error fetching leaderboard:', error)
-    return jsonResponse({ success: false, error: 'Failed to fetch leaderboard' }, 500)
+    return jsonResponse({ success: false, error: 'Failed to fetch leaderboard' }, 500, request)
   }
 }
 
 /**
  * GET /api/health - Health check endpoint
  */
-function healthCheck(): Response {
-  return jsonResponse({
-    success: true,
-    data: {
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      version: '1.0.0',
+function healthCheck(request: Request): Response {
+  return jsonResponse(
+    {
+      success: true,
+      data: {
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        version: '1.0.0',
+      },
     },
-  })
+    200,
+    request,
+  )
 }
 
 export default {
@@ -192,7 +205,7 @@ export default {
 
     // Route handling
     if (path === '/api/health') {
-      return healthCheck()
+      return healthCheck(request)
     }
 
     if (path === '/api/progress') {
@@ -209,7 +222,7 @@ export default {
     }
 
     // 404 for unmatched routes
-    return jsonResponse({ success: false, error: 'Not found' }, 404)
+    return jsonResponse({ success: false, error: 'Not found' }, 404, request)
   },
 
   // Scheduled event handler for cleanup tasks
