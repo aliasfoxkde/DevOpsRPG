@@ -367,7 +367,7 @@ function MatchingGame({
                       disabled={isMatched}
                       className={`w-full p-3 rounded-lg border transition-all text-center font-medium ${
                         isMatched
-                          ? 'bg-green-900/50 border-green-600 text-green-300 opacity-50'
+                          ? 'bg-green-900/50 border-green-600 text-green-300 grayscale'
                           : isSelected
                             ? 'bg-amber-900/50 border-amber-500 text-amber-300'
                             : 'bg-slate-700 hover:bg-slate-600 border-slate-600 text-slate-200'
@@ -396,7 +396,7 @@ function MatchingGame({
                       disabled={isMatched}
                       className={`w-full p-3 rounded-lg border transition-all text-center text-sm ${
                         isMatched
-                          ? 'bg-green-900/50 border-green-600 text-green-300 opacity-50'
+                          ? 'bg-green-900/50 border-green-600 text-green-300 grayscale'
                           : isWrong
                             ? 'bg-red-900/50 border-red-500 animate-shake'
                             : 'bg-slate-700 hover:bg-slate-600 border-slate-600 text-slate-200'

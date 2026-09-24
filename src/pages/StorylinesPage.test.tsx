@@ -111,7 +111,7 @@ describe('StorylinesPage', () => {
     const locked = closestContainer(screen.getByText(arc.episodes[4].title), 'div.rounded-lg')
     expect(within(locked).queryByText('Continue Story →')).not.toBeInTheDocument()
     expect(within(locked).queryByText(/quest/)).not.toBeInTheDocument()
-    expect(locked.className).toContain('opacity-50')
+    expect(locked.className).toContain('grayscale')
   })
 
   it('marks an arc complete once every chapter is finished', () => {

@@ -132,7 +132,7 @@ export function CodePuzzleGame({ rounds = 5, onComplete, onSkip }: CodePuzzleGam
       return 'bg-red-900/50 border-red-500'
     }
 
-    return 'bg-slate-700 border-slate-600 opacity-50'
+    return 'bg-slate-700 border-slate-600'
   }
 
   return (

@@ -74,16 +74,18 @@ describe('ProfilePage', () => {
     renderSeededPage(<ProfilePage />, { route: '/profile', url: '/profile' })
 
     expect(screen.getByRole('heading', { name: 'Sound Effects' })).toBeInTheDocument()
-    const toggle = screen.getByRole('button')
+    const toggle = screen.getByRole('switch', { name: 'Sound effects' })
+    const checkedBefore = toggle.getAttribute('aria-checked')
     const knobBefore = toggle.firstChild as HTMLElement
     const classBefore = knobBefore.className
 
     await user.click(toggle)
 
-    const knobAfter = screen.getByRole('button').firstChild as HTMLElement
-    expect(knobAfter.className).not.toBe(classBefore)
+    const knobAfter = screen.getByRole('switch', { name: 'Sound effects' })
+    expect(knobAfter.getAttribute('aria-checked')).toBe(checkedBefore === 'true' ? 'false' : 'true')
+    expect((knobAfter.firstChild as HTMLElement).className).not.toBe(classBefore)
     // The two knob positions are mutually exclusive
-    expect(knobAfter.className).toMatch(/left-1|translate-x-8/)
+    expect((knobAfter.firstChild as HTMLElement).className).toMatch(/left-1|translate-x-8/)
   })
 
   it('remembers an unmuted player and mutes them on toggle', async () => {
@@ -92,12 +94,14 @@ describe('ProfilePage', () => {
     localStorage.setItem('soundEnabled', 'true')
     renderPage(<ProfilePage />, { route: '/profile', url: '/profile' })
 
-    const knob = screen.getByRole('button').firstChild as HTMLElement
+    const knob = screen.getByRole('switch', { name: 'Sound effects' }).firstChild as HTMLElement
     expect(knob.className).toContain('translate-x-8')
 
-    await user.click(screen.getByRole('button'))
+    await user.click(screen.getByRole('switch', { name: 'Sound effects' }))
 
-    expect((screen.getByRole('button').firstChild as HTMLElement).className).toContain('left-1')
+    expect(
+      (screen.getByRole('switch', { name: 'Sound effects' }).firstChild as HTMLElement).className,
+    ).toContain('left-1')
     expect(localStorage.getItem('soundEnabled')).toBe('false')
   })
 

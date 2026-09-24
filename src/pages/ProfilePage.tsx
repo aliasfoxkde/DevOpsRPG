@@ -40,6 +40,10 @@ export default function ProfilePage() {
           </div>
         </div>
         <button
+          type="button"
+          role="switch"
+          aria-checked={!isMuted}
+          aria-label="Sound effects"
           onClick={() => {
             if (!isMuted) playSound('click')
             toggleMute()
@@ -153,7 +157,7 @@ export default function ProfilePage() {
                     className={`relative p-3 rounded-lg border ${
                       isUnlocked
                         ? `${RARITY_COLORS[badge.rarity]} opacity-100`
-                        : 'bg-slate-800/50 border-slate-700 opacity-50'
+                        : 'bg-slate-800/50 border-slate-700 grayscale'
                     }`}
                   >
                     <div className="text-3xl mb-1">{badge.icon}</div>
@@ -162,13 +166,13 @@ export default function ProfilePage() {
                     >
                       {badge.name}
                     </div>
-                    <div className={`text-xs ${isUnlocked ? 'text-slate-300' : 'text-slate-600'}`}>
+                    <div className={`text-xs ${isUnlocked ? 'text-slate-300' : 'text-slate-500'}`}>
                       {badge.description}
                     </div>
                     {isUnlocked && <div className="absolute top-1 right-1 text-xs">✓</div>}
                     {!isUnlocked && (
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-slate-600 text-2xl">🔒</span>
+                        <span className="text-slate-500 text-2xl">🔒</span>
                       </div>
                     )}
                   </div>
@@ -204,7 +208,7 @@ export default function ProfilePage() {
                   {milestone.title}
                 </div>
                 <div
-                  className={`text-sm ${milestone.unlocked ? 'text-purple-300' : 'text-slate-600'}`}
+                  className={`text-sm ${milestone.unlocked ? 'text-purple-300' : 'text-slate-500'}`}
                 >
                   {milestone.message}
                 </div>

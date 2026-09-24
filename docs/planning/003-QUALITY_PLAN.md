@@ -350,6 +350,35 @@ more routes (every page route), per-page AAA report; contrast ≥ 7:1 for body-t
 target size and focus-appearance assertions in component tests; quiz timer pause/extend
 affordance (AAA 2.2.1).
 
+**Phase C status — DONE (2026-09-24).** Full WCAG 2.1 AAA pass achieved and enforced:
+`audit:a11y -- --aaa-strict` reports **0 AA and 0 AAA critical/serious across all 30 routes ×
+both themes** (baseline this cycle: 6 AA critical + 488 AA serious + 1,004 AAA serious).
+How it was reached, and what it cost:
+
+- **Contrast tokens, not per-element patches.** The `@theme` remaps in `src/index.css`
+  now target ≥ 7:1: slate-400/500 text (7.2-8.8:1 on the three card surfaces), white-text
+  fills (amber/green/purple/cyan/blue/red/orange 500-700 shades, 7.1-8.4:1 in both
+  directions), and 400-level accent text (purple/blue/red/orange, 7.2-7.5:1 on dark cards).
+  Tertiary text at 7:1 still sits well below slate-300 (9.8:1) and white (15:1), so text
+  hierarchy survives.
+- **Whole-card `opacity` dimming eliminated.** Locked/owned cards used `opacity-30..60`
+  containers, which composite EVERY token below 4.5:1 — no alpha keeps dimmed slate-500
+  text at AA (0.85 → 4.44:1). The grayscale filter is luminance-preserving: state is still
+  visibly dimmed, ratios unchanged, so text keeps full contrast. Applied to 15+ card
+  patterns across 14 files; disabled controls keep their opacity (axe exempts disabled).
+- **Named controls.** The profile sound toggle became a real `role="switch"` with
+  `aria-checked` (tests assert the state flip); game-library Category/Difficulty selects
+  got `htmlFor`/`id` labels.
+- **Data color fixes.** PVP rank palette retuned (bronze/master/grandmaster) for contrast
+  on self-tinted tiles; the rank-tier small text is neutral slate-200 with identity carried
+  by the tile tint. AboutPage tech chips moved to AA/AAA-passing shades of the same hues.
+- **CI enforcement.** An `a11y` job (dev server + `--aaa-strict`) added to `.gitforce.yml`
+  and mirrored in `ci.yml`; it gates preview and production deploys.
+- Residuals accepted: emoji-only glyphs (axe skips them by design), disabled-control
+  states (WCAG exempts them), and `filter grayscale` visuals being marginally less
+  "dimmed" than the old 60% alpha. Two audit flakes were observed under heavy machine
+  load (a mid-HMR capture and one transient) — the clean-tree gate reruns green.
+
 **Phase D — Phase 5 refactoring (2-3 sessions, after B has GameContext ≥ 90%).**
 Per `002-REFACTORING.md`: split `GameContext` into store + quest engine + companion +
 achievement + persistence modules behind a stable `useGame` facade; unify the 3 companion
@@ -386,8 +415,11 @@ wrangler deploy with existing env vars → byte-verify production.
   over — the ratchet records each notch and the plan states where it stopped and why.
 - `w3schools-content.ts` (scraped content) stays a documented knip/coverage exclusion:
   it is data, not logic.
-- AAA contrast ≥ 7:1 on every text token may force palette changes with visual-design
-  review; changes are made token-level and re-audited.
+- ~~AAA contrast ≥ 7:1 on every text token may force palette changes with visual-design
+  review~~ — resolved 2026-09-24: the palette changes were made token-level (500/600 fills
+  darken, 400-level accent text lightens) and the app passed `--aaa-strict` with the visual
+  hierarchy intact; see the Phase C status above for the one structural rule that came out
+  of it (no whole-card opacity over text).
 
 ### 4.4 Cycle 2 execution log — 2026-09-24 (Phase A complete)
 

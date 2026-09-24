@@ -100,14 +100,14 @@ export default function AboutPage() {
           <h2 className="text-2xl font-bold text-slate-100 mb-4">🛠️ Built With</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { name: 'React', color: 'bg-cyan-600' },
+              { name: 'React', color: 'bg-cyan-700' },
               { name: 'TypeScript', color: 'bg-blue-600' },
-              { name: 'Tailwind', color: 'bg-cyan-500' },
+              { name: 'Tailwind', color: 'bg-cyan-700' },
               { name: 'Vite', color: 'bg-purple-600' },
-              { name: 'React Router', color: 'bg-red-500' },
-              { name: 'Cloudflare', color: 'bg-orange-500' },
+              { name: 'React Router', color: 'bg-red-700' },
+              { name: 'Cloudflare', color: 'bg-orange-700' },
               { name: 'Vitest', color: 'bg-green-600' },
-              { name: 'Playwright', color: 'bg-purple-500' },
+              { name: 'Playwright', color: 'bg-purple-700' },
             ].map((tech) => (
               <div
                 key={tech.name}

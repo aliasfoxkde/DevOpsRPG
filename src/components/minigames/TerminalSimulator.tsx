@@ -332,7 +332,7 @@ export function TerminalSimulator({ onComplete, category }: TerminalSimulatorPro
             {/* XP Earned */}
             <div className="mb-6 p-4 bg-amber-900/30 rounded-lg border border-amber-600/30">
               <div className="text-3xl font-bold text-amber-400">+{xpEarned} XP</div>
-              <div className="text-sm text-slate-400">Experience earned</div>
+              <div className="text-sm text-slate-300">Experience earned</div>
             </div>
 
             {/* Actions */}

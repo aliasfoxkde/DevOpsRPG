@@ -452,7 +452,7 @@ export default function HomePage() {
                   className={`relative text-center p-4 rounded-xl transition-all hover:scale-105 ${
                     isUnlocked
                       ? 'bg-gradient-to-b from-slate-800 to-slate-900 border border-amber-600/30 shadow-lg shadow-amber-900/20'
-                      : 'bg-slate-900/50 border border-slate-800 opacity-60'
+                      : 'bg-slate-900/50 border border-slate-800 grayscale'
                   }`}
                 >
                   {/* Status Badge */}

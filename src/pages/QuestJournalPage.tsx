@@ -352,7 +352,7 @@ export default function QuestJournalPage() {
                 to={isUnlocked ? `/quest/${quest.id}` : '#'}
                 className={`block p-4 rounded-xl border transition-all ${
                   !isUnlocked
-                    ? 'bg-slate-900/50 border-slate-700/50 opacity-50 cursor-not-allowed'
+                    ? 'bg-slate-900/50 border-slate-700/50 grayscale cursor-not-allowed'
                     : isCompleted
                       ? 'bg-green-900/20 border-green-700/50 hover:border-green-500'
                       : 'bg-slate-800/80 border-slate-600 hover:border-amber-500/50'
@@ -452,7 +452,7 @@ export default function QuestJournalPage() {
                 className={`relative p-6 rounded-xl border transition-all ${
                   isUnlocked
                     ? 'bg-slate-800/80 border-slate-600 hover:border-amber-500/50'
-                    : 'bg-slate-900/50 border-slate-700/50 opacity-60'
+                    : 'bg-slate-900/50 border-slate-700/50 grayscale'
                 }`}
               >
                 {/* Realm Header */}

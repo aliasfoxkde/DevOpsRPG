@@ -314,7 +314,7 @@ export default function CharacterSheetPage() {
                 {lockedAchievements.map((achievement) => (
                   <div
                     key={achievement.id}
-                    className="p-3 bg-slate-700/30 rounded-lg border border-slate-600/30 opacity-60"
+                    className="p-3 bg-slate-700/30 rounded-lg border border-slate-600/30 grayscale"
                   >
                     <div className="text-2xl mb-1 grayscale">🔒</div>
                     <div className="text-sm font-bold text-slate-400">{achievement.name}</div>

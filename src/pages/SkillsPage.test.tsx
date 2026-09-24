@@ -138,7 +138,7 @@ describe('SkillsPage', () => {
     // CI/CD Pipeline is locked behind Containerization: no upgrade button yet
     const lockedHint = requirementRow('Containerization')
     expect(lockedHint.querySelector('.text-red-400')).not.toBeNull()
-    expect(skillCard('CI/CD Pipeline').className).toContain('opacity-60')
+    expect(skillCard('CI/CD Pipeline').className).toContain('grayscale')
     expect(
       within(skillCard('CI/CD Pipeline')).queryByRole('button', { name: '+1' }),
     ).not.toBeInTheDocument()

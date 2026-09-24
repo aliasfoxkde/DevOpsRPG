@@ -174,7 +174,7 @@ export default function RewardsPage() {
                       : 'bg-slate-800/50 border-slate-700'
                 }`}
               >
-                <div className="text-xs text-slate-400 mb-1">Day {day}</div>
+                <div className="text-xs text-slate-300 mb-1">Day {day}</div>
                 <div className="text-2xl mb-1">{reward.icon}</div>
                 <div className="text-xs text-slate-300">
                   {reward.reward.type === 'xp' && `+${reward.reward.value} XP`}
@@ -256,12 +256,12 @@ export default function RewardsPage() {
                     isToday ? 'bg-amber-900/50 border border-amber-500' : 'bg-slate-800/50'
                   }`}
                 >
-                  <div className="text-xs text-slate-500 mb-1">{day}</div>
+                  <div className="text-xs text-slate-300 mb-1">{day}</div>
                   <div
                     className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center ${
                       isActive && game.character.streakDays > 0
                         ? 'bg-green-600 text-white'
-                        : 'bg-slate-700 text-slate-500'
+                        : 'bg-slate-700 text-slate-300'
                     }`}
                   >
                     {isActive && game.character.streakDays > 0 ? '✓' : '○'}

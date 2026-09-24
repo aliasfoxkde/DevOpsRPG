@@ -174,7 +174,7 @@ ${formData.description}
                         : type === 'change'
                           ? 'bg-blue-600 text-white'
                           : 'bg-green-600 text-white'
-                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                    : 'bg-slate-700 text-white hover:bg-slate-600'
                 }`}
               >
                 {type === 'bug' && '🐛 '}

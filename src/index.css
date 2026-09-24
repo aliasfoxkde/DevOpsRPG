@@ -1,22 +1,41 @@
 @import 'tailwindcss';
 
 /*
- * WCAG 2.1 AA contrast remaps (Tailwind v4 CSS-first theme tokens).
+ * WCAG 2.1 contrast remaps (Tailwind v4 CSS-first theme tokens).
  *
  * The app's components are styled for dark surfaces; these shades are tuned
- * so text passes >= 4.5:1 against the surfaces it is actually rendered on.
- * Verified with `node scripts/axe-audit.mjs` (dev server required):
- *   - slate-500 muted text on dark surfaces: 4.8:1 on slate-800,
- *     6.0:1 on slate-950 (was 3.1-3.8)
- *   - amber-500/600 fills under white text: 6.0:1 / 5.0:1 (was ~3.2)
- *   - green-500/600 fills under white text: 5.0:1 / 6.7:1 (was ~3.2)
+ * against the surfaces they are actually rendered on. Verified with
+ * `node scripts/axe-audit.mjs --aaa-strict` (dev server required):
+ *   - slate-400/500 muted text on dark surfaces: 7.2:1 on bg-card,
+ *     8.0:1 on slate-800 panels, 8.8:1 on slate-950 (was 5.6-6.8)
+ *   - amber-500/600 fills under white text: 7.2:1 / 8.1:1 (was 6.0 / 5.0)
+ *   - green-500/600 fills under white text: 7.5:1 / 8.4:1 (was 5.0 / 6.7)
+ *   - purple-600 / cyan-700 fills under white text: 7.4:1 / 7.5:1
+ *   - blue-600 / red-600 / red-700 / orange-600/700 fills: 7.1-7.9:1
+ *   - 400-level accent text on dark cards: purple 7.2:1, blue 7.3:1,
+ *     red 7.2:1, orange 7.5:1; blue-300 on blue-900 chips 7.3:1
+ * The 500/600/700 fill shades stay >= 7:1 in BOTH directions: reversed
+ * (fill on a white chip, as in OfflineIndicator) they measure 7.2-8.4:1.
  */
 @theme {
-  --color-slate-500: #90a1b9;
-  --color-amber-500: #a34808;
-  --color-amber-600: #b45309;
-  --color-green-500: #15803d;
-  --color-green-600: #116a33;
+  --color-slate-400: #aab7ca;
+  --color-slate-500: #aab7ca;
+  --color-amber-500: #8d4207;
+  --color-amber-600: #823c06;
+  --color-green-500: #12622f;
+  --color-green-600: #0e5a2b;
+  --color-purple-600: #7c0dd0;
+  --color-cyan-700: #005c7a;
+  --color-blue-600: #0d4ad4;
+  --color-red-600: #b30006;
+  --color-red-700: #a80007;
+  --color-orange-600: #a52c00;
+  --color-orange-700: #a02a00;
+  --color-purple-400: #d89fff;
+  --color-blue-400: #7fbaff;
+  --color-red-400: #ff9a9c;
+  --color-orange-400: #ffa60d;
+  --color-blue-300: #abd5ff;
 }
 
 :root {
@@ -42,7 +61,7 @@
   --card: #1f2937;
   --card-foreground: #f9fafb;
   --muted: #374151;
-  --muted-foreground: #9ca3af;
+  --muted-foreground: #aab7ca;
   --border: #374151;
 }
 
@@ -174,10 +193,10 @@ body {
     @apply bg-amber-600 text-white hover:bg-amber-500 active:bg-amber-800;
   }
   .btn-secondary {
-    @apply bg-slate-700 text-slate-200 hover:bg-slate-600 active:bg-slate-800;
+    @apply bg-slate-700 text-white hover:bg-slate-600 active:bg-slate-800;
   }
   .btn-ghost {
-    @apply bg-transparent text-slate-300 hover:bg-slate-700;
+    @apply bg-transparent text-slate-200 hover:bg-slate-700;
   }
   .btn-success {
     @apply bg-green-600 text-white hover:bg-green-500 active:bg-green-700;

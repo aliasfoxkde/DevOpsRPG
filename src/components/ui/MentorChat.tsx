@@ -439,7 +439,7 @@ export default function MentorChat() {
                   setInput('How do I earn XP?')
                 }}
                 aria-label="Ask about XP"
-                className="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-full"
+                className="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded-full"
               >
                 XP Help
               </button>
@@ -448,7 +448,7 @@ export default function MentorChat() {
                   setInput('Where should I go next?')
                 }}
                 aria-label="Ask for guidance"
-                className="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-full"
+                className="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded-full"
               >
                 Guidance
               </button>
@@ -457,7 +457,7 @@ export default function MentorChat() {
                   setInput('Show me my progress')
                 }}
                 aria-label="Show my progress"
-                className="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-full"
+                className="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded-full"
               >
                 Progress
               </button>

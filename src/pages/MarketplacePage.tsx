@@ -385,7 +385,7 @@ export default function MarketplacePage() {
                 <p className="text-slate-500 mb-4">
                   Listing creation will be available once the backend server is implemented.
                 </p>
-                <p className="text-slate-600 text-sm">
+                <p className="text-slate-500 text-sm">
                   You&apos;ll be able to list your badges, titles, equipment, and collectibles for
                   other players to purchase.
                 </p>

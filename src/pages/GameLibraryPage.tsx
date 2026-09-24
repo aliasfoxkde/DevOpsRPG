@@ -432,8 +432,11 @@ export default function GameLibraryPage() {
 
             {/* Category */}
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Category</label>
+              <label htmlFor="game-category" className="block text-sm text-slate-400 mb-1">
+                Category
+              </label>
               <select
+                id="game-category"
                 value={category}
                 onChange={(e) => {
                   setCategory(e.target.value)
@@ -450,8 +453,11 @@ export default function GameLibraryPage() {
 
             {/* Difficulty */}
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Difficulty</label>
+              <label htmlFor="game-difficulty" className="block text-sm text-slate-400 mb-1">
+                Difficulty
+              </label>
               <select
+                id="game-difficulty"
                 value={difficulty}
                 onChange={(e) => {
                   setDifficulty(e.target.value)
@@ -474,7 +480,7 @@ export default function GameLibraryPage() {
               onClick={() => {
                 setSortBy('name')
               }}
-              className={`px-3 py-1 rounded text-sm ${sortBy === 'name' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
+              className={`px-3 py-1 rounded text-sm ${sortBy === 'name' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-white hover:bg-slate-600'}`}
             >
               Name
             </button>
@@ -482,7 +488,7 @@ export default function GameLibraryPage() {
               onClick={() => {
                 setSortBy('category')
               }}
-              className={`px-3 py-1 rounded text-sm ${sortBy === 'category' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
+              className={`px-3 py-1 rounded text-sm ${sortBy === 'category' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-white hover:bg-slate-600'}`}
             >
               Category
             </button>
@@ -568,7 +574,7 @@ export default function GameLibraryPage() {
                   ) : game.players !== 'TBA' ? (
                     <span className="text-xs text-slate-500">Coming Soon</span>
                   ) : (
-                    <span className="text-xs text-slate-600">TBA</span>
+                    <span className="text-xs text-slate-500">TBA</span>
                   )}
                 </div>
               </div>

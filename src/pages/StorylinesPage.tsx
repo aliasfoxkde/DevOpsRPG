@@ -171,7 +171,7 @@ export default function StorylinesPage() {
                                   ? isNext
                                     ? 'bg-amber-900/20 border-amber-700/50'
                                     : 'bg-slate-800/50 border-slate-700'
-                                  : 'bg-slate-900/50 border-slate-800 opacity-50'
+                                  : 'bg-slate-900/50 border-slate-800 grayscale'
                             }`}
                           >
                             <div className="flex items-start gap-3">
@@ -183,7 +183,7 @@ export default function StorylinesPage() {
                                       ? isNext
                                         ? 'bg-amber-600 text-white animate-pulse'
                                         : 'bg-purple-600 text-white'
-                                      : 'bg-slate-700 text-slate-400'
+                                      : 'bg-slate-700 text-white'
                                 }`}
                               >
                                 {completed ? '✓' : index + 1}

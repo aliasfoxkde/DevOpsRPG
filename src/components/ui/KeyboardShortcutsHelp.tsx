@@ -68,7 +68,7 @@ export default function KeyboardShortcutsHelp() {
         onClick={() => {
           setIsOpen(true)
         }}
-        className="fixed bottom-16 sm:bottom-4 left-4 z-40 w-12 h-12 rounded-full bg-slate-700 hover:bg-slate-600 text-slate-300 text-lg flex items-center justify-center shadow-lg transition-colors active:scale-95 touch-manipulation"
+        className="fixed bottom-16 sm:bottom-4 left-4 z-40 w-12 h-12 rounded-full bg-slate-700 hover:bg-slate-600 text-white text-lg flex items-center justify-center shadow-lg transition-colors active:scale-95 touch-manipulation"
         title="Keyboard Shortcuts (?)"
         aria-label="Show keyboard shortcuts"
       >
@@ -121,7 +121,7 @@ export default function KeyboardShortcutsHelp() {
               className={`px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                 activeCategory === cat
                   ? 'bg-amber-600 text-white'
-                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  : 'bg-slate-700 text-white hover:bg-slate-600'
               }`}
             >
               {cat}

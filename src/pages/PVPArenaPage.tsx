@@ -412,9 +412,9 @@ export default function PVPArenaPage() {
               style={{ backgroundColor: `${rank.color}20` }}
             >
               <div className="text-2xl mb-1">{rank.icon}</div>
-              <div className="text-xs font-medium" style={{ color: rank.color }}>
-                {rank.name}
-              </div>
+              {/* Rank name stays neutral for 7:1 contrast on the self-tinted
+                  tile; rank.color carries identity via the tile tint. */}
+              <div className="text-xs font-medium text-slate-200">{rank.name}</div>
             </div>
           ))}
         </div>

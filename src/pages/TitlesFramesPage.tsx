@@ -20,7 +20,7 @@ function TitleCard({ title, isUnlocked, isEquipped, onEquip }: TitleCardProps) {
   return (
     <div
       className={`relative p-4 rounded-xl border-2 transition-all ${
-        isUnlocked ? rarityColors[title.rarity] : 'border-slate-700 bg-slate-800/50 opacity-60'
+        isUnlocked ? rarityColors[title.rarity] : 'border-slate-700 bg-slate-800/50 grayscale'
       } ${isEquipped ? 'ring-2 ring-amber-400' : ''}`}
     >
       {isEquipped && (
@@ -81,7 +81,7 @@ function FrameCard({ frame, isUnlocked, isEquipped, onEquip }: FrameCardProps) {
   return (
     <div
       className={`relative p-4 rounded-xl border-2 transition-all ${
-        isUnlocked ? rarityColors[frame.rarity] : 'border-slate-700 bg-slate-800/50 opacity-60'
+        isUnlocked ? rarityColors[frame.rarity] : 'border-slate-700 bg-slate-800/50 grayscale'
       } ${isEquipped ? 'ring-2 ring-amber-400' : ''}`}
     >
       {isEquipped && (

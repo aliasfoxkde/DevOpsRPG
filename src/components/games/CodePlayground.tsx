@@ -261,13 +261,13 @@ ${code}
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm px-2 py-0.5 rounded bg-slate-600 text-slate-300">
+                    <span className="text-sm px-2 py-0.5 rounded bg-slate-600 text-white">
                       {challenge.language.toUpperCase()}
                     </span>
                     <span className="text-amber-400 text-sm">+{challenge.xpReward} XP</span>
                   </div>
                   <h4 className="font-bold text-white">{challenge.title}</h4>
-                  <p className="text-xs text-slate-400 mt-1">{challenge.description}</p>
+                  <p className="text-xs text-slate-300 mt-1">{challenge.description}</p>
                   {isCompleted && <span className="text-green-400 text-xs">✓ Completed</span>}
                 </button>
               )
@@ -313,7 +313,7 @@ ${code}
                 <div className="flex gap-2">
                   <button
                     onClick={resetCode}
-                    className="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded"
+                    className="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded"
                   >
                     Reset
                   </button>

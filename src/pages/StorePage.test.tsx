@@ -155,7 +155,7 @@ describe('StorePage', () => {
     // The card stops being buyable and renders as owned
     expect(within(card).getByText('Owned')).toBeInTheDocument()
     expect(within(card).queryByRole('button')).not.toBeInTheDocument()
-    expect(card.className).toContain('opacity-60')
+    expect(card.className).toContain('grayscale')
   })
 
   it('adds a purchased power-up to the inventory', async () => {

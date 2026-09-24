@@ -7,13 +7,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 Quality-infrastructure cycle: GitForge-first CI, a production worker CORS fix found by the
-new worker test suite, and a repo-wide strict type-aware lint campaign.
+new worker test suite, a repo-wide strict type-aware lint campaign, and a full WCAG 2.1 AAA
+accessibility pass.
 
 ### Added
 
 - GitForge CI pipeline (`.gitforce.yml`) as the primary CI/CD definition — lint/format/knip,
   typecheck (app + tooling + worker), unit + worker tests, e2e, aegis security scan, and build;
   the GitHub Actions workflow mirrors the same npm scripts so both platforms stay in lockstep
+- `a11y` job in both CI pipelines: the axe audit runs over a dev server with `--aaa-strict`
+  (0 AA and AAA violations required) and gates preview + production deploys
 - `npm run audit:secrets`: Aegis production-profile pattern scan with a committed baseline
   ratchet (`aegis-baseline.json`, 198 triaged findings) — the gate fails only on findings that
   are new relative to the baseline
@@ -35,6 +38,18 @@ new worker test suite, and a repo-wide strict type-aware lint campaign.
 - Strict type-aware lint campaign: typescript-eslint `strictTypeChecked` applied per-scope
   (app / tooling / worker) resolving 1,165 reported errors to a zero-warning gate, including
   removal of dead exports surfaced by the type-aware rules
+- **Accessibility: full WCAG 2.1 AAA pass** (baseline: 6 AA critical + 488 AA serious +
+  1,004 AAA serious violations → 0/0/0, verified twice with `audit:a11y -- --aaa-strict`):
+  - contrast tokens retuned for the surfaces they render on (slate-400/500 text 7.2-8.8:1;
+    amber/green/purple/cyan/blue/red/orange fills ≥ 7:1 under white text in both directions)
+  - locked/owned cards no longer dim via whole-card `opacity` (which dragged every text
+    token below 4.5:1 at any alpha) — the grayscale filter signals state without touching
+    luminance, so all text keeps full contrast
+  - unnamed controls named: sound-effects toggle is a real `role="switch"` with
+    `aria-checked`, game-library Category/Difficulty selects are labelled
+  - PVP rank palette retuned so small rank text passes on self-tinted tiles; tile labels
+    are neutral text with the rank color carried by the tile tint
+- `docs/process/VALIDATION.md` a11y gate updated to reflect the enforced AA + AAA standard
 
 ### Changed
 

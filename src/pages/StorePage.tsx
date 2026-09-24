@@ -447,7 +447,7 @@ export default function StorePage() {
             return (
               <div
                 key={item.id}
-                className={`bg-gradient-to-br ${bgClass} rounded-xl border ${borderClass} overflow-hidden transition-all hover:scale-105 ${isOwned || isAlreadyPurchased ? 'opacity-60' : ''}`}
+                className={`bg-gradient-to-br ${bgClass} rounded-xl border ${borderClass} overflow-hidden transition-all hover:scale-105 ${isOwned || isAlreadyPurchased ? 'grayscale' : ''}`}
               >
                 {/* Header */}
                 <div className="p-4 text-center border-b border-slate-700/50">

@@ -315,7 +315,7 @@ export default function BadgesPage() {
                   setSelectedBadge(badge)
                 }}
                 className={`relative p-4 rounded-xl border transition-all hover:scale-105 ${
-                  unlocked ? rarityClass : 'bg-slate-800/80 border-slate-700 opacity-60 grayscale'
+                  unlocked ? rarityClass : 'bg-slate-800/80 border-slate-700 grayscale'
                 }`}
               >
                 <div className="text-4xl mb-2">{unlocked ? badge.icon : '❓'}</div>

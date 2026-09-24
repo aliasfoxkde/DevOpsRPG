@@ -1166,10 +1166,7 @@ export default function WorldMapPage() {
               const isUnlocked = character.level >= realm.requiredLevel
               const color = getRealmColor(realm.id)
               return (
-                <div
-                  key={realm.id}
-                  className={`flex items-center gap-2 text-sm ${!isUnlocked ? 'opacity-40' : ''}`}
-                >
+                <div key={realm.id} className="flex items-center gap-2 text-sm">
                   <div
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: isUnlocked ? color.primary : '#4b5563' }}

@@ -89,7 +89,7 @@ export default function CareerPathPage() {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 filterDemand === 'all'
                   ? 'bg-blue-600 text-white'
-                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  : 'bg-slate-700 text-white hover:bg-slate-600'
               }`}
             >
               All Paths
@@ -101,7 +101,7 @@ export default function CareerPathPage() {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 filterDemand === 'high'
                   ? 'bg-red-600 text-white'
-                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  : 'bg-slate-700 text-white hover:bg-slate-600'
               }`}
             >
               High Demand
@@ -113,7 +113,7 @@ export default function CareerPathPage() {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 filterDemand === 'growing'
                   ? 'bg-green-600 text-white'
-                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  : 'bg-slate-700 text-white hover:bg-slate-600'
               }`}
             >
               Growing

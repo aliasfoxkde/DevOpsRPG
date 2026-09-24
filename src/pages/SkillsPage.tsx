@@ -159,7 +159,7 @@ export default function SkillsPage() {
                           isMaxed
                             ? 'bg-amber-900/30 border-amber-500/50'
                             : !requirementsMet
-                              ? 'bg-slate-800/50 border-slate-700/50 opacity-60'
+                              ? 'bg-slate-800/50 border-slate-700/50 grayscale'
                               : currentLevel > 0
                                 ? 'bg-blue-900/20 border-blue-600/50'
                                 : 'bg-slate-800/50 border-slate-700'
@@ -188,7 +188,7 @@ export default function SkillsPage() {
                                   </span>
                                 )}
                                 {!requirementsMet && (
-                                  <span className="px-2 py-0.5 bg-slate-600 text-slate-300 text-xs font-medium rounded-full">
+                                  <span className="px-2 py-0.5 bg-slate-600 text-white text-xs font-medium rounded-full">
                                     🔒 Locked
                                   </span>
                                 )}

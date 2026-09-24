@@ -18,7 +18,7 @@ export const PVP_RANKS: PVPRank[] = [
     icon: '🥉',
     minPoints: 0,
     maxPoints: 999,
-    color: '#cd7f32',
+    color: '#eda55a',
     rewards: { bonusXP: 1.1, bonusGold: 1.1 },
   },
   {
@@ -63,7 +63,7 @@ export const PVP_RANKS: PVPRank[] = [
     icon: '🏆',
     minPoints: 20000,
     maxPoints: 39999,
-    color: '#ff6b6b',
+    color: '#ff8587',
     rewards: { bonusXP: 1.75, bonusGold: 1.75 },
   },
   {
@@ -72,7 +72,7 @@ export const PVP_RANKS: PVPRank[] = [
     icon: '👑',
     minPoints: 40000,
     maxPoints: Infinity,
-    color: '#9b59b6',
+    color: '#cd9bff',
     rewards: { bonusXP: 2.0, bonusGold: 2.0 },
   },
 ]

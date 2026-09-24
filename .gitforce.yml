@@ -47,6 +47,25 @@ jobs:
         run: npx playwright test --project=chromium
     timeout: 20m
     retry: 1
+  - name: a11y
+    image: mcr.microsoft.com/playwright:v1.52.0
+    steps:
+      - name: Install dependencies
+        run: npm ci
+      - name: Accessibility audit (WCAG 2.1 AA + AAA strict, 30 routes × 2 themes)
+        run: |
+          npm run dev -- --port 5173 --strictPort >/tmp/vite.log 2>&1 &
+          VITE_PID=$!
+          for i in $(seq 1 60); do
+            node -e "fetch('http://localhost:5173').then(() => process.exit(0), () => process.exit(1))" >/dev/null 2>&1 && break
+            sleep 1
+          done
+          npm run audit:a11y -- http://localhost:5173 --aaa-strict
+          EXIT_CODE=$?
+          kill "$VITE_PID" 2>/dev/null || true
+          exit "$EXIT_CODE"
+    timeout: 20m
+    retry: 1
   - name: security
     image: node:20
     steps:

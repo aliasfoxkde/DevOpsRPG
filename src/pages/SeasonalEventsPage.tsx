@@ -49,7 +49,7 @@ function EventCard({
           ? 'border-amber-500 shadow-lg shadow-amber-500/20'
           : isUpcoming
             ? 'border-slate-600'
-            : 'border-slate-700 opacity-60'
+            : 'border-slate-700 grayscale'
       }`}
     >
       {/* Event banner */}

@@ -99,7 +99,7 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
           className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
             isUnlocked
               ? 'bg-gradient-to-br from-orange-900/30 to-red-900/30 border-orange-700/50 hover:border-orange-500'
-              : 'bg-slate-800/30 border-slate-700/50 opacity-50 cursor-not-allowed'
+              : 'bg-slate-800/30 border-slate-700/50 grayscale cursor-not-allowed'
           }`}
         >
           <div className={`text-4xl mb-3 ${!isUnlocked && 'grayscale'}`}>⌨️</div>
@@ -123,7 +123,7 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
           className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
             isUnlocked
               ? 'bg-gradient-to-br from-purple-900/30 to-pink-900/30 border-purple-700/50 hover:border-purple-500'
-              : 'bg-slate-800/30 border-slate-700/50 opacity-50 cursor-not-allowed'
+              : 'bg-slate-800/30 border-slate-700/50 grayscale cursor-not-allowed'
           }`}
         >
           <div className={`text-4xl mb-3 ${!isUnlocked && 'grayscale'}`}>🧠</div>
@@ -149,7 +149,7 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
           className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
             isUnlocked
               ? 'bg-gradient-to-br from-cyan-900/30 to-blue-900/30 border-cyan-700/50 hover:border-cyan-500'
-              : 'bg-slate-800/30 border-slate-700/50 opacity-50 cursor-not-allowed'
+              : 'bg-slate-800/30 border-slate-700/50 grayscale cursor-not-allowed'
           }`}
         >
           <div className={`text-4xl mb-3 ${!isUnlocked && 'grayscale'}`}>🔢</div>
@@ -173,7 +173,7 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
           className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
             isUnlocked
               ? 'bg-gradient-to-br from-green-900/30 to-emerald-900/30 border-green-700/50 hover:border-green-500'
-              : 'bg-slate-800/30 border-slate-700/50 opacity-50 cursor-not-allowed'
+              : 'bg-slate-800/30 border-slate-700/50 grayscale cursor-not-allowed'
           }`}
         >
           <div className={`text-4xl mb-3 ${!isUnlocked && 'grayscale'}`}>💻</div>
@@ -197,7 +197,7 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
           className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
             isUnlocked
               ? 'bg-gradient-to-br from-red-900/30 to-orange-900/30 border-red-700/50 hover:border-red-500'
-              : 'bg-slate-800/30 border-slate-700/50 opacity-50 cursor-not-allowed'
+              : 'bg-slate-800/30 border-slate-700/50 grayscale cursor-not-allowed'
           }`}
         >
           <div className={`text-4xl mb-3 ${!isUnlocked && 'grayscale'}`}>⚡</div>
@@ -223,7 +223,7 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
           className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
             isUnlocked
               ? 'bg-gradient-to-br from-slate-900/30 to-slate-800/30 border-slate-600/50 hover:border-slate-400'
-              : 'bg-slate-800/30 border-slate-700/50 opacity-50 cursor-not-allowed'
+              : 'bg-slate-800/30 border-slate-700/50 grayscale cursor-not-allowed'
           }`}
         >
           <div className={`text-4xl mb-3 ${!isUnlocked && 'grayscale'}`}>💻</div>
@@ -249,7 +249,7 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
           className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
             isUnlocked
               ? 'bg-gradient-to-br from-red-900/30 to-orange-900/30 border-red-700/50 hover:border-red-500'
-              : 'bg-slate-800/30 border-slate-700/50 opacity-50 cursor-not-allowed'
+              : 'bg-slate-800/30 border-slate-700/50 grayscale cursor-not-allowed'
           }`}
         >
           <div className={`text-4xl mb-3 ${!isUnlocked && 'grayscale'}`}>🚨</div>
@@ -265,7 +265,7 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
       <button
         onClick={onClose}
         aria-label="Back to Game"
-        className="mt-8 w-full py-3 bg-slate-700 hover:bg-slate-600 text-slate-300 font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500"
+        className="mt-8 w-full py-3 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500"
       >
         Back to Game
       </button>

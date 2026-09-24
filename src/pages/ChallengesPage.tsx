@@ -398,7 +398,7 @@ export default function ChallengesPage() {
               </div>
               <button
                 onClick={abandonDailyDash}
-                className="mt-4 w-full py-2 bg-slate-700 hover:bg-slate-600 text-slate-400 text-sm font-bold rounded-lg transition-colors"
+                className="mt-4 w-full py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm font-bold rounded-lg transition-colors"
               >
                 🛑 Abandon Dash
               </button>
@@ -558,7 +558,7 @@ export default function ChallengesPage() {
                     ) : challenge.claimed ? (
                       <div className="text-green-400 text-2xl">✓</div>
                     ) : (
-                      <div className="text-slate-600 text-2xl">🔒</div>
+                      <div className="text-slate-500 text-2xl">🔒</div>
                     )}
                   </div>
                 </div>

@@ -349,7 +349,7 @@ export default function SocialPage() {
                       disabled={onCooldown}
                       className={`p-4 rounded-xl border-2 transition-all text-left ${
                         onCooldown
-                          ? 'border-slate-700 bg-slate-800/50 opacity-60 cursor-not-allowed'
+                          ? 'border-slate-700 bg-slate-800/50 grayscale cursor-not-allowed'
                           : 'border-slate-700 bg-card hover:border-amber-500/50 hover:bg-amber-900/20'
                       }`}
                     >

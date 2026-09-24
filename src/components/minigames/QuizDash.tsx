@@ -171,7 +171,7 @@ export function QuizDashGame({ onComplete, onSkip }: QuizDashProps) {
       return 'bg-red-600 border-red-500 cursor-not-allowed'
     }
 
-    return 'bg-slate-700 border-slate-600 cursor-not-allowed opacity-50'
+    return 'bg-slate-700 border-slate-600 cursor-not-allowed'
   }
 
   if (isComplete) {

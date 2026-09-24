@@ -138,7 +138,7 @@ export default function TechnologyCollectionPage() {
                           ? 'bg-gradient-to-br from-amber-900/30 to-slate-800 border-amber-500/50'
                           : state === 'in_progress'
                             ? 'bg-gradient-to-br from-blue-900/30 to-slate-800 border-blue-500/50'
-                            : 'bg-slate-800/50 border-slate-700/50 opacity-60'
+                            : 'bg-slate-800/50 border-slate-700/50 grayscale'
                       }`}
                     >
                       {/* Lock overlay for locked cards */}
