@@ -16,6 +16,19 @@ interface MiniGameHubProps {
 
 const UNLOCK_LEVEL = 3
 
+/**
+ * Share of a round's maximum score that the player actually hit.
+ *
+ * The Terminal and Incident simulators report `(score, xpEarned)` rather than
+ * `(score, maxScore)`, so a run that earns nothing arrives with a zero
+ * denominator. Every reward below divides by it, so treat that as a 0% round
+ * instead of letting the bonus maths turn into NaN XP, NaN gold and a
+ * wrongly granted speed badge.
+ */
+function accuracyRatio(score: number, maxScore: number): number {
+  return maxScore > 0 ? score / maxScore : 0
+}
+
 export function MiniGameHub({ onClose }: MiniGameHubProps) {
   const { game, addXP, addGold, grantBadge, incrementStat } = useGame()
   const { character } = game
@@ -27,13 +40,14 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
   const handleGameComplete = (score: number, maxScore: number) => {
     setGameResult({ score, maxScore })
     // Award bonus XP based on performance
-    const xpBonus = Math.round((score / maxScore) * 50)
-    const goldBonus = Math.round((score / maxScore) * 25)
+    const ratio = accuracyRatio(score, maxScore)
+    const xpBonus = Math.round(ratio * 50)
+    const goldBonus = Math.round(ratio * 25)
     addXP(xpBonus)
     addGold(goldBonus)
 
     // Check for badges
-    if (score >= maxScore * 0.8) {
+    if (ratio >= 0.8) {
       grantBadge('speed_demon')
     }
 
@@ -261,11 +275,12 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
   const renderResult = () => {
     if (!gameResult) return null
 
+    const ratio = accuracyRatio(gameResult.score, gameResult.maxScore)
     // The time bonus can push the raw score past maxScore; accuracy itself
     // is still capped at a perfect score.
-    const percentage = Math.min(100, Math.round((gameResult.score / gameResult.maxScore) * 100))
-    const xpEarned = Math.round((gameResult.score / gameResult.maxScore) * 50)
-    const goldEarned = Math.round((gameResult.score / gameResult.maxScore) * 25)
+    const percentage = Math.min(100, Math.round(ratio * 100))
+    const xpEarned = Math.round(ratio * 50)
+    const goldEarned = Math.round(ratio * 25)
 
     return (
       <div className="p-6 text-center">

@@ -122,9 +122,9 @@ export default function LeaderboardPage() {
   const sortedData = useMemo(() => {
     const sorted = [...leaderboardData].sort((a, b) => {
       if (sortKey === 'rank') {
-        return sortDirection === 'asc'
-          ? (a.id === 'player' ? -1 : 1) - (b.id === 'player' ? -1 : 1)
-          : (b.id === 'player' ? -1 : 1) - (a.id === 'player' ? -1 : 1)
+        // The board arrives XP-sorted, so "rank" means XP standing: the player
+        // keeps their real position instead of being pinned to the bottom.
+        return sortDirection === 'asc' ? a.xp - b.xp : b.xp - a.xp
       }
       const aVal = a[sortKey]
       const bVal = b[sortKey]

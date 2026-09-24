@@ -3,7 +3,8 @@ import { useState } from 'react'
 import { render, screen, act, fireEvent } from '@testing-library/react'
 import { GameProvider, type GameState } from '../../contexts/GameContext'
 import { MiniGameHub } from './MiniGameHub'
-import { mathChallenges } from '../../data/minigames'
+import { getRandomCommands, mathChallenges } from '../../data/minigames'
+import { INCIDENT_SCENARIOS } from '../../data/incidentScenarios'
 import { STORAGE_KEYS } from '../../utils/gameUtils'
 
 /**
@@ -33,7 +34,9 @@ function storedCharacter(): GameState['character'] {
 }
 
 /** Read one numeric stat counter back out of the persisted save file. */
-function storedStat(stat: 'memoryCount' | 'mathCount' | 'quizCount'): number {
+function storedStat(
+  stat: 'memoryCount' | 'mathCount' | 'quizCount' | 'typerCount' | 'minigameCount',
+): number {
   return storedState().stats?.[stat] ?? 0
 }
 
@@ -298,5 +301,170 @@ describe('MiniGameHub', () => {
       vi.advanceTimersByTime(2000)
     })
     expect(screen.getByText('⏱ 43s')).toBeInTheDocument()
+  })
+
+  it('opens the Code Puzzle board from its tile', () => {
+    seedLevel(UNLOCK_LEVEL)
+    renderHub()
+    launchGame('code puzzle')
+
+    expect(title('💻 Code Puzzle').length).toBeGreaterThan(0)
+    // The puzzle is presented as a snippet with a blank to fill in.
+    expect(screen.getByText('___')).toBeInTheDocument()
+    expect(screen.getAllByRole('button').length).toBeGreaterThan(2)
+  })
+
+  it('opens the Terminal Simulator from its tile', () => {
+    seedLevel(UNLOCK_LEVEL)
+    renderHub()
+    launchGame('terminal simulator')
+
+    expect(title('💻 Terminal Simulator').length).toBeGreaterThan(0)
+    expect(screen.getByText('terminal@devopsquest ~')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /start challenge/i })).toBeEnabled()
+  })
+
+  it('opens the Incident Response simulator from its tile', () => {
+    seedLevel(UNLOCK_LEVEL)
+    renderHub()
+    launchGame('incident response')
+
+    expect(title('🚨 Incident Response').length).toBeGreaterThan(0)
+    expect(screen.getByText('Incident Response Training')).toBeInTheDocument()
+    for (const scenario of INCIDENT_SCENARIOS) {
+      expect(screen.getByRole('button', { name: new RegExp(scenario.title) })).toBeEnabled()
+    }
+  })
+
+  it('banks a perfect Command Typer round against the typer counter', () => {
+    seedLevel(UNLOCK_LEVEL)
+    renderHub()
+    launchGame('command typer')
+
+    // Math.random is pinned, so the hub deals the same five commands again.
+    const dealt = getRandomCommands(5)
+    const input = screen.getByPlaceholderText('Type the command...')
+    for (const command of dealt) {
+      fireEvent.change(input, { target: { value: command.command } })
+      fireEvent.keyDown(input, { key: 'Enter' })
+    }
+
+    expect(screen.getByText('⌨️ Command Typer Complete!')).toBeInTheDocument()
+    expect(screen.getByText('You typed 5 out of 5 commands correctly (100%)')).toBeInTheDocument()
+    const score = Number(screen.getByText('Score').previousElementSibling?.textContent)
+    expect(score).toBeGreaterThanOrEqual(500)
+
+    fireEvent.click(screen.getByRole('button', { name: /claim rewards/i }))
+
+    const accuracy = Math.min(100, Math.round((score / (dealt.length * 100)) * 100))
+    const xpBonus = Math.round((score / (dealt.length * 100)) * 50)
+    const goldBonus = Math.round((score / (dealt.length * 100)) * 25)
+
+    expect(screen.getByText('Excellent!')).toBeInTheDocument()
+    expect(screen.getByText(`${accuracy}%`)).toBeInTheDocument()
+    expect(screen.getByText(`+${xpBonus} XP`)).toBeInTheDocument()
+    expect(screen.getByText(`+${goldBonus} 🪙`)).toBeInTheDocument()
+
+    const character = storedCharacter()
+    expect(character.xp).toBe(xpBonus)
+    expect(character.gold).toBe(goldBonus)
+    expect(storedStat('typerCount')).toBe(1)
+    expect(storedStat('minigameCount')).toBe(0)
+    // A perfect round clears the 80% bar for the speed badge.
+    expect(storedBadgeUnlock('speed_demon')).toBeTruthy()
+  })
+
+  it('returns a failed Command Typer round to the menu without paying out', () => {
+    seedLevel(UNLOCK_LEVEL)
+    renderHub()
+    launchGame('command typer')
+
+    const input = screen.getByPlaceholderText('Type the command...')
+    for (let i = 0; i < 5; i++) {
+      fireEvent.change(input, { target: { value: 'definitely not the command' } })
+      fireEvent.keyDown(input, { key: 'Enter' })
+    }
+
+    expect(screen.getByText('Keep Practicing!')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /practice more/i }))
+
+    expect(title('🎮 Mini-Games').length).toBeGreaterThan(0)
+    expect(storedCharacter().xp).toBe(0)
+    expect(storedStat('typerCount')).toBe(0)
+  })
+
+  it('scores a perfect Quiz Dash round into the quiz counter', () => {
+    seedLevel(UNLOCK_LEVEL)
+    renderHub()
+    launchGame('quiz dash')
+
+    expect(title('⚡ Quiz Dash').length).toBeGreaterThan(0)
+
+    // The pinned Math.random keeps the dealt deck in file order, so the five
+    // questions and their correct options are known up front.
+    const correctAnswers = [
+      'Continuous Deployment',
+      'Kubernetes',
+      'Build automation',
+      'Infrastructure as Code',
+      'Git',
+    ]
+    for (const answer of correctAnswers) {
+      fireEvent.click(screen.getByRole('button', { name: new RegExp(answer) }))
+      act(() => {
+        vi.advanceTimersByTime(1000)
+      })
+    }
+
+    // The final answer reports straight to the hub, so the results screen
+    // replaces the quiz view immediately (no intermediate quiz summary).
+    // A flawless run is 100%: full bonus, speed badge, quiz stat.
+    expect(screen.getByText('Excellent!')).toBeInTheDocument()
+    expect(screen.getByText('5 / 5')).toBeInTheDocument()
+    expect(screen.getByText('100%')).toBeInTheDocument()
+    expect(screen.getByText('+50 XP')).toBeInTheDocument()
+    expect(screen.getByText('+25 🪙')).toBeInTheDocument()
+
+    const character = storedCharacter()
+    expect(character.xp).toBe(50)
+    expect(character.gold).toBe(25)
+    expect(storedStat('quizCount')).toBe(1)
+    expect(storedBadgeUnlock('speed_demon')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: /more games/i }))
+    expect(title('🎮 Mini-Games').length).toBeGreaterThan(0)
+  })
+
+  it('records a zero-credit incident run without corrupting the save file', () => {
+    const scenario = INCIDENT_SCENARIOS[0]
+    seedLevel(UNLOCK_LEVEL)
+    renderHub()
+    launchGame('incident response')
+
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(scenario.title) }))
+    expect(screen.getByText('🔍 Diagnostics')).toBeInTheDocument()
+
+    // The clock runs out with not a single diagnostic step completed.
+    act(() => {
+      vi.advanceTimersByTime((scenario.estimatedTime + 2) * 1000)
+    })
+    // Expiry is reported from a follow-up macrotask, so give it a tick once
+    // the timers above have flushed their renders.
+    act(() => {
+      vi.advanceTimersByTime(50)
+    })
+
+    expect(screen.getByText('Keep Practicing!')).toBeInTheDocument()
+    expect(screen.getByText('💪')).toBeInTheDocument()
+    expect(screen.getByText('0%')).toBeInTheDocument()
+    expect(screen.getByText('+0 XP')).toBeInTheDocument()
+    expect(screen.getByText('+0 🪙')).toBeInTheDocument()
+
+    const character = storedCharacter()
+    expect(character.xp).toBe(0)
+    expect(character.gold).toBe(0)
+    expect(storedStat('minigameCount')).toBe(1)
+    // A zero-credit run must not hand out the "fast and accurate" badge.
+    expect(storedBadgeUnlock('speed_demon')).toBeUndefined()
   })
 })

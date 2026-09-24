@@ -173,4 +173,91 @@ describe('CodePlayground', () => {
     expect(screen.getByText('Choose a Challenge:')).toBeInTheDocument()
     expect(screen.queryByText("You've earned")).not.toBeInTheDocument()
   })
+
+  it('renders a live preview for a CSS challenge and rewards a correct rule', () => {
+    const { onComplete } = setup()
+    openChallenge('Style with Color')
+
+    writeCode('div {\n  background-color: lightblue;\n}')
+    run()
+
+    expect(screen.getByText('Correct!')).toBeInTheDocument()
+    expect(screen.getAllByText('+15 XP')).toHaveLength(2) // header + success overlay
+    expect(onComplete).toHaveBeenCalledWith(15)
+    // The preview iframe is repointed at the generated document.
+    expect(screen.getByTitle('Code Preview')).toHaveAttribute('srcdoc')
+  })
+
+  it('styles a CSS selector for a different challenge family', () => {
+    const { onComplete } = setup()
+    openChallenge('Add Padding')
+
+    writeCode('.box {\n  padding: 20px;\n}')
+    run()
+
+    expect(screen.getByText('Correct!')).toBeInTheDocument()
+    expect(onComplete).toHaveBeenCalledWith(15)
+  })
+
+  it('solves a challenge when the parent ignores the XP callback', () => {
+    render(<CodePlayground />)
+    openChallenge('Declare a Variable')
+
+    writeCode('const serverName = "production"')
+    run()
+
+    expect(screen.getByText('Correct!')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /next challenge/i }))
+    expect(screen.getByText("You've earned 15 XP in Code Playground!")).toBeInTheDocument()
+  })
+
+  it('solves a JavaScript challenge and embeds the code in the preview document', () => {
+    const { onComplete } = setup()
+    openChallenge('Create an Object')
+
+    writeCode('const config = {\n  env: "production"\n};')
+    run()
+
+    expect(screen.getByText('Correct!')).toBeInTheDocument()
+    expect(onComplete).toHaveBeenCalledWith(20)
+    const srcdoc = screen.getByTitle('Code Preview').getAttribute('srcdoc') ?? ''
+    expect(srcdoc).toContain('<script>')
+    expect(srcdoc).toContain('production')
+  })
+
+  it('resets the hint count and editor when a solved challenge is reopened', () => {
+    setup()
+    openChallenge('Style with Color')
+
+    fireEvent.click(screen.getByRole('button', { name: /hint \(0\/2\)/i }))
+    writeCode('div { background-color: lightblue; }')
+    run()
+    fireEvent.click(screen.getByRole('button', { name: /next challenge/i }))
+
+    expect(
+      within(screen.getByRole('button', { name: /style with color/i })).getByText('✓ Completed'),
+    ).toBeInTheDocument()
+
+    openChallenge('Style with Color')
+
+    expect(editor()).toHaveValue('div {\n  /* Set background-color to lightblue */\n  \n}')
+    expect(screen.getByRole('button', { name: /hint \(0\/2\)/i })).toBeEnabled()
+    expect(screen.queryByText(/Hint 1:/)).not.toBeInTheDocument()
+  })
+
+  it('keeps the hint output intact once every hint has been handed out', () => {
+    setup()
+    openChallenge('Style Text')
+
+    fireEvent.click(screen.getByRole('button', { name: /hint \(0\/3\)/i }))
+    fireEvent.click(screen.getByRole('button', { name: /hint \(1\/3\)/i }))
+    fireEvent.click(screen.getByRole('button', { name: /hint \(2\/3\)/i }))
+    expect(screen.getByText(/Hint 3: Use 24px/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /hint \(3\/3\)/i })).toBeDisabled()
+
+    // Every hint is gone; the disabled button must not restart the list.
+    fireEvent.click(screen.getByRole('button', { name: /hint \(3\/3\)/i }))
+    expect(screen.getByText(/Hint 3: Use 24px/)).toBeInTheDocument()
+    expect(screen.queryByText(/Hint 1: font-size property/)).not.toBeInTheDocument()
+  })
 })

@@ -1,10 +1,22 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ProfilePage from './ProfilePage'
 import { BADGES } from '@/data/badges'
 import { MILESTONES } from '@/data/milestones'
-import { renderSeededPage, seedDefaultGame } from './test-utils'
+import { COLLECTIBLES_POOL } from '@/data/collectibles'
+import { XP_PER_LEVEL } from '@/utils/gameUtils'
+import { closestContainer, renderPage, renderSeededPage, seedDefaultGame } from './test-utils'
+import { STORAGE_KEYS } from '@/utils/gameUtils'
+import type { GameState } from '@/contexts/GameContext'
+
+/** Seeds the default save with `overrides` applied on top of it. */
+function seedWith(overrides: Partial<GameState>): GameState {
+  const base = seedDefaultGame()
+  const merged = { ...base, ...overrides }
+  localStorage.setItem(STORAGE_KEYS.GAME, JSON.stringify(merged))
+  return merged
+}
 
 describe('ProfilePage', () => {
   beforeEach(() => {
@@ -72,5 +84,81 @@ describe('ProfilePage', () => {
     expect(knobAfter.className).not.toBe(classBefore)
     // The two knob positions are mutually exclusive
     expect(knobAfter.className).toMatch(/left-1|translate-x-8/)
+  })
+
+  it('remembers an unmuted player and mutes them on toggle', async () => {
+    const user = userEvent.setup()
+    // The hook reads its opt-in flag from localStorage on mount
+    localStorage.setItem('soundEnabled', 'true')
+    renderPage(<ProfilePage />, { route: '/profile', url: '/profile' })
+
+    const knob = screen.getByRole('button').firstChild as HTMLElement
+    expect(knob.className).toContain('translate-x-8')
+
+    await user.click(screen.getByRole('button'))
+
+    expect((screen.getByRole('button').firstChild as HTMLElement).className).toContain('left-1')
+    expect(localStorage.getItem('soundEnabled')).toBe('false')
+  })
+
+  it('counts only unused collectibles as owned', () => {
+    const [first, second] = COLLECTIBLES_POOL
+    seedWith({
+      collectibles: [
+        { ...first, used: false },
+        { ...second, used: true },
+      ],
+    })
+    renderPage(<ProfilePage />, { route: '/profile', url: '/profile' })
+
+    expect(screen.getByText('Collectibles').previousElementSibling).toHaveTextContent('1')
+  })
+
+  it('shows the level progress earned inside the current level', () => {
+    // 320 XP at 100 XP per level puts the hero on level 4 with 20 XP banked
+    seedWith({ character: { ...seedDefaultGame().character, xp: 320, level: 4 } })
+    renderPage(<ProfilePage />, { route: '/profile', url: '/profile' })
+
+    expect(screen.getByText('320')).toBeInTheDocument()
+    expect(screen.getByText('Level 4')).toBeInTheDocument()
+    expect(screen.getByText(`20 / ${XP_PER_LEVEL} XP`)).toBeInTheDocument()
+  })
+
+  it('marks an unlocked badge and an unlocked milestone as claimed', () => {
+    // Badge and milestone titles overlap, so pick entries with unique names
+    const badge = BADGES.find((entry) => !MILESTONES.some((m) => m.title === entry.name))
+    if (!badge) throw new Error('no badge with a title unique to BADGES')
+    const milestone = MILESTONES.find((entry) => !BADGES.some((b) => b.name === entry.title))
+    if (!milestone) throw new Error('no milestone with a title unique to MILESTONES')
+
+    seedWith({
+      badges: BADGES.map((entry) =>
+        entry.id === badge.id ? { ...entry, unlockedAt: new Date().toISOString() } : entry,
+      ),
+      milestones: MILESTONES.map((entry) =>
+        entry.id === milestone.id ? { ...entry, unlocked: true } : entry,
+      ),
+    })
+    renderPage(<ProfilePage />, { route: '/profile', url: '/profile' })
+
+    // Summary tiles move off zero
+    expect(screen.getByText('Badges Earned').previousElementSibling).toHaveTextContent(
+      `1/${BADGES.length}`,
+    )
+    const milestoneCounter = screen
+      .getAllByText('Milestones')
+      .map((el) => el.previousElementSibling?.textContent)
+      .find((text) => text === `1/${MILESTONES.length}`)
+    expect(milestoneCounter).toBeDefined()
+
+    // The earned badge drops its lock overlay for a completion check
+    const badgeCard = closestContainer(screen.getByText(badge.name), 'div.relative')
+    expect(within(badgeCard).getByText('✓')).toBeInTheDocument()
+    expect(within(badgeCard).queryByText('🔒')).not.toBeInTheDocument()
+
+    // The reached milestone no longer advertises its XP bonus
+    const milestoneCard = closestContainer(screen.getAllByText(milestone.title)[0], 'div.p-4')
+    expect(within(milestoneCard).getByText('✓')).toBeInTheDocument()
+    expect(within(milestoneCard).queryByText(`+${milestone.xpBonus} XP`)).not.toBeInTheDocument()
   })
 })

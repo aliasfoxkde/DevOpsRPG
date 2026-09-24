@@ -215,6 +215,41 @@ describe('TreasureChest', () => {
       expect(onChestOpen).not.toHaveBeenCalled()
     })
   })
+
+  describe('reuse', () => {
+    it('can be reopened after being closed and pays out again', () => {
+      const { onChestOpen } = renderChest({ preGeneratedLoot: RARITY_LOOT.epic })
+
+      openChest()
+      act(() => {
+        vi.advanceTimersByTime(800)
+      })
+      fireEvent.click(screen.getByRole('button', { name: 'Click to close' }))
+      expect(onChestOpen).toHaveBeenCalledTimes(1)
+
+      openChest()
+      act(() => {
+        vi.advanceTimersByTime(800)
+      })
+
+      expect(onChestOpen).toHaveBeenCalledTimes(2)
+      expect(onChestOpen).toHaveBeenLastCalledWith(RARITY_LOOT.epic)
+      expect(screen.getByText('Random Collectible')).toBeInTheDocument()
+    })
+
+    it('works without an onChestOpen callback', () => {
+      render(<TreasureChest preGeneratedLoot={RARITY_LOOT.legendary} />)
+
+      openChest()
+      act(() => {
+        vi.advanceTimersByTime(800)
+      })
+
+      // The loot still lands on screen; nothing blew up on the missing callback.
+      expect(screen.getByText('🏆')).toBeInTheDocument()
+      expect(screen.getByText('Rare Badge')).toBeInTheDocument()
+    })
+  })
 })
 
 describe('getRandomLoot', () => {

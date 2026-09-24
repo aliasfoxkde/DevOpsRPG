@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
+import { act, fireEvent, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import SettingsPage from './SettingsPage'
 import { closestContainer, renderPage, renderSeededPage, seedDefaultGame } from './test-utils'
@@ -15,6 +15,24 @@ import { allQuests } from '@/data/quests'
 // real audio behaviour. Defining it also flips the hook's `isSupported` check
 // (`'speechSynthesis' in window`), which is exactly the code path browsers take.
 beforeAll(() => {
+  // jsdom has no matchMedia either. Selecting the "System" appearance makes
+  // ThemeContext resolve the OS preference, so give it a stable answer
+  // (light) rather than letting the page crash on a missing API.
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    writable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(() => true),
+    })),
+  })
+
   if (!('speechSynthesis' in window)) {
     Object.defineProperty(window, 'speechSynthesis', {
       configurable: true,
@@ -342,5 +360,81 @@ describe('SettingsPage', () => {
 
     expect(localStorage.getItem(STORAGE_KEYS.GAME)).toBeNull()
     expect(localStorage.getItem(STORAGE_KEYS.BACKUP)).toBeNull()
+  })
+
+  it('resolves the system appearance from the OS preference', async () => {
+    const user = userEvent.setup()
+    renderSeededPage(<SettingsPage />, { route: '/settings', url: '/settings' })
+
+    await user.click(screen.getByRole('radio', { name: /System/ }))
+
+    expect(screen.getByRole('radio', { name: /System/ })).toBeChecked()
+    expect(screen.getByRole('radio', { name: /Dark Mode/ })).not.toBeChecked()
+    expect(localStorage.getItem('theme')).toBe('system')
+    // The stubbed media query reports light, so that is what gets resolved
+    expect(screen.getByText('Current:')).toHaveTextContent('light')
+
+    // ...and picking Dark explicitly wins over the OS setting again
+    await user.click(screen.getByRole('radio', { name: /Dark Mode/ }))
+    expect(screen.getByRole('radio', { name: /Dark Mode/ })).toBeChecked()
+    expect(localStorage.getItem('theme')).toBe('dark')
+    expect(screen.getByText('Current:')).toHaveTextContent('dark')
+  })
+
+  it('plays the confirmation sound while sound effects are enabled', async () => {
+    const user = userEvent.setup()
+    // The app starts muted; opting in is what makes the click sound fire
+    localStorage.setItem('soundEnabled', 'true')
+    renderPage(<SettingsPage />, { route: '/settings', url: '/settings' })
+
+    expect(screen.getByRole('switch', { name: 'Sound effects' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    )
+
+    await user.click(screen.getByRole('switch', { name: 'Sound effects' }))
+
+    expect(screen.getByRole('switch', { name: 'Sound effects' })).toHaveAttribute(
+      'aria-checked',
+      'false',
+    )
+    expect(screen.getByText('🔇')).toBeInTheDocument()
+    expect(localStorage.getItem('soundEnabled')).toBe('false')
+  })
+
+  it('reloads the page once a restored backup has been staged', async () => {
+    vi.useFakeTimers()
+    renderSeededPage(<SettingsPage />, { route: '/settings', url: '/settings' })
+
+    fireEvent.click(screen.getByRole('button', { name: /Import/ }))
+    fireEvent.change(screen.getByPlaceholderText('Paste your backup JSON here...'), {
+      target: {
+        value: JSON.stringify({
+          version: '1.0.0',
+          character: { name: 'Reloaded Hero', level: 3, xp: 300, gold: 90 },
+          completedQuests: [],
+          badges: [],
+          companions: [],
+          stats: {},
+        }),
+      },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Restore Backup' }))
+
+    expect(screen.getByText('✓ Import successful! Reloading...')).toBeInTheDocument()
+    expect(JSON.parse(localStorage.getItem('devopsquest-import') ?? 'null')).toMatchObject({
+      character: { name: 'Reloaded Hero' },
+    })
+
+    // The reload is deferred a second so the player can read the confirmation.
+    // jsdom cannot reload a document, so the call itself is unobservable here;
+    // what matters is that the staged save survives until it happens.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1000)
+    })
+    expect(JSON.parse(localStorage.getItem('devopsquest-import') ?? 'null')).toMatchObject({
+      character: { name: 'Reloaded Hero' },
+    })
+    expect(screen.getByText('✓ Import successful! Reloading...')).toBeInTheDocument()
   })
 })

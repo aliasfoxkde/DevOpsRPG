@@ -1,13 +1,21 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { screen, within, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import MarketplacePage from './MarketplacePage'
-import { renderPage, renderSeededPage, seedDefaultGame } from './test-utils'
+import { closestContainer, renderPage, renderSeededPage, seedDefaultGame } from './test-utils'
 import { STORAGE_KEYS } from '@/utils/gameUtils'
+
+// The mock listings stamp their "listedAt" when this module is imported, so
+// every relative timestamp is measured against this moment.
+const MODULE_LOAD = Date.now()
 
 describe('MarketplacePage', () => {
   beforeEach(() => {
     localStorage.clear()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
   it('renders the marketplace header, gold balance and every listing', () => {
@@ -145,5 +153,74 @@ describe('MarketplacePage', () => {
       character: { gold: number }
     }
     expect(stored.character.gold).toBe(500)
+  })
+
+  it('closes the purchase modal with the × button', async () => {
+    const user = userEvent.setup()
+    renderSeededPage(<MarketplacePage />, { route: '/marketplace', url: '/marketplace' })
+
+    await user.click(screen.getByText('Docker Expert'))
+    expect(screen.getByRole('heading', { name: 'Confirm Purchase' })).toBeInTheDocument()
+
+    await user.click(screen.getByText('×'))
+    expect(screen.queryByRole('heading', { name: 'Confirm Purchase' })).not.toBeInTheDocument()
+  })
+
+  it('closes the create-listing modal with the × button', async () => {
+    const user = userEvent.setup()
+    renderSeededPage(<MarketplacePage />, { route: '/marketplace', url: '/marketplace' })
+
+    await user.click(screen.getByRole('button', { name: /Create New Listing/ }))
+    expect(screen.getByRole('heading', { name: 'Create New Listing' })).toBeInTheDocument()
+    expect(screen.getByText('Select Item to List')).toBeInTheDocument()
+
+    await user.click(screen.getByText('×'))
+    expect(screen.queryByRole('heading', { name: 'Create New Listing' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Select Item to List')).not.toBeInTheDocument()
+  })
+
+  it('clears the purchase notification after four seconds', () => {
+    vi.useFakeTimers()
+    const game = seedDefaultGame()
+    localStorage.setItem(
+      STORAGE_KEYS.GAME,
+      JSON.stringify({ ...game, character: { ...game.character, gold: 500 } }),
+    )
+    renderPage(<MarketplacePage />, { route: '/marketplace', url: '/marketplace' })
+
+    fireEvent.click(screen.getByText('Docker Expert'))
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm Purchase' }))
+
+    const announcement = screen.getByText(/Would purchase "Docker Expert"/)
+    expect(announcement).toHaveClass('bg-blue-900/30', 'text-blue-300')
+
+    act(() => {
+      vi.advanceTimersByTime(4000)
+    })
+
+    expect(screen.queryByText(/Would purchase/)).not.toBeInTheDocument()
+  })
+
+  it('shows "Just now" for a listing less than an hour old', () => {
+    // Put the clock 30 minutes after the newest fixture was listed (2h before
+    // module load), so it reads as fresh while the others keep hour counts
+    vi.useFakeTimers({ now: MODULE_LOAD - 90 * 60 * 1000 })
+    renderPage(<MarketplacePage />, { route: '/marketplace', url: '/marketplace' })
+
+    const newest = closestContainer(screen.getByText('Docker Expert'), 'div.rounded-xl')
+    expect(within(newest).getByText('Just now')).toBeInTheDocument()
+    expect(within(newest).queryByText(/h ago/)).not.toBeInTheDocument()
+    expect(screen.getByText('3h ago')).toBeInTheDocument()
+    expect(screen.getByText('10h ago')).toBeInTheDocument()
+    expect(screen.getAllByText('Just now')).toHaveLength(1)
+  })
+
+  it('ages listings past a day into days', () => {
+    // Push the clock forward so all three fixtures clear the 24h mark
+    vi.useFakeTimers({ now: MODULE_LOAD + 30 * 60 * 60 * 1000 })
+    renderPage(<MarketplacePage />, { route: '/marketplace', url: '/marketplace' })
+
+    expect(screen.getAllByText('1d ago')).toHaveLength(3)
+    expect(screen.queryByText(/h ago$/)).not.toBeInTheDocument()
   })
 })

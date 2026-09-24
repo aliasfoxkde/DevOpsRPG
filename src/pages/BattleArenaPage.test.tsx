@@ -4,12 +4,14 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import BattleArenaPage from './BattleArenaPage'
 import { w3schoolsContent } from '@/data/w3schools-content'
-import { allQuests } from '@/data/quests'
+import { allQuests, realms } from '@/data/quests'
 import { technologies } from '@/data/technologies'
 import { getQuizForTopic, type QuizQuestion } from '@/data/quizzes'
+import { MILESTONES } from '@/data/milestones'
+import { BADGES } from '@/data/badges'
 import { ThemeProvider } from '@/contexts/ThemeContext'
-import { GameProvider, type GameState } from '@/contexts/GameContext'
-import { renderPage, seedDefaultGame } from './test-utils'
+import { GameProvider, useGame, type GameState } from '@/contexts/GameContext'
+import { closestContainer, renderPage, seedDefaultGame } from './test-utils'
 import { STORAGE_KEYS, GOLD_XP_RATIO } from '@/utils/gameUtils'
 
 function renderQuest(questId: string) {
@@ -96,6 +98,57 @@ function advanceButton(): HTMLElement {
     .find((entry) => /^(Next Question|See Results)/.test(entry.textContent))
   if (!button) throw new Error('Quiz advance button not found')
   return button
+}
+
+const INTRO_QUIZ = getQuizForTopic('html_intro')
+
+/** Drives the real html_intro quiz to a perfect pass. */
+function passQuiz() {
+  for (const question of INTRO_QUIZ) {
+    fireEvent.click(quizOptions()[correctIndexOf(question)])
+    fireEvent.click(advanceButton())
+  }
+}
+
+/**
+ * Completes a quest straight through the provider, the way another surface of
+ * the app (the journal, a modal) would while the arena is open.
+ */
+function CompleteProbe({ questId }: { questId: string }) {
+  const { completeQuest } = useGame()
+  return (
+    <button
+      onClick={() => {
+        completeQuest(questId)
+      }}
+    >
+      force complete
+    </button>
+  )
+}
+
+/** Arena plus the probe, so a quest can be completed behind its back. */
+function renderQuestWithProbe(questId: string) {
+  return render(
+    <ThemeProvider>
+      <GameProvider>
+        <MemoryRouter initialEntries={[`/quest/${questId}`]}>
+          <Routes>
+            <Route
+              path="/quest/:questId"
+              element={
+                <>
+                  <BattleArenaPage />
+                  <CompleteProbe questId={questId} />
+                </>
+              }
+            />
+            <Route path="/quests" element={<div>Quest Journal</div>} />
+          </Routes>
+        </MemoryRouter>
+      </GameProvider>
+    </ThemeProvider>,
+  )
 }
 
 describe('BattleArenaPage', () => {
@@ -328,5 +381,343 @@ describe('BattleArenaPage', () => {
 
     expect(screen.getByText('Quest Journal')).toBeInTheDocument()
     expect(screen.queryByText('Quest Completed!')).not.toBeInTheDocument()
+  })
+
+  it('stacks the streak bonus, mini-game, treasure chest and random encounter', () => {
+    // 0 wins every roll: mini-game 25%, chest 30%, encounter 20%, and it picks
+    // the matching mini-game with the first loot table entry (+10 XP)
+    vi.spyOn(Math, 'random').mockReturnValue(0)
+    vi.useFakeTimers()
+    const game = seedDefaultGame()
+    localStorage.setItem(
+      STORAGE_KEYS.GAME,
+      JSON.stringify({ ...game, character: { ...game.character, streakDays: 7 } }),
+    )
+    const quest = questById('quest_html_intro')
+    const baseXp = game.character.xp
+    const baseGold = game.character.gold
+    const view = renderQuest('quest_html_intro')
+
+    fireEvent.click(quizToggle())
+    passQuiz()
+    fireEvent.click(screen.getByRole('button', { name: 'Complete Quest' }))
+
+    // Streak celebration (7 days is a multiple of 7) shows up first
+    act(() => {
+      vi.advanceTimersByTime(600)
+    })
+    expect(screen.getByText(/7 Day Streak!/)).toBeInTheDocument()
+    expect(screen.getByText(/Bonus XP!/)).toBeInTheDocument()
+
+    // ...then the bonus mini-game, auto-solved with its own hotkey
+    act(() => {
+      vi.advanceTimersByTime(400)
+    })
+    expect(screen.getByText('🔗 Match the Terms!')).toBeInTheDocument()
+    act(() => {
+      fireEvent.keyDown(window, { key: 'n' })
+    })
+    act(() => {
+      vi.advanceTimersByTime(300)
+    })
+    expect(screen.queryByText('🔗 Match the Terms!')).not.toBeInTheDocument()
+    // The bonus is only visible in the study panel, so assert on the balance
+    expect(storedGame().character.xp).toBe(baseXp + quest.xpReward + 10)
+
+    // Chest and random encounter pop up while the celebrations are still up
+    act(() => {
+      vi.advanceTimersByTime(300)
+    })
+    const chestOverlay = closestContainer(
+      screen.getByRole('button', { name: 'Open treasure chest' }),
+      '.fixed',
+    )
+    const encounterOverlay = closestContainer(screen.getByText('Random Event!'), '.fixed')
+    expect(within(encounterOverlay).getByText('+20 XP')).toBeInTheDocument()
+    expect(within(encounterOverlay).getByText('+10 Gold')).toBeInTheDocument()
+    // Its only button claims the reward and closes the popup
+    fireEvent.click(within(encounterOverlay).getByRole('button'))
+    expect(screen.queryByText('Random Event!')).not.toBeInTheDocument()
+
+    // Opening the chest plays a short animation before paying the loot
+    fireEvent.click(screen.getByRole('button', { name: 'Open treasure chest' }))
+    act(() => {
+      vi.advanceTimersByTime(800)
+    })
+    expect(within(chestOverlay).getByText('+10 XP!')).toBeInTheDocument()
+    expect(within(chestOverlay).getByText(/common loot acquired!/)).toBeInTheDocument()
+
+    const bonusXp = 10 + 10 + 20
+    expect(storedGame().character.xp).toBe(baseXp + quest.xpReward + bonusXp)
+    expect(storedGame().character.gold).toBe(
+      baseGold + Math.floor(quest.xpReward * GOLD_XP_RATIO) + 10,
+    )
+
+    // A badge may be celebrating at the same time, so stay inside the chest
+    fireEvent.click(within(chestOverlay).getByRole('button', { name: 'Awesome!' }))
+    expect(screen.queryByRole('button', { name: /Open treasure chest/ })).not.toBeInTheDocument()
+
+    // Leaving with celebrations still pending must not throw
+    expect(() => {
+      view.unmount()
+    }).not.toThrow()
+  })
+
+  it('pays nothing when the bonus mini-game is answered wrong', () => {
+    // Randomness is faked per call site: only the mini-game roll wins, every
+    // other roll (collectible drop, chest, encounter) loses, and 0.99 picks
+    // the trivia variant of the mini-game.
+    let miniGameRolls = 0
+    vi.spyOn(Math, 'random').mockImplementation(() => {
+      const callSite = new Error().stack ?? ''
+      if (callSite.includes('rollChance')) {
+        miniGameRolls += 1
+        return miniGameRolls === 1 ? 0.1 : 0.99
+      }
+      return 0.99
+    })
+    vi.useFakeTimers()
+    const game = seedDefaultGame()
+    const quest = questById('quest_html_intro')
+    renderQuest('quest_html_intro')
+
+    fireEvent.click(quizToggle())
+    passQuiz()
+    fireEvent.click(screen.getByRole('button', { name: 'Complete Quest' }))
+
+    act(() => {
+      vi.advanceTimersByTime(900)
+    })
+    expect(screen.getByText('🎯 Quick Trivia!')).toBeInTheDocument()
+
+    // Answer the trivia question wrong and bank the consolation tip only
+    fireEvent.click(screen.getByRole('button', { name: 'Single large application' }))
+    expect(screen.getByText('❌ Not quite!')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /^Continue$/ }))
+
+    expect(screen.queryByText('🎯 Quick Trivia!')).not.toBeInTheDocument()
+    expect(storedGame().character.xp).toBe(game.character.xp + quest.xpReward)
+    expect(storedGame().character.gold).toBe(
+      game.character.gold + Math.floor(quest.xpReward * GOLD_XP_RATIO),
+    )
+  })
+
+  it('celebrates the milestone and badge carried by the last victory', () => {
+    vi.useFakeTimers()
+    const milestone = MILESTONES[0]
+    const badge = BADGES[1]
+    const game = seedDefaultGame()
+    localStorage.setItem(
+      STORAGE_KEYS.GAME,
+      JSON.stringify({
+        ...game,
+        lastVictory: { xp: 53, levelUp: false, newLevel: 1, milestone, badge },
+      }),
+    )
+    renderQuest('quest_html_intro')
+
+    act(() => {
+      vi.advanceTimersByTime(2100)
+    })
+
+    expect(screen.getByText('⭐ MILESTONE UNLOCKED!')).toBeInTheDocument()
+    expect(screen.getByText(milestone.title)).toBeInTheDocument()
+    expect(screen.getByText(milestone.message)).toBeInTheDocument()
+    expect(screen.getByText(`+${milestone.xpBonus} XP BONUS!`)).toBeInTheDocument()
+
+    act(() => {
+      vi.advanceTimersByTime(400)
+    })
+
+    expect(screen.getByText('🎖️ BADGE EARNED!')).toBeInTheDocument()
+    expect(screen.getByText(badge.name)).toBeInTheDocument()
+    expect(screen.getByText(badge.description)).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Awesome!' }))
+    expect(screen.queryByText('🎖️ BADGE EARNED!')).not.toBeInTheDocument()
+
+    // The milestone closes itself 3.5s after it appeared, then hands back
+    act(() => {
+      vi.advanceTimersByTime(4500)
+    })
+    expect(screen.queryByText('⭐ MILESTONE UNLOCKED!')).not.toBeInTheDocument()
+  })
+
+  it('pays the treasure chest loot in gold when the roll lands there', () => {
+    // Only the chest roll wins and the loot table lands on its gold entry
+    let rewardRoll = 0
+    let lootRoll = 0
+    vi.spyOn(Math, 'random').mockImplementation(() => {
+      const callSite = new Error().stack ?? ''
+      if (callSite.includes('rollChance')) {
+        rewardRoll += 1
+        return rewardRoll === 2 ? 0.1 : 0.99
+      }
+      if (callSite.includes('getRandomLoot')) {
+        lootRoll += 1
+        return lootRoll === 1 ? 0.1 : 0.9
+      }
+      return 0.99
+    })
+    vi.useFakeTimers()
+    const game = seedDefaultGame()
+    const quest = questById('quest_html_intro')
+    renderQuest('quest_html_intro')
+
+    fireEvent.click(quizToggle())
+    passQuiz()
+    fireEvent.click(screen.getByRole('button', { name: 'Complete Quest' }))
+
+    act(() => {
+      vi.advanceTimersByTime(1300)
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Open treasure chest' }))
+    act(() => {
+      vi.advanceTimersByTime(800)
+    })
+
+    expect(screen.getByText('+10 Gold!')).toBeInTheDocument()
+    expect(screen.getByText(/common loot acquired!/)).toBeInTheDocument()
+    expect(storedGame().character.gold).toBe(
+      game.character.gold + Math.floor(quest.xpReward * GOLD_XP_RATIO) + 10,
+    )
+    expect(storedGame().character.xp).toBe(game.character.xp + quest.xpReward)
+    expect(storedGame().collectibles).toEqual([])
+  })
+
+  it('closes the bonus mini-game without a reward when it is skipped', () => {
+    // Only the mini-game roll wins, so no chest and no encounter compete
+    let miniGameRoll = 0
+    vi.spyOn(Math, 'random').mockImplementation(() => {
+      if ((new Error().stack ?? '').includes('rollChance')) {
+        miniGameRoll += 1
+        return miniGameRoll === 1 ? 0.1 : 0.99
+      }
+      return 0.99
+    })
+    vi.useFakeTimers()
+    const game = seedDefaultGame()
+    const quest = questById('quest_html_intro')
+    renderQuest('quest_html_intro')
+
+    fireEvent.click(quizToggle())
+    passQuiz()
+    fireEvent.click(screen.getByRole('button', { name: 'Complete Quest' }))
+
+    act(() => {
+      vi.advanceTimersByTime(900)
+    })
+    expect(screen.getByText('🎯 Quick Trivia!')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Skip for now' }))
+
+    expect(screen.queryByText('🎯 Quick Trivia!')).not.toBeInTheDocument()
+    expect(storedGame().character.xp).toBe(game.character.xp + quest.xpReward)
+  })
+
+  it('opens the quiz from the study call to action', () => {
+    renderQuest('quest_html_intro')
+
+    fireEvent.click(screen.getByRole('button', { name: /Take Quiz to Complete/ }))
+
+    expect(screen.getByText('What does HTML stand for?')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Take Quiz to Complete/ })).not.toBeInTheDocument()
+  })
+
+  it('unlocks a finished realm and closes its modal', () => {
+    vi.useFakeTimers()
+    const game = seedDefaultGame()
+    localStorage.setItem(
+      STORAGE_KEYS.GAME,
+      JSON.stringify({ ...game, showRealmCompletion: 'foundations' }),
+    )
+    renderQuest('quest_html_intro')
+
+    act(() => {
+      vi.advanceTimersByTime(3100)
+    })
+
+    expect(screen.getByText('REALM COMPLETE!')).toBeInTheDocument()
+    const modal = closestContainer(screen.getByText('REALM COMPLETE!'), '.fixed')
+    expect(within(modal).getByText(realms.foundations.name)).toBeInTheDocument()
+    expect(within(modal).getByText('Quests Conquered')).toBeInTheDocument()
+
+    fireEvent.click(within(modal).getByRole('button', { name: /Continue to Next Realm/ }))
+
+    expect(screen.queryByText('REALM COMPLETE!')).not.toBeInTheDocument()
+  })
+
+  it('awards a quest once even when Complete Quest is clicked twice', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.99)
+    vi.useFakeTimers()
+    const game = seedDefaultGame()
+    const quest = questById('quest_html_intro')
+    renderQuest('quest_html_intro')
+
+    fireEvent.click(quizToggle())
+    passQuiz()
+    const complete = screen.getByRole('button', { name: 'Complete Quest' })
+    act(() => {
+      complete.click()
+      complete.click()
+    })
+
+    // One click completed it, the second was swallowed by a guard
+    expect(storedGame().completedQuests.map((entry) => entry.questId)).toEqual(['quest_html_intro'])
+    expect(storedGame().character.xp).toBe(game.character.xp + quest.xpReward)
+  })
+
+  it('refuses to complete a quest that another surface already finished', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.99)
+    vi.useFakeTimers()
+    const quest = questById('quest_html_intro')
+    renderQuestWithProbe('quest_html_intro')
+
+    // The quiz is open when the quest is completed elsewhere
+    fireEvent.click(quizToggle())
+    fireEvent.click(screen.getByRole('button', { name: 'force complete' }))
+    const afterProbe = storedGame()
+    expect(afterProbe.character.xp).toBe(quest.xpReward)
+
+    passQuiz()
+    fireEvent.click(screen.getByRole('button', { name: 'Complete Quest' }))
+
+    // The arena was told the quest was already done: no second award, no
+    // confetti and no auto-navigation
+    expect(storedGame().completedQuests).toHaveLength(1)
+    expect(storedGame().character.xp).toBe(afterProbe.character.xp)
+    expect(screen.queryByText('Excellent! Moving to next quest...')).not.toBeInTheDocument()
+    expect(document.querySelector('.animate-fall')).toBeNull()
+
+    // And because the arena never "completed" it, nothing auto-navigates
+    act(() => {
+      vi.advanceTimersByTime(3000)
+    })
+    expect(screen.queryByText('Quest Journal')).not.toBeInTheDocument()
+  })
+
+  it('sends a hero back to the journal when the finished quest was the last', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.99)
+    vi.useFakeTimers()
+    const game = seedDefaultGame()
+    const remaining = allQuests.filter((entry) => entry.id !== 'quest_html_intro')
+    localStorage.setItem(
+      STORAGE_KEYS.GAME,
+      JSON.stringify({
+        ...game,
+        completedQuests: remaining.map((entry) => completedEntry(entry.id)),
+      }),
+    )
+    renderQuestWithJournal('quest_html_intro')
+
+    fireEvent.click(quizToggle())
+    passQuiz()
+    fireEvent.click(screen.getByRole('button', { name: 'Complete Quest' }))
+
+    act(() => {
+      vi.advanceTimersByTime(2500)
+    })
+
+    expect(screen.getByText('Quest Journal')).toBeInTheDocument()
   })
 })

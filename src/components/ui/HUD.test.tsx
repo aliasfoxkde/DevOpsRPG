@@ -2,10 +2,11 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vites
 import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
-import { GameProvider } from '../../contexts/GameContext'
+import { GameProvider, type GameState } from '../../contexts/GameContext'
 import { ThemeProvider } from '../../contexts/ThemeContext'
 import { allQuests } from '../../data/quests'
 import { HUD } from './HUD'
+import { STORAGE_KEYS } from '../../utils/gameUtils'
 
 // jsdom has no matchMedia. ThemeProvider needs it once the theme is set to
 // "system", which the HUD theme cycler can select.
@@ -46,6 +47,14 @@ function renderHud(initialPath = '/quests') {
 beforeEach(() => {
   localStorage.clear()
 })
+
+/**
+ * The provider merges a partial save file over its defaults, so a test only
+ * has to spell out the character fields the assertions care about.
+ */
+function seedCharacter(character: Partial<GameState['character']>) {
+  localStorage.setItem(STORAGE_KEYS.GAME, JSON.stringify({ character, badges: [] }))
+}
 
 describe('HUD', () => {
   it('renders the logo link back to the home realm', () => {
@@ -110,6 +119,88 @@ describe('HUD', () => {
   it('hides the XP multiplier badge while no boost is active', () => {
     renderHud()
     expect(screen.queryByText('1x')).toBeNull()
+  })
+
+  it('celebrates a long streak with the fire badge and the top tier copy', () => {
+    seedCharacter({ streakDays: 8 })
+    renderHud('/')
+
+    expect(screen.getByTitle('🔥 8 day streak! Amazing!')).toBeInTheDocument()
+    expect(screen.getByText('🔥')).toHaveClass('text-orange-400')
+    expect(screen.getByText('8')).toBeInTheDocument()
+    expect(screen.getByText('Legendary!')).toBeInTheDocument()
+  })
+
+  it('encourages a mid streak without the fire badge', () => {
+    seedCharacter({ streakDays: 4 })
+    renderHud('/')
+
+    expect(screen.getByTitle('🔥 4 day streak! Keep it up!')).toBeInTheDocument()
+    expect(screen.getByText('🔥')).toHaveClass('text-orange-400')
+    expect(screen.getByText('Great progress!')).toBeInTheDocument()
+  })
+
+  it('shows a cold streak in grey with the calendar icon', () => {
+    seedCharacter({ streakDays: 0 })
+    renderHud('/')
+
+    expect(screen.getByTitle('🔥 0 day streak! Build your streak!')).toBeInTheDocument()
+    expect(screen.getByText('📅')).toHaveClass('text-slate-500')
+    expect(screen.getByText('Keep going!')).toBeInTheDocument()
+  })
+
+  it('surfaces an active XP multiplier', () => {
+    seedCharacter({ xpMultiplier: 1.5, gold: 250 })
+    renderHud('/')
+
+    expect(screen.getByTitle('✨ 1.5x XP boost active!')).toBeInTheDocument()
+    expect(screen.getByText('1.5x')).toBeInTheDocument()
+    expect(screen.getByText('✨ 1.5x XP boost')).toBeInTheDocument()
+    expect(screen.getByTitle('💰 250 gold - Spend it in the Shop!')).toBeInTheDocument()
+  })
+
+  it('closes the mobile menu when the logo is clicked', async () => {
+    const user = userEvent.setup()
+    renderHud()
+
+    await user.click(screen.getByRole('button', { name: 'Toggle menu' }))
+    expect(screen.getByText('Level 1')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('link', { name: /DevOpsQuest/ }))
+
+    expect(screen.queryByText('Level 1')).toBeNull()
+  })
+
+  it('closes the mobile menu when a primary destination is picked', async () => {
+    const user = userEvent.setup()
+    renderHud()
+
+    await user.click(screen.getByRole('button', { name: 'Toggle menu' }))
+    expect(screen.getByText('Level 1')).toBeInTheDocument()
+
+    // The desktop bar renders the same destinations without a close handler,
+    // so pick the stacked link that only exists inside the mobile menu.
+    const mobileHome = screen
+      .getAllByRole('link', { name: /Home$/ })
+      .find((link) => link.className.includes('flex-col'))
+    if (!mobileHome) throw new Error('The mobile menu did not render a Home link')
+    await user.click(mobileHome)
+
+    expect(screen.queryByText('Level 1')).toBeNull()
+  })
+
+  it('marks the active secondary destination in the mobile menu', async () => {
+    const user = userEvent.setup()
+    seedCharacter({})
+    renderHud('/skills')
+
+    await user.click(screen.getByRole('button', { name: 'Toggle menu' }))
+
+    const skills = screen
+      .getAllByRole('link', { name: /Skills/ })
+      .find((link) => link.getAttribute('href') === '/skills')
+    expect(skills).toHaveClass('bg-amber-600')
+    expect(screen.getByRole('link', { name: /Settings/ })).not.toHaveClass('bg-amber-600')
   })
 
   it('cycles the theme and persists the choice', async () => {
@@ -206,6 +297,48 @@ describe('HUD', () => {
       fireEvent.mouseDown(document.body)
 
       expect(screen.queryByRole('menu')).toBeNull()
+    })
+
+    it('opens with the ArrowDown key and closes again on Escape', () => {
+      renderHud()
+
+      const more = screen.getByRole('button', { name: 'More navigation options' })
+      fireEvent.keyDown(more, { key: 'ArrowDown' })
+      expect(screen.getByRole('menu', { name: 'More navigation' })).toBeInTheDocument()
+      expect(more).toHaveAttribute('aria-expanded', 'true')
+
+      // ArrowDown is only an opener; it must not toggle the menu back shut.
+      fireEvent.keyDown(more, { key: 'ArrowDown' })
+      expect(screen.getByRole('menu', { name: 'More navigation' })).toBeInTheDocument()
+
+      fireEvent.keyDown(document, { key: 'Escape' })
+      expect(screen.queryByRole('menu')).toBeNull()
+      expect(more).toHaveAttribute('aria-expanded', 'false')
+      expect(more).toHaveFocus()
+    })
+
+    it('ignores Escape while the menu is already closed', () => {
+      renderHud()
+
+      fireEvent.keyDown(document, { key: 'Escape' })
+
+      expect(screen.queryByRole('menu')).toBeNull()
+      expect(screen.getByRole('button', { name: 'More navigation options' })).not.toHaveFocus()
+    })
+
+    it('highlights the destination matching the current route', async () => {
+      const user = userEvent.setup()
+      renderHud('/skills')
+
+      await user.click(screen.getByRole('button', { name: 'More navigation options' }))
+
+      const skills = screen
+        .getAllByRole('menuitem')
+        .find((item) => item.getAttribute('href') === '/skills')
+      expect(skills).toHaveClass('bg-amber-600/20')
+      expect(
+        screen.getAllByRole('menuitem').find((item) => item.getAttribute('href') === '/settings'),
+      ).not.toHaveClass('bg-amber-600/20')
     })
   })
 

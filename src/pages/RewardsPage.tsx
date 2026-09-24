@@ -122,7 +122,9 @@ export default function RewardsPage() {
       setShowMystery(true)
     } catch (err) {
       console.error('Failed to open mystery box:', err)
-      // Show a friendly error message to the user
+      // The popup below advertises a consolation prize, so pay it out — the
+      // page's own contract is to grant exactly what the popup shows.
+      addGold(10)
       setMysteryResult({
         type: 'gold',
         value: 10,

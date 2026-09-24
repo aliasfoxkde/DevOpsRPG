@@ -204,6 +204,13 @@ export default function MilestonesPage() {
   const totalCount = MILESTONES.length
   const completionPercent = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0
 
+  // The grid renders the static catalogue, whose entries never carry an unlock
+  // timestamp, so resolve the persisted record before showing the unlock date.
+  const selectedUnlockedAt = selectedMilestone
+    ? (milestones.find((m) => m.id === selectedMilestone.id)?.unlockedAt ??
+      selectedMilestone.unlockedAt)
+    : undefined
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
@@ -455,11 +462,11 @@ export default function MilestonesPage() {
                 </span>
               </div>
 
-              {isUnlocked(selectedMilestone) && selectedMilestone.unlockedAt && (
+              {isUnlocked(selectedMilestone) && selectedUnlockedAt && (
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-500">Unlocked At</span>
                   <span className="text-slate-300">
-                    {new Date(selectedMilestone.unlockedAt).toLocaleDateString()}
+                    {new Date(selectedUnlockedAt).toLocaleDateString()}
                   </span>
                 </div>
               )}

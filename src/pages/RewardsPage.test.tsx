@@ -85,6 +85,53 @@ describe('RewardsPage', () => {
     expect(screen.getAllByText('🔒')).toHaveLength(4)
   })
 
+  it('maps Sunday onto the seventh daily reward slot', () => {
+    vi.useFakeTimers()
+    // Sunday is getDay() 0, which the track treats as the seventh and final day
+    const sunday = new Date()
+    sunday.setDate(sunday.getDate() + ((7 - sunday.getDay()) % 7))
+    sunday.setHours(12, 0, 0, 0)
+    vi.setSystemTime(sunday)
+    renderSeededPage(<RewardsPage />, { route: '/rewards', url: '/rewards' })
+
+    expect(screen.getByText('Day 7 reward available!')).toBeInTheDocument()
+
+    act(() => {
+      fireEvent.click(screen.getByRole('button', { name: 'CLAIM!' }))
+    })
+
+    // The claim is recorded against the remapped day number, not 0
+    expect(storedGame().dailyRewardsClaimed).toEqual([7])
+    expect(screen.queryByRole('button', { name: 'CLAIM!' })).not.toBeInTheDocument()
+  })
+
+  it('promotes the streak title and unlocks every milestone at 30 days', () => {
+    seedAndRender((game) => ({ ...game, character: { ...game.character, streakDays: 30 } }))
+
+    const streakBox = closestContainer(screen.getByText('Day Streak'), '.flex.items-center.gap-4')
+    expect(within(streakBox).getByText('🔥')).toBeInTheDocument()
+    expect(screen.getByText('🏆 Legend')).toBeInTheDocument()
+    for (const milestone of ['3 Days', '7 Days', '14 Days', '30 Days']) {
+      const card = closestContainer(screen.getByText(milestone), '.rounded-lg')
+      expect(card.textContent).toContain('✓')
+      expect(card.textContent).not.toContain('🔒')
+    }
+  })
+
+  it('ranks a three day streak as an apprentice with one milestone earned', () => {
+    seedAndRender((game) => ({ ...game, character: { ...game.character, streakDays: 3 } }))
+
+    const streakBox = closestContainer(screen.getByText('Day Streak'), '.flex.items-center.gap-4')
+    expect(within(streakBox).getByText('⚡')).toBeInTheDocument()
+    expect(screen.getByText('🌱 Apprentice')).toBeInTheDocument()
+    expect(closestContainer(screen.getByText('3 Days'), '.rounded-lg').textContent).toContain('✓')
+    for (const milestone of ['7 Days', '14 Days', '30 Days']) {
+      expect(closestContainer(screen.getByText(milestone), '.rounded-lg').textContent).toContain(
+        '🔒',
+      )
+    }
+  })
+
   it('spins the bonus wheel and reports a prize', async () => {
     vi.useFakeTimers()
     renderSeededPage(<RewardsPage />, { route: '/rewards', url: '/rewards' })
@@ -282,5 +329,107 @@ describe('RewardsPage', () => {
 
     expect(screen.getByText('Streak Shield Active')).toBeInTheDocument()
     expect(screen.getByText('Your streak is protected for 2 day(s)')).toBeInTheDocument()
+  })
+
+  it('pays a badge pack out and records the badge in the save', async () => {
+    const user = userEvent.setup()
+    // A non-empty inventory makes the claim guard scan it before offering the pack
+    const game = seedAndRender((state) => ({
+      ...state,
+      completedQuests: allQuests.slice(0, 15).map((quest) => ({
+        topicId: quest.topicId,
+        technologyId: quest.technologyId,
+        questId: quest.id,
+        completed: true,
+        xpEarned: quest.xpReward,
+        completedAt: new Date().toISOString(),
+      })),
+      collectibles: [poolCollectible('hint_scroll')],
+    }))
+
+    const tier = REWARD_TIERS.find((entry) => entry.id === 'tier_2')
+    if (!tier) throw new Error('Journeyman Pack missing from REWARD_TIERS')
+    const card = closestContainer(screen.getByText(tier.name), '.rounded-lg')
+    expect(within(card).getByText('+ Badge')).toBeInTheDocument()
+
+    await user.click(within(card).getByRole('button', { name: /CLAIM PACK/ }))
+
+    const stored = storedGame()
+    expect(stored.character.xp).toBe(game.character.xp + tier.rewards.xp)
+    expect(stored.character.gold).toBe(game.character.gold + tier.rewards.gold)
+    // The advertised badge is granted, the inventory is untouched
+    expect(stored.badges.find((badge) => badge.id === tier.rewards.badge)?.unlockedAt).toBeTruthy()
+    expect(stored.collectibles).toHaveLength(1)
+    expect(within(card).getByText('✓ Claimed!')).toBeInTheDocument()
+  })
+
+  it('refuses to re-offer a pack that is already recorded as claimed', () => {
+    seedAndRender((state) => ({
+      ...state,
+      completedQuests: allQuests.slice(0, 5).map((quest) => ({
+        topicId: quest.topicId,
+        technologyId: quest.technologyId,
+        questId: quest.id,
+        completed: true,
+        xpEarned: quest.xpReward,
+        completedAt: new Date().toISOString(),
+      })),
+      collectibles: [{ ...poolCollectible('hint_scroll'), id: 'tier_claimed_tier_1' }],
+    }))
+
+    // The Apprentice Pack is complete but its claim marker blocks the payout
+    const card = closestContainer(screen.getByText('Apprentice Pack'), '.rounded-lg')
+    expect(within(card).getByText('100%')).toBeInTheDocument()
+    expect(within(card).getByText('✓ Claimed!')).toBeInTheDocument()
+    expect(within(card).queryByRole('button', { name: /CLAIM PACK/ })).not.toBeInTheDocument()
+  })
+
+  it('pays a mystery box that rolls gold', async () => {
+    const user = userEvent.setup()
+    // A common box rolls xp or gold first: 0.6 forces the gold row of its table
+    vi.spyOn(Math, 'random').mockReturnValue(0.6)
+    const game = seedAndRender((state) => ({
+      ...state,
+      collectibles: [poolCollectible('mystery_common')],
+    }))
+
+    await user.click(screen.getByRole('button', { name: '🎁 OPEN' }))
+
+    const revealed = screen.getByText('Mystery Box Opened!').nextElementSibling
+    if (!(revealed instanceof HTMLElement)) throw new Error('Mystery reward element missing')
+    const goldReward = /^🪙 \+(\d+) Gold$/.exec(revealed.textContent)
+    if (!goldReward) throw new Error(`Expected a gold reward, saw "${revealed.textContent}"`)
+
+    await user.click(screen.getByRole('button', { name: /Awesome!/ }))
+
+    const after = storedGame()
+    expect(after.character.gold).toBe(game.character.gold + Number(goldReward[1]))
+    expect(after.character.xp).toBe(game.character.xp)
+  })
+
+  it('falls back to a consolation prize when a box cannot be opened', async () => {
+    const user = userEvent.setup()
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const corrupt: unknown = JSON.parse(
+      JSON.stringify({ ...poolCollectible('mystery_common'), effect: undefined }),
+    )
+    const game = seedAndRender((state) => ({ ...state, collectibles: [corrupt as Collectible] }))
+
+    await user.click(screen.getByRole('button', { name: '🎁 OPEN' }))
+
+    // A fixed 10 gold consolation is shown and paid instead of a crash
+    expect(screen.getByText('Mystery Box Opened!')).toBeInTheDocument()
+    expect(screen.getByText('🪙 +10 Gold')).toBeInTheDocument()
+    expect(errorSpy).toHaveBeenCalled()
+
+    await user.click(screen.getByRole('button', { name: /Awesome!/ }))
+
+    const after = storedGame()
+    expect(after.character.gold).toBe(game.character.gold + 10)
+    expect(after.character.xp).toBe(game.character.xp)
+    // The broken box is consumed on close, so the player is not stuck with it
+    expect(after.collectibles).toHaveLength(1)
+    expect(after.collectibles[0].used).toBe(true)
+    expect(screen.getByText('(0 active)')).toBeInTheDocument()
   })
 })

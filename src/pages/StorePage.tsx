@@ -105,7 +105,9 @@ const SHOP_ITEMS: ShopItem[] = [
 
   // Utility
   {
-    id: 'buy_hint',
+    // Must match the `hint_scroll` collectible id in COLLECTIBLES_POOL, which is
+    // what GameContext.purchaseItem resolves a `buy_` prefixed id against.
+    id: 'buy_hint_scroll',
     name: 'Hint Scroll',
     description: 'Reveals the correct answer on a quiz',
     icon: '💡',
@@ -255,7 +257,7 @@ const CATEGORIES = [
 ]
 
 export default function StorePage() {
-  const { game, purchaseItem, equipItem, equipCompanion } = useGame()
+  const { game, purchaseItem, equipItem, equipCompanion, addGold } = useGame()
   const { character, activeCompanion } = game
   const [category, setCategory] = useState('all')
   const [purchaseMessage, setPurchaseMessage] = useState<string | null>(null)
@@ -286,8 +288,10 @@ export default function StorePage() {
         setPurchaseMessage(`You already own ${item.name}!`)
         return
       }
-      // Deduct gold and equip
-      purchaseItem(item.id, item.price)
+      // Deduct gold and equip. GameContext.purchaseItem only resolves
+      // companion and collectible ids, so an equipment id would be a silent
+      // no-op there and the price is paid here instead.
+      addGold(-item.price)
       equipItem(item.equipmentData.id)
       setPurchaseMessage(`Purchased and equipped ${item.name}!`)
       setTimeout(() => {
@@ -319,8 +323,6 @@ export default function StorePage() {
         return 'from-amber-900/50 to-slate-800'
       case undefined:
         return 'from-slate-700 to-slate-800'
-      default:
-        return 'from-slate-700 to-slate-800'
     }
   }
 
@@ -337,8 +339,6 @@ export default function StorePage() {
       case 'legendary':
         return 'border-amber-600'
       case undefined:
-        return 'border-slate-600'
-      default:
         return 'border-slate-600'
     }
   }
@@ -438,11 +438,11 @@ export default function StorePage() {
             const isEquipment = item.category === 'equipment'
             const isOwned =
               isEquipment && character.equippedItems.includes(item.equipmentData?.id || '')
+            // Companion ids in state are the shop suffix ("buy_companion_owl"
+            // -> "owl"), so the comparison has to strip the shop prefix.
             const isAlreadyPurchased =
               item.category === 'companion' &&
-              game.companions.some(
-                (c) => c.id === `buy_companion_${item.id.replace('buy_companion_', '')}`,
-              )
+              game.companions.some((c) => c.id === item.id.replace('buy_companion_', ''))
 
             return (
               <div

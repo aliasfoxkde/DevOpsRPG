@@ -118,6 +118,16 @@ describe('OnboardingWizard', () => {
       await user.type(nameInput(), 'Nia  ')
       expect(continueButton()).toBeEnabled()
     })
+
+    it('refuses to continue on a whitespace-only name', async () => {
+      const user = userEvent.setup()
+      renderWizard()
+
+      await user.type(nameInput(), '   ')
+
+      expect(continueButton()).toBeDisabled()
+      expect(screen.queryByText('Choose Your Path')).toBeNull()
+    })
   })
 
   describe('step 1 - class selection', () => {

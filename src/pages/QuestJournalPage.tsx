@@ -226,7 +226,10 @@ export default function QuestJournalPage() {
               aria-label="Filter quests by difficulty"
               value={filterDifficulty}
               onChange={(e) => {
-                setFilterDifficulty(e.target.value as FilterDifficulty)
+                // A select always reports a string, but the filter compares
+                // against the numeric quest difficulty.
+                const value = e.target.value
+                setFilterDifficulty(value === 'all' ? 'all' : (Number(value) as FilterDifficulty))
               }}
               className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
             >
