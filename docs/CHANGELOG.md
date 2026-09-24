@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [0.1.3] - 2026-09-24
 
 Quality-infrastructure cycle: GitForge-first CI, a production worker CORS fix found by the
 new worker test suite, a repo-wide strict type-aware lint campaign, and a full WCAG 2.1 AAA
@@ -18,8 +18,8 @@ accessibility pass.
 - `a11y` job in both CI pipelines: the axe audit runs over a dev server with `--aaa-strict`
   (0 AA and AAA violations required) and gates preview + production deploys
 - `npm run audit:secrets`: Aegis production-profile pattern scan with a committed baseline
-  ratchet (`aegis-baseline.json`, 198 triaged findings) — the gate fails only on findings that
-  are new relative to the baseline
+  ratchet (`aegis-baseline.json`, re-triaged at 354 findings after the file splits) — the gate
+  fails only on findings that are new relative to the baseline
 - `npm run test:worker` + `worker/vitest.config.ts`: 18 tests over the worker KV API router
   (CORS preflight/echo, auth schemes, progress merge semantics, leaderboard happy/sad paths,
   404 routing) using in-memory KV/D1 fakes with real get/put serialization semantics
@@ -50,9 +50,31 @@ accessibility pass.
   - PVP rank palette retuned so small rank text passes on self-tinted tiles; tile labels
     are neutral text with the rank color carried by the tile tint
 - `docs/process/VALIDATION.md` a11y gate updated to reflect the enforced AA + AAA standard
+- Victory Modal e2e tests were broken by their own seeding: the seed wrote a partial record
+  that `loadAndValidateGame` rejects (no `character`/`badges`), so the app booted a fresh game
+  and the modal never appeared. Seeds now build a valid record pre-boot via `addInitScript`
+  (replacing the evaluate→reload version that raced the app's mount-time save); suite 30/30
+  across chromium/firefox/webkit
 
 ### Changed
 
+- `GameContext` decomposed (2,327 → 1,509 lines) into focused modules behind an unchanged
+  `useGame` facade: state types (`src/contexts/game/types.ts`, re-exported for import
+  compatibility), linear XP math (`xp.ts`, kept deliberately separate from gameUtils' capped
+  skill curve), default-state factories (`defaultState.ts`), and the full persistence layer
+  (`gameStorage.ts` — load/validate/deep-merge/backup fallback, dual-key save, cross-tab
+  sync). Pure unlock rules moved to tested modules (`achievementsRules`, `progression`,
+  `titlesFramesRules`) with 26 new threshold unit tests pinning every ladder boundary; the
+  duplicated prestige stats literal was deduplicated into `createEmptyStats()`. One
+  deliberate non-unification is documented in `progression.ts`: `completeQuest`'s inline
+  completed-tech list intentionally tracks techs touched, not only fully-completed ones
+- Companion data models unified into `src/data/companions.ts` (`Companion`,
+  `COMPANIONS_DATA`, `EVOLVED_COMPANIONS`) with data-integrity tests covering evolution
+  references, id uniqueness, and bond/bonus bounds
+- `quizzes.ts` (2,833 lines) split into 26 per-technology modules under `src/data/quizzes/`
+  behind a 125-line assembling barrel; the split was performed via the TypeScript compiler
+  API and proven data-equivalent (same 105-topic key set, per-key deep equality, alias
+  resolution intact)
 - `docs/process/VALIDATION.md` rewritten to document the actual 10-gate validation suite and
   coverage-ratchet procedure (the previous text described OAuth flows, iframes and ports this
   app does not have)
@@ -233,7 +255,7 @@ We use [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Minor version**: New functionality in backwards compatible manner
 - **Patch version**: Backwards compatible bug fixes
 
-Current version: **0.1.0** (Pre-alpha - Feature complete for foundation)
+Current version: **0.1.3** (Pre-alpha - Feature complete for foundation)
 
 ---
 

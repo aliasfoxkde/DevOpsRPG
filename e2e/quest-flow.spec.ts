@@ -59,26 +59,41 @@ test.describe('Victory Modal', () => {
   // Seeds victory state using the app's own persisted shape (storage key from
   // STORAGE_KEYS.GAME = 'devopsquest_game'), then reloads so the app loads it.
   async function loadWithVictory(page: Page) {
-    await page.goto('/')
-    await expect(page.getByRole('progressbar', { name: /experience/i })).toBeVisible({
-      timeout: 15000,
-    })
-
-    await page.evaluate(() => {
+    // Seeds via addInitScript so the record exists before the app boots.
+    // The previous evaluate-then-reload version raced the app's mount-time
+    // requestAnimationFrame quest save, which could overwrite the seed with
+    // pre-seed state after the write but before the reload.
+    await page.addInitScript(() => {
       const key = 'devopsquest_game'
       // Structural slice of the app's persisted GameState: only the fields this
       // seed touches are modelled, everything else is passed through untouched.
       const isRecord = (value: unknown): value is Record<string, unknown> =>
         typeof value === 'object' && value !== null
       const raw = localStorage.getItem(key)
-      const parsed: unknown = raw ? JSON.parse(raw) : {}
+      let parsed: unknown = {}
+      try {
+        parsed = raw ? JSON.parse(raw) : {}
+      } catch {
+        parsed = {}
+      }
       const state = isRecord(parsed) ? parsed : {}
       state.hasSeenOnboarding = true
       state.showVictory = true
       state.lastVictory = { xp: 100, levelUp: false, newLevel: 2, milestone: null, badge: null }
+      // loadAndValidateGame rejects records without these two fields before it
+      // deep-merges onto the app defaults, and a rejected record boots a fresh
+      // game with showVictory cleared. An empty character object and empty
+      // badge array pass the check and merge onto the defaults on load.
+      if (!isRecord(state.character)) state.character = {}
+      if (!Array.isArray(state.badges)) state.badges = []
       localStorage.setItem(key, JSON.stringify(state))
     })
-    await page.reload()
+    await page.goto('/')
+    // Scoped to the banner: the victory modal under test renders its own
+    // "Experience progress" bar, which would trip strict mode on this wait.
+    await expect(
+      page.getByRole('banner').getByRole('progressbar', { name: /experience/i }),
+    ).toBeVisible({ timeout: 15000 })
   }
 
   test('victory modal shows on quest complete', async ({ page }) => {

@@ -8,3 +8,4 @@ package-lock.json
 src/data/w3schools-content.ts
 audit-report.json
 aegis-report.json
+aegis-baseline.json

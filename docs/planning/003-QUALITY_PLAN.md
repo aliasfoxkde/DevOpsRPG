@@ -386,6 +386,36 @@ data models into `src/data/companions.ts`; split `quizzes.ts` into per-technolog
 extract `WorldMapPage` subcomponents; port scripts off sync I/O with tests. Behavior
 locked by B's tests before each split.
 
+**Phase D status — 3 of 5 items landed (2026-09-24, commits 31023aa / 7161fc3 / 9ec309f).**
+
+- `GameContext` decomposed 2327 → 1509 lines with the `useGame` public API byte-identical
+  (zero consumer edits; `GameState`/`CharacterClass` re-exported from the new
+  `src/contexts/game/types.ts`). Extracted modules, each pure and unit-tested:
+  `types.ts` (state types), `xp.ts` (linear level math + title ladder — kept deliberately
+  separate from gameUtils' capped `XP_THRESHOLDS` curve), `defaultState.ts` (`ACHIEVEMENTS`,
+  default-state factories, `createEmptyStats()` deduplicating the prestige stats literal),
+  `gameStorage.ts` (localStorage load/validate/deep-merge/backup fallback + save and
+  cross-tab-sync effects), `achievementsRules.ts` (legacy achievement switch),
+  `progression.ts` (`computeFullyCompletedTechnologies`, deduplicating the identical
+  loops in the badge/milestone checkers), `titlesFramesRules.ts` (title/frame unlock
+  ladders + per-tech quest counting). The companion data models were unified into
+  `src/data/companions.ts` with data-integrity tests. One deliberate non-unification is
+  documented in `progression.ts`: `completeQuest`'s inline completed-tech list tracks
+  techs _touched_, a broader `shouldUnlockBadge` input than the strict all-topics-complete
+  derivation — merging would silently change badge behavior.
+- `quizzes.ts` (2,833 lines) split into 26 per-technology modules under `src/data/quizzes/`
+  with a 125-line assembling barrel. The split was performed mechanically via the
+  TypeScript compiler API and proven equivalent (same 105-topic key set, per-key deep
+  equality, alias resolution intact).
+- Scripts sync-I/O item closed as no-action-needed: the only sync I/O in `scripts/` is
+  one startup read (`axe-audit.mjs` loading axe-core) and two terminal output writes
+  (`scrape-w3schools.js`, `deep-audit.mjs`) — one-shot CLI tools with no event loop or
+  concurrency to protect; porting to async would be churn.
+- Remaining Phase D item: `WorldMapPage` (1,381 lines) subcomponent extraction —
+  presentational restructuring, intentionally deferred: per `002-REFACTORING.md`'s own
+  risk rule ("one refactor at a time, verify each") it is not rushed into the same
+  release as the store/data splits above.
+
 **Phase E — GitForge pipeline (blocked on user auth).** Mechanical once
 `gitforge auth --login <user>` runs: `gitforge repo --create aliasfoxkde/DevOpsRPG`,
 register the pipeline (lint → typecheck → test → e2e → build), push both remotes,
@@ -425,16 +455,16 @@ wrangler deploy with existing env vars → byte-verify production.
 
 Phase A landed in full. Final gate state after the campaign:
 
-| Gate                       | Result                                                                                                          |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| ESLint (strictTypeChecked) | 1165 errors → **0 errors / 0 warnings** across 198 files (`--max-warnings 0`), zero eslint-disable comments     |
-| Typecheck                  | 3 projects green (app `tsconfig.json`, tooling `tsconfig.node.json` incl. `scripts/**` + `e2e/**`, `worker/`)   |
-| Tests                      | **70 files / 606 tests passing**; new tests added for every fixed defect                                        |
-| Prettier                   | repo-wide single-format commit; `format:check` gate green                                                       |
-| Knip                       | 0 unused exports/files/deps; config trimmed to auto-detected entries; `src/**/*.css` followed                   |
-| Aegis                      | baseline committed (`aegis-baseline.json`, 198 findings triaged — see below); `audit:secrets` fails only on new |
-| Coverage                   | 62.63/58.30/62.23/65.24 → **65.51 stmts / 59.25 branch / 65.88 funcs / 68.08 lines**; thresholds ratcheted up   |
-| Build                      | `tsc -b && vite build` green                                                                                    |
+| Gate                       | Result                                                                                                        |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| ESLint (strictTypeChecked) | 1165 errors → **0 errors / 0 warnings** across 198 files (`--max-warnings 0`), zero eslint-disable comments   |
+| Typecheck                  | 3 projects green (app `tsconfig.json`, tooling `tsconfig.node.json` incl. `scripts/**` + `e2e/**`, `worker/`) |
+| Tests                      | **70 files / 606 tests passing**; new tests added for every fixed defect                                      |
+| Prettier                   | repo-wide single-format commit; `format:check` gate green                                                     |
+| Knip                       | 0 unused exports/files/deps; config trimmed to auto-detected entries; `src/**/*.css` followed                 |
+| Aegis                      | baseline committed (`aegis-baseline.json`, triaged — see below); `audit:secrets` fails only on new            |
+| Coverage                   | 62.63/58.30/62.23/65.24 → **65.51 stmts / 59.25 branch / 65.88 funcs / 68.08 lines**; thresholds ratcheted up |
+| Build                      | `tsc -b && vite build` green                                                                                  |
 
 Work executed:
 
@@ -467,13 +497,19 @@ Work executed:
   and a `security` job (aegis baseline ratchet, degrade-to-warning on GitHub where the
   binary is unavailable), npm scripts `format`/`format:check`/`knip`/`audit:secrets`,
   `typecheck` extended to all three tsconfigs.
-- **Aegis baseline triage** (198 findings, all reviewed): the 8 "high" findings are
-  false positives — scraped W3Schools teaching content about `innerHTML` (React
-  escapes on render), a `'devopsquest_voice_settings'` STORAGE_KEY constant, a
-  `secret:` badge-category label, and a `100000000` XP clamp matching tax-number
-  patterns. Mediums are `Math.random()` game randomness (66), 5-digit XP values read
-  as zip codes (59), SQL-teaching content, and localhost URLs in docs/scripts of a
-  fully client-side app. Baseline ratchet means any NEW occurrence fails CI.
+- **Aegis baseline triage** (198 findings at first commit, all reviewed; re-triaged at
+  354 findings on 2026-09-24 after the Phase D file splits created new scan units —
+  same finding classes, new fingerprints): the "high" findings are all false positives
+  — scraped W3Schools teaching content about `innerHTML` (React escapes on render), a
+  `'devopsquest_voice_settings'` STORAGE_KEY constant, `secret:` badge-category labels,
+  a `100000000` XP clamp matching tax-number patterns, and test mocks with fake
+  bearer tokens/API keys. Mediums are `Math.random()` game randomness (client-side
+  drop chances and response variety), 5-digit XP values read as zip codes,
+  SQL-teaching content, and localhost URLs in docs/scripts/CI of a fully client-side
+  app. Baseline ratchet means any NEW occurrence fails CI. (Note: never write audit
+  output into the repo tree — the scanner will scan its own SARIF/JSON output and
+  each finding appears twice; `aegis-baseline.json` is prettier-ignored for the same
+  reason.)
 - **Coverage measurement note**: vitest v8 coverage under 2-worker parallelism
   silently dropped 2 test files (undercounting both tests and coverage); the 2026-09-24
   numbers above are from a single-worker run. Use `--maxWorkers=1` for coverage runs
