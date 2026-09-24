@@ -25,6 +25,7 @@ npm run lint
 ## Cloudflare Pages Deployment
 
 ### Prerequisites
+
 - Wrangler CLI installed (`npm install -g wrangler`)
 - Cloudflare account configured
 
@@ -36,6 +37,7 @@ npm run deploy
 ```
 
 This runs:
+
 1. `npm run build:cloudflare` - builds the ViteJS app
 2. `npx wrangler pages deploy dist` - deploys to Cloudflare
 

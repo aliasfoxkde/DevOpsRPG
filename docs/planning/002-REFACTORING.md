@@ -18,6 +18,7 @@
 ### 1. GameContext Split (900+ lines → ~200 lines each)
 
 **Current State:**
+
 - Single `GameContext.tsx` handles everything
 - Quest completion, XP calculation, badges, milestones, companions, collectibles, etc.
 
@@ -33,6 +34,7 @@ src/contexts/
 ```
 
 **Migration Plan:**
+
 1. Create `QuestContext` with `completeQuest`, `isQuestCompleted`, `getNextQuest`
 2. Create `CollectionContext` with badge/milestone/collectible logic
 3. Update components to use new contexts
@@ -42,11 +44,13 @@ src/contexts/
 ### 2. Quiz Component Refactor
 
 **Current Issues:**
+
 - 550+ lines in Quiz.tsx
 - Mixed concerns (UI, state, handlers)
 - `finishHandledRef` state machine is confusing
 
 **Proposed Structure:**
+
 ```
 src/components/ui/quiz/
 ├── Quiz.tsx                 # Main container
@@ -63,11 +67,13 @@ src/components/ui/quiz/
 ### 3. BattleArenaPage Simplification
 
 **Current Issues:**
+
 - 570+ lines
 - Many inline timer refs
 - Complex completion flow
 
 **Proposed Structure:**
+
 ```
 src/pages/BattleArenaPage/
 ├── BattleArenaPage.tsx      # Main container
@@ -88,6 +94,7 @@ src/pages/BattleArenaPage/
 **Current:** 25+ data files with some duplication
 
 **Proposed:** Organize by domain
+
 ```
 src/data/
 ├── quests/
@@ -116,6 +123,7 @@ src/data/
 **Current:** Mixed in `hooks/` directory
 
 **Proposed:** Group related hooks
+
 ```
 src/hooks/
 ├── useGame.ts               # useGame convenience hook
@@ -134,6 +142,7 @@ src/hooks/
 **Current:** Some components have similar patterns
 
 **Create unified base components:**
+
 ```
 src/components/ui/
 ├── Base/
@@ -153,6 +162,7 @@ src/components/ui/
 **Current:** Mix of Tailwind classes and some inline styles
 
 **Proposed:**
+
 - Establish Tailwind component patterns in `tailwind.config.js`
 - Extract complex animations to CSS keyframes
 - Document color palette usage
@@ -162,6 +172,7 @@ src/components/ui/
 **Current:** Magic numbers scattered in code
 
 **Proposed:** Centralize constants
+
 ```typescript
 // src/constants/
 export const QUIZ = {
@@ -188,6 +199,7 @@ export const GAME = {
 **Current:** Types defined in various places
 
 **Proposed:** Central type definitions
+
 ```typescript
 // src/types/
 export * from './quest.types'
@@ -200,30 +212,35 @@ export * from './progression.types'
 ## 📋 REFACTORING EXECUTION PLAN
 
 ### Phase 1: Preparation (1-2 days)
+
 1. Set up comprehensive test coverage
 2. Create GitHub Actions CI/CD
 3. Establish pre-commit hooks
 4. Document current behavior
 
 ### Phase 2: Context Split (2-3 days)
+
 1. Extract QuestContext
 2. Extract CollectionContext
 3. Update all consumers
 4. Test thoroughly
 
 ### Phase 3: Quiz Refactor (2-3 days)
+
 1. Split into smaller components
 2. Extract hook for state machine
 3. Simplify 'n' key handler
 4. Add comprehensive tests
 
 ### Phase 4: Data Layer (1-2 days)
+
 1. Reorganize data files
 2. Create clear exports
 3. Remove duplication
 4. Add data validation
 
 ### Phase 5: Polish (1-2 days)
+
 1. Constants organization
 2. Component library cleanup
 3. CSS/Tailwind improvements
@@ -233,18 +250,19 @@ export * from './progression.types'
 
 ## ⚠️ Risks & Mitigations
 
-| Risk | Mitigation |
-|------|------------|
+| Risk                            | Mitigation                                  |
+| ------------------------------- | ------------------------------------------- |
 | Breaking existing functionality | Comprehensive test coverage before refactor |
-| Too many changes at once | One refactor at a time, verify each |
-| Performance regression | Benchmark before/after |
-| Losing context during split | Frequent commits, small PRs |
+| Too many changes at once        | One refactor at a time, verify each         |
+| Performance regression          | Benchmark before/after                      |
+| Losing context during split     | Frequent commits, small PRs                 |
 
 ---
 
 ## ✅ SUCCESS CRITERIA
 
 After refactoring:
+
 - [ ] No increase in bundle size
 - [ ] All existing tests pass
 - [ ] New test coverage > 70%

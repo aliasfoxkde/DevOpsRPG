@@ -8,17 +8,17 @@
 
 ## Technology Stack
 
-| Layer | Technology | Justification |
-|-------|------------|---------------|
-| Frontend | ViteJS + React 19 | CSR-first SPA, excellent DX, fast builds |
-| Styling | Tailwind CSS v4 | Theme system, dark/light modes via @tailwindcss/vite |
-| State | React Context + localStorage | Simple, offline-capable |
-| Backend | Cloudflare Workers | Edge computing, free tier |
-| Database | Cloudflare D1 (SQLite) | SQL at edge, zero config |
-| Sessions | Cloudflare KV | Fast key-value session store |
-| Auth | Google/GitHub OAuth | Standard SSO, Workers integration |
-| Deployment | Cloudflare Pages | Free hosting, global CDN |
-| Testing | Vitest + Playwright | Unit and E2E coverage |
+| Layer      | Technology                   | Justification                                        |
+| ---------- | ---------------------------- | ---------------------------------------------------- |
+| Frontend   | ViteJS + React 19            | CSR-first SPA, excellent DX, fast builds             |
+| Styling    | Tailwind CSS v4              | Theme system, dark/light modes via @tailwindcss/vite |
+| State      | React Context + localStorage | Simple, offline-capable                              |
+| Backend    | Cloudflare Workers           | Edge computing, free tier                            |
+| Database   | Cloudflare D1 (SQLite)       | SQL at edge, zero config                             |
+| Sessions   | Cloudflare KV                | Fast key-value session store                         |
+| Auth       | Google/GitHub OAuth          | Standard SSO, Workers integration                    |
+| Deployment | Cloudflare Pages             | Free hosting, global CDN                             |
+| Testing    | Vitest + Playwright          | Unit and E2E coverage                                |
 
 ---
 
@@ -67,18 +67,23 @@
 ## Learning Path Order (47 Technologies)
 
 ### Phase 1 - Foundations (6)
+
 INTRO TO PROGRAMMING → INTRO TO HTML & CSS → HTML → CSS → JAVASCRIPT → SQL
 
 ### Phase 2 - Backend Basics (8)
+
 PYTHON → JAVA → PHP → C → C++ → C# → HOW TO → W3.CSS
 
 ### Phase 3 - Frameworks & Databases (11)
+
 BOOTSTRAP → REACT → MYSQL → JQUERY → EXCEL → XML → DJANGO → NUMPY → PANDAS → NODEJS → DSA
 
 ### Phase 4 - Advanced & Cloud (9)
+
 TYPESCRIPT → ANGULAR → ANGULARJS → GIT → POSTGRESQL → MONGODB → ASP → AI → R
 
 ### Phase 5 - Modern DevOps (13)
+
 GO → KOTLIN → SWIFT → SASS → VUE → GEN AI → SCIPY → AWS → CYBERSECURITY → DATA SCIENCE → BASH → RUST → TOOLS
 
 ---
@@ -127,11 +132,13 @@ CREATE TABLE achievements (
 ## Cloudflare Deployment
 
 ### Pages Configuration
+
 - Build command: `npm run build:cloudflare`
 - Output directory: `dist`
 - Node version: 18
 
 ### Workers Configuration
+
 - Wrangler.toml for worker bindings
 - D1 database bindings
 - KV namespace bindings

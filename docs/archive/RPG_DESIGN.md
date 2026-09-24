@@ -33,7 +33,8 @@ Your mission: **Master the Eternal Pipeline** — every technology, every practi
 The journey takes you through five distinct realms, each representing a phase of DevOps mastery:
 
 #### 1. **The Village of Foundations** 🏘️
-*Where every hero begins their journey*
+
+_Where every hero begins their journey_
 
 The village of Clearwater sits at the base of Mount Deploy. Here, aspiring Paladins learn the ancient arts: HTML structures the world, CSS styles it, JavaScript brings it to life. Git keeps records of all changes. SQL speaks to the data keepers.
 
@@ -41,10 +42,11 @@ The village of Clearwater sits at the base of Mount Deploy. Here, aspiring Palad
 **Quests:** 55 topics
 **Level Requirement:** 1
 
-The village elder, **Old Terminal**, tells you: *"Every great system began with a single HTML tag. Learn the foundations, and you can build anything."*
+The village elder, **Old Terminal**, tells you: _"Every great system began with a single HTML tag. Learn the foundations, and you can build anything."_
 
 #### 2. **The Forest of Scripts** 🌲
-*The misty woods where automation spirits dwell*
+
+_The misty woods where automation spirits dwell_
 
 Beyond the village lies the Whispering Woods. Here, the Script Spirits teach the art of automation. Python serpents offer wisdom in exchange for clean code. Bash whispers commands from the shadows. Docker containers float like jellyfish, holding entire worlds within.
 
@@ -52,10 +54,11 @@ Beyond the village lies the Whispering Woods. Here, the Script Spirits teach the
 **Quests:** 19 topics
 **Level Requirement:** 5
 
-The forest spirit, **Commander Container**, warns: *"Manually deploying to ten servers is madness. Automate, or be automated."*
+The forest spirit, **Commander Container**, warns: _"Manually deploying to ten servers is madness. Automate, or be automated."_
 
 #### 3. **The Castle of Frameworks** 🏰
-*Towering halls filled with powerful constructs*
+
+_Towering halls filled with powerful constructs_
 
 The Castle of Constructs rises from the mist. React guardians defend the frontend. Node.js monks run the backend temples. PostgreSQL and MongoDB vaults hold endless data treasures. The Data Mages who rule here are powerful but secretive.
 
@@ -63,10 +66,11 @@ The Castle of Constructs rises from the mist. React guardians defend the fronten
 **Quests:** 23 topics
 **Level Requirement:** 10
 
-Castle librarian **Database Diana** says: *"A framework is just someone else's code. Master it, then transcend it."*
+Castle librarian **Database Diana** says: _"A framework is just someone else's code. Master it, then transcend it."_
 
 #### 4. **The Mountains of Cloud** ⛰️
-*Where the cloud eagles soar and storms rage*
+
+_Where the cloud eagles soar and storms rage_
 
 The most treacherous terrain. AWS trading posts perch on impossible cliffs. Kubernetes warships command fleets of containers. Terraform mages reshape the very infrastructure with spell-like configurations.
 
@@ -74,10 +78,11 @@ The most treacherous terrain. AWS trading posts perch on impossible cliffs. Kube
 **Quests:** 14 topics
 **Level Requirement:** 15
 
-Cloud veteran **Scalable Steve** teaches: *"In the cloud, everything fails all the time. Build for failure, and you will never fail."*
+Cloud veteran **Scalable Steve** teaches: _"In the cloud, everything fails all the time. Build for failure, and you will never fail."_
 
 #### 5. **The Citadel of DevOps** 🏛️
-*Final home of the true Pipeline Paladins*
+
+_Final home of the true Pipeline Paladins_
 
 The ancient Citadel at the peak of Mount Deploy. Only those who have mastered all other realms may enter. Here, CI/CD monks perform endless deployment rituals. Prometheus watchers monitor all. Security sentinels guard against threats both internal and external.
 
@@ -85,7 +90,7 @@ The ancient Citadel at the peak of Mount Deploy. Only those who have mastered al
 **Quests:** 12 topics
 **Level Requirement:** 20
 
-Grand Master **Deployment Derek** speaks: *"You've come far, Apprentice. But the final test awaits. Only by conquering the Ultimate Pipeline can you become a true DevOps Master."*
+Grand Master **Deployment Derek** speaks: _"You've come far, Apprentice. But the final test awaits. Only by conquering the Ultimate Pipeline can you become a true DevOps Master."_
 
 ---
 
@@ -94,7 +99,8 @@ Grand Master **Deployment Derek** speaks: *"You've come far, Apprentice. But the
 Upon beginning your journey, choose your class:
 
 ### ⚔️ Cloud Knight
-*"The cloud is my fortress"*
+
+_"The cloud is my fortress"_
 
 **Specialization:** AWS, Infrastructure, Scaling
 **Starting Bonus:** +20% XP in cloud technologies
@@ -102,7 +108,8 @@ Upon beginning your journey, choose your class:
 **Best For:** Infrastructure-focused learners
 
 ### 🗡️ Script Warrior
-*"Automation is the ultimate weapon"*
+
+_"Automation is the ultimate weapon"_
 
 **Specialization:** Python, Bash, Docker, Automation
 **Starting Bonus:** +20% XP in scripting technologies
@@ -110,7 +117,8 @@ Upon beginning your journey, choose your class:
 **Best For:** Automation-focused learners
 
 ### 🧙 Data Mage
-*"Data is power"*
+
+_"Data is power"_
 
 **Specialization:** SQL, PostgreSQL, MongoDB, React
 **Starting Bonus:** +20% XP in data technologies
@@ -118,7 +126,8 @@ Upon beginning your journey, choose your class:
 **Best For:** Full-stack developers
 
 ### 🏛️ DevOps Sage
-*"Master of all trades"*
+
+_"Master of all trades"_
 
 **Specialization:** Balanced growth through all realms
 **Starting Bonus:** +10% XP in all technologies
@@ -132,6 +141,7 @@ Upon beginning your journey, choose your class:
 ### 1. Experience & Leveling
 
 **XP Sources:**
+
 - Completing quests: 75-150 XP per quest
 - Daily login bonus: 25 XP
 - Streak bonuses: +10% XP per streak day (max +100%)
@@ -140,36 +150,42 @@ Upon beginning your journey, choose your class:
 **Leveling Formula:** Every 100 XP = Level Up
 
 **Title Progression:**
-| Level | Title | Unlock |
-|-------|-------|--------|
-| 1-5 | DevOps Apprentice | Village of Foundations |
-| 6-10 | DevOps Journeyman | Forest of Scripts |
-| 11-15 | DevOps Expert | Castle of Frameworks |
-| 16-20 | DevOps Master | Mountains of Cloud |
-| 21-25 | DevOps Sage | Citadel of DevOps |
-| 26+ | Pipeline Paladin | Elite challenges |
+
+| Level | Title             | Unlock                 |
+| ----- | ----------------- | ---------------------- |
+| 1-5   | DevOps Apprentice | Village of Foundations |
+| 6-10  | DevOps Journeyman | Forest of Scripts      |
+| 11-15 | DevOps Expert     | Castle of Frameworks   |
+| 16-20 | DevOps Master     | Mountains of Cloud     |
+| 21-25 | DevOps Sage       | Citadel of DevOps      |
+| 26+   | Pipeline Paladin  | Elite challenges       |
 
 ### 2. The Skill Tree
 
 Skills unlock as you level up. Each skill provides passive bonuses or active abilities:
 
 **Tier 1 (Level 1+):**
+
 - **Quick Study** — Topics show preview before starting
 - **XP Boost** — +5% XP from all sources
 
 **Tier 2 (Level 5+):**
+
 - **Auto-Save** — Progress saved every topic
 - **Streak Shield** — One streak recovery per week
 
 **Tier 3 (Level 10+):**
+
 - **Mentor Mode** — Hints for difficult topics
 - **XP Surge** — +10% XP from all sources
 
 **Tier 4 (Level 15+):**
+
 - **Time Warp** — Restart topic without penalty
 - **Double XP Weekend** — Activates twice monthly
 
 **Tier 5 (Level 20+):**
+
 - **Master's Wisdom** — +15% XP from all sources
 - **Instant Complete** — Skip already-known topics (with warning)
 
@@ -178,17 +194,20 @@ Skills unlock as you level up. Each skill provides passive bonuses or active abi
 Equip items to gain bonuses. Items earned through achievements and milestones:
 
 **Weapons (XP Bonuses):**
+
 - Wooden Keyboard (starter) — +0%
 - Mechanical Keyboard (+5% XP) — Complete 10 quests
 - RGB Gaming Mech (+10% XP) — Reach Level 10
 - Legendary HHKB (+15% XP) — Become DevOps Master
 
 **Armor (Streak Protection):**
+
 - Cotton T-Shirt (starter) — 0 streak saves
 - DevOps Hoodie (1 save/week) — Complete first realm
 - Mithril Hoodie (3 saves/week) — Reach Level 15
 
 **Accessories:**
+
 - Git Scroll (1 free retry) — Complete Git quest
 - Docker Charm (skip Docker intro) — Complete Forest
 - Cloud Wings (instant realm unlock) — Complete Mountains
@@ -197,33 +216,36 @@ Equip items to gain bonuses. Items earned through achievements and milestones:
 
 Achievements unlock cosmetics, XP bonuses, and special abilities:
 
-| Achievement | Condition | Reward |
-|-------------|-----------|--------|
-| First Steps | Complete 1 quest | +50 Gold |
-| Foundation Breaker | Complete Village | Title: "Village Native" |
-| Forest Walker | Complete Scripts | +100 Gold |
-| Castle Champion | Complete Frameworks | +200 Gold |
-| Mountain Climber | Complete Mountains | +300 Gold |
-| Citadel Guardian | Complete DevOps | +500 Gold, Final Quest |
-| 7-Day Warrior | 7-day streak | +1 Streak Shield |
-| 30-Day Legend | 30-day streak | Title: "Dedicated" |
-| Collector | 1 of each tech | Badge: "Well-Rounded" |
-| Speedrunner | Level 10 in 7 days | Badge: "Fast Learner" |
+| Achievement        | Condition           | Reward                  |
+| ------------------ | ------------------- | ----------------------- |
+| First Steps        | Complete 1 quest    | +50 Gold                |
+| Foundation Breaker | Complete Village    | Title: "Village Native" |
+| Forest Walker      | Complete Scripts    | +100 Gold               |
+| Castle Champion    | Complete Frameworks | +200 Gold               |
+| Mountain Climber   | Complete Mountains  | +300 Gold               |
+| Citadel Guardian   | Complete DevOps     | +500 Gold, Final Quest  |
+| 7-Day Warrior      | 7-day streak        | +1 Streak Shield        |
+| 30-Day Legend      | 30-day streak       | Title: "Dedicated"      |
+| Collector          | 1 of each tech      | Badge: "Well-Rounded"   |
+| Speedrunner        | Level 10 in 7 days  | Badge: "Fast Learner"   |
 
 ### 5. Side Quests & Mini-Games
 
 #### Side Quests
 
 **Daily Quests** (reset at midnight):
+
 - "Practice Makes Perfect" — Complete 3 quests today (25 XP)
 - "Review Session" — Review a completed topic (15 XP)
 - "Streak Keeper" — Maintain your streak (streak bonus)
 
 **Weekly Quests:**
+
 - "Realm Sweep" — Complete all available quests in one realm (100 XP)
 - "Speed Demon" — Complete 5 quests in one hour (75 XP)
 
 **Secret Quests** (hidden):
+
 - "The Hidden Configuration" — Find the secret settings menu
 - "Debug Detective" — Report a bug (just kidding, but could be real!)
 - "Night Owl" — Study between midnight and 4am
@@ -231,9 +253,10 @@ Achievements unlock cosmetics, XP bonuses, and special abilities:
 #### Mini-Games
 
 **1. Command Typer** ⌨️
-*Type commands correctly to cast spells*
+_Type commands correctly to cast spells_
 
 A timed typing challenge where you must type DevOps commands:
+
 - `git commit -m "fix: resolve issue"`
 - `docker run -d -p 80:8080 nginx`
 - `kubectl get pods -n production`
@@ -241,9 +264,10 @@ A timed typing challenge where you must type DevOps commands:
 **Rewards:** Bonus XP, "Speedrunner" achievement progress
 
 **2. Architecture Puzzle** 🧩
-*Arrange system components correctly*
+_Arrange system components correctly_
 
 Drag-and-drop challenge to arrange architecture diagrams:
+
 - Place AWS components in correct VPC layout
 - Arrange Docker containers for a web app
 - Design a CI/CD pipeline with correct stages
@@ -251,9 +275,10 @@ Drag-and-drop challenge to arrange architecture diagrams:
 **Rewards:** Bonus XP, unlocks "Architect" title
 
 **3. Config Matcher** 🎯
-*Match configurations to scenarios*
+_Match configurations to scenarios_
 
 Multiple choice game:
+
 - "This web server needs high availability..." → Which config?
 - "This database requires encryption at rest..." → Which settings?
 - "This container needs to run in privileged mode..." → Safe or dangerous?
@@ -261,9 +286,10 @@ Multiple choice game:
 **Rewards:** Bonus XP, "Security Sense" skill
 
 **4. Debug Dungeon** 🐛
-*Find and fix the bug in the code*
+_Find and fix the bug in the code_
 
 Given a broken configuration, find the bug:
+
 - Syntax errors in YAML
 - Wrong port numbers in docker-compose
 - Missing environment variables
@@ -274,26 +300,31 @@ Given a broken configuration, find the bug:
 ### 6. NPCs & Mentors
 
 **Old Terminal** (Village Elder)
+
 - Appears in: Village of Foundations
 - Provides: Tips, backstory, encouragement
 - Quote: "The terminal never lies, my friend. Only those who can't read it."
 
 **Commander Container** (Docker Admiral)
+
 - Appears in: Forest of Scripts
 - Provides: Docker strategy tips
 - Quote: "A container holds everything it needs. Unlike us, poor humans."
 
 **Database Diana** (Data Keeper)
+
 - Appears in: Castle of Frameworks
 - Provides: Database optimization tips
 - Quote: "A poorly indexed query is a query from hell."
 
 **Cloud Commander** (AWS Veteran)
+
 - Appears in: Mountains of Cloud
 - Provides: Cloud architecture wisdom
 - Quote: "If it's not in at least two availability zones, it doesn't exist."
 
 **Deployment Derek** (Grand Master)
+
 - Appears in: Citadel of DevOps
 - Provides: Final guidance, ultimate quest
 - Quote: "The pipeline never sleeps. Neither can a true DevOps Master."
@@ -324,6 +355,7 @@ Each phase has a time limit and scoring. Pass all phases to become a **DevOps Ma
 ### Victory
 
 Upon defeating The Eternal CI/CD:
+
 - You receive the title "True DevOps Master"
 - Your name is added to the Hall of Legends
 - The Great Outage is permanently prevented
@@ -336,25 +368,19 @@ Upon defeating The Eternal CI/CD:
 ### Color Palette
 
 **Light Mode (The Day Cycle):**
+
 ```css
---background: #1a1a2e        /* Deep night purple */
---foreground: #eaeaea
---primary: #f39c12           /* Gold - XP, rewards */
---secondary: #9b59b6         /* Purple - magic, skills */
---accent: #2ecc71            /* Green - success, progress */
---danger: #e74c3c            /* Red - damage, warnings */
---quest: #3498db             /* Blue - quest markers */
+--background: #1a1a2e /* Deep night purple */ --foreground: #eaeaea --primary: #f39c12
+  /* Gold - XP, rewards */ --secondary: #9b59b6 /* Purple - magic, skills */ --accent: #2ecc71
+  /* Green - success, progress */ --danger: #e74c3c /* Red - damage, warnings */ --quest: #3498db
+  /* Blue - quest markers */;
 ```
 
 **Dark Mode (The Night Cycle):**
+
 ```css
---background: #0d0d1a
---foreground: #eaeaea
---primary: #f39c12
---secondary: #9b59b6
---accent: #2ecc71
---danger: #e74c3c
---quest: #3498db
+--background: #0d0d1a --foreground: #eaeaea --primary: #f39c12 --secondary: #9b59b6
+  --accent: #2ecc71 --danger: #e74c3c --quest: #3498db;
 ```
 
 ### Typography
@@ -366,6 +392,7 @@ Upon defeating The Eternal CI/CD:
 ### UI/HUD Design
 
 **Top HUD Bar:**
+
 - XP bar (full width, glowing amber)
 - Character avatar + name + level
 - Current title
@@ -374,11 +401,13 @@ Upon defeating The Eternal CI/CD:
 - Settings gear
 
 **Bottom HUD:**
+
 - Current quest objective
 - Realm indicator
 - Mini-map dots showing progress
 
 **Side Panels:**
+
 - Quest log (collapsible)
 - Skills tree (button to open modal)
 - Inventory/Equipment (button to open modal)
@@ -398,6 +427,7 @@ Upon defeating The Eternal CI/CD:
 ## Implementation Roadmap
 
 ### Phase 1: Core RPG (This Implementation)
+
 - [x] GameContext with XP/Level/Quest system
 - [x] Quest data structure from technologies
 - [x] Realm progression system
@@ -408,6 +438,7 @@ Upon defeating The Eternal CI/CD:
 - [x] Victory celebration modal
 
 ### Phase 2: Full RPG Features
+
 - [ ] Character class selection on first visit
 - [ ] Class-specific bonuses
 - [ ] Skill tree UI and unlocking
@@ -417,12 +448,14 @@ Upon defeating The Eternal CI/CD:
 - [ ] Realm stories and lore
 
 ### Phase 3: Mini-Games
+
 - [ ] Command Typer mini-game
 - [ ] Architecture Puzzle mini-game
 - [ ] Config Matcher mini-game
 - [ ] Debug Dungeon mini-game
 
 ### Phase 4: Polish
+
 - [ ] Sound effects and ambient music
 - [ ] Particle effects and animations
 - [ ] Character customization
@@ -434,12 +467,14 @@ Upon defeating The Eternal CI/CD:
 ## Technical Notes
 
 ### State Management
+
 - GameContext manages all RPG state
 - localStorage for persistence
 - Achievements tracked in state
 - Quest progress tracked by topicId
 
 ### Routing
+
 - `/` — Tavern (Home/Intro)
 - `/quests` — Quest Journal (World Map)
 - `/quest/:questId` — Battle Arena (Learning Content)
@@ -448,6 +483,7 @@ Upon defeating The Eternal CI/CD:
 - `/achievements` — Achievements Modal
 
 ### Components
+
 - HUD (always visible)
 - QuestCard
 - XPBar

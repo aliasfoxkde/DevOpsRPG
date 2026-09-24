@@ -3,6 +3,7 @@
 ## Completed Enhancements
 
 ### 1. World Map (🗺️)
+
 - **File**: `src/pages/WorldMapPage.tsx`
 - **Data**: `src/data/worldmap.ts`
 - Interactive visual map showing the SDLC journey through 5 realms
@@ -13,6 +14,7 @@
 - Quest completion percentage display per realm
 
 ### 2. Leaderboard (🏆)
+
 - **File**: `src/pages/LeaderboardPage.tsx`
 - Global leaderboard with mock data
 - Sortable by: rank, name, level, XP, completed quests, badges, streak
@@ -22,11 +24,13 @@
 - Class-based color coding
 
 ### 3. Navigation Updates
+
 - Added Map and Rank links to HUD
 - New routes: `/worldmap` and `/leaderboard`
 - Mobile-responsive nav with hamburger menu
 
 ### 4. Interactive Features
+
 - **Confetti celebration** on quest complete
 - **Treasure chests** with loot rarities (30% chance)
 - **Mini-games** (Trivia, Matching) (25% chance)
@@ -36,6 +40,7 @@
 - **EncounterEvent** for random bonus events
 
 ### 5. Content Expansion
+
 - **Machine Learning** - 8 topics covering ML fundamentals, TensorFlow, Scikit-Learn, MLOps
 - **Networking** - 4 topics covering DNS, HTTP, Load Balancers
 - **API Design** - 4 topics covering REST, GraphQL, Authentication
@@ -47,51 +52,57 @@
 ## Technology Coverage (Current)
 
 ### Phase 1: Foundations (Level 1+)
-| Technology | Topics | Status |
-|------------|--------|--------|
-| HTML | 15 | ✅ Complete |
-| CSS | 11 | ✅ Complete |
-| JavaScript | 12 | ✅ Complete |
-| Git | 4 | ✅ Complete |
-| SQL | 8 | ✅ Complete |
+
+| Technology | Topics | Status      |
+| ---------- | ------ | ----------- |
+| HTML       | 15     | ✅ Complete |
+| CSS        | 11     | ✅ Complete |
+| JavaScript | 12     | ✅ Complete |
+| Git        | 4      | ✅ Complete |
+| SQL        | 8      | ✅ Complete |
 
 ### Phase 2: Scripts (Level 5+)
-| Technology | Topics | Status |
-|------------|--------|--------|
-| Python | 10 | ✅ Complete |
-| Bash | 4 | ✅ Complete |
-| Docker | 5 | ✅ Complete |
+
+| Technology | Topics | Status      |
+| ---------- | ------ | ----------- |
+| Python     | 10     | ✅ Complete |
+| Bash       | 4      | ✅ Complete |
+| Docker     | 5      | ✅ Complete |
 
 ### Phase 3: Frameworks (Level 10+)
-| Technology | Topics | Status |
-|------------|--------|--------|
-| React | 8 | ✅ Complete |
-| Node.js | 5 | ✅ Complete |
-| PostgreSQL | 5 | ✅ Complete |
-| MongoDB | 5 | ✅ Complete |
+
+| Technology | Topics | Status      |
+| ---------- | ------ | ----------- |
+| React      | 8      | ✅ Complete |
+| Node.js    | 5      | ✅ Complete |
+| PostgreSQL | 5      | ✅ Complete |
+| MongoDB    | 5      | ✅ Complete |
 
 ### Phase 4: Cloud (Level 15+)
-| Technology | Topics | Status |
-|------------|--------|--------|
-| AWS | 5 | ✅ Complete |
-| Kubernetes | 5 | ✅ Complete |
-| Terraform | 4 | ✅ Complete |
+
+| Technology | Topics | Status      |
+| ---------- | ------ | ----------- |
+| AWS        | 5      | ✅ Complete |
+| Kubernetes | 5      | ✅ Complete |
+| Terraform  | 4      | ✅ Complete |
 
 ### Phase 5: DevOps (Level 20+)
-| Technology | Topics | Status |
-|------------|--------|--------|
-| CI/CD | 4 | ✅ Complete |
-| Prometheus | 4 | ✅ Complete |
-| Security | 4 | ✅ Complete |
+
+| Technology | Topics | Status      |
+| ---------- | ------ | ----------- |
+| CI/CD      | 4      | ✅ Complete |
+| Prometheus | 4      | ✅ Complete |
+| Security   | 4      | ✅ Complete |
 
 ### Phase 6: AI & Intelligence (Level 25+)
-| Technology | Topics | Status |
-|------------|--------|--------|
-| Machine Learning | 8 | ✅ Complete |
-| Networking | 4 | ✅ Complete |
-| API Design | 4 | ✅ Complete |
-| Observability | 3 | ✅ Complete |
-| GitOps | 2 | ✅ Complete |
+
+| Technology       | Topics | Status      |
+| ---------------- | ------ | ----------- |
+| Machine Learning | 8      | ✅ Complete |
+| Networking       | 4      | ✅ Complete |
+| API Design       | 4      | ✅ Complete |
+| Observability    | 3      | ✅ Complete |
+| GitOps           | 2      | ✅ Complete |
 
 **Total**: 24 technologies, ~150+ quests, 180+ quiz questions
 
@@ -153,6 +164,7 @@
 ## Testing Checklist
 
 Before deploying:
+
 - [x] World map loads correctly with all 5 realms
 - [x] Leaderboard displays and sorts properly
 - [x] Navigation works on mobile (hamburger menu)

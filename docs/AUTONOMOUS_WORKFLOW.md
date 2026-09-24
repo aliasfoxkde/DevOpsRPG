@@ -26,6 +26,7 @@ DevOpsRPG uses an automated workflow system inspired by Dark Factory principles 
 Access via Settings page or `/feedback` route.
 
 Features:
+
 - Bug report, feature request, change request, or praise
 - Categorization by area (Quest System, Battle Arena, etc.)
 - Direct GitHub issue creation
@@ -34,23 +35,30 @@ Features:
 ## GitHub Issue Templates
 
 ### Bug Report
+
 For reporting bugs or unexpected behavior.
+
 - Fields: Description, expected behavior, reproduction steps, area
 - Auto-labels: `bug`, `needs-triage`
 
 ### Feature Request
+
 For new feature suggestions.
+
 - Fields: Problem statement, proposed solution, alternatives, area
 - Auto-labels: `enhancement`, `needs-triage`
 
 ### Change Request
+
 For modifying existing functionality.
+
 - Fields: Current behavior, proposed change, rationale, area
 - Auto-labels: `change-request`, `needs-triage`
 
 ## Autonomous Workflow (GitHub Actions)
 
 ### Trigger Conditions
+
 - Daily at 9:00 AM UTC (off-peak)
 - On issue creation with `needs-triage` label
 - Manual trigger via `workflow_dispatch`
@@ -58,27 +66,32 @@ For modifying existing functionality.
 ### Workflow Phases
 
 #### Phase 1: Triage
+
 - Fetch open issues with `needs-triage` label
 - Filter out already-processed issues
 - Output issue list for next phase
 
 #### Phase 2: Analysis
+
 - Categorize by type (bug, feature, change)
 - Assign priority (high, medium, low)
 - Estimate complexity and time
 
 #### Phase 3: Implementation
+
 - Create feature branch from `main`
 - Run validation (lint, typecheck, tests)
 - Generate implementation task file
 - Create draft PR with context
 
 #### Phase 4: Quality Check
+
 - Full CI/CD validation
 - Build verification
 - Report generation
 
 #### Phase 5: Reporting
+
 - Generate daily report
 - Post to artifact storage
 - Comment on processed issues
@@ -86,34 +99,39 @@ For modifying existing functionality.
 ## Integration with External Systems
 
 ### Dark Factory Integration
+
 The workflow patterns are inspired by:
+
 - Automated triage and prioritization
 - AI-assisted analysis
 - Continuous validation pipeline
 
 ### Atheon-Enhanced Integration
+
 Security scanning integration:
+
 - Pattern-based secrets detection
 - Quality enforcement checks
 - Code health monitoring
 
 ## Label Definitions
 
-| Label | Purpose |
-|-------|---------|
-| `bug` | Bug reports |
-| `enhancement` | Feature requests |
-| `change-request` | Existing feature changes |
-| `needs-triage` | New issues awaiting review |
-| `priority-high` | Critical issues |
-| `priority-medium` | Important issues |
-| `priority-low` | Nice-to-have items |
-| `good-first-issue` | Beginner-friendly tasks |
-| `help-wanted` | Seeking community contributions |
+| Label              | Purpose                         |
+| ------------------ | ------------------------------- |
+| `bug`              | Bug reports                     |
+| `enhancement`      | Feature requests                |
+| `change-request`   | Existing feature changes        |
+| `needs-triage`     | New issues awaiting review      |
+| `priority-high`    | Critical issues                 |
+| `priority-medium`  | Important issues                |
+| `priority-low`     | Nice-to-have items              |
+| `good-first-issue` | Beginner-friendly tasks         |
+| `help-wanted`      | Seeking community contributions |
 
 ## Copilot Instructions
 
 The `.github/copilot-instructions.md` file provides AI coding assistants with:
+
 - Project context and architecture
 - Code quality standards
 - Issue handling workflows

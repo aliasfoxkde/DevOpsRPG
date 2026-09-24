@@ -3,6 +3,7 @@
 ## What Went Wrong
 
 The current implementation is a flat, disconnected tech-tree catalog. It has:
+
 - No storyline or narrative
 - No character/avatar system
 - No progression path (just a list of phases)
@@ -19,6 +20,7 @@ The current implementation is a flat, disconnected tech-tree catalog. It has:
 **Core Concept:** The player is a **DevOps Apprentice** on a quest to become a **DevOps Master**. They start in "The Village of Foundations" and progress through increasingly dangerous territories, defeating "knowledge monsters" (topics) to level up their skills.
 
 ### Game Loop
+
 1. Player sees their **Quest Journal** — current mission highlighted
 2. They enter a topic → **Battle Screen** with learning content
 3. They complete challenges → **Victory!** with XP rewards, animations
@@ -26,6 +28,7 @@ The current implementation is a flat, disconnected tech-tree catalog. It has:
 5. Dashboard shows character stats, achievements, inventory
 
 ### Five Realms (Phases)
+
 1. **Village of Foundations** (HTML, CSS, JS, Git, SQL) — Tutorial zone
 2. **Forest of Scripts** (Python, Bash, Docker) — Easy quests
 3. **Castle of Frameworks** (React, Node.js, PostgreSQL, MongoDB) — Medium difficulty
@@ -37,16 +40,17 @@ The current implementation is a flat, disconnected tech-tree catalog. It has:
 ## Core RPG Systems
 
 ### 1. Character System
+
 ```typescript
 interface Character {
   name: string
   class: 'Cloud Knight' | 'Script Warrior' | 'Data Mage' | 'DevOps Sage'
-  avatar: string  // emoji or icon
+  avatar: string // emoji or icon
   level: number
   xp: number
-  hp: number  // starts at 100, depleted by wrong answers
-  mp: number  // mental power, used for "special attacks"
-  title: string  // changes with level
+  hp: number // starts at 100, depleted by wrong answers
+  mp: number // mental power, used for "special attacks"
+  title: string // changes with level
   achievements: Achievement[]
   inventory: InventoryItem[]
   completedQuests: string[]
@@ -56,6 +60,7 @@ interface Character {
 ```
 
 ### 2. Quest System
+
 ```typescript
 interface Quest {
   id: string
@@ -74,6 +79,7 @@ interface Quest {
 ```
 
 ### 3. Combat/Battle System
+
 - Each topic is a "battle"
 - Read content = "attack" the knowledge monster
 - Complete topic = "defeat" the monster
@@ -81,6 +87,7 @@ interface Quest {
 - No HP loss for now (learning-focused), but the FEEL of combat matters
 
 ### 4. Rewards & Progression
+
 - **XP**: 25-100 per topic (based on difficulty)
 - **Gold**: Earned with achievements, used for future cosmetic items
 - **Level Up**: Every 100 XP → level up with celebration animation
@@ -92,6 +99,7 @@ interface Quest {
   - Level 21+: DevOps Sage
 
 ### 5. World Map (replaces LearnPage)
+
 - Visual map showing all 5 realms
 - Nodes connected by paths
 - Locked nodes show padlock icon
@@ -100,18 +108,21 @@ interface Quest {
 - Hover shows quest preview
 
 ### 6. HUD (always visible)
+
 - Top bar: XP bar, level, title, streak
 - Character avatar in corner
 - Current quest objective
 - Quick stats (topics done, time spent)
 
 ### 7. Quest Journal (replaces LearnPage list)
+
 - Current main quest with objectives
 - Side quests available
 - Daily quests (resets each day)
 - Quest log with story flavor
 
 ### 8. Battle Screen (replaces TechnologyPage)
+
 - Topic content presented as "enemy intel"
 - Progress bar as "battle progress"
 - Completion = "Victory!" with fanfare
@@ -122,34 +133,25 @@ interface Quest {
 ## Visual Design
 
 ### Color Palette (RPG Fantasy Theme)
+
 ```css
 /* Light Mode */
---background: #1a1a2e        /* Dark purple-blue night */
---foreground: #eaeaea
---primary: #f39c12           /* Gold/orange for XP */
---secondary: #9b59b6          /* Purple for magic */
---accent: #2ecc71            /* Green for success */
---danger: #e74c3c            /* Red for damage */
---card: #16213e              /* Dark blue card */
---border: #0f3460            /* Blue border */
-
-/* Dark Mode */
---background: #0d0d1a
---foreground: #eaeaea
---primary: #f39c12
---secondary: #9b59b6
---accent: #2ecc71
---danger: #e74c3c
---card: #1a1a2e
---border: #0f3460
+--background: #1a1a2e /* Dark purple-blue night */ --foreground: #eaeaea --primary: #f39c12
+  /* Gold/orange for XP */ --secondary: #9b59b6 /* Purple for magic */ --accent: #2ecc71
+  /* Green for success */ --danger: #e74c3c /* Red for damage */ --card: #16213e
+  /* Dark blue card */ --border: #0f3460 /* Blue border */ /* Dark Mode */ --background: #0d0d1a
+  --foreground: #eaeaea --primary: #f39c12 --secondary: #9b59b6 --accent: #2ecc71 --danger: #e74c3c
+  --card: #1a1a2e --border: #0f3460;
 ```
 
 ### Typography
+
 - Headings: "Cinzel" (fantasy RPG feel) or similar serif
 - Body: System UI for readability
 - Numbers/Stats: Monospace for game stats
 
 ### Animations (CRITICAL for game feel)
+
 1. **XP Gain**: "+25 XP" floats up from action, fades out
 2. **Level Up**: Golden burst, title announcement
 3. **Quest Complete**: Checkmark with particle effect
@@ -163,6 +165,7 @@ interface Quest {
 ## Page Structure
 
 ### HomePage → **Tavern** (Meeting Place)
+
 - Character intro/creation
 - Show current quest
 - "Begin Quest" button → goes to current quest
@@ -170,6 +173,7 @@ interface Quest {
 - Recent achievements display
 
 ### DashboardPage → **Character Sheet**
+
 - Full character stats display
 - Achievement showcase (badges)
 - Inventory/collection
@@ -177,11 +181,13 @@ interface Quest {
 - Leaderboard (future)
 
 ### LearnPage → **Quest Journal / World Map**
+
 - Toggle between:
   1. **World Map**: Visual map of all realms
   2. **Quest Log**: List of available/in-progress quests
 
 ### TechnologyPage → **Battle Arena**
+
 - Topic content displayed as "enemy information"
 - Battle progress bar
 - "Study" = "Prepare for battle"
@@ -189,6 +195,7 @@ interface Quest {
 - Victory screen with rewards
 
 ### New: **Battle Results Modal**
+
 - XP gained (animated counter)
 - Level progress bar
 - Achievement unlocked (if any)
@@ -200,6 +207,7 @@ interface Quest {
 ## Implementation Priorities
 
 ### Phase 1: Core RPG Shell (HIGHEST PRIORITY)
+
 1. Redesign ProgressContext → CharacterContext (character, XP, levels)
 2. Add quest data structure and quest system
 3. Create HUD component (always visible XP/level bar)
@@ -208,6 +216,7 @@ interface Quest {
 6. Victory/Level-up animations
 
 ### Phase 2: World Map
+
 1. Visual SVG/Canvas map of all realms
 2. Animated node connections
 3. Lock/unlock logic
@@ -215,6 +224,7 @@ interface Quest {
 5. Progress visualization
 
 ### Phase 3: Polish
+
 1. Character avatar selection
 2. Achievement system with badges
 3. Daily quests
@@ -226,11 +236,13 @@ interface Quest {
 ## Data Changes
 
 ### Technologies remain the same, but become "Quests":
+
 - Each technology = a "Realm" with multiple "Battles" (topics)
 - Topics have difficulty ratings (1-5 skulls)
 - Each topic has story flavor text
 
 ### Example Quest Data:
+
 ```typescript
 const QUESTS = [
   {
@@ -243,7 +255,7 @@ const QUESTS = [
     type: 'battle',
     xpReward: 25,
     difficulty: 1,
-    status: 'available'
+    status: 'available',
   },
   // ...
 ]
@@ -253,25 +265,26 @@ const QUESTS = [
 
 ## Component Map
 
-| Old Component | New Component | Purpose |
-|--------------|---------------|---------|
-| DashboardPage | CharacterSheet | Full character stats |
-| LearnPage | QuestJournal / WorldMap | Quest selection |
-| TechnologyPage | BattleArena | Learning content as combat |
-| Navbar | TopHUD | Always-visible game stats |
-| ProgressContext | CharacterContext | All game state |
-| (new) | XPBar | Animated XP display |
-| (new) | QuestCard | Individual quest display |
-| (new) | VictoryModal | Post-battle rewards |
-| (new) | WorldMap | Visual realm navigation |
-| (new) | CharacterAvatar | Avatar display |
-| (new) | AchievementBadge | Badge display |
+| Old Component   | New Component           | Purpose                    |
+| --------------- | ----------------------- | -------------------------- |
+| DashboardPage   | CharacterSheet          | Full character stats       |
+| LearnPage       | QuestJournal / WorldMap | Quest selection            |
+| TechnologyPage  | BattleArena             | Learning content as combat |
+| Navbar          | TopHUD                  | Always-visible game stats  |
+| ProgressContext | CharacterContext        | All game state             |
+| (new)           | XPBar                   | Animated XP display        |
+| (new)           | QuestCard               | Individual quest display   |
+| (new)           | VictoryModal            | Post-battle rewards        |
+| (new)           | WorldMap                | Visual realm navigation    |
+| (new)           | CharacterAvatar         | Avatar display             |
+| (new)           | AchievementBadge        | Badge display              |
 
 ---
 
 ## Success Metrics
 
 A successful redesign means:
+
 1. User opens app → sees character, XP, current quest IMMEDIATELY
 2. User never sees "pick what to learn" — they're on a RAILROADED quest
 3. Completing a topic feels REWARDING (animation, sound, XP popup)

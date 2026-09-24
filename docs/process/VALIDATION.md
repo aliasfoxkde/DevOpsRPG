@@ -48,24 +48,26 @@
 
 ## Test Coverage Requirements
 
-| Type | Target | Minimum |
-|------|--------|---------|
-| Unit | 85% | 80% |
-| Integration | 70% | 60% |
-| E2E | Critical paths 100% | Critical paths 90% |
-| Overall | 80% | 75% |
+| Type        | Target              | Minimum            |
+| ----------- | ------------------- | ------------------ |
+| Unit        | 85%                 | 80%                |
+| Integration | 70%                 | 60%                |
+| E2E         | Critical paths 100% | Critical paths 90% |
+| Overall     | 80%                 | 75%                |
 
 ---
 
 ## Visual Checkpoints
 
 ### Homepage (Logged Out)
+
 - Logo and tagline visible
 - Google/GitHub login buttons displayed
 - Theme switcher visible
 - PWA install prompt (if eligible)
 
 ### Dashboard (Logged In)
+
 - User avatar and name displayed
 - XP and level prominently shown
 - Current streak displayed with fire animation
@@ -73,6 +75,7 @@
 - Quick links to continue learning
 
 ### Learning Page
+
 - Technology list organized by category
 - Progress indicators per technology
 - W3Schools iframe renders correctly
@@ -80,6 +83,7 @@
 - Next/Previous topic navigation works
 
 ### Gamification Elements
+
 - XP pop animation on earn
 - Achievement unlock animation
 - Level-up celebration

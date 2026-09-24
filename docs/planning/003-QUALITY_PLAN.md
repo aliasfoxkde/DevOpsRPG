@@ -12,15 +12,15 @@ All numbers below were measured on `main` during a full audit session — not es
 
 ### 1.1 Test & Build Gates
 
-| Gate | State | Notes |
-|------|-------|-------|
-| `npm run lint` | ✅ 0 errors, 0 warnings | Was 14 warnings; all resolved |
-| `npm run typecheck` | ✅ clean | strict mode, noUnusedLocals/Parameters |
-| `npm run test` | ✅ 187/187 (21 files) | Was running foreign suites from a stray symlink |
-| `npm run test:e2e` (chromium) | ✅ 10/10 | Specs rewritten; was 0/13 (env + stale selectors) |
-| `npm run build` | ✅ passes | tsc -b && vite build |
-| Coverage (v8) | ⚠️ **13.72% stmts / 7.81% branch / 12.18% funcs / 14.63% lines** | Target: 99% (Phase 2) |
-| E2E (firefox, webkit) | ❌ not validated locally | CI-only; needs browser install (Phase 6) |
+| Gate                          | State                                                            | Notes                                             |
+| ----------------------------- | ---------------------------------------------------------------- | ------------------------------------------------- |
+| `npm run lint`                | ✅ 0 errors, 0 warnings                                          | Was 14 warnings; all resolved                     |
+| `npm run typecheck`           | ✅ clean                                                         | strict mode, noUnusedLocals/Parameters            |
+| `npm run test`                | ✅ 187/187 (21 files)                                            | Was running foreign suites from a stray symlink   |
+| `npm run test:e2e` (chromium) | ✅ 10/10                                                         | Specs rewritten; was 0/13 (env + stale selectors) |
+| `npm run build`               | ✅ passes                                                        | tsc -b && vite build                              |
+| Coverage (v8)                 | ⚠️ **13.72% stmts / 7.81% branch / 12.18% funcs / 14.63% lines** | Target: 99% (Phase 2)                             |
+| E2E (firefox, webkit)         | ❌ not validated locally                                         | CI-only; needs browser install (Phase 6)          |
 
 ### 1.2 Infrastructure Defects Fixed This Session (Phase 0 — done)
 
@@ -52,16 +52,17 @@ All numbers below were measured on `main` during a full audit session — not es
 
 Six key pages scanned:
 
-| Page | Critical | Serious | Dominant issue |
-|------|----------|---------|----------------|
-| `/` | 0 | 9 | color-contrast |
-| `/quests` | 5 | 2 | `select-name` — unnamed `<select>` elements |
-| `/worldmap` | 0 | 7 | color-contrast |
-| `/store` | 0 | 1 | color-contrast |
-| `/settings` | 1 | 24 | `button-name` + contrast (worst page) |
-| `/rewards` | 0 | 64 | color-contrast (worst contrast count) |
+| Page        | Critical | Serious | Dominant issue                              |
+| ----------- | -------- | ------- | ------------------------------------------- |
+| `/`         | 0        | 9       | color-contrast                              |
+| `/quests`   | 5        | 2       | `select-name` — unnamed `<select>` elements |
+| `/worldmap` | 0        | 7       | color-contrast                              |
+| `/store`    | 0        | 1       | color-contrast                              |
+| `/settings` | 1        | 24      | `button-name` + contrast (worst page)       |
+| `/rewards`  | 0        | 64      | color-contrast (worst contrast count)       |
 
 Systemic findings:
+
 - **Color contrast (107 instances)**: slate-300/400 text on slate-800/900 backgrounds and
   amber-on-slate combinations sit below the 4.5:1 AA ratio. Needs a theme-level token fix,
   not per-element patches.
@@ -73,7 +74,7 @@ Systemic findings:
 ### 1.4 Static Analysis (Aegis pattern scan)
 
 5,756 findings triaged; **overwhelmingly false positives in data/documentation files**
-(quiz questions *teaching* `innerHTML`, the word "Secret" as a badge label, `.env` entries
+(quiz questions _teaching_ `innerHTML`, the word "Secret" as a badge label, `.env` entries
 inside `.gitignore`, localhost SSRF flags on local audit scripts, workflow `secrets.*` usage).
 Actionable items: KeyboardShortcutsHelp backdrop (mitigated: Escape works; focus trap → Phase 3),
 `missing-lang` on generated HTML in CodePlayground (Phase 3), `sync-in-async` in scripts
@@ -82,17 +83,17 @@ suppressions for data-file false positives are curated.
 
 ### 1.5 Code-Smell Inventory
 
-| Smell | Evidence | Phase |
-|-------|----------|-------|
-| God file | `GameContext.tsx` 2,008 lines (state + 60+ actions + companions data) | 5 (see 002-REFACTORING) |
-| Mega data file | `quizzes.ts` 2,751 lines single module | 5 |
-| Mega page | `WorldMapPage.tsx` 1,139 lines | 5 |
-| Duplicate data models | 3 companion shapes: `GameContext.COMPANIONS_DATA` (game model), `EVOLVED_COMPANIONS`, store `ShopItem` companions | 5 |
-| Untrained dead path | `OnboardingWizard` unreachable (default `hasSeenOnboarding: true`) — decide: wire for new users or remove | 5 / product decision |
-| Page tests | 4 of 34 pages have unit tests | 2 |
-| Component tests | 7 of 43 components | 2 |
-| Blocking sync I/O | `deep-audit.mjs`, `scrape-w3schools.js` use `*Sync()` | 5 |
-| Regex-driven audit scripts | `scripts/*.mjs` duplicate concerns; no tests | 5 |
+| Smell                      | Evidence                                                                                                          | Phase                   |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| God file                   | `GameContext.tsx` 2,008 lines (state + 60+ actions + companions data)                                             | 5 (see 002-REFACTORING) |
+| Mega data file             | `quizzes.ts` 2,751 lines single module                                                                            | 5                       |
+| Mega page                  | `WorldMapPage.tsx` 1,139 lines                                                                                    | 5                       |
+| Duplicate data models      | 3 companion shapes: `GameContext.COMPANIONS_DATA` (game model), `EVOLVED_COMPANIONS`, store `ShopItem` companions | 5                       |
+| Untrained dead path        | `OnboardingWizard` unreachable (default `hasSeenOnboarding: true`) — decide: wire for new users or remove         | 5 / product decision    |
+| Page tests                 | 4 of 34 pages have unit tests                                                                                     | 2                       |
+| Component tests            | 7 of 43 components                                                                                                | 2                       |
+| Blocking sync I/O          | `deep-audit.mjs`, `scrape-w3schools.js` use `*Sync()`                                                             | 5                       |
+| Regex-driven audit scripts | `scripts/*.mjs` duplicate concerns; no tests                                                                      | 5                       |
 
 ### 1.6 Documentation Gaps
 
@@ -136,6 +137,7 @@ Strategy: **ratchet, don't boil the ocean.** Raise `vitest` `coverage.thresholds
 (+5% lines per merge week) so coverage can never regress while the backlog burns down.
 
 Order of work (highest value first):
+
 - [ ] `GameContext` (17% → 95%): quest completion, XP/level-up, badge/milestone unlocks,
       companion purchase/evolution, storage backup restore, cross-tab merge. This file holds
       every game rule — it is the highest-leverage target.
@@ -240,6 +242,7 @@ extended to 28 tests (sanitization bounds, collection caps, download flow);
 `gameUtils.test.ts` boundary branches. UI/minigame/page suites added in parallel.
 
 Real defects the new tests caught:
+
 1. `grantBadge` was a **no-op for every catalog badge** — badges are pre-seeded locked and
    the guard tested "id exists" instead of "id unlocked", so challenge/reward badge claims
    silently did nothing. (`src/contexts/GameContext.tsx`)
@@ -266,6 +269,7 @@ exhaustive-deps`, `@typescript-eslint/no-explicit-any`, `no-fallthrough`, `eqeqe
 (3-browser matrix, browser cache, report artifact); both deploy jobs now gate on it.
 
 **Infrastructure findings.**
+
 - **E2E port squatting:** a foreign Vite app bound `0.0.0.0:5173` and Playwright's
   `reuseExistingServer` served it to every test — 100% false failures that looked like app
   breakage. E2E now boots its own dev server on dedicated port **5299** (`E2E_PORT` still
@@ -280,19 +284,15 @@ exhaustive-deps`, `@typescript-eslint/no-explicit-any`, `no-fallthrough`, `eqeqe
 62.23% functions / 65.24% lines. `coverage.thresholds` in `vite.config.ts` is pinned just
 below those values (60/56/60/63) per ADR-0004, so coverage can only move up.
 
-Four more defects fixed while integrating the page suites:
-6. `ChallengesPage.handleClaim` guard was inverted — the CLAIM! button (rendered only for
-   completed challenges) silently did nothing.
-7. The `Infinity` "no fastest quest yet" sentinel did not survive JSON persistence: after
-   reload Analytics showed `0s` and the next quest collapsed the record to 0 (wrongly
-   unlocking the speed badge). The load path now restores the sentinel.
-8. `BadgesPage` counted the pre-seeded catalog as "earned" ("81 of 81" for a new player) —
-   now counts real unlocks.
-9. Minigames batch (found by re-encoding agent tests to the fixed behavior): unanswerable
-   `css_prop` puzzle, `git_cmd`/`python_list` options missing their answers, command-less
-   final step in `high-cpu-production`, IncidentSimulator stale-closure scoring (86% on a
-   flawless run) and unapplied hint penalty, duplicated Terminal-tile accessible name,
-   hub accuracy >100%.
+Four more defects fixed while integrating the page suites: 6. `ChallengesPage.handleClaim` guard was inverted — the CLAIM! button (rendered only for
+completed challenges) silently did nothing. 7. The `Infinity` "no fastest quest yet" sentinel did not survive JSON persistence: after
+reload Analytics showed `0s` and the next quest collapsed the record to 0 (wrongly
+unlocking the speed badge). The load path now restores the sentinel. 8. `BadgesPage` counted the pre-seeded catalog as "earned" ("81 of 81" for a new player) —
+now counts real unlocks. 9. Minigames batch (found by re-encoding agent tests to the fixed behavior): unanswerable
+`css_prop` puzzle, `git_cmd`/`python_list` options missing their answers, command-less
+final step in `high-cpu-production`, IncidentSimulator stale-closure scoring (86% on a
+flawless run) and unapplied hint penalty, duplicated Terminal-tile accessible name,
+hub accuracy >100%.
 
 Also this session: ADRs added under `docs/decisions/` (Phase 7 start); stale
 `docs/DECISIONS.md` entries marked superseded; `docs/TASKS.md` (the last stale
@@ -301,3 +301,76 @@ page renders.
 
 **Still open:** Phase 5 refactoring (GameContext split), knip/prettier adoption,
 quarterly dependency refresh (Phase 7 cadence).
+
+---
+
+## 4. Cycle 2 — 2026-09-24: measured gaps and expanded roadmap
+
+Baseline v0.1.2 (all gates green: lint, typecheck, 636/636 tests, axe 0/0, actionlint,
+E2E 3 browsers, CI + release + deploy verified). This cycle closes what Cycle 1
+deliberately deferred, sized by measurement rather than intuition.
+
+### 4.1 Measured gap baseline
+
+| Area                      | Baseline (2026-09-24)                                                                                                                                                                    | Target                                           |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| Statement coverage        | 62.63% (branch 58.30 / funcs 62.23 / lines 65.24)                                                                                                                                        | ≥ 99% ratcheted                                  |
+| Weakest areas             | `useSoundEffects` 12%, `BackgroundGenerator` 31%, `useVoiceNarration` 42%, `SettingsPage` 43%, `BattleArenaPage` 45%, `FeedbackPage` 48%, `GameContext` ~48%                             | all ≥ 90%                                        |
+| knip                      | 11 unused files, 72 unused exports, 30 unused types, 2 duplicate exports, 3 dependency findings                                                                                          | 0 (config-documented ignores only)               |
+| Type-aware ESLint         | 200 findings (123 src / 77 tests); top: `no-unsafe-member-access` 76                                                                                                                     | 0 on `recommendedTypeChecked` + strict additions |
+| console.* in shipped code | 48 (Quiz 16, GameContext 10, worker 5, hooks 4, main 4)                                                                                                                                  | removed or funneled through the error boundary   |
+| Aegis scan                | 6053 findings; 3 "critical" all false positives (example URLs in teaching content); true classes: console noise; `react-missing-key-prop` hits are pattern noise (keys verified present) | baseline-gated: new findings fail CI             |
+| Accessibility             | WCAG 2.1 AA: 0 violations on 6 routes × 2 themes                                                                                                                                         | AAA pass + more routes                           |
+| GitForge CI               | gateway healthy `:42780`; CLI unauthenticated (401) — interactive `gitforge auth --login <user>` is the user-only credential step                                                        | pipeline created + first green run               |
+| Scripts                   | `deep-audit.mjs` hardcodes `localhost:5173`, writes `audit-report.json` (unignored)                                                                                                      | env-configurable, artifacts ignored              |
+
+### 4.2 Phases
+
+**Phase A — Tooling adoption (1 session).** Prettier (repo-wide single-format commit, CI
+gate), knip (config with documented entry points for `public/sw.js`, `worker/`, `scripts/`;
+fix or delete each finding), type-aware ESLint (`recommendedTypeChecked` + `switch-exhaustiveness-check`
+
+- `no-console` warn/error + `react/jsx-key`), aegis npm script with checked-in baseline
+  (new findings fail), scripts de-hardcoded, `audit-report.json` ignored.
+
+**Phase B — Coverage ratchet 62.6% → 99% (multi-session, parallel).** Order by leverage:
+
+1. `GameContext` branches (~48% → 95%): companions, equipment, collectibles, storylines,
+   guild, PvP, prestige, seasonal events, world map transitions.
+2. Hooks: `useSoundEffects` (12%), `useVoiceNarration`, `useKeyboardShortcuts`,
+   `useLocalStorage` branches.
+3. Pages at the bottom: `SettingsPage` (43%), `BattleArenaPage` (45%), `FeedbackPage` (48%),
+   then 60-75% band (Rewards, Store, Marketplace, PVP, WorldMap, Guild).
+4. `BackgroundGenerator` (31%), utils (`achievementCardGenerator`, `backgroundGenerator`).
+5. `worker/` KV API (its own package, untested).
+   Thresholds rise as areas land; every defect found gets a fix + regression test.
+
+**Phase C — Accessibility AAA (1-2 sessions).** Extend `axe-audit.mjs`: AAA rule set,
+more routes (every page route), per-page AAA report; contrast ≥ 7:1 for body-text tokens;
+target size and focus-appearance assertions in component tests; quiz timer pause/extend
+affordance (AAA 2.2.1).
+
+**Phase D — Phase 5 refactoring (2-3 sessions, after B has GameContext ≥ 90%).**
+Per `002-REFACTORING.md`: split `GameContext` into store + quest engine + companion +
+achievement + persistence modules behind a stable `useGame` facade; unify the 3 companion
+data models into `src/data/companions.ts`; split `quizzes.ts` into per-technology modules;
+extract `WorldMapPage` subcomponents; port scripts off sync I/O with tests. Behavior
+locked by B's tests before each split.
+
+**Phase E — GitForge pipeline (blocked on user auth).** Mechanical once
+`gitforge auth --login <user>` runs: `gitforge repo --create aliasfoxkde/DevOpsRPG`,
+register the pipeline (lint → typecheck → test → e2e → build), push both remotes,
+webhook trigger. The GitHub `ci.yml` remains the mirror.
+
+**Phase F — Release cadence.** Gates → CHANGELOG 0.1.3 → tag + GitHub release →
+wrangler deploy with existing env vars → byte-verify production.
+
+### 4.3 Honest constraints
+
+- 99% _lines_ is reachable; 99% _branch_ on a content-heavy SPA has long-tail files
+  (WorldMapPage 1000+ lines of presentational branches) where the cost/benefit crosses
+  over — the ratchet records each notch and the plan states where it stopped and why.
+- `w3schools-content.ts` (scraped content) stays a documented knip/coverage exclusion:
+  it is data, not logic.
+- AAA contrast ≥ 7:1 on every text token may force palette changes with visual-design
+  review; changes are made token-level and re-audited.

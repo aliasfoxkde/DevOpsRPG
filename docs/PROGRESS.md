@@ -8,15 +8,15 @@
 
 ## Progress Summary
 
-| Phase | Status | Progress | Notes |
-|-------|--------|----------|-------|
-| Phase 1: Critical Bug Fixes | ✅ Complete | 100% | Quest nav, level jumping investigated, HTML forms verified |
-| Phase 2: Navigation Overhaul | ✅ Complete | 100% | HUD redesigned with accessibility improvements |
-| Phase 3: Visual Design Audit | ✅ Complete | 100% | Typography standardized, focus indicators added |
-| Phase 4: Career Path Completion | ✅ Complete | 100% | 10 career paths, getTechnologyCompletion working |
-| Phase 5: Skill System Enhancement | ✅ Complete | 100% | Visual skill trees with dependencies and recommended paths |
-| Phase 6: Equipment System | ✅ Complete | 100% | Equipment store, equip/unequip, CharacterSheet UI |
-| Phase 7: Polish & Testing | ✅ Complete | 100% | Accessibility audit, keyboard navigation, ARIA labels |
+| Phase                             | Status      | Progress | Notes                                                      |
+| --------------------------------- | ----------- | -------- | ---------------------------------------------------------- |
+| Phase 1: Critical Bug Fixes       | ✅ Complete | 100%     | Quest nav, level jumping investigated, HTML forms verified |
+| Phase 2: Navigation Overhaul      | ✅ Complete | 100%     | HUD redesigned with accessibility improvements             |
+| Phase 3: Visual Design Audit      | ✅ Complete | 100%     | Typography standardized, focus indicators added            |
+| Phase 4: Career Path Completion   | ✅ Complete | 100%     | 10 career paths, getTechnologyCompletion working           |
+| Phase 5: Skill System Enhancement | ✅ Complete | 100%     | Visual skill trees with dependencies and recommended paths |
+| Phase 6: Equipment System         | ✅ Complete | 100%     | Equipment store, equip/unequip, CharacterSheet UI          |
+| Phase 7: Polish & Testing         | ✅ Complete | 100%     | Accessibility audit, keyboard navigation, ARIA labels      |
 
 ---
 
@@ -39,15 +39,15 @@
 
 ### Sprint Backlog
 
-| Task | Status | Notes |
-|------|--------|-------|
-| Quest auto-navigation fix | ✅ Done | commit bfe9a12 |
-| Add career paths | ✅ Done | 3 new paths added |
-| Navigation scrollbar fix | ✅ Done | commit 4415889 |
-| HUD redesign (7 items) | ✅ Done | commit 4415889 |
-| Visual design audit | [~] In Progress | Typography, buttons, cards standardized |
-| Level jumping investigation | [ ] Pending | - |
-| HTML Forms repetition | [ ] Pending | - |
+| Task                        | Status          | Notes                                   |
+| --------------------------- | --------------- | --------------------------------------- |
+| Quest auto-navigation fix   | ✅ Done         | commit bfe9a12                          |
+| Add career paths            | ✅ Done         | 3 new paths added                       |
+| Navigation scrollbar fix    | ✅ Done         | commit 4415889                          |
+| HUD redesign (7 items)      | ✅ Done         | commit 4415889                          |
+| Visual design audit         | [~] In Progress | Typography, buttons, cards standardized |
+| Level jumping investigation | [ ] Pending     | -                                       |
+| HTML Forms repetition       | [ ] Pending     | -                                       |
 
 ---
 
@@ -73,17 +73,21 @@
 ## Bug Fixes Log
 
 ### 2026-06-26: Quest Auto-Navigation Stale Closure
+
 **Commit**: bfe9a12
 **Issue**: Level jumping 16→17→18 without completing quests
 **Fix**:
+
 - Added navigationLockRef to prevent duplicate navigations
 - Replaced stale getNextQuest() with fresh localStorage read
 - Increased delay to 2500ms
 
 ### 2026-06-26: Career Path Additions
+
 **Commit**: f7593a2
 **Issue**: Missing career paths per BRAINSTORM.md
 **Fix**:
+
 - Added AI Engineer career path
 - Added Software Engineer career path
 - Added AI Architect career path
@@ -93,12 +97,14 @@
 ## Code Quality
 
 ### Build Status
+
 - **Lint**: 0 errors
 - **TypeScript**: 0 errors
 - **Build**: Passing (vite build)
 - **Tests**: 5/6 Playwright quest-flow tests passing
 
 ### Test Coverage (Legacy)
+
 - **Statements**: 97.16% (206/212) ✅
 - **Branches**: 97.64% (83/85) ✅
 - **Functions**: 96% (72/75) ✅
@@ -110,19 +116,19 @@
 
 ### Development Velocity
 
-| Day | Tasks Completed | Notes |
-|-----|-----------------|-------|
-| 2026-06-26 | 5 | Bug fixes, career paths, planning |
+| Day        | Tasks Completed | Notes                             |
+| ---------- | --------------- | --------------------------------- |
+| 2026-06-26 | 5               | Bug fixes, career paths, planning |
 
 ### Overall Completion
 
-| Metric | Value | Target |
-|--------|-------|--------|
-| Critical Bugs Fixed | 1/4 | 4/4 |
-| Navigation Items Reduced | ✅ 7 items | 7 primary + More dropdown |
-| Career Paths Implemented | ✅ 10/11 | Per BRAINSTORM |
-| Skill System Enhanced | ✅ Yes | Per-skill XP tracking |
-| Equipment System | ✅ Foundation | Data model + methods done |
+| Metric                   | Value         | Target                    |
+| ------------------------ | ------------- | ------------------------- |
+| Critical Bugs Fixed      | 1/4           | 4/4                       |
+| Navigation Items Reduced | ✅ 7 items    | 7 primary + More dropdown |
+| Career Paths Implemented | ✅ 10/11      | Per BRAINSTORM            |
+| Skill System Enhanced    | ✅ Yes        | Per-skill XP tracking     |
+| Equipment System         | ✅ Foundation | Data model + methods done |
 
 ---
 

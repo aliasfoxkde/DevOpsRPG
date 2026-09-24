@@ -35,6 +35,7 @@ Based on analysis of `docs/BRAINSTORM.md` and codebase audit, this plan addresse
 ### Proposed Navigation Structure
 
 **Primary Navigation (7 items - visible on all devices):**
+
 1. 🏠 Home (Dashboard)
 2. 🗺️ Quests (Quest Journal + Battle Arena)
 3. 📖 Learn (Technology/Study content)
@@ -44,6 +45,7 @@ Based on analysis of `docs/BRAINSTORM.md` and codebase audit, this plan addresse
 7. ⚙️ More (Settings + About + Events)
 
 **Secondary Navigation (accessible via dropdown or submenu):**
+
 - Skills (under Hero or Learn)
 - Career Path (under Learn or top-level)
 - Guild/Social (group features)
@@ -71,12 +73,14 @@ Based on analysis of `docs/BRAINSTORM.md` and codebase audit, this plan addresse
 ### Current Design Assessment
 
 **What's Working:**
+
 - Dark gaming theme with RPG elements
 - Consistent color palette (amber, slate, green)
 - Status bars and progress indicators
 - Celebration effects (confetti, level-up)
 
 **Issues:**
+
 - Heavy emoji usage can feel "childish"
 - Some animations may be distracting
 - Inconsistent text sizing (text-xs, text-sm, text-lg mixed)
@@ -120,6 +124,7 @@ Based on analysis of `docs/BRAINSTORM.md` and codebase audit, this plan addresse
    - ❌ Management (Team Lead → Manager → Director → VP → CTO)
 
 2. **Non-functional code**:
+
    ```typescript
    // getTechnologyCompletion() always returns 0 - STUB
    // questIds arrays are all empty
@@ -133,12 +138,14 @@ Based on analysis of `docs/BRAINSTORM.md` and codebase audit, this plan addresse
 ### Proposed Career Path Structure
 
 **Level 1: Foundations**
+
 ```text
 IT Support Track:
 Helpdesk → Desktop Support → Field Technician → Systems Administrator
 ```
 
 **Level 2: Specializations**
+
 ```text
 Development Track:
 Junior Developer → Software Engineer → Senior Engineer → Tech Lead
@@ -154,6 +161,7 @@ Security Analyst → Security Engineer → Cloud Security Architect → CISO
 ```
 
 **Level 3: Leadership** (Management path)
+
 ```text
 Team Lead → Manager → Director → VP → CTO
 ```
@@ -183,6 +191,7 @@ Team Lead → Manager → Director → VP → CTO
 ### Proposed Skill System
 
 **Per-Skill XP Tracking:**
+
 ```text
 Linux Skill: Level 12 (2,400 XP)
 ├── Shell Basics (unlocked)
@@ -192,11 +201,13 @@ Linux Skill: Level 12 (2,400 XP)
 ```
 
 **Skill Effects:**
+
 - Linux Level 10+ → +5% XP for Linux-related quests
 - Docker Level 10+ → Unlock Docker certification quest line
 - AWS Level 10+ → Unlock AWS certification quest line
 
 **Implementation:**
+
 1. Add `skillXp` tracking in GameState
 2. Award skill XP when completing related quests
 3. Implement skill unlocks (certain quests require skill levels)
@@ -213,16 +224,17 @@ Linux Skill: Level 12 (2,400 XP)
 
 ### Proposed Equipment
 
-| Equipment | Bonus | Rarity |
-|-----------|-------|--------|
-| Mechanical Keyboard | +5% Typing Challenge XP | Common |
-| Cloud Architect Notebook | +5% Architecture Quest XP | Uncommon |
-| Linux Penguin Plush | +5% Linux Quest XP | Rare |
-| Server Rack Miniature | +5% Infrastructure Quest XP | Rare |
-| Coffee Mug | +10% Daily Streak Protection | Common |
-| Dual Monitor Setup | +10% Quiz Score | Uncommon |
+| Equipment                | Bonus                        | Rarity   |
+| ------------------------ | ---------------------------- | -------- |
+| Mechanical Keyboard      | +5% Typing Challenge XP      | Common   |
+| Cloud Architect Notebook | +5% Architecture Quest XP    | Uncommon |
+| Linux Penguin Plush      | +5% Linux Quest XP           | Rare     |
+| Server Rack Miniature    | +5% Infrastructure Quest XP  | Rare     |
+| Coffee Mug               | +10% Daily Streak Protection | Common   |
+| Dual Monitor Setup       | +10% Quiz Score              | Uncommon |
 
 **Equipment Slots:**
+
 1. **Workstation** (Laptop/Desktop/Monitor)
 2. **Accessories** (Keyboard/Mouse/Headphones)
 3. **Cosmetic** (Avatar frame/background)
@@ -233,18 +245,21 @@ Linux Skill: Level 12 (2,400 XP)
 ## Part 6: UI/UX Polish
 
 ### Navigation Improvements
+
 1. Reduce HUD items from 19 to 7 primary + expandable menu
 2. Fix scrollbar overflow issues
 3. Improve mobile hamburger menu
 4. Add breadcrumb navigation for deep pages
 
 ### Visual Consistency
+
 1. Standardize card components
 2. Create reusable button variants
 3. Consistent spacing throughout
 4. Better loading states (skeleton components)
 
 ### Accessibility
+
 1. ARIA labels on all interactive elements
 2. Keyboard navigation support
 3. Focus indicators
@@ -255,12 +270,14 @@ Linux Skill: Level 12 (2,400 XP)
 ## Implementation Phases
 
 ### Phase 1: Critical Bug Fixes (Immediate)
+
 - [ ] Quest auto-navigation stale closure bug
 - [ ] Navigation scrollbar issues
 - [ ] Level jumping bug
 - [ ] HTML Forms repetition bug
 
 ### Phase 2: Navigation Overhaul
+
 - [ ] Redesign HUD with 7 primary items
 - [ ] Implement collapsible "More" menu
 - [ ] Fix mobile menu
@@ -268,6 +285,7 @@ Linux Skill: Level 12 (2,400 XP)
 - [ ] Add breadcrumb navigation
 
 ### Phase 3: Visual Design Audit
+
 - [ ] Audit and standardize typography
 - [ ] Reduce emoji density, add SVG icons
 - [ ] Standardize card/button components
@@ -275,6 +293,7 @@ Linux Skill: Level 12 (2,400 XP)
 - [ ] Balance gamification with professionalism
 
 ### Phase 4: Career Path Completion
+
 - [ ] Add missing career paths (IT Support, Security, Management)
 - [ ] Implement getTechnologyCompletion()
 - [ ] Link questIds to career technologies
@@ -282,6 +301,7 @@ Linux Skill: Level 12 (2,400 XP)
 - [ ] Implement skill token currency
 
 ### Phase 5: Skill System Enhancement
+
 - [ ] Add per-skill XP tracking
 - [ ] Implement skill XP awards on quest completion
 - [ ] Create skill unlock system
@@ -289,6 +309,7 @@ Linux Skill: Level 12 (2,400 XP)
 - [ ] Add skill-based bonuses
 
 ### Phase 6: Equipment System
+
 - [ ] Design equipment data model
 - [ ] Create equipment store
 - [ ] Implement equipment slots
@@ -296,6 +317,7 @@ Linux Skill: Level 12 (2,400 XP)
 - [ ] Visual equipment display on character
 
 ### Phase 7: Polish & Testing
+
 - [ ] Comprehensive Playwright testing
 - [ ] Visual regression testing
 - [ ] Performance optimization
@@ -307,6 +329,7 @@ Linux Skill: Level 12 (2,400 XP)
 ## Validation Checklist
 
 ### Navigation
+
 - [ ] HUD displays 7 primary items on desktop
 - [ ] Mobile menu is usable (2-column, readable text)
 - [ ] No horizontal scrollbar on any viewport
@@ -314,6 +337,7 @@ Linux Skill: Level 12 (2,400 XP)
 - [ ] Active state clearly indicated
 
 ### Visual Design
+
 - [ ] Consistent typography scale
 - [ ] Cards have uniform styling
 - [ ] Animations are subtle (no bouncing/pulsing)
@@ -321,18 +345,21 @@ Linux Skill: Level 12 (2,400 XP)
 - [ ] Dark/light modes both look good
 
 ### Career Paths
+
 - [ ] All 8+ career paths implemented
 - [ ] Progress calculates correctly
 - [ ] Career transitions work with permanent bonuses
 - [ ] Milestones award correctly
 
 ### Skills
+
 - [ ] Per-skill XP tracked accurately
 - [ ] Skill levels increase appropriately
 - [ ] Skill bonuses apply to gameplay
 - [ ] Skill trees display correctly
 
 ### Equipment
+
 - [ ] Equipment can be purchased
 - [ ] Equipment slots work
 - [ ] Bonuses apply correctly

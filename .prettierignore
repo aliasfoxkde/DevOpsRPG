@@ -1,0 +1,10 @@
+dist
+coverage
+node_modules
+playwright-report
+test-results
+package-lock.json
+# Generated scrape output — data, not authored code
+src/data/w3schools-content.ts
+audit-report.json
+aegis-report.json

@@ -31,11 +31,11 @@ npm run preview
 
 ## What's Next?
 
-| Task | Command |
-|------|---------|
-| Run tests | `npm run test` |
-| Lint code | `npm run lint` |
-| Type check | `npm run typecheck` |
+| Task            | Command                                                              |
+| --------------- | -------------------------------------------------------------------- |
+| Run tests       | `npm run test`                                                       |
+| Lint code       | `npm run lint`                                                       |
+| Type check      | `npm run typecheck`                                                  |
 | Full validation | `npm run lint && npm run typecheck && npm run test && npm run build` |
 
 ---
@@ -43,11 +43,13 @@ npm run preview
 ## Common Issues
 
 **Port in use:**
+
 ```bash
 npx kill-port 5173
 ```
 
 **Clear localStorage:**
+
 ```bash
 localStorage.clear()
 location.reload()

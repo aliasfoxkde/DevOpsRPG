@@ -16,12 +16,12 @@
 
 ## Test Coverage Goals
 
-| Category | Target | Priority |
-|----------|--------|----------|
-| Utility functions | 90% | High |
-| React hooks | 85% | High |
-| Components | 70% | Medium |
-| E2E flows | 100% | Critical |
+| Category          | Target | Priority |
+| ----------------- | ------ | -------- |
+| Utility functions | 90%    | High     |
+| React hooks       | 85%    | High     |
+| Components        | 70%    | Medium   |
+| E2E flows         | 100%   | Critical |
 
 ---
 
@@ -56,18 +56,21 @@ tests/
 ## Critical Test Scenarios
 
 ### Authentication
+
 - [ ] Google OAuth flow
 - [ ] GitHub OAuth flow
 - [ ] Session persistence
 - [ ] Logout functionality
 
 ### Learning Flow
+
 - [ ] Technology catalog displays
 - [ ] Topic navigation
 - [ ] Progress marking
 - [ ] W3Schools iframe loads
 
 ### Gamification
+
 - [ ] XP calculation accuracy
 - [ ] Level progression
 - [ ] Achievement unlock
@@ -75,12 +78,14 @@ tests/
 - [ ] Daily bonus application
 
 ### Theme System
+
 - [ ] Dark mode toggle
 - [ ] Light mode toggle
 - [ ] System preference detection
 - [ ] Theme persistence
 
 ### PWA
+
 - [ ] Service worker registration
 - [ ] Offline functionality
 - [ ] Install prompt display
@@ -91,6 +96,7 @@ tests/
 ## CI/CD Integration
 
 Tests run on every push:
+
 1. Lint check
 2. Type check
 3. Unit tests
@@ -102,6 +108,7 @@ Tests run on every push:
 ## Coverage Reporting
 
 Coverage reports generated on every test run:
+
 - `coverage/index.html` - HTML report
 - `coverage/coverage.json` - JSON for tooling
 - `coverage/text-summary` - Terminal output

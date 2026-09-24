@@ -38,33 +38,38 @@
 
 ## Technology Stack
 
-| Layer | Technology | Justification |
-|-------|------------|---------------|
-| Frontend | Next.js 14 + TypeScript | App Router, CSR-first, excellent DX |
-| Styling | Tailwind CSS + CSS Variables | Theme system, dark/light modes |
-| State | React Context + localStorage | Simple, offline-capable |
-| Backend | Cloudflare Workers | Edge computing, free tier |
-| Database | Cloudflare D1 (SQLite) | SQL at edge, zero config |
-| Sessions | Cloudflare KV | Fast key-value session store |
-| Auth | Google/GitHub OAuth | Standard SSO, Workers integration |
-| Deployment | Cloudflare Pages | Free hosting, global CDN |
-| Testing | Vitest + Playwright | 80% coverage target |
+| Layer      | Technology                   | Justification                       |
+| ---------- | ---------------------------- | ----------------------------------- |
+| Frontend   | Next.js 14 + TypeScript      | App Router, CSR-first, excellent DX |
+| Styling    | Tailwind CSS + CSS Variables | Theme system, dark/light modes      |
+| State      | React Context + localStorage | Simple, offline-capable             |
+| Backend    | Cloudflare Workers           | Edge computing, free tier           |
+| Database   | Cloudflare D1 (SQLite)       | SQL at edge, zero config            |
+| Sessions   | Cloudflare KV                | Fast key-value session store        |
+| Auth       | Google/GitHub OAuth          | Standard SSO, Workers integration   |
+| Deployment | Cloudflare Pages             | Free hosting, global CDN            |
+| Testing    | Vitest + Playwright          | 80% coverage target                 |
 
 ## Learning Path Order (47 Technologies)
 
 ### Phase 1 - Foundations (6)
+
 INTRO TO PROGRAMMING → INTRO TO HTML & CSS → HTML → CSS → JAVASCRIPT → SQL
 
 ### Phase 2 - Backend Basics (8)
+
 PYTHON → JAVA → PHP → C → C++ → C# → HOW TO → W3.CSS
 
 ### Phase 3 - Frameworks & Databases (11)
+
 BOOTSTRAP → REACT → MYSQL → JQUERY → EXCEL → XML → DJANGO → NUMPY → PANDAS → NODEJS → DSA
 
 ### Phase 4 - Advanced & Cloud (9)
+
 TYPESCRIPT → ANGULAR → ANGULARJS → GIT → POSTGRESQL → MONGODB → ASP → AI → R
 
 ### Phase 5 - Modern DevOps (13)
+
 GO → KOTLIN → SWIFT → SASS → VUE → GEN AI → SCIPY → AWS → CYBERSECURITY → DATA SCIENCE → BASH → RUST → TOOLS
 
 ## Career Path Themes
@@ -78,12 +83,14 @@ GO → KOTLIN → SWIFT → SASS → VUE → GEN AI → SCIPY → AWS → CYBERS
 ## Gamification System
 
 ### XP & Leveling
+
 - Topic completion: 50-200 XP (difficulty-scaled)
 - Quiz pass: 25-100 XP
 - Daily streak: +10% XP per consecutive day
 - Level formula: `level = floor(sqrt(xp / 100))`
 
 ### Achievements
+
 - First Steps (complete 1 topic)
 - Dedicated Learner (7-day streak)
 - Polyglot (5 categories)
@@ -91,6 +98,7 @@ GO → KOTLIN → SWIFT → SASS → VUE → GEN AI → SCIPY → AWS → CYBERS
 - Speed Demon (<5 min per topic)
 
 ### Daily Rewards
+
 - Day 1: 10 XP bonus
 - Day 3: 25 XP bonus
 - Day 7: 50 XP + badge
@@ -138,6 +146,7 @@ CREATE TABLE achievements (
 ## Implementation Phases
 
 ### Phase 1: Foundation (Current)
+
 - [x] Project setup with Next.js 14
 - [ ] Tailwind CSS with dark/light mode
 - [ ] Theme system (CSS variables)
@@ -145,6 +154,7 @@ CREATE TABLE achievements (
 - [ ] Basic layout components
 
 ### Phase 2: Authentication
+
 - [ ] Cloudflare Workers setup
 - [ ] Google OAuth
 - [ ] GitHub OAuth
@@ -152,12 +162,14 @@ CREATE TABLE achievements (
 - [ ] D1 schema + migrations
 
 ### Phase 3: Core Learning UI
+
 - [ ] Technology catalog
 - [ ] Topic viewer (W3Schools iframe)
 - [ ] Progress tracking
 - [ ] Navigation
 
 ### Phase 4: Gamification
+
 - [ ] XP system
 - [ ] Level calculations
 - [ ] Achievement system
@@ -165,11 +177,13 @@ CREATE TABLE achievements (
 - [ ] Theme selection
 
 ### Phase 5: Polish & PWA
+
 - [ ] Service worker
 - [ ] Offline support
 - [ ] Install prompt
 
 ### Phase 6: Testing & Deployment
+
 - [ ] Unit tests (Vitest)
 - [ ] E2E tests (Playwright)
 - [ ] CI/CD pipeline

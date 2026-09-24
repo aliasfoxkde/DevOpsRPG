@@ -408,10 +408,10 @@ Earned everywhere.
 
 Used for:
 
-* cosmetics
-* pets
-* equipment
-* themes
+- cosmetics
+- pets
+- equipment
+- themes
 
 ---
 
@@ -421,9 +421,9 @@ Rare.
 
 Used for:
 
-* unlocking specializations
-* prestige bonuses
-* career transitions
+- unlocking specializations
+- prestige bonuses
+- career transitions
 
 ---
 
@@ -475,8 +475,8 @@ Zombie Server Outbreak
 
 Lessons:
 
-* disaster recovery
-* incident response
+- disaster recovery
+- incident response
 
 ---
 
@@ -620,22 +620,22 @@ The current site is intentionally minimalistic and focused on learning rather th
 
 ### Strengths
 
-* Clear learning hierarchy.
-* Professional appearance.
-* Good information architecture.
-* Focuses on real-world DevOps reasoning.
-* Avoids distracting gimmicks. ([devopsquest.dev][1])
+- Clear learning hierarchy.
+- Professional appearance.
+- Good information architecture.
+- Focuses on real-world DevOps reasoning.
+- Avoids distracting gimmicks. ([devopsquest.dev][1])
 
 ### Weaknesses
 
 From a retention perspective:
 
-* Very little anticipation.
-* No collectible systems.
-* No identity/progression.
-* No long-term mastery loop.
-* No social systems.
-* No "I want to come back tomorrow" mechanism.
+- Very little anticipation.
+- No collectible systems.
+- No identity/progression.
+- No long-term mastery loop.
+- No social systems.
+- No "I want to come back tomorrow" mechanism.
 
 The site currently feels like:
 
@@ -657,40 +657,40 @@ Priority order:
 
 ## Phase 1
 
-* XP
-* Levels
-* Achievements
-* Daily quests
-* Streaks
-* Gold currency
+- XP
+- Levels
+- Achievements
+- Daily quests
+- Streaks
+- Gold currency
 
 ---
 
 ## Phase 2
 
-* Skill trees
-* Career paths
-* Equipment
-* Cosmetics
-* Pets
+- Skill trees
+- Career paths
+- Equipment
+- Cosmetics
+- Pets
 
 ---
 
 ## Phase 3
 
-* Career transitions (prestige)
-* Certification system
-* Seasonal events
-* Collections
+- Career transitions (prestige)
+- Certification system
+- Seasonal events
+- Collections
 
 ---
 
 ## Phase 4
 
-* Guilds
-* Community challenges
-* Marketplace
-* User-generated challenges
+- Guilds
+- Community challenges
+- Marketplace
+- User-generated challenges
 
 ---
 
@@ -706,4 +706,4 @@ If a mechanic makes users complete one more lesson, one more quiz, or one more s
 
 That principle will keep DevOpsQuest from turning into an idle game with DevOps paint and instead make it a genuine RPG-style career progression platform built around real technical skills.
 
-[1]: https://devopsquest.dev/?utm_source=chatgpt.com "DevOpsQuest – Cloud & DevOps Learning Game"
+[1]: https://devopsquest.dev/?utm_source=chatgpt.com 'DevOpsQuest – Cloud & DevOps Learning Game'

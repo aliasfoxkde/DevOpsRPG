@@ -6,11 +6,11 @@
 
 ## 🎮 Quick Links
 
-| Resource | Description |
-|----------|-------------|
-| [Live Game](https://devopsquest.pages.dev) | Play the latest version |
-| [GitHub Repository](https://github.com/aliasfoxkde/DevOpsRPG) | Source code |
-| [Contributing Guide](../CONTRIBUTING.md) | How to contribute |
+| Resource                                                      | Description             |
+| ------------------------------------------------------------- | ----------------------- |
+| [Live Game](https://devopsquest.pages.dev)                    | Play the latest version |
+| [GitHub Repository](https://github.com/aliasfoxkde/DevOpsRPG) | Source code             |
+| [Contributing Guide](../CONTRIBUTING.md)                      | How to contribute       |
 
 ---
 
@@ -55,12 +55,12 @@ docs/
 
 ### Key Systems
 
-| System | Location | Description |
-|--------|----------|-------------|
-| Game State | `src/contexts/GameContext.tsx` | Core state management |
-| Quest Engine | `src/pages/BattleArenaPage.tsx` | Quiz and progression |
-| Navigation | `src/components/ui/HUD.tsx` | Primary navigation |
-| Data | `src/data/` | Quests, badges, technologies |
+| System       | Location                        | Description                  |
+| ------------ | ------------------------------- | ---------------------------- |
+| Game State   | `src/contexts/GameContext.tsx`  | Core state management        |
+| Quest Engine | `src/pages/BattleArenaPage.tsx` | Quiz and progression         |
+| Navigation   | `src/components/ui/HUD.tsx`     | Primary navigation           |
+| Data         | `src/data/`                     | Quests, badges, technologies |
 
 ### CI/CD
 
@@ -73,12 +73,14 @@ docs/
 ## 🚀 Development
 
 ### Prerequisites
+
 - Node.js >= 20
 - npm >= 10
 - Git
 - GitHub CLI (`gh`)
 
 ### Setup
+
 ```bash
 git clone https://github.com/aliasfoxkde/DevOpsRPG.git
 cd DevOpsRPG
@@ -87,6 +89,7 @@ npm run dev
 ```
 
 ### Validation
+
 ```bash
 npm run lint        # ESLint
 npm run typecheck   # TypeScript
@@ -98,16 +101,16 @@ npm run build       # Production build
 
 ## 📖 Game Systems
 
-| System | Status | Documentation |
-|--------|--------|---------------|
-| Quest Engine | ✅ Active | W3Schools integration, quiz mechanics |
-| XP & Levels | ✅ Active | 100 XP/level, titles at 6/11/16/21 |
-| Badges | ✅ Active | 80+ badges, rarity tiers |
-| Daily/Weekly Quests | ✅ Active | Streak system with shields |
-| Career Paths | ✅ Active | 10 career tracks |
-| Skill System | ✅ Active | Per-skill XP tracking |
-| Equipment | ✅ Active | 18 items, gameplay bonuses |
-| Autonomous Workflow | ✅ Active | AI-assisted issue handling |
+| System              | Status    | Documentation                         |
+| ------------------- | --------- | ------------------------------------- |
+| Quest Engine        | ✅ Active | W3Schools integration, quiz mechanics |
+| XP & Levels         | ✅ Active | 100 XP/level, titles at 6/11/16/21    |
+| Badges              | ✅ Active | 80+ badges, rarity tiers              |
+| Daily/Weekly Quests | ✅ Active | Streak system with shields            |
+| Career Paths        | ✅ Active | 10 career tracks                      |
+| Skill System        | ✅ Active | Per-skill XP tracking                 |
+| Equipment           | ✅ Active | 18 items, gameplay bonuses            |
+| Autonomous Workflow | ✅ Active | AI-assisted issue handling            |
 
 ---
 
@@ -128,12 +131,12 @@ See [AUTONOMOUS_WORKFLOW.md](./AUTONOMOUS_WORKFLOW.md) for full details.
 
 ## 📊 Project Status
 
-| Metric | Value |
-|--------|-------|
-| Tests | 187 passing |
-| Lint Errors | 0 |
-| TypeScript Errors | 0 |
-| Build | ✅ Passing |
-| Last Deploy | https://378111cd.devopsquest.pages.dev |
+| Metric            | Value                                  |
+| ----------------- | -------------------------------------- |
+| Tests             | 187 passing                            |
+| Lint Errors       | 0                                      |
+| TypeScript Errors | 0                                      |
+| Build             | ✅ Passing                             |
+| Last Deploy       | https://378111cd.devopsquest.pages.dev |
 
 **Last Updated**: 2026-06-27

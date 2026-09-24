@@ -12,6 +12,7 @@ Quality hardening pass: accessibility driven to zero violations, strict linting 
 and a test campaign that caught real data/logic defects.
 
 ### Added
+
 - `npm run audit:a11y` (scripts/axe-audit.mjs): Playwright + axe-core scan of 6 routes in both themes, non-zero exit on critical/serious violations
 - `src/data/integrity.test.ts`: 37 cross-module data-integrity tests (unique ids, referential integrity, prerequisite cycles, quiz answerability, phase→realm mapping, badge requirement handling, puzzle solvability)
 - `src/contexts/GameContext.test.tsx`: 21 behavior tests (XP/level, quest completion idempotency, badge grants, streak shields, learning topics, daily rewards, persistence + backup recovery + cross-tab sync)
@@ -22,11 +23,13 @@ and a test campaign that caught real data/logic defects.
 - Architecture Decision Records under `docs/decisions/` (GitForge-first CI, prod-only service worker, onboarding default, coverage ratchet)
 
 ### Changed
+
 - ESLint runs with `--max-warnings 0` and promoted rules to error: `react-hooks/exhaustive-deps`, `@typescript-eslint/no-explicit-any`, `no-fallthrough`, `eqeqeq`, `prefer-const`
 - Playwright E2E boots its dev server on dedicated port 5299 (E2E_PORT overrides) so a foreign Vite app on the default port can no longer silently serve the wrong app to every test; human dev server stays on 5173
 - Dark-first theme default matching the app's design (dark was already the visual default; now explicit and tested)
 
 ### Fixed
+
 - **`grantBadge` was a no-op for every catalog badge** — badges are pre-seeded in locked state and the guard tested "id exists" instead of "id unlocked", so challenge/reward/seasonal badge claims silently did nothing
 - Secret side quest `perfectionist` rewarded badge id `perfectionist`, which had no badge definition (claims would have rendered a broken entry) — badge added (epic, 300 XP / 150 gold)
 - Phase 7 had no category in `technologies.ts` although Kafka/RabbitMQ/Istio are phase 7 — added `Streaming & Mesh`
@@ -51,6 +54,7 @@ quality/infrastructure hardening pass. Full baselines and the phased roadmap liv
 [docs/planning/003-QUALITY_PLAN.md](planning/003-QUALITY_PLAN.md).
 
 ### Added
+
 - New technologies: Ansible (configuration management), Kafka (event streaming), RabbitMQ (message broker), Istio (service mesh)
 - Enhanced Terraform topics with modules and state management
 - Achievement notification system (badge/milestone unlock toasts)
@@ -62,6 +66,7 @@ quality/infrastructure hardening pass. Full baselines and the phased roadmap liv
 - `src/vite-env.d.ts` for `import.meta.env` typing
 
 ### Changed
+
 - Improved technologies count from 47 to 51+
 - DashboardPage now uses enhanced StreakTracker component
 - Replaced W3Schools placeholder URLs with official documentation URLs for Kubernetes, Terraform, CI/CD, Prometheus, Security, ML, Networking, API Design, Observability, Ansible, Kafka, RabbitMQ, Istio, and Bash
@@ -70,6 +75,7 @@ quality/infrastructure hardening pass. Full baselines and the phased roadmap liv
 - Service worker registration is production-only (`import.meta.env.PROD`) — no more dev-server navigation hijacking
 
 ### Fixed
+
 - Removed the tracked `.claude` symlink that pulled the global agent-harness tree into Vite's file watcher, wedging the dev server event loop and failing all 13 E2E tests
 - E2E specs rewritten against current behavior (the onboarding wizard is skipped by default; selectors now role-based) — 10/10 passing on Chromium
 - All 14 ESLint warnings resolved: 8 `react-hooks/exhaustive-deps` fixed properly (callback ordering, memoization, effect deps) and 6 `react-refresh/only-export-components` resolved by moving constants to `gameUtils` or deleting dead exports
@@ -89,7 +95,7 @@ quality/infrastructure hardening pass. Full baselines and the phased roadmap liv
 - grantBadge now properly triggers recentBadgeUnlocks for celebration UI
 - Removed deprecated helper badge (help_count requirement not implemented)
 - Ansible prerequisite fixed: 'linux' → 'bash' (linux technology doesn't exist)
-- Quiz/topic ID mismatches fixed: css_boxmodel→css_box_model, aws_ec2→aws-ec2, aws_s3→aws-s3, python_*→py_*
+- Quiz/topic ID mismatches fixed: css_boxmodel→css_box_model, aws_ec2→aws-ec2, aws_s3→aws-s3, python__→py__
 - tier_5 milestone requirement value fixed: 118 → 163 quests
 - all_categories badge now properly checks earnedCategories for quest/streak/skill/secret
 - all_badges badge now properly checks total badges earned
@@ -110,6 +116,7 @@ quality/infrastructure hardening pass. Full baselines and the phased roadmap liv
 ## [0.1.0] - 2026-06-22
 
 ### Added
+
 - Initial project scaffold
 - ViteJS + React 19 + TypeScript configuration
 - Tailwind CSS v4 with dark/light theme support
@@ -124,6 +131,7 @@ quality/infrastructure hardening pass. Full baselines and the phased roadmap liv
 - Onboarding wizard for new users
 
 ### Fixed
+
 - Badge/milestone unlocking broken for technology-based badges (computing techCompleted from completedQuests)
 - XP progress display showing wrong values when XP > 2*xpToNextLevel
 - Division by zero causing NaN display in progress calculations
@@ -154,6 +162,7 @@ quality/infrastructure hardening pass. Full baselines and the phased roadmap liv
 - BadgesPage playerStats used game.completedRealms instead of destructured completedRealms
 
 ### Planned (Next Release)
+
 - OAuth authentication (Google, GitHub)
 - Cloudflare D1 database integration
 - Cloudflare KV session management

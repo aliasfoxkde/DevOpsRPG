@@ -23,7 +23,7 @@ run is not treated as a code failure signal.
 - Release automation extracts release notes from `docs/CHANGELOG.md` on tag push
   and publishes to GitForge (GitHub release as a mirror copy).
 - Credentials never live in the repository; the interactive `gitforge auth
-  --login` on the user's machine is the credential path.
+--login` on the user's machine is the credential path.
 
 ## Consequences
 
