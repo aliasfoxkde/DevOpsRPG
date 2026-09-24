@@ -17,9 +17,7 @@ describe('CharacterSheetPage', () => {
     const { character } = seedDefaultGame()
     renderSeededPage(<CharacterSheetPage />)
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Character Sheet/ }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /Character Sheet/ })).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 2, name: character.name })).toBeInTheDocument()
     // The title is echoed by the XP bar as well, so allow repeats
     expect(screen.getAllByText(character.title).length).toBeGreaterThan(0)

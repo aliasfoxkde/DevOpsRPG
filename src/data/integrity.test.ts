@@ -16,8 +16,8 @@ import { COLLECTIBLES_POOL, DAILY_REWARDS } from './collectibles'
 import { codePuzzles } from './minigames'
 
 const techList = Object.values(technologies)
-const allTopics = techList.flatMap(t => t.topics)
-const topicIds = new Set(allTopics.map(t => t.id))
+const allTopics = techList.flatMap((t) => t.topics)
+const topicIds = new Set(allTopics.map((t) => t.id))
 const realmMapByPhase: Record<number, string> = {
   1: 'foundations',
   2: 'scripts',
@@ -43,16 +43,16 @@ describe('technologies', () => {
     for (const [key, tech] of Object.entries(technologies)) {
       expect(tech.id, `key ${key} should match tech.id`).toBe(key)
     }
-    expect(duplicates(techList.map(t => t.id))).toEqual([])
+    expect(duplicates(techList.map((t) => t.id))).toEqual([])
   })
 
   it('has globally unique topic ids across all technologies', () => {
-    expect(duplicates(allTopics.map(t => t.id))).toEqual([])
+    expect(duplicates(allTopics.map((t) => t.id))).toEqual([])
   })
 
   it('has unique slugs for technologies and topics', () => {
-    expect(duplicates(techList.map(t => t.slug))).toEqual([])
-    expect(duplicates(allTopics.map(t => t.slug))).toEqual([])
+    expect(duplicates(techList.map((t) => t.slug))).toEqual([])
+    expect(duplicates(allTopics.map((t) => t.slug))).toEqual([])
   })
 
   it('numbers topics sequentially from 1 within each technology', () => {
@@ -96,7 +96,7 @@ describe('technologies', () => {
 
   it('maps every technology phase to a known category', () => {
     for (const tech of techList) {
-      expect(Object.values(categories).map(c => c.phase)).toContain(tech.phase)
+      expect(Object.values(categories).map((c) => c.phase)).toContain(tech.phase)
     }
   })
 })
@@ -125,7 +125,7 @@ describe('realms', () => {
   })
 
   it('gates higher realms behind higher levels', () => {
-    const levels = Object.values(realms).map(r => r.requiredLevel)
+    const levels = Object.values(realms).map((r) => r.requiredLevel)
     expect([...levels].sort((a, b) => a - b)).toEqual(levels)
     expect(levels[0]).toBe(1)
   })
@@ -137,7 +137,7 @@ describe('quests', () => {
   })
 
   it('has unique quest ids', () => {
-    expect(duplicates(allQuests.map(q => q.id))).toEqual([])
+    expect(duplicates(allQuests.map((q) => q.id))).toEqual([])
   })
 
   it('references valid technologies, topics and realms', () => {
@@ -182,7 +182,7 @@ describe('quizzes', () => {
   })
 
   it('has unique question ids', () => {
-    const ids = Object.values(quizzes).flatMap(qs => qs.map(q => q.id))
+    const ids = Object.values(quizzes).flatMap((qs) => qs.map((q) => q.id))
     expect(duplicates(ids)).toEqual([])
   })
 
@@ -219,7 +219,7 @@ describe('quizzes', () => {
 
 describe('badges, milestones and titles', () => {
   it('has unique badge ids with valid rarity tiers', () => {
-    expect(duplicates(BADGES.map(b => b.id))).toEqual([])
+    expect(duplicates(BADGES.map((b) => b.id))).toEqual([])
     const rarities = Object.keys(RARITY_COLORS)
     for (const badge of BADGES) {
       expect(rarities, `${badge.id} rarity ${badge.rarity}`).toContain(badge.rarity)
@@ -234,22 +234,30 @@ describe('badges, milestones and titles', () => {
     // would make the badge permanently unobtainable with no error anywhere.
     const handled = HANDLED_REQUIREMENT_TYPES as readonly string[]
     for (const badge of BADGES) {
-      expect(handled, `${badge.id} type ${badge.requirement.type}`).toContain(badge.requirement.type)
+      expect(handled, `${badge.id} type ${badge.requirement.type}`).toContain(
+        badge.requirement.type,
+      )
     }
   })
 
   it('has unique milestone ids with valid triggers and bonuses', () => {
-    expect(duplicates(MILESTONES.map(m => m.id))).toEqual([])
+    expect(duplicates(MILESTONES.map((m) => m.id))).toEqual([])
     for (const milestone of MILESTONES) {
       const { trigger, xpBonus } = milestone
       const numericTarget =
-        trigger.type === 'quest_count' ? trigger.count :
-        trigger.type === 'streak' ? trigger.days :
-        trigger.type === 'level' ? trigger.level :
-        trigger.type === 'quiz_streak' ? trigger.count :
-        trigger.type === 'minigame_complete' ? trigger.count :
-        trigger.type === 'speed_quest' ? trigger.minutes :
-        undefined
+        trigger.type === 'quest_count'
+          ? trigger.count
+          : trigger.type === 'streak'
+            ? trigger.days
+            : trigger.type === 'level'
+              ? trigger.level
+              : trigger.type === 'quiz_streak'
+                ? trigger.count
+                : trigger.type === 'minigame_complete'
+                  ? trigger.count
+                  : trigger.type === 'speed_quest'
+                    ? trigger.minutes
+                    : undefined
       if (numericTarget !== undefined) {
         expect(numericTarget, milestone.id).toBeGreaterThan(0)
       }
@@ -265,27 +273,30 @@ describe('badges, milestones and titles', () => {
   })
 
   it('has unique title ids', () => {
-    expect(duplicates(TITLES.map(t => t.id))).toEqual([])
+    expect(duplicates(TITLES.map((t) => t.id))).toEqual([])
   })
 })
 
 describe('side quests and collectibles', () => {
   it('gives every side quest a unique id and positive reward', () => {
     const pools = [DAILY_QUESTS_POOL, WEEKLY_QUESTS_POOL, SECRET_QUESTS_POOL]
-    const ids = pools.flatMap(pool => pool.map(q => q.id))
+    const ids = pools.flatMap((pool) => pool.map((q) => q.id))
     expect(duplicates(ids)).toEqual([])
     for (const quest of pools.flat()) {
       expect(quest.rewards.xp, quest.id).toBeGreaterThan(0)
       expect(quest.rewards.gold, quest.id).toBeGreaterThanOrEqual(0)
       expect(quest.requirement.count, quest.id).toBeGreaterThan(0)
       if (quest.rewards.badge) {
-        expect(BADGES.some(b => b.id === quest.rewards.badge), `${quest.id} badge ${quest.rewards.badge}`).toBe(true)
+        expect(
+          BADGES.some((b) => b.id === quest.rewards.badge),
+          `${quest.id} badge ${quest.rewards.badge}`,
+        ).toBe(true)
       }
     }
   })
 
   it('has unique collectible ids', () => {
-    expect(duplicates(COLLECTIBLES_POOL.map(c => c.id))).toEqual([])
+    expect(duplicates(COLLECTIBLES_POOL.map((c) => c.id))).toEqual([])
   })
 
   it('offers daily rewards for a 7-day cycle', () => {
@@ -295,8 +306,8 @@ describe('side quests and collectibles', () => {
 
 describe('world map', () => {
   it('only connects locations that exist', () => {
-    const ids = new Set(worldMapLocations.map(l => l.id))
-    expect(duplicates(worldMapLocations.map(l => l.id))).toEqual([])
+    const ids = new Set(worldMapLocations.map((l) => l.id))
+    expect(duplicates(worldMapLocations.map((l) => l.id))).toEqual([])
     for (const location of worldMapLocations) {
       for (const connection of location.connectedTo) {
         expect(ids.has(connection), `${location.id} -> ${connection}`).toBe(true)
@@ -324,7 +335,7 @@ describe('world map', () => {
 
 describe('code puzzles', () => {
   it('gives every puzzle a unique id and non-empty options containing the answer', () => {
-    expect(duplicates(codePuzzles.map(p => p.id))).toEqual([])
+    expect(duplicates(codePuzzles.map((p) => p.id))).toEqual([])
     for (const puzzle of codePuzzles) {
       // Puzzles are answered by clicking an option; without options (or with
       // the answer missing from them) the round can never be solved.
@@ -336,13 +347,13 @@ describe('code puzzles', () => {
 
 describe('skill trees and career paths', () => {
   it('has unique skill tree and skill ids', () => {
-    expect(duplicates(SKILL_TREES.map(t => t.id))).toEqual([])
-    const skillIds = SKILL_TREES.flatMap(t => t.skills.map(s => s.id))
+    expect(duplicates(SKILL_TREES.map((t) => t.id))).toEqual([])
+    const skillIds = SKILL_TREES.flatMap((t) => t.skills.map((s) => s.id))
     expect(duplicates(skillIds)).toEqual([])
   })
 
   it('only references existing skills in dependencies and paths', () => {
-    const skillIds = new Set(SKILL_TREES.flatMap(t => t.skills.map(s => s.id)))
+    const skillIds = new Set(SKILL_TREES.flatMap((t) => t.skills.map((s) => s.id)))
     for (const tree of SKILL_TREES) {
       for (const skill of tree.skills) {
         expect(skill.maxLevel, skill.id).toBeGreaterThan(0)
@@ -358,6 +369,6 @@ describe('skill trees and career paths', () => {
   })
 
   it('has unique career path ids', () => {
-    expect(duplicates(CAREER_PATHS.map(p => p.id))).toEqual([])
+    expect(duplicates(CAREER_PATHS.map((p) => p.id))).toEqual([])
   })
 })

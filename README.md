@@ -22,11 +22,11 @@ Open http://localhost:5173
 
 ## 📚 Documentation
 
-| Doc | Description |
-|-----|-------------|
-| [docs/README.md](docs/README.md) | Full documentation index |
-| [docs/QUICKSTART.md](docs/QUICKSTART.md) | 5-minute setup |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute |
+| Doc                                                        | Description                |
+| ---------------------------------------------------------- | -------------------------- |
+| [docs/README.md](docs/README.md)                           | Full documentation index   |
+| [docs/QUICKSTART.md](docs/QUICKSTART.md)                   | 5-minute setup             |
+| [CONTRIBUTING.md](CONTRIBUTING.md)                         | How to contribute          |
 | [docs/AUTONOMOUS_WORKFLOW.md](docs/AUTONOMOUS_WORKFLOW.md) | Autonomous workflow system |
 
 ---
@@ -35,18 +35,18 @@ Open http://localhost:5173
 
 For AI agents working on this codebase:
 
-| File | Purpose |
-|------|---------|
-| `CLAUDE.md` | Project configuration and rules |
-| `.github/copilot-instructions.md` | Issue handling instructions |
-| [docs/planning/000-AUDIT_OVERVIEW.md](docs/planning/000-AUDIT_OVERVIEW.md) | Current project status |
+| File                                                                       | Purpose                         |
+| -------------------------------------------------------------------------- | ------------------------------- |
+| `CLAUDE.md`                                                                | Project configuration and rules |
+| `.github/copilot-instructions.md`                                          | Issue handling instructions     |
+| [docs/planning/000-AUDIT_OVERVIEW.md](docs/planning/000-AUDIT_OVERVIEW.md) | Current project status          |
 
 ---
 
 ## Status
 
-| Metric | Value |
-|--------|-------|
-| Tests | 187 passing |
-| Build | ✅ Passing |
+| Metric | Value                                  |
+| ------ | -------------------------------------- |
+| Tests  | 187 passing                            |
+| Build  | ✅ Passing                             |
 | Deploy | https://378111cd.devopsquest.pages.dev |

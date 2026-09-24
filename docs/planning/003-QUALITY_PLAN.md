@@ -374,3 +374,64 @@ wrangler deploy with existing env vars → byte-verify production.
   it is data, not logic.
 - AAA contrast ≥ 7:1 on every text token may force palette changes with visual-design
   review; changes are made token-level and re-audited.
+
+### 4.4 Cycle 2 execution log — 2026-09-24 (Phase A complete)
+
+Phase A landed in full. Final gate state after the campaign:
+
+| Gate                       | Result                                                                                                          |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| ESLint (strictTypeChecked) | 1165 errors → **0 errors / 0 warnings** across 198 files (`--max-warnings 0`), zero eslint-disable comments     |
+| Typecheck                  | 3 projects green (app `tsconfig.json`, tooling `tsconfig.node.json` incl. `scripts/**` + `e2e/**`, `worker/`)   |
+| Tests                      | **70 files / 606 tests passing**; new tests added for every fixed defect                                        |
+| Prettier                   | repo-wide single-format commit; `format:check` gate green                                                       |
+| Knip                       | 0 unused exports/files/deps; config trimmed to auto-detected entries; `src/**/*.css` followed                   |
+| Aegis                      | baseline committed (`aegis-baseline.json`, 198 findings triaged — see below); `audit:secrets` fails only on new |
+| Coverage                   | 62.63/58.30/62.23/65.24 → **65.51 stmts / 59.25 branch / 65.88 funcs / 68.08 lines**; thresholds ratcheted up   |
+| Build                      | `tsc -b && vite build` green                                                                                    |
+
+Work executed:
+
+- **Strict type-aware lint campaign** (typescript-eslint `strictTypeChecked` with
+  `parserOptions.project` per scope — app/tooling/worker). Two rules tuned with written
+  justification in `eslint.config.js`: `restrict-template-expressions` allows
+  number/boolean interpolation (game UI interpolates stats everywhere),
+  `no-confusing-void-expression` allows the `void` operator (idiomatic
+  floating-promise suppression). Everything else at strict defaults.
+- **Parallel remediation across 5 scopes** (contexts/utils/data, pages A-L, pages M-Z,
+  ui/worker, games/minigames/e2e). Every scope re-verified independently, then the whole
+  repo re-linted.
+- **Real defects fixed along the way** (each with regression test where applicable):
+  cross-tab `storage` events with non-object payloads wiped the save to defaults
+  (GameContext); malformed saves (`character: null`, `achievements: [null]`) discarded
+  the entire save including the backup instead of the bad part; `localStorage.theme`
+  cast unvalidated ("purple" reached `documentElement.classList`); import sanitizer
+  stringified non-scalar ids to `"[object Object]"`; missing `case 'specific'` in
+  `communityChallenges` fell silently to `default: 0`; Confetti `animationRef.current!`
+  crash path; ChallengesPage `dailyDash.startTime!` non-null assertion inside a
+  `setInterval` closure; BattleArenaPage's "Quest Content Unavailable" fallback is live
+  code (5 technology ids — ansible, foundations, istio, kafka, rabbitmq — have no
+  w3schools-content entry), verified against the data before keeping it.
+- **Scrape script de-stubbed**: `scripts/scrape-w3schools.js` now performs real
+  fetch/parse of W3Schools topic pages (entity decoding, `<h2>` sectioning,
+  `<pre>` code examples, main-region extraction) and throws on HTTP/parse failure —
+  the previous version returned hardcoded placeholder data.
+- **Tooling wiring**: `.gitforce.yml` (GitForge primary pipeline: lint → format → knip →
+  typecheck → test → e2e → security → build), `ci.yml` gains `format:check`, `knip`
+  and a `security` job (aegis baseline ratchet, degrade-to-warning on GitHub where the
+  binary is unavailable), npm scripts `format`/`format:check`/`knip`/`audit:secrets`,
+  `typecheck` extended to all three tsconfigs.
+- **Aegis baseline triage** (198 findings, all reviewed): the 8 "high" findings are
+  false positives — scraped W3Schools teaching content about `innerHTML` (React
+  escapes on render), a `'devopsquest_voice_settings'` STORAGE_KEY constant, a
+  `secret:` badge-category label, and a `100000000` XP clamp matching tax-number
+  patterns. Mediums are `Math.random()` game randomness (66), 5-digit XP values read
+  as zip codes (59), SQL-teaching content, and localhost URLs in docs/scripts of a
+  fully client-side app. Baseline ratchet means any NEW occurrence fails CI.
+- **Coverage measurement note**: vitest v8 coverage under 2-worker parallelism
+  silently dropped 2 test files (undercounting both tests and coverage); the 2026-09-24
+  numbers above are from a single-worker run. Use `--maxWorkers=1` for coverage runs
+  until root-caused.
+
+Cycle 2 continues with Phase B (coverage), Phase C (AAA), Phase D (refactor), Phase E
+(GitForge, user-auth-gated) per §4.2.

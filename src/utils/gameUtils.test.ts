@@ -25,7 +25,7 @@ describe('gameUtils', () => {
     it('should contain all original elements', () => {
       const arr = [1, 2, 3, 4, 5]
       const result = shuffleArray(arr)
-      arr.forEach(item => {
+      arr.forEach((item) => {
         expect(result).toContain(item)
       })
     })

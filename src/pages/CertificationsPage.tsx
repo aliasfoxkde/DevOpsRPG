@@ -1,13 +1,20 @@
 import { Link } from 'react-router-dom'
 import { useGame } from '../contexts/GameContext'
-import { CERTIFICATIONS, DIFFICULTY_COLORS, DIFFICULTY_LABELS, type Certification } from '../data/certifications'
+import {
+  CERTIFICATIONS,
+  DIFFICULTY_COLORS,
+  DIFFICULTY_LABELS,
+  type Certification,
+} from '../data/certifications'
 import { allQuests, type Quest } from '../data/quests'
 
 export default function CertificationsPage() {
   const { game } = useGame()
 
   // Check if certification requirements are met
-  const checkRequirements = (cert: Certification): {
+  const checkRequirements = (
+    cert: Certification,
+  ): {
     met: boolean
     levelMet: boolean
     questMet: boolean
@@ -17,16 +24,18 @@ export default function CertificationsPage() {
     const questMet = game.completedQuests.length >= cert.requiredQuests
 
     // Check technology completion
-    const techProgress: Record<string, { completed: number; total: number }> = {}
+    const techProgress: Partial<Record<string, { completed: number; total: number }>> = {}
     for (const techId of cert.requiredTechnologies) {
-      const techQuests = allQuests.filter((q: Quest) => q.technologyId.toLowerCase() === techId.toLowerCase())
-      const completed = game.completedQuests.filter(cq =>
-        techQuests.some((tq: Quest) => tq.id === cq.questId)
+      const techQuests = allQuests.filter(
+        (q: Quest) => q.technologyId.toLowerCase() === techId.toLowerCase(),
+      )
+      const completed = game.completedQuests.filter((cq) =>
+        techQuests.some((tq: Quest) => tq.id === cq.questId),
       ).length
       techProgress[techId] = { completed, total: techQuests.length }
     }
     const techsMet = cert.requiredTechnologies.every(
-      techId => (techProgress[techId]?.completed || 0) >= 3
+      (techId) => (techProgress[techId]?.completed || 0) >= 3,
     )
 
     return {
@@ -40,7 +49,7 @@ export default function CertificationsPage() {
   // Get certification state
   const getCertState = (cert: Certification): 'locked' | 'available' | 'earned' => {
     // Check if already earned (has the badge)
-    const hasBadge = game.badges.some(b => b.id === cert.badgeId && b.unlockedAt)
+    const hasBadge = game.badges.some((b) => b.id === cert.badgeId && b.unlockedAt)
     if (hasBadge) return 'earned'
 
     // Check if requirements are met
@@ -51,15 +60,22 @@ export default function CertificationsPage() {
   }
 
   // Group by difficulty
-  const byDifficulty = CERTIFICATIONS.reduce((acc, cert) => {
-    if (!acc[cert.difficulty]) acc[cert.difficulty] = []
-    acc[cert.difficulty].push(cert)
-    return acc
-  }, {} as Record<string, Certification[]>)
+  const byDifficulty = CERTIFICATIONS.reduce<Record<string, Certification[] | undefined>>(
+    (acc, cert) => {
+      const bucket = acc[cert.difficulty]
+      if (bucket) {
+        bucket.push(cert)
+      } else {
+        acc[cert.difficulty] = [cert]
+      }
+      return acc
+    },
+    {},
+  )
 
   // Stats
-  const earned = CERTIFICATIONS.filter(c => getCertState(c) === 'earned').length
-  const available = CERTIFICATIONS.filter(c => getCertState(c) === 'available').length
+  const earned = CERTIFICATIONS.filter((c) => getCertState(c) === 'earned').length
+  const available = CERTIFICATIONS.filter((c) => getCertState(c) === 'available').length
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
@@ -88,7 +104,9 @@ export default function CertificationsPage() {
               <div className="text-sm text-slate-400">Available</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-slate-400">{CERTIFICATIONS.length - earned - available}</div>
+              <div className="text-3xl font-bold text-slate-400">
+                {CERTIFICATIONS.length - earned - available}
+              </div>
               <div className="text-sm text-slate-400">Locked</div>
             </div>
           </div>
@@ -96,7 +114,7 @@ export default function CertificationsPage() {
 
         {/* Certifications by Difficulty */}
         <div className="space-y-8">
-          {(['foundation', 'associate', 'professional', 'expert'] as const).map(diff => {
+          {(['foundation', 'associate', 'professional', 'expert'] as const).map((diff) => {
             const certs = byDifficulty[diff] || []
             if (certs.length === 0) return null
 
@@ -107,18 +125,22 @@ export default function CertificationsPage() {
                   style={{ color: DIFFICULTY_COLORS[diff] }}
                 >
                   <span className="text-2xl">
-                    {diff === 'foundation' ? '🌱' :
-                     diff === 'associate' ? '⚡' :
-                     diff === 'professional' ? '🔥' : '👑'}
+                    {diff === 'foundation'
+                      ? '🌱'
+                      : diff === 'associate'
+                        ? '⚡'
+                        : diff === 'professional'
+                          ? '🔥'
+                          : '👑'}
                   </span>
                   <span>{DIFFICULTY_LABELS[diff]}</span>
                   <span className="text-sm text-slate-500 ml-auto">
-                    {certs.filter(c => getCertState(c) === 'earned').length}/{certs.length}
+                    {certs.filter((c) => getCertState(c) === 'earned').length}/{certs.length}
                   </span>
                 </h2>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {certs.map(cert => {
+                  {certs.map((cert) => {
                     const state = getCertState(cert)
                     const reqs = checkRequirements(cert)
 
@@ -129,27 +151,27 @@ export default function CertificationsPage() {
                           state === 'earned'
                             ? 'bg-gradient-to-br from-amber-900/30 to-slate-800 border-amber-500/50'
                             : state === 'available'
-                            ? 'bg-gradient-to-br from-green-900/30 to-slate-800 border-green-500/50'
-                            : 'bg-slate-800/50 border-slate-700/50'
+                              ? 'bg-gradient-to-br from-green-900/30 to-slate-800 border-green-500/50'
+                              : 'bg-slate-800/50 border-slate-700/50'
                         }`}
                       >
                         {/* Header */}
                         <div className="flex items-start gap-3 mb-3">
-                          <span className={`text-3xl ${state === 'locked' ? 'grayscale opacity-50' : ''}`}>
+                          <span
+                            className={`text-3xl ${state === 'locked' ? 'grayscale opacity-50' : ''}`}
+                          >
                             {cert.icon}
                           </span>
                           <div className="flex-1">
-                            <h3 className={`font-bold ${state === 'earned' ? 'text-amber-400' : 'text-slate-200'}`}>
+                            <h3
+                              className={`font-bold ${state === 'earned' ? 'text-amber-400' : 'text-slate-200'}`}
+                            >
                               {cert.fullName}
                             </h3>
                             <p className="text-xs text-slate-400">{cert.name}</p>
                           </div>
-                          {state === 'earned' && (
-                            <span className="text-xl">✅</span>
-                          )}
-                          {state === 'available' && (
-                            <span className="text-xl">⭐</span>
-                          )}
+                          {state === 'earned' && <span className="text-xl">✅</span>}
+                          {state === 'available' && <span className="text-xl">⭐</span>}
                         </div>
 
                         {/* Description */}
@@ -166,7 +188,8 @@ export default function CertificationsPage() {
                           <div className="flex justify-between">
                             <span className="text-slate-500">Quests:</span>
                             <span className={reqs.questMet ? 'text-green-400' : 'text-red-400'}>
-                              {game.completedQuests.length}/{cert.requiredQuests} {reqs.questMet ? '✓' : '✗'}
+                              {game.completedQuests.length}/{cert.requiredQuests}{' '}
+                              {reqs.questMet ? '✓' : '✗'}
                             </span>
                           </div>
                           {cert.requiredTechnologies.length > 0 && (
@@ -191,23 +214,29 @@ export default function CertificationsPage() {
 
                         {/* Flavor text */}
                         <p className="text-xs italic text-slate-500">
-                          "{cert.flavorText}"
+                          &quot;{cert.flavorText}&quot;
                         </p>
 
                         {/* State indicator */}
                         {state === 'locked' && (
                           <div className="mt-3 text-center">
-                            <span className="text-xs text-slate-500">Complete requirements to unlock</span>
+                            <span className="text-xs text-slate-500">
+                              Complete requirements to unlock
+                            </span>
                           </div>
                         )}
                         {state === 'available' && (
                           <div className="mt-3 text-center">
-                            <span className="text-sm text-green-400 font-medium">🎉 Available to claim!</span>
+                            <span className="text-sm text-green-400 font-medium">
+                              🎉 Available to claim!
+                            </span>
                           </div>
                         )}
                         {state === 'earned' && (
                           <div className="mt-3 text-center">
-                            <span className="text-sm text-amber-400 font-medium">✓ Certification Earned!</span>
+                            <span className="text-sm text-amber-400 font-medium">
+                              ✓ Certification Earned!
+                            </span>
                           </div>
                         )}
                       </div>
@@ -221,10 +250,7 @@ export default function CertificationsPage() {
 
         {/* Back Link */}
         <div className="text-center mt-8">
-          <Link
-            to="/"
-            className="text-amber-400 hover:text-amber-300 transition-colors"
-          >
+          <Link to="/" className="text-amber-400 hover:text-amber-300 transition-colors">
             ← Back to Home
           </Link>
         </div>

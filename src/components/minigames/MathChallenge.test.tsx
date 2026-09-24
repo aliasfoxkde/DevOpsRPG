@@ -18,17 +18,15 @@ const FULL_TIME_ROUND_SCORE = 100 + Math.floor(GAME_DURATION.MATH_CHALLENGE / 5)
 function setup(rounds = 5) {
   const onComplete = vi.fn()
   const onSkip = vi.fn()
-  const view = render(
-    <MathChallengeGame rounds={rounds} onComplete={onComplete} onSkip={onSkip} />,
-  )
-  const input = screen.getByPlaceholderText('Enter your answer...') as HTMLInputElement
+  const view = render(<MathChallengeGame rounds={rounds} onComplete={onComplete} onSkip={onSkip} />)
+  const input = screen.getByPlaceholderText('Enter your answer...')
   const submit = screen.getByRole('button', { name: /check answer/i })
   return { ...view, onComplete, onSkip, input, submit }
 }
 
 /** Type an answer into the live input and submit it. */
 function answer(value: string) {
-  const input = screen.getByPlaceholderText('Enter your answer...') as HTMLInputElement
+  const input = screen.getByPlaceholderText('Enter your answer...')
   fireEvent.change(input, { target: { value } })
   fireEvent.click(screen.getByRole('button', { name: /check answer/i }))
 }
@@ -71,9 +69,7 @@ describe('MathChallengeGame', () => {
     const expectedScore = FULL_TIME_ROUND_SCORE * 5
     expect(screen.getByText('🔢 Math Challenge Complete!')).toBeInTheDocument()
     expect(screen.getByText('Math Wizard!')).toBeInTheDocument()
-    expect(
-      screen.getByText('You solved 5 out of 5 problems correctly (100%)'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('You solved 5 out of 5 problems correctly (100%)')).toBeInTheDocument()
     expect(screen.getByText('5')).toBeInTheDocument() // correct
     expect(screen.getByText('0')).toBeInTheDocument() // wrong
     expect(screen.getByText(String(expectedScore))).toBeInTheDocument()
@@ -96,9 +92,7 @@ describe('MathChallengeGame', () => {
     answer(String(mathChallenges[1].answer + 1))
     for (let i = 2; i < 5; i++) answer(String(mathChallenges[i].answer))
 
-    expect(
-      screen.getByText('You solved 3 out of 5 problems correctly (60%)'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('You solved 3 out of 5 problems correctly (60%)')).toBeInTheDocument()
     expect(screen.getByText('3')).toBeInTheDocument()
     expect(screen.getByText('2')).toBeInTheDocument()
 

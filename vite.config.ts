@@ -47,12 +47,13 @@ export default defineConfig({
       // Ratchet, not a target: each threshold is pinned just below the
       // measured value at the time it was set, so coverage can only move up.
       // Measured 2026-09-23: stmts 62.63 / branch 58.30 / funcs 62.23 / lines 65.24
+      // Measured 2026-09-24: stmts 65.51 / branch 59.25 / funcs 65.88 / lines 68.08
       // (see docs/decisions/0004-coverage-ratchet-policy.md).
       thresholds: {
-        statements: 60,
-        branches: 56,
-        functions: 60,
-        lines: 63,
+        statements: 65,
+        branches: 58.5,
+        functions: 65,
+        lines: 67.5,
       },
     },
   },

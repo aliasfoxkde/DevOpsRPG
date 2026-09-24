@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
-import { GameProvider } from '../../contexts/GameContext'
+import { GameProvider, type GameState } from '../../contexts/GameContext'
 import { TerminalSimulator } from './TerminalSimulator'
 import { getRandomChallenges, type TerminalChallenge } from '../../data/terminalChallenges'
 import { STORAGE_KEYS } from '../../utils/gameUtils'
@@ -15,7 +15,7 @@ const ROUNDS = 10
 const PINNED_RANDOM = 0.6
 
 function renderGame(category?: TerminalChallenge['category']) {
-  const onComplete = vi.fn()
+  const onComplete = vi.fn<(score: number, xpEarned: number) => void>()
   const view = render(
     <GameProvider>
       <TerminalSimulator onComplete={onComplete} category={category} />
@@ -24,8 +24,12 @@ function renderGame(category?: TerminalChallenge['category']) {
   return { ...view, onComplete }
 }
 
-function storedCharacter() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEYS.GAME)!).character
+function storedCharacter(): GameState['character'] {
+  const raw = localStorage.getItem(STORAGE_KEYS.GAME)
+  if (!raw) throw new Error('No game state was persisted to localStorage')
+  const state = JSON.parse(raw) as Partial<GameState>
+  if (!state.character) throw new Error('Persisted game state has no character')
+  return state.character
 }
 
 function submitCommand(value: string) {

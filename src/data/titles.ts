@@ -257,14 +257,9 @@ export const FRAMES: Frame[] = [
     icon: '🌈',
     requirement: 'Reach level 50',
     rarity: 'legendary',
-    colors: { border: 'linear-gradient(135deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #8b00ff)', glow: 'rgba(255, 255, 255, 0.5)' },
+    colors: {
+      border: 'linear-gradient(135deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #8b00ff)',
+      glow: 'rgba(255, 255, 255, 0.5)',
+    },
   },
 ]
-
-export function getTitleById(id: string): Title | undefined {
-  return TITLES.find(t => t.id === id)
-}
-
-export function getFrameById(id: string) {
-  return FRAMES.find(f => f.id === id)
-}

@@ -3,16 +3,16 @@ import { render, screen, act } from '@testing-library/react'
 import { ThemeProvider, useTheme } from './ThemeContext'
 
 // Mock matchMedia globally
-function createMatchMediaMock(matches: boolean) {
-  return vi.fn().mockImplementation((query) => ({
+function createMatchMediaMock(matches: boolean): (query: string) => MediaQueryList {
+  return vi.fn((query: string): MediaQueryList => ({
     matches,
     media: query,
     onchange: null,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
+    addListener: () => {},
+    removeListener: () => {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    dispatchEvent: () => false,
   }))
 }
 
@@ -24,9 +24,27 @@ function TestComponent() {
     <div>
       <p data-testid="theme">{theme}</p>
       <p data-testid="resolved-theme">{resolvedTheme}</p>
-      <button onClick={() => setTheme('light')}>Light</button>
-      <button onClick={() => setTheme('dark')}>Dark</button>
-      <button onClick={() => setTheme('system')}>System</button>
+      <button
+        onClick={() => {
+          setTheme('light')
+        }}
+      >
+        Light
+      </button>
+      <button
+        onClick={() => {
+          setTheme('dark')
+        }}
+      >
+        Dark
+      </button>
+      <button
+        onClick={() => {
+          setTheme('system')
+        }}
+      >
+        System
+      </button>
     </div>
   )
 }
@@ -45,11 +63,11 @@ describe('ThemeContext', () => {
     vi.restoreAllMocks()
   })
 
-  it('defaults to dark when no preference is stored (dark-first app)', async () => {
+  it('defaults to dark when no preference is stored (dark-first app)', () => {
     render(
       <ThemeProvider>
         <TestComponent />
-      </ThemeProvider>
+      </ThemeProvider>,
     )
 
     expect(screen.getByTestId('theme')).toHaveTextContent('dark')
@@ -62,7 +80,7 @@ describe('ThemeContext', () => {
     render(
       <ThemeProvider>
         <TestComponent />
-      </ThemeProvider>
+      </ThemeProvider>,
     )
 
     expect(screen.getByTestId('resolved-theme')).toHaveTextContent('light')
@@ -75,21 +93,21 @@ describe('ThemeContext', () => {
     render(
       <ThemeProvider>
         <TestComponent />
-      </ThemeProvider>
+      </ThemeProvider>,
     )
 
     expect(screen.getByTestId('resolved-theme')).toHaveTextContent('dark')
   })
 
-  it('sets theme to light explicitly', async () => {
+  it('sets theme to light explicitly', () => {
     render(
       <ThemeProvider>
         <TestComponent />
-      </ThemeProvider>
+      </ThemeProvider>,
     )
 
     const lightButton = screen.getByText('Light')
-    await act(async () => {
+    act(() => {
       lightButton.click()
     })
 
@@ -98,15 +116,15 @@ describe('ThemeContext', () => {
     expect(localStorage.getItem('theme')).toBe('light')
   })
 
-  it('sets theme to dark explicitly', async () => {
+  it('sets theme to dark explicitly', () => {
     render(
       <ThemeProvider>
         <TestComponent />
-      </ThemeProvider>
+      </ThemeProvider>,
     )
 
     const darkButton = screen.getByText('Dark')
-    await act(async () => {
+    act(() => {
       darkButton.click()
     })
 
@@ -115,28 +133,28 @@ describe('ThemeContext', () => {
     expect(localStorage.getItem('theme')).toBe('dark')
   })
 
-  it('persists theme to localStorage', async () => {
+  it('persists theme to localStorage', () => {
     render(
       <ThemeProvider>
         <TestComponent />
-      </ThemeProvider>
+      </ThemeProvider>,
     )
 
     const darkButton = screen.getByText('Dark')
-    await act(async () => {
+    act(() => {
       darkButton.click()
     })
 
     expect(localStorage.getItem('theme')).toBe('dark')
   })
 
-  it('restores theme from localStorage on mount', async () => {
+  it('restores theme from localStorage on mount', () => {
     localStorage.setItem('theme', 'dark')
 
     render(
       <ThemeProvider>
         <TestComponent />
-      </ThemeProvider>
+      </ThemeProvider>,
     )
 
     expect(screen.getByTestId('theme')).toHaveTextContent('dark')
@@ -154,7 +172,7 @@ describe('ThemeContext', () => {
     consoleSpy.mockRestore()
   })
 
-  it('handles theme change from dark to system', async () => {
+  it('handles theme change from dark to system', () => {
     // Start with dark
     localStorage.setItem('theme', 'dark')
     vi.stubGlobal('matchMedia', createMatchMediaMock(false))
@@ -162,7 +180,7 @@ describe('ThemeContext', () => {
     render(
       <ThemeProvider>
         <TestComponent />
-      </ThemeProvider>
+      </ThemeProvider>,
     )
 
     expect(screen.getByTestId('theme')).toHaveTextContent('dark')
@@ -170,7 +188,7 @@ describe('ThemeContext', () => {
 
     // Switch to system
     const systemButton = screen.getByText('System')
-    await act(async () => {
+    act(() => {
       systemButton.click()
     })
 

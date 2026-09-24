@@ -14,7 +14,7 @@ const IDENTITY_SHUFFLE_RANDOM = 0.999999
 const PAIRS = 6
 
 function setup(pairs = PAIRS) {
-  const onComplete = vi.fn()
+  const onComplete = vi.fn<(score: number, maxScore: number) => void>()
   const view = render(<MemoryMatch pairs={pairs} onComplete={onComplete} />)
   return { ...view, onComplete }
 }
@@ -57,7 +57,9 @@ describe('MemoryMatch', () => {
     setup()
 
     expect(screen.getByText('🧠 Memory Match')).toBeInTheDocument()
-    expect(screen.getByText('Match the DevOps icons! Click cards to flip them.')).toBeInTheDocument()
+    expect(
+      screen.getByText('Match the DevOps icons! Click cards to flip them.'),
+    ).toBeInTheDocument()
     expect(screen.getByText('Pairs: 0/6')).toBeInTheDocument()
     expect(screen.getByText('Moves: 0')).toBeInTheDocument()
     expect(cards()).toHaveLength(PAIRS * 2)

@@ -307,8 +307,8 @@ export default function SocialPage() {
                 <button
                   key={friend.id}
                   onClick={() => {
-                        setSelectedFriend(friend)
-                      }}
+                    setSelectedFriend(friend)
+                  }}
                   className={`p-3 rounded-lg border-2 transition-all text-left ${
                     selectedFriend?.id === friend.id
                       ? 'border-amber-500 bg-amber-900/30'
@@ -342,10 +342,10 @@ export default function SocialPage() {
                     <button
                       key={gift.id}
                       onClick={() => {
-                          if (!onCooldown) {
-                            sendGift(selectedFriend, gift)
-                          }
-                        }}
+                        if (!onCooldown) {
+                          sendGift(selectedFriend, gift)
+                        }
+                      }}
                       disabled={onCooldown}
                       className={`p-4 rounded-xl border-2 transition-all text-left ${
                         onCooldown

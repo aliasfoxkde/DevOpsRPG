@@ -23,7 +23,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <p>Content</p>
-      </ErrorBoundary>
+      </ErrorBoundary>,
     )
     expect(screen.getByText('Content')).toBeInTheDocument()
   })
@@ -32,7 +32,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     )
 
     expect(screen.getByText(/something went wrong/i)).toBeInTheDocument()
@@ -42,7 +42,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     )
 
     expect(screen.getByText('Test error')).toBeInTheDocument()
@@ -52,7 +52,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     )
 
     expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument()
@@ -62,7 +62,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     )
 
     expect(screen.getByRole('button', { name: /go home/i })).toBeInTheDocument()
@@ -72,7 +72,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary fallback={<p>Custom fallback</p>}>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     )
 
     expect(screen.getByText('Custom fallback')).toBeInTheDocument()
@@ -82,7 +82,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     )
 
     // componentDidCatch logs to console.error
@@ -95,7 +95,7 @@ describe('ErrorBoundary', () => {
     const { getByRole } = render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     )
 
     // Verify the Go Home button is rendered

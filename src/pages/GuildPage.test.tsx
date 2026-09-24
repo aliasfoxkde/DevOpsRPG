@@ -19,10 +19,14 @@ describe('GuildPage', () => {
     const { character } = seedDefaultGame()
     renderSeededPage(<GuildPage />, { route: '/guild', url: '/guild' })
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Guild Hall/ }),
-    ).toBeInTheDocument()
-    for (const label of ['📊 Overview', '👥 Members', '⚔️ Challenges', '🌐 Community', '🔍 Discover']) {
+    expect(screen.getByRole('heading', { level: 1, name: /Guild Hall/ })).toBeInTheDocument()
+    for (const label of [
+      '📊 Overview',
+      '👥 Members',
+      '⚔️ Challenges',
+      '🌐 Community',
+      '🔍 Discover',
+    ]) {
       expect(screen.getByRole('button', { name: label })).toBeInTheDocument()
     }
     // The demo guild is joined by default
@@ -30,9 +34,7 @@ describe('GuildPage', () => {
     expect(
       screen.getByText(`${MOCK_GUILD.memberCount}/${MOCK_GUILD.maxMembers} members`),
     ).toBeInTheDocument()
-    expect(
-      screen.getByText(`${MOCK_GUILD.xp} / ${MOCK_GUILD.xpToNextLevel}`),
-    ).toBeInTheDocument()
+    expect(screen.getByText(`${MOCK_GUILD.xp} / ${MOCK_GUILD.xpToNextLevel}`)).toBeInTheDocument()
     // A level 1 player is a plain member
     expect(screen.getByText('Your Role')).toBeInTheDocument()
     expect(character.level).toBe(1)
@@ -45,9 +47,7 @@ describe('GuildPage', () => {
     expect(screen.getByText('🧙 Your Guild Contribution')).toBeInTheDocument()
     expect(screen.getByText('Guild XP Contributed')).toBeInTheDocument()
     expect(screen.getByText('📊 Guild Statistics')).toBeInTheDocument()
-    expect(
-      screen.getByText(MOCK_GUILD.totalQuests.toLocaleString()),
-    ).toBeInTheDocument()
+    expect(screen.getByText(MOCK_GUILD.totalQuests.toLocaleString())).toBeInTheDocument()
     expect(screen.getByText('🏆 Guild Achievements')).toBeInTheDocument()
     expect(screen.getByText('🏅 Guild Founded')).toBeInTheDocument()
     // The contribution tile mirrors the character level from the save
@@ -83,9 +83,7 @@ describe('GuildPage', () => {
     for (const challenge of MOCK_GUILD_CHALLENGES) {
       expect(screen.getByText(challenge.title)).toBeInTheDocument()
       // Player has finished no quests, so only the base progress shows
-      expect(
-        screen.getByText(`${challenge.progress}/${challenge.target}`),
-      ).toBeInTheDocument()
+      expect(screen.getByText(`${challenge.progress}/${challenge.target}`)).toBeInTheDocument()
     }
   })
 

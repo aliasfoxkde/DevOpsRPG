@@ -31,67 +31,11 @@ export interface CommunityStats {
   }
 }
 
-// Get community stats from localStorage
-export function getCommunityStats(): CommunityStats {
-  const stored = localStorage.getItem('devopsquest_community_stats')
-  if (stored) {
-    try {
-      return JSON.parse(stored)
-    } catch {
-      // Invalid JSON, return defaults
-    }
-  }
-  return getDefaultCommunityStats()
-}
-
-function getDefaultCommunityStats(): CommunityStats {
-  return {
-    totalQuestsCompleted: 0,
-    totalXPEarned: 0,
-    highestStreak: 0,
-    totalQuizzesTaken: 0,
-    totalPerfectQuizzes: 0,
-    weeklyQuestsCompleted: 0,
-    weeklyXPCompleted: 0,
-    lastWeekReset: new Date().toISOString(),
-    challengeHistory: {
-      completedChallenges: [],
-      totalContributions: 0,
-    },
-  }
-}
-
-// Save community stats to localStorage
-export function saveCommunityStats(stats: CommunityStats): void {
-  localStorage.setItem('devopsquest_community_stats', JSON.stringify(stats))
-}
-
-// Update community stats when player completes a quest
-export function updateCommunityStatsOnQuestComplete(
-  stats: CommunityStats,
-  xpEarned: number
-): CommunityStats {
-  const now = new Date()
-  const lastReset = new Date(stats.lastWeekReset)
-
-  // Check if we need to reset weekly stats (every Monday)
-  const needsWeeklyReset = now.getDay() === 1 && now.getTime() - lastReset.getTime() > 6 * 24 * 60 * 60 * 1000
-
-  return {
-    ...stats,
-    totalQuestsCompleted: stats.totalQuestsCompleted + 1,
-    totalXPEarned: stats.totalXPEarned + xpEarned,
-    weeklyQuestsCompleted: needsWeeklyReset ? 1 : stats.weeklyQuestsCompleted + 1,
-    weeklyXPCompleted: needsWeeklyReset ? xpEarned : stats.weeklyXPCompleted + xpEarned,
-    lastWeekReset: needsWeeklyReset ? now.toISOString() : stats.lastWeekReset,
-  }
-}
-
 // Generate weekly community challenges
 export function generateWeeklyChallenges(stats: CommunityStats): CommunityChallenge[] {
   const now = new Date()
   const nextMonday = new Date(now)
-  nextMonday.setDate(nextMonday.getDate() + (8 - nextMonday.getDay()) % 7)
+  nextMonday.setDate(nextMonday.getDate() + ((8 - nextMonday.getDay()) % 7))
   nextMonday.setHours(23, 59, 59, 999)
 
   const baseChallenges: Omit<CommunityChallenge, 'current' | 'completed'>[] = [
@@ -141,17 +85,14 @@ export function generateWeeklyChallenges(stats: CommunityStats): CommunityChalle
     },
   ]
 
-  return baseChallenges.map(c => ({
+  return baseChallenges.map((c) => ({
     ...c,
     current: getCurrentProgress(c.type, stats),
     completed: stats.challengeHistory.completedChallenges.includes(c.id),
   }))
 }
 
-function getCurrentProgress(
-  type: CommunityChallenge['type'],
-  stats: CommunityStats
-): number {
+function getCurrentProgress(type: CommunityChallenge['type'], stats: CommunityStats): number {
   switch (type) {
     case 'quests':
       return stats.weeklyQuestsCompleted
@@ -161,23 +102,10 @@ function getCurrentProgress(
       return stats.highestStreak
     case 'quiz':
       return stats.totalPerfectQuizzes
-    default:
-      return 0
-  }
-}
-
-// Get player's contribution percentage to a challenge
-export function getPlayerContribution(
-  challenge: CommunityChallenge,
-  playerQuestsThisWeek: number,
-  playerXPThisWeek: number
-): number {
-  switch (challenge.type) {
-    case 'quests':
-      return playerQuestsThisWeek
-    case 'xp':
-      return playerXPThisWeek
-    default:
+    // "specific" challenges are one-off events with no aggregate stat to
+    // track, so they only complete through their own explicit completion
+    // flow and report no automatic progress.
+    case 'specific':
       return 0
   }
 }

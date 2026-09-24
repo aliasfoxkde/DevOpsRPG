@@ -11,11 +11,13 @@ interface MemoryMatchProps {
 export function MemoryMatch({ pairs = 6, onComplete }: MemoryMatchProps) {
   const [cards] = useState<MemoryCard[]>(() => {
     const selectedIcons = shuffleArray(memoryIcons).slice(0, pairs)
-    const cardPairs = shuffleArray([...selectedIcons, ...selectedIcons].map((icon, idx) => ({
-      ...icon,
-      id: `${icon.id}-${idx}`,
-      matched: false,
-    })))
+    const cardPairs = shuffleArray(
+      [...selectedIcons, ...selectedIcons].map((icon, idx) => ({
+        ...icon,
+        id: `${icon.id}-${idx}`,
+        matched: false,
+      })),
+    )
     return cardPairs
   })
   const [flippedIndices, setFlippedIndices] = useState<number[]>([])
@@ -25,49 +27,56 @@ export function MemoryMatch({ pairs = 6, onComplete }: MemoryMatchProps) {
   const [startTime] = useState<number>(() => Date.now())
 
   // Store elapsed time when game is won to avoid impure Date.now() in render
-  const [wonStats, setWonStats] = useState<{ elapsed: number; score: number; stars: number } | null>(null)
+  const [wonStats, setWonStats] = useState<{
+    elapsed: number
+    score: number
+    stars: number
+  } | null>(null)
 
-  const handleCardClick = useCallback((index: number) => {
-    if (gameState !== 'playing') return
-    if (flippedIndices.includes(index)) return
-    if (matchedIndices.includes(index)) return
-    if (flippedIndices.length >= 2) return
+  const handleCardClick = useCallback(
+    (index: number) => {
+      if (gameState !== 'playing') return
+      if (flippedIndices.includes(index)) return
+      if (matchedIndices.includes(index)) return
+      if (flippedIndices.length >= 2) return
 
-    const newFlipped = [...flippedIndices, index]
-    setFlippedIndices(newFlipped)
+      const newFlipped = [...flippedIndices, index]
+      setFlippedIndices(newFlipped)
 
-    if (newFlipped.length === 2) {
-      setMoves(m => m + 1)
+      if (newFlipped.length === 2) {
+        setMoves((m) => m + 1)
 
-      const [first, second] = newFlipped
-      if (cards[first].id.replace(/-[^-]+$/, '') === cards[second].id.replace(/-[^-]+$/, '')) {
-        // Match!
-        setMatchedIndices(prev => {
-          const newMatched = [...prev, first, second]
-          if (newMatched.length === cards.length) {
-            // Use functional update for moves to get latest value
-            setMoves(currentMoves => {
-              const elapsed = Math.floor((Date.now() - startTime) / 1000)
-              const timeBonus = Math.max(0, 300 - elapsed)
-              const movesBonus = Math.max(0, (pairs * 3 - currentMoves) * 10)
-              const score = 500 + timeBonus + movesBonus
-              const stars = currentMoves <= pairs * 1.5 ? 3 : currentMoves <= pairs * 2.5 ? 2 : 1
-              setWonStats({ elapsed, score, stars })
-              setGameState('won')
-              return currentMoves
-            })
-          }
-          return newMatched
-        })
-        setFlippedIndices([])
-      } else {
-        // No match - flip back after delay
-        setTimeout(() => {
+        const [first, second] = newFlipped
+        if (cards[first].id.replace(/-[^-]+$/, '') === cards[second].id.replace(/-[^-]+$/, '')) {
+          // Match!
+          setMatchedIndices((prev) => {
+            const newMatched = [...prev, first, second]
+            if (newMatched.length === cards.length) {
+              // Use functional update for moves to get latest value
+              setMoves((currentMoves) => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000)
+                const timeBonus = Math.max(0, 300 - elapsed)
+                const movesBonus = Math.max(0, (pairs * 3 - currentMoves) * 10)
+                const score = 500 + timeBonus + movesBonus
+                const stars = currentMoves <= pairs * 1.5 ? 3 : currentMoves <= pairs * 2.5 ? 2 : 1
+                setWonStats({ elapsed, score, stars })
+                setGameState('won')
+                return currentMoves
+              })
+            }
+            return newMatched
+          })
           setFlippedIndices([])
-        }, 1000)
+        } else {
+          // No match - flip back after delay
+          setTimeout(() => {
+            setFlippedIndices([])
+          }, 1000)
+        }
       }
-    }
-  }, [flippedIndices, matchedIndices, cards, gameState, startTime, pairs])
+    },
+    [flippedIndices, matchedIndices, cards, gameState, startTime, pairs],
+  )
 
   const handleComplete = () => {
     if (!wonStats) return
@@ -94,12 +103,8 @@ export function MemoryMatch({ pairs = 6, onComplete }: MemoryMatchProps) {
         </div>
         <div className="p-6 text-center">
           <div className="text-6xl mb-4">{'⭐'.repeat(stars)}</div>
-          <h3 className="text-2xl font-bold text-white mb-2">
-            Memory Master!
-          </h3>
-          <p className="text-slate-300 mb-4">
-            You matched all pairs in {moves} moves
-          </p>
+          <h3 className="text-2xl font-bold text-white mb-2">Memory Master!</h3>
+          <p className="text-slate-300 mb-4">You matched all pairs in {moves} moves</p>
 
           <div className="grid grid-cols-3 gap-4 mb-6">
             <div className="bg-slate-900/50 rounded-lg p-3">
@@ -116,9 +121,7 @@ export function MemoryMatch({ pairs = 6, onComplete }: MemoryMatchProps) {
             </div>
           </div>
 
-          <div className="text-green-400 mb-4">
-            +{Math.round(score / 2)} Bonus XP earned!
-          </div>
+          <div className="text-green-400 mb-4">+{Math.round(score / 2)} Bonus XP earned!</div>
 
           <div className="flex items-center justify-center gap-4">
             <button
@@ -142,7 +145,9 @@ export function MemoryMatch({ pairs = 6, onComplete }: MemoryMatchProps) {
             🧠 Memory Match
           </h2>
           <div className="flex items-center gap-4 text-sm">
-            <span className="text-slate-400">Pairs: {matchedIndices.length / 2}/{pairs}</span>
+            <span className="text-slate-400">
+              Pairs: {matchedIndices.length / 2}/{pairs}
+            </span>
             <span className="text-amber-400">Moves: {moves}</span>
           </div>
         </div>
@@ -164,7 +169,9 @@ export function MemoryMatch({ pairs = 6, onComplete }: MemoryMatchProps) {
             return (
               <button
                 key={card.id}
-                onClick={() => handleCardClick(index)}
+                onClick={() => {
+                  handleCardClick(index)
+                }}
                 disabled={isMatched || gameState !== 'playing'}
                 className={`aspect-square rounded-lg transition-all duration-300 transform touch-manipulation ${
                   isRevealed
@@ -177,9 +184,7 @@ export function MemoryMatch({ pairs = 6, onComplete }: MemoryMatchProps) {
                     <span className={`text-2xl sm:text-3xl ${isMatched ? '' : 'animate-bounce'}`}>
                       {card.icon}
                     </span>
-                    {isMatched && (
-                      <span className="text-xs text-green-400 mt-1">✓</span>
-                    )}
+                    {isMatched && <span className="text-xs text-green-400 mt-1">✓</span>}
                   </div>
                 ) : (
                   <div className="flex items-center justify-center h-full">

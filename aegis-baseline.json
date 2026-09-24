@@ -1,0 +1,3439 @@
+{
+  "findings": [
+    {
+      "id": "000000000000000018d82ec9500bede2",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./.github/wiki/Getting-Started.md",
+        "line": 29,
+        "column": 326
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./.github/wiki/Getting-Started.md:29:49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763",
+      "stable_id": "aegis-5ca8c801d4679122908817a47d9a8d0391638425338314fbd30fa664a8a6b8be"
+    },
+    {
+      "id": "000000000000000018d82ec9557ed24f",
+      "pattern": "email-address",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./.github/workflows/autonomous-agents.yml",
+        "line": 141,
+        "column": 4684
+      },
+      "description": "Email address detected",
+      "reference": "https://tools.ietf.org/html/rfc5322",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "email-address:./.github/workflows/autonomous-agents.yml:141:cd29c5ac348a026a3ec5286890908fffb5bf6ab77f20672171be323a70c95026",
+      "stable_id": "aegis-92a6721c0867f39288a068553d071e346e64a9b9a08636c87b391263045a8f60"
+    },
+    {
+      "id": "000000000000000018d82ec9557f0cf6",
+      "pattern": "email-address",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./.github/workflows/autonomous-agents.yml",
+        "line": 166,
+        "column": 5575
+      },
+      "description": "Email address detected",
+      "reference": "https://tools.ietf.org/html/rfc5322",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "email-address:./.github/workflows/autonomous-agents.yml:166:cd29c5ac348a026a3ec5286890908fffb5bf6ab77f20672171be323a70c95026",
+      "stable_id": "aegis-a31590970644782532067c1aed0f5a5456333ca9c0ad7f1fc879e203d984533a"
+    },
+    {
+      "id": "000000000000000018d82ec968f40a29",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./README.md",
+        "line": 19,
+        "column": 488
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./README.md:19:49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763",
+      "stable_id": "aegis-4f2f3be9b89c887a3708d813ff65754bb37bb5e3007b17061695a8a1ceb1a6eb"
+    },
+    {
+      "id": "000000000000000018d82ec97b1cace5",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./docs/QUICKSTART.md",
+        "line": 21,
+        "column": 247
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./docs/QUICKSTART.md:21:49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763",
+      "stable_id": "aegis-b55325ec587d1e0ba080b0b00db9620458fffc99bc996e3b37a18bdc3d7b4b69"
+    },
+    {
+      "id": "000000000000000018d82ec99eafd664",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./docs/development/DEVELOPMENT.md",
+        "line": 23,
+        "column": 253
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./docs/development/DEVELOPMENT.md:23:49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763",
+      "stable_id": "aegis-b035bfb6bd132e0bb3c64b2972e0d745ebb4a30408ea84c772c681220841d534"
+    },
+    {
+      "id": "000000000000000018d82ec9ae31b1f2",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./docs/planning/003-QUALITY_PLAN.md",
+        "line": 34,
+        "column": 2448
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./docs/planning/003-QUALITY_PLAN.md:34:49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763",
+      "stable_id": "aegis-d1cd2937886e2312fea974c1026ca64eb1ec0d410d05bd484f5c9edec4344d20"
+    },
+    {
+      "id": "000000000000000018d82ec9ae31d1de",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./docs/planning/003-QUALITY_PLAN.md",
+        "line": 35,
+        "column": 2517
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./docs/planning/003-QUALITY_PLAN.md:35:19e36255972107d42b8cecb77ef5622e842e8a50778a6ed8dd1ce94732daca9e",
+      "stable_id": "aegis-5fc7371fbd8c8d1cd88c40bfd54ed98b136929a5fb0d5d9d9f1971173d500aaa"
+    },
+    {
+      "id": "000000000000000018d82ec9ae31e883",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./docs/planning/003-QUALITY_PLAN.md",
+        "line": 35,
+        "column": 2553
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./docs/planning/003-QUALITY_PLAN.md:35:12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "stable_id": "aegis-300b34bb860cd06cd0994f58b92c6ebb04f4a936477322ce8e0243e5d4567916"
+    },
+    {
+      "id": "000000000000000018d82ec9ae31fcb3",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./docs/planning/003-QUALITY_PLAN.md",
+        "line": 78,
+        "column": 5231
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./docs/planning/003-QUALITY_PLAN.md:78:49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763",
+      "stable_id": "aegis-e759e5964dce8054bdda9f7175640670caa9413223353518e9c0875ea9dbe7b9"
+    },
+    {
+      "id": "000000000000000018d82ec9ae321286",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./docs/planning/003-QUALITY_PLAN.md",
+        "line": 273,
+        "column": 17514
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./docs/planning/003-QUALITY_PLAN.md:273:19e36255972107d42b8cecb77ef5622e842e8a50778a6ed8dd1ce94732daca9e",
+      "stable_id": "aegis-f720751c60a8461f984babb6720369b5154ad6d1e415d204706b7959f925609e"
+    },
+    {
+      "id": "000000000000000018d82ec9ae3228e5",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./docs/planning/003-QUALITY_PLAN.md",
+        "line": 325,
+        "column": 22838
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./docs/planning/003-QUALITY_PLAN.md:325:49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763",
+      "stable_id": "aegis-482ef1d1b159ac68391207d5887fdbd9f160a5f2f82e9ffece8ca75009505346"
+    },
+    {
+      "id": "000000000000000018d82ec9b7789603",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./docs/planning/003-QUALITY_PLAN.md",
+        "line": 278,
+        "column": 17896
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./docs/planning/003-QUALITY_PLAN.md:278:d3d64843022420dc7dc2862b235e38ed08e77ab37be23ea65d851b8b2b037901",
+      "stable_id": "aegis-d2a8d10dbdb2d2d357f548b31767e74597f976c9a548b0cac706bc79cfa92d88"
+    },
+    {
+      "id": "000000000000000018d82ec9b778bcc1",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./docs/planning/003-QUALITY_PLAN.md",
+        "line": 324,
+        "column": 22558
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./docs/planning/003-QUALITY_PLAN.md:324:d3d64843022420dc7dc2862b235e38ed08e77ab37be23ea65d851b8b2b037901",
+      "stable_id": "aegis-53639d44dc32c4a39c2afe2ac07fc2e17d94a54d8f4d49307820e25218af30e9"
+    },
+    {
+      "id": "000000000000000018d82ec9bcb6a449",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./docs/process/VALIDATION.md",
+        "line": 107,
+        "column": 2487
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./docs/process/VALIDATION.md:107:49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763",
+      "stable_id": "aegis-8eda67211e412bb9afe0edd14eae085ceb4e8e57d49e5d1accc35694ce354fac"
+    },
+    {
+      "id": "000000000000000018d82ec9c84157c5",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./docs/CHANGELOG.md",
+        "line": 73,
+        "column": 6572
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./docs/CHANGELOG.md:73:12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "stable_id": "aegis-e6d55773051fb8bea49fbf1d7bd025cabd7bd29886f3ef77c59fda08d199ad24"
+    },
+    {
+      "id": "000000000000000018d82ec9c8417c54",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./docs/CHANGELOG.md",
+        "line": 73,
+        "column": 6635
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./docs/CHANGELOG.md:73:19e36255972107d42b8cecb77ef5622e842e8a50778a6ed8dd1ce94732daca9e",
+      "stable_id": "aegis-ba80a6e06610401a28bf607c26c88b240f951fd038b84de3277a23e3f0522355"
+    },
+    {
+      "id": "000000000000000018d82ec9ca187d5c",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./docs/decisions/0001-gitforge-primary-ci.md",
+        "line": 10,
+        "column": 313
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./docs/decisions/0001-gitforge-primary-ci.md:10:d3d64843022420dc7dc2862b235e38ed08e77ab37be23ea65d851b8b2b037901",
+      "stable_id": "aegis-3abe5f6d4ba786de3b4c038b0cfc29b831fe4d6b4e9d67cfa3b287d0b09d120f"
+    },
+    {
+      "id": "000000000000000018d82ec9ca189c76",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./docs/decisions/0001-gitforge-primary-ci.md",
+        "line": 11,
+        "column": 339
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./docs/decisions/0001-gitforge-primary-ci.md:11:2015e08c61f5c6da87e6a80f193a8812c224c44acf96ad4fcfd0e9d2d0eda7ff",
+      "stable_id": "aegis-7a38f3335bc829cd850f7d9c2de5366f56a24c2e8c1bd16018608bec43d1d72a"
+    },
+    {
+      "id": "000000000000000018d82ec9d266b531",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./e2e/onboarding.spec.ts",
+        "line": 14,
+        "column": 615
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./e2e/onboarding.spec.ts:14:d4c999ae43633bd2036188d2bca68e1be8202b2cc1f3a1c42a728eaff7d2483d",
+      "stable_id": "aegis-3907e1fdf0c12a92c74a8a8497a629762480e88ab4aa1709c0fe08e5b0a66f1b"
+    },
+    {
+      "id": "000000000000000018d82ec9d266d706",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./e2e/onboarding.spec.ts",
+        "line": 23,
+        "column": 942
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./e2e/onboarding.spec.ts:23:d4c999ae43633bd2036188d2bca68e1be8202b2cc1f3a1c42a728eaff7d2483d",
+      "stable_id": "aegis-7e6030f191cd5971f588ced9e3223fe1388e306198cc95255b49db5126f6e919"
+    },
+    {
+      "id": "000000000000000018d82ec9d31a94c7",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./e2e/quest-flow.spec.ts",
+        "line": 7,
+        "column": 263
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./e2e/quest-flow.spec.ts:7:d4c999ae43633bd2036188d2bca68e1be8202b2cc1f3a1c42a728eaff7d2483d",
+      "stable_id": "aegis-3e287d526b596a12a1bde26b5ef7ebc7fbfa512ee18465fd3a73aaa1d00302aa"
+    },
+    {
+      "id": "000000000000000018d82ec9d31aba27",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./e2e/quest-flow.spec.ts",
+        "line": 46,
+        "column": 1656
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./e2e/quest-flow.spec.ts:46:d4c999ae43633bd2036188d2bca68e1be8202b2cc1f3a1c42a728eaff7d2483d",
+      "stable_id": "aegis-c503727092eb3093a5818c97d76d07426dfcb2bae76d41c20f4667470d6bb011"
+    },
+    {
+      "id": "000000000000000018d82ec9d31ace58",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./e2e/quest-flow.spec.ts",
+        "line": 54,
+        "column": 1998
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./e2e/quest-flow.spec.ts:54:39e5b4830d4d9c14db7368a95b65d5463ea3d09520373723430c03a5a453b5df",
+      "stable_id": "aegis-f9172bb47f449f7fa0b66a730cee2529d82733c06ff340a46eeb9657c52f9406"
+    },
+    {
+      "id": "000000000000000018d82ec9d31ae842",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./e2e/quest-flow.spec.ts",
+        "line": 64,
+        "column": 2388
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./e2e/quest-flow.spec.ts:64:d4c999ae43633bd2036188d2bca68e1be8202b2cc1f3a1c42a728eaff7d2483d",
+      "stable_id": "aegis-94d6ba33a54ce1d030b5c7ff1f70918dd80a6040224085e8060793a231512496"
+    },
+    {
+      "id": "000000000000000018d82ec9d31b0116",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./e2e/quest-flow.spec.ts",
+        "line": 87,
+        "column": 3349
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./e2e/quest-flow.spec.ts:87:39e5b4830d4d9c14db7368a95b65d5463ea3d09520373723430c03a5a453b5df",
+      "stable_id": "aegis-3911d990c8b02573597ff069089adf7153e88037579c5717abaef4847cc3835d"
+    },
+    {
+      "id": "000000000000000018d82ec9d31b2219",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./e2e/quest-flow.spec.ts",
+        "line": 93,
+        "column": 3543
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./e2e/quest-flow.spec.ts:93:39e5b4830d4d9c14db7368a95b65d5463ea3d09520373723430c03a5a453b5df",
+      "stable_id": "aegis-1bc989f88969838fa53b0a1014dd7ae9dad094c228e64db208a5173f75154f45"
+    },
+    {
+      "id": "000000000000000018d82ec9e47d8eed",
+      "pattern": "bitcoin-address",
+      "category": "pii",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./package-lock.json",
+        "line": 9010,
+        "column": 306277
+      },
+      "description": "Bitcoin address detected",
+      "reference": "https://en.wikipedia.org/wiki/Bitcoin",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "bitcoin-address:./package-lock.json:9010:dc6ff219eb0728dd20e11f4bd965a6b5e849e3c0285962459786807dfb103884",
+      "stable_id": "aegis-07d1c0eaed5211c786dcc1dcf7e0afac4d06cc8552a687db73e74a260856148d"
+    },
+    {
+      "id": "000000000000000018d82ec9e272852b",
+      "pattern": "sox-compliance",
+      "category": "compliance",
+      "severity": "low",
+      "confidence": "medium",
+      "location": {
+        "file": "./package-lock.json",
+        "line": 5287,
+        "column": 178489
+      },
+      "description": "SOX compliance reference detected",
+      "reference": "https://www.soxlaw.com/",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sox-compliance:./package-lock.json:5287:0469b6164421e939559b51d624da52f37e559ca81735ae6227db78ca1f653757",
+      "stable_id": "aegis-692bdd0f8cb28de19ed5e277b161f44edcf3eda3edbc3838dc74c58e8df0e8cf"
+    },
+    {
+      "id": "000000000000000018d82ec9e272a6ff",
+      "pattern": "nist-framework",
+      "category": "compliance",
+      "severity": "low",
+      "confidence": "medium",
+      "location": {
+        "file": "./package-lock.json",
+        "line": 2001,
+        "column": 65301
+      },
+      "description": "NIST Cybersecurity Framework reference detected",
+      "reference": "https://www.nist.gov/cyberframework",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "nist-framework:./package-lock.json:2001:05f32f019949cb39fb04f18f998499ae402f6d98c66a4e884b1bd9fdf3f8efa4",
+      "stable_id": "aegis-b9d975d094f5e3fb4379e70fd7592c5f0dc2b0e86693d3c35155c7915de79560"
+    },
+    {
+      "id": "000000000000000018d82ec9e272bd5e",
+      "pattern": "nist-framework",
+      "category": "compliance",
+      "severity": "low",
+      "confidence": "medium",
+      "location": {
+        "file": "./package-lock.json",
+        "line": 4440,
+        "column": 148033
+      },
+      "description": "NIST Cybersecurity Framework reference detected",
+      "reference": "https://www.nist.gov/cyberframework",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "nist-framework:./package-lock.json:4440:c0b4083c2e90c371564aa6cd1f4d19d0be17425dcf62bd53b0f654556ba993d8",
+      "stable_id": "aegis-488597147616265c1e373de4bc4092508f5680146964654a3a1e77b85316c275"
+    },
+    {
+      "id": "000000000000000018d82eca13ec5baa",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./scripts/axe-audit.mjs",
+        "line": 2,
+        "column": 152
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./scripts/axe-audit.mjs:2:12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "stable_id": "aegis-e762c24bf09dfae0da278602e932d62b2b6d1665e67cc0a4619765ad7e746c73"
+    },
+    {
+      "id": "000000000000000018d82eca13ec88ad",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./scripts/axe-audit.mjs",
+        "line": 21,
+        "column": 1250
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./scripts/axe-audit.mjs:21:12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "stable_id": "aegis-01ba89be9643b98bdff41c03ac8a0421b8654a1744336a1fdd3c310ec3b84410"
+    },
+    {
+      "id": "000000000000000018d82eca153c060a",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./scripts/audit-app.mjs",
+        "line": 5,
+        "column": 240
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./scripts/audit-app.mjs:5:49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763",
+      "stable_id": "aegis-3dbed682255bdfb620c94c75d7fcf7316b71c39cd5bca371d04e3a1df2330a69"
+    },
+    {
+      "id": "000000000000000018d82eca172ad8c1",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./scripts/check-quests.mjs",
+        "line": 5,
+        "column": 240
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./scripts/check-quests.mjs:5:49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763",
+      "stable_id": "aegis-997a5c7f53973d1c0fe1c79bd16e5e735c3a2cb07b92318512336241db65d59d"
+    },
+    {
+      "id": "000000000000000018d82eca1a4ef823",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./scripts/fix-audit.mjs",
+        "line": 6,
+        "column": 301
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./scripts/fix-audit.mjs:6:49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763",
+      "stable_id": "aegis-50fb347b56a07dd2e89f2c5df63b07cd6667da88fb3b9fe634196e1e1fbc794f"
+    },
+    {
+      "id": "000000000000000018d82eca1a4f22b2",
+      "pattern": "xss-via-url",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./scripts/fix-audit.mjs",
+        "line": 118,
+        "column": 4432
+      },
+      "description": "Potential XSS via URL parameters",
+      "reference": "https://owasp.org/www-community/attacks/xss/",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "xss-via-url:./scripts/fix-audit.mjs:118:e701bb94548095fc395685329a11c5cd324d687d7589bc2194db26353ee3551a",
+      "stable_id": "aegis-04f77bbb3db6f7ce2e4c7524a7f44ab044487f7cff92411e93ff7d4dfae23d82"
+    },
+    {
+      "id": "000000000000000018d82eca1a7ce7d1",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./scripts/fix-audit.mjs",
+        "line": 144,
+        "column": 5271
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./scripts/fix-audit.mjs:144:39e5b4830d4d9c14db7368a95b65d5463ea3d09520373723430c03a5a453b5df",
+      "stable_id": "aegis-eb19e4410dbdc6166ff6b01dc2d35ff9676f484d52e47469bd13ad8251e2f403"
+    },
+    {
+      "id": "000000000000000018d82eca1a7cfa19",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./scripts/fix-audit.mjs",
+        "line": 164,
+        "column": 5952
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./scripts/fix-audit.mjs:164:39e5b4830d4d9c14db7368a95b65d5463ea3d09520373723430c03a5a453b5df",
+      "stable_id": "aegis-2d3a76a79a9ef36255d7d2ebc76f0b1f350462d84e05dbf45f3df1480adba0cb"
+    },
+    {
+      "id": "000000000000000018d82eca1b9f8696",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./scripts/deep-audit.mjs",
+        "line": 13,
+        "column": 560
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./scripts/deep-audit.mjs:13:49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763",
+      "stable_id": "aegis-ddfccfed6921744bf885ec40e7d948dae6f890a09678ec49b743a52ce6a6b7f1"
+    },
+    {
+      "id": "000000000000000018d82eca1bb815e0",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./scripts/deep-audit.mjs",
+        "line": 135,
+        "column": 4902
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./scripts/deep-audit.mjs:135:39e5b4830d4d9c14db7368a95b65d5463ea3d09520373723430c03a5a453b5df",
+      "stable_id": "aegis-c7bd0d3e73c25fca8d0033d4fdca0fd155ab63b49674ca8e52edd40132f6fdf3"
+    },
+    {
+      "id": "000000000000000018d82eca473626ce",
+      "pattern": "xss-via-url",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./src/components/minigames/QuizDash.tsx",
+        "line": 204,
+        "column": 6067
+      },
+      "description": "Potential XSS via URL parameters",
+      "reference": "https://owasp.org/www-community/attacks/xss/",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "xss-via-url:./src/components/minigames/QuizDash.tsx:204:480875a5895a4628020b0543bafb3bdc8e95d406e1903b8204113b778e2820a5",
+      "stable_id": "aegis-c723a0873a2ebc92f58bd46aa4cb1764369a1593b003e3a3574a2632904c4580"
+    },
+    {
+      "id": "000000000000000018d82eca433644a7",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/minigames/QuizDash.tsx",
+        "line": 84,
+        "column": 2454
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/minigames/QuizDash.tsx:84:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-9a9778ec26cc104fa8b9eb23373ca21a0a4e98cec3387fe9a1e8baf468560452"
+    },
+    {
+      "id": "000000000000000018d82eca4c90c927",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/minigames/CommandTyper.test.tsx",
+        "line": 10,
+        "column": 403
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/minigames/CommandTyper.test.tsx:10:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-f77fac69e28758b92bfcbc1840bff15513fc17f6be3ed87dca34a22b8a63bc99"
+    },
+    {
+      "id": "000000000000000018d82eca50398b9b",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/minigames/MathChallenge.test.tsx",
+        "line": 8,
+        "column": 368
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/minigames/MathChallenge.test.tsx:8:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-9c0aa5924791295af8e6e3864e643b87ba1ac4c2e8b5547a96000854f58d2d60"
+    },
+    {
+      "id": "000000000000000018d82eca5470cb94",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/minigames/MathChallenge.test.tsx",
+        "line": 220,
+        "column": 9246
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/components/minigames/MathChallenge.test.tsx:220:39e5b4830d4d9c14db7368a95b65d5463ea3d09520373723430c03a5a453b5df",
+      "stable_id": "aegis-afbe4751b2215afc8482e23f41ff5486f15f7561d56358dfab9583045825dfb3"
+    },
+    {
+      "id": "000000000000000018d82eca54ddc9b5",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/minigames/QuizDash.test.tsx",
+        "line": 6,
+        "column": 281
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/minigames/QuizDash.test.tsx:6:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-733420e06a604ea48bc01367534c82ddd5aa506fc940ba4367c54f8be1309e51"
+    },
+    {
+      "id": "000000000000000018d82eca576ee94b",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/minigames/CodePuzzle.test.tsx",
+        "line": 7,
+        "column": 281
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/minigames/CodePuzzle.test.tsx:7:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-6c2d29cf7e7806e0af3b80937efc1ff008f4d81aad0adef16df9668b7f43b60a"
+    },
+    {
+      "id": "000000000000000018d82eca5a336c8e",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/minigames/MemoryMatch.test.tsx",
+        "line": 7,
+        "column": 267
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/minigames/MemoryMatch.test.tsx:7:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-86b80d4f900b63133540c9fe10f2c8656e4bf990d6701a880ba148333ad8aa78"
+    },
+    {
+      "id": "000000000000000018d82eca5c9e00fa",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/minigames/TerminalSimulator.test.tsx",
+        "line": 11,
+        "column": 503
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/minigames/TerminalSimulator.test.tsx:11:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-be45784b763c9bf6a3ebaf18f01aea9772ebd244752020b25aeffa3550dc597d"
+    },
+    {
+      "id": "000000000000000018d82eca6eb9f23a",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/minigames/MiniGameHub.test.tsx",
+        "line": 10,
+        "column": 430
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/minigames/MiniGameHub.test.tsx:10:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-ec388068767bbecad7f3dce54116d70bd9e9091e041a8166a300ee8e529f5225"
+    },
+    {
+      "id": "000000000000000018d82eca7e578986",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/QuickMiniGame.tsx",
+        "line": 107,
+        "column": 3348
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/QuickMiniGame.tsx:107:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-e3d39bfce02cc67cf998d1d86cf1489e27344a7802b2e1903c7f0e30c7801ec2"
+    },
+    {
+      "id": "000000000000000018d82eca7e57b1e7",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/QuickMiniGame.tsx",
+        "line": 108,
+        "column": 3440
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/QuickMiniGame.tsx:108:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-06c03eed7ea19debb4deb2d1e07c52eee55550ca48671c5e0ccdbaa2a23d8da2"
+    },
+    {
+      "id": "000000000000000018d82eca7e582e94",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/QuickMiniGame.tsx",
+        "line": 126,
+        "column": 3894
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/QuickMiniGame.tsx:126:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-6dfea74731e75fc821cd2d22524ba312d263c704818ff9bf62b3f3bb54bd7375"
+    },
+    {
+      "id": "000000000000000018d82eca7e5848c5",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/QuickMiniGame.tsx",
+        "line": 254,
+        "column": 8516
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/QuickMiniGame.tsx:254:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-04dd6e44fd6be8b1d0628d95768189aec51aae777a2be60783f1b4c3419689c0"
+    },
+    {
+      "id": "000000000000000018d82eca7e585f69",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/QuickMiniGame.tsx",
+        "line": 255,
+        "column": 8616
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/QuickMiniGame.tsx:255:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-58d3db4c74e797197929c042445b93fe4286091188def266324289b747cd33d0"
+    },
+    {
+      "id": "000000000000000018d82eca7e587bc9",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/QuickMiniGame.tsx",
+        "line": 256,
+        "column": 8696
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/QuickMiniGame.tsx:256:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-5fbb5dbb812be806279f063c656c76654ee59edcdc73eab31a7622f9fbd7018b"
+    },
+    {
+      "id": "000000000000000018d82eca828a4e95",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/RealmCompletionModal.tsx",
+        "line": 13,
+        "column": 426
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/components/ui/RealmCompletionModal.tsx:13:39e5b4830d4d9c14db7368a95b65d5463ea3d09520373723430c03a5a453b5df",
+      "stable_id": "aegis-3c1155dacd6d57529145f5bb95dc0cb18d533c46bf2807f27ccee36a83299755"
+    },
+    {
+      "id": "000000000000000018d82eca888a4153",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/TreasureChest.tsx",
+        "line": 43,
+        "column": 1713
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/TreasureChest.tsx:43:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-fe36b1f34b1097c134a70a38fd5720676001eb6aae81fdcdc340eb5fd04db156"
+    },
+    {
+      "id": "000000000000000018d82eca888a6fb4",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/TreasureChest.tsx",
+        "line": 57,
+        "column": 2073
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/TreasureChest.tsx:57:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-78f419c75a50ff5077166ee61cf61de5a815d5d21d86caeacf6344f5b1c2f030"
+    },
+    {
+      "id": "000000000000000018d82ecab4043f06",
+      "pattern": "server-version",
+      "category": "web-security",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/Icon.tsx",
+        "line": 498,
+        "column": 16522
+      },
+      "description": "Server version header detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "server-version:./src/components/ui/Icon.tsx:498:a077c9a3048c9c9a55340bff38db80ce300476633d3667fedaf55b3254f87355",
+      "stable_id": "aegis-92793587138ec0b66607bc02976b0cd829e61e450b3b875706f263c72dbc1d4f"
+    },
+    {
+      "id": "000000000000000018d82ecacd0efbe8",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/LevelUpEffect.tsx",
+        "line": 19,
+        "column": 552
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/LevelUpEffect.tsx:19:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-d3d4e9fad200b6cf210524743e582c4a04f2e0b2331584da8fe8a9b0d70fc0df"
+    },
+    {
+      "id": "000000000000000018d82ecacd0f218e",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/LevelUpEffect.tsx",
+        "line": 20,
+        "column": 594
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/LevelUpEffect.tsx:20:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-de005c84439a0ff9424076dc29fba5fe250b80a1434c444d37425a4d30a6c598"
+    },
+    {
+      "id": "000000000000000018d82ecacd0f3b79",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/LevelUpEffect.tsx",
+        "line": 21,
+        "column": 634
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/LevelUpEffect.tsx:21:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-2c807bd7bd021c1880ad938a68782fbb9a74d28ac6813c036ff170b9eda55c69"
+    },
+    {
+      "id": "000000000000000018d82ecad77f7ff7",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/MentorChat.tsx",
+        "line": 237,
+        "column": 10068
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/MentorChat.tsx:237:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-e8294123de5c9ec7a169baf900fee88540ab2dbf99ac18547a00bd91471cc597"
+    },
+    {
+      "id": "000000000000000018d82ecad77faa40",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/MentorChat.tsx",
+        "line": 242,
+        "column": 10159
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/MentorChat.tsx:242:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-68a43c85952df80cacc7ab834a569148d33f9558d6d167270e9945cfa0be0c84"
+    },
+    {
+      "id": "000000000000000018d82ecad77fc65a",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/MentorChat.tsx",
+        "line": 296,
+        "column": 11757
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/MentorChat.tsx:296:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-80a15bad501e0d8b27d380ff5760e8762d1507cff926d393eb6fcd7423ec5323"
+    },
+    {
+      "id": "000000000000000018d82ecad837cebb",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/VictoryModal.tsx",
+        "line": 9,
+        "column": 404
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/components/ui/VictoryModal.tsx:9:39e5b4830d4d9c14db7368a95b65d5463ea3d09520373723430c03a5a453b5df",
+      "stable_id": "aegis-aef5218e46675eb639b271dda7bda4fa729bfda22e645a2d31e0ee674df48209"
+    },
+    {
+      "id": "000000000000000018d82ecadecdd757",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/CelebrationOverlay.tsx",
+        "line": 16,
+        "column": 378
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/components/ui/CelebrationOverlay.tsx:16:39e5b4830d4d9c14db7368a95b65d5463ea3d09520373723430c03a5a453b5df",
+      "stable_id": "aegis-cdb0f58f8c8efb44b5860f3de3fce6c254cde2b6c9fffd92c367c427b04f1ef9"
+    },
+    {
+      "id": "000000000000000018d82ecae4347396",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/Confetti.tsx",
+        "line": 39,
+        "column": 1008
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/Confetti.tsx:39:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-c825429fa0e52aef6e6f8828874ed50d7e6816cf9b7bc599ec4a09ba157c6086"
+    },
+    {
+      "id": "000000000000000018d82ecae4349fc8",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/Confetti.tsx",
+        "line": 40,
+        "column": 1060
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/Confetti.tsx:40:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-db91fe401f4cf48c53916e8a648ba25e6a9821580e9e28abe6ad8637e8e52188"
+    },
+    {
+      "id": "000000000000000018d82ecae434b7ca",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/Confetti.tsx",
+        "line": 41,
+        "column": 1099
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/Confetti.tsx:41:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-8af6a1bba2239807d7a603ff14a41205ebf9216858db2638952d7ff4010c64aa"
+    },
+    {
+      "id": "000000000000000018d82ecae434d612",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/Confetti.tsx",
+        "line": 42,
+        "column": 1141
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/Confetti.tsx:42:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-fcdcdc1773b37b1dc34aadc3c403ca7924e27776fd51ef805e66b67d95ad59af"
+    },
+    {
+      "id": "000000000000000018d82ecae434f043",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/Confetti.tsx",
+        "line": 43,
+        "column": 1195
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/Confetti.tsx:43:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-22471fa929d15b157156005c80d962e93180e786dfca7d146e40d8d0ff9ae313"
+    },
+    {
+      "id": "000000000000000018d82ecae43518e9",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/Confetti.tsx",
+        "line": 44,
+        "column": 1248
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/Confetti.tsx:44:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-48cbb33feb6ec0c6ab1fd7a93f4d5fb2437a47d72ffbb1f92fb2db322b342723"
+    },
+    {
+      "id": "000000000000000018d82ecae4352d19",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/Confetti.tsx",
+        "line": 45,
+        "column": 1297
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/Confetti.tsx:45:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-c3f8bd14720319cf283da1f4a3023082ab57929a9e9148d6891ac4845b557000"
+    },
+    {
+      "id": "000000000000000018d82ecae4354790",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/Confetti.tsx",
+        "line": 46,
+        "column": 1340
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/Confetti.tsx:46:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-0af138d666ed738993640f1be1f9c5aefc7c9af81d7b4feff3d2732590fcbe83"
+    },
+    {
+      "id": "000000000000000018d82ecae43563a9",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/components/ui/Confetti.tsx",
+        "line": 47,
+        "column": 1400
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/components/ui/Confetti.tsx:47:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-c76ea6f0653bcab5ef58fe6919d901ec87e9c0fcf96418696cf93cc2402da5ab"
+    },
+    {
+      "id": "000000000000000018d82ecafb5a4963",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/contexts/GameContext.tsx",
+        "line": 911,
+        "column": 30810
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/contexts/GameContext.tsx:911:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-8c815363bba826e575adc02351a896a57b7b067c582cae627149e002426f72b9"
+    },
+    {
+      "id": "000000000000000018d82ecafb5a73f2",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/contexts/GameContext.tsx",
+        "line": 1242,
+        "column": 42891
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/contexts/GameContext.tsx:1242:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-4e59d53f03643e4f3519f2a65183c6a8a43d4f85ce962679ce61d842b511db61"
+    },
+    {
+      "id": "000000000000000018d82ecafb5a8e23",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/contexts/GameContext.tsx",
+        "line": 1261,
+        "column": 43789
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/contexts/GameContext.tsx:1261:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-2be9175f6a1d27d4c94e0d89bccd35bcb1b8dbae185c9046c0a42d0ac7ea5b19"
+    },
+    {
+      "id": "000000000000000018d82ecafb5aaa3c",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/contexts/GameContext.tsx",
+        "line": 1345,
+        "column": 46736
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/contexts/GameContext.tsx:1345:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-6cf4f893408ec0142342cd9155be69dd97d278ab514ced5aa623faad955c6640"
+    },
+    {
+      "id": "000000000000000018d82ecb0d8969dc",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/badges.ts",
+        "line": 629,
+        "column": 14872
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/badges.ts:629:39e5b4830d4d9c14db7368a95b65d5463ea3d09520373723430c03a5a453b5df",
+      "stable_id": "aegis-18611eed8bf6ffeb50445811437084162523bb5dcf3b61f9047799ef360753eb"
+    },
+    {
+      "id": "000000000000000018d82ecb2031a919",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/guilds.ts",
+        "line": 119,
+        "column": 2343
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/guilds.ts:119:39e5b4830d4d9c14db7368a95b65d5463ea3d09520373723430c03a5a453b5df",
+      "stable_id": "aegis-e86f929efafe060e7379d9acc41ab16fc77f00ef7dc695ea2eeeaecab1527054"
+    },
+    {
+      "id": "000000000000000018d82ecb2031d54b",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/guilds.ts",
+        "line": 143,
+        "column": 2948
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/guilds.ts:143:d4c999ae43633bd2036188d2bca68e1be8202b2cc1f3a1c42a728eaff7d2483d",
+      "stable_id": "aegis-c752c1e0f7b784c49d93b0bc5b63c979f0ed6dc0cdbd5267f1f6fe9811e812bb"
+    },
+    {
+      "id": "000000000000000018d82ecb2031f4f1",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/guilds.ts",
+        "line": 157,
+        "column": 3223
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/guilds.ts:157:751965f4d8a6e3fe5fa61c1df1cf71bfb2699dc391ae5dd9e94df1b93a35bf12",
+      "stable_id": "aegis-e9385701d52da753f0a522eaed66f6b21141c1c8cf8e88ad73b33b4bd6896c32"
+    },
+    {
+      "id": "000000000000000018d82ecb20321339",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/guilds.ts",
+        "line": 199,
+        "column": 4057
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/guilds.ts:199:c5d1866aabc15dda07995e73b08c4ccb514947dcd3a621cea851af5fe366f11b",
+      "stable_id": "aegis-db2e3a5fbcd156f78901bc67d75b1d3ec7db29939a8a11176ff917dd716498d7"
+    },
+    {
+      "id": "000000000000000018d82ecb20322f52",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/guilds.ts",
+        "line": 248,
+        "column": 5322
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/guilds.ts:248:39e5b4830d4d9c14db7368a95b65d5463ea3d09520373723430c03a5a453b5df",
+      "stable_id": "aegis-ffef1e791f3bfc3b98373aff9749e337f1f409c262e03f404b0f790cff474ccf"
+    },
+    {
+      "id": "000000000000000018d82ecb20325055",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/guilds.ts",
+        "line": 250,
+        "column": 5387
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/guilds.ts:250:39e5b4830d4d9c14db7368a95b65d5463ea3d09520373723430c03a5a453b5df",
+      "stable_id": "aegis-5e33a7e079289daf84d4ce1e4eef9a92ffc73fc63b228a8fd25636acd486336d"
+    },
+    {
+      "id": "000000000000000018d82ecb20326a86",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/guilds.ts",
+        "line": 279,
+        "column": 6201
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/guilds.ts:279:434a7e656c53f103a7a2ed1ccc8bb6fd53e9c10e4df29edd2a11b9036342a08d",
+      "stable_id": "aegis-80d0df8ff4a28aea04fc3406f901c9dd9196c33a1495202ead1974d3dc82b07b"
+    },
+    {
+      "id": "000000000000000018d82ecb203284b6",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/guilds.ts",
+        "line": 280,
+        "column": 6227
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/guilds.ts:280:876c9b16254e157d1eb645390dcfae6f29b9d3cd394e73a91de8ee5d0e67ee43",
+      "stable_id": "aegis-90ad5579c92cf07cc1f0b3acfa52264813973b161a662f8053ee7b5b716274d5"
+    },
+    {
+      "id": "000000000000000018d82ecb20329f2d",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/guilds.ts",
+        "line": 299,
+        "column": 6759
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/guilds.ts:299:c5d1866aabc15dda07995e73b08c4ccb514947dcd3a621cea851af5fe366f11b",
+      "stable_id": "aegis-8d3d7acf85927807516ff0a1047f15b88ae692934932d28f0d7692c914fb32d3"
+    },
+    {
+      "id": "000000000000000018d82ecb2032be8d",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/guilds.ts",
+        "line": 300,
+        "column": 6785
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/guilds.ts:300:d4c999ae43633bd2036188d2bca68e1be8202b2cc1f3a1c42a728eaff7d2483d",
+      "stable_id": "aegis-b1658d1b31f8836a2c54b4dea79945b24db4bf1391506848e104ff6a32fa9ad9"
+    },
+    {
+      "id": "000000000000000018d82ecb291c3c0d",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./src/data/incidentScenarios.ts",
+        "line": 329,
+        "column": 11401
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./src/data/incidentScenarios.ts:329:49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763",
+      "stable_id": "aegis-834e14e066b81449dba37ccd34f07cfa333b204b211c4195a018525bf524ead0"
+    },
+    {
+      "id": "000000000000000018d82ecb23864619",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./src/data/incidentScenarios.ts",
+        "line": 121,
+        "column": 3875
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./src/data/incidentScenarios.ts:121:5a93151af8cfe3b3eab35acb0edc839c5a819c926962ae36de89ef76d37bc364",
+      "stable_id": "aegis-8bc1eed02038abdb9c80f91abd76064d4a3c8be3980b2652730cf759334c3d70"
+    },
+    {
+      "id": "000000000000000018d82ecb23866aee",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./src/data/incidentScenarios.ts",
+        "line": 129,
+        "column": 4160
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./src/data/incidentScenarios.ts:129:7c4311a3faa04adb261e340a207e888578f710d0e8d8c12d520b6d9a3aa566a5",
+      "stable_id": "aegis-88957b3f5008a61c9843876ab06c2edd6bb843e9fd28344b19e3e4da7d7bbd14"
+    },
+    {
+      "id": "000000000000000018d82ecb238682f0",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./src/data/incidentScenarios.ts",
+        "line": 160,
+        "column": 5253
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./src/data/incidentScenarios.ts:160:e2dcea36e685b1c1c419a325b9ec3282359b843d9cf2e347fdd1ce5390ec4b9d",
+      "stable_id": "aegis-beb0e47d7025f5b3294ed8425fa06db2dd5c782a72beb37a239d6592710ce06a"
+    },
+    {
+      "id": "000000000000000018d82ecb2f690248",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/milestones.ts",
+        "line": 428,
+        "column": 11622
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/data/milestones.ts:428:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-62fa47df734b580869ccae601069ec8461b21f38a2a6796be741b014f3833375"
+    },
+    {
+      "id": "000000000000000018d82ecb3372c111",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/minigames.ts",
+        "line": 184,
+        "column": 5965
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/minigames.ts:184:04f720b424d7e32428e0199b9bacd2f536bfa18e458701d570654410d4ff9509",
+      "stable_id": "aegis-b580742b1c8c561e18d5b8165437f9bfc0cf8b36bd4a88fed01c151afe23e8ed"
+    },
+    {
+      "id": "000000000000000018d82ecb3372e85a",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/minigames.ts",
+        "line": 185,
+        "column": 5983
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/minigames.ts:185:0f255ec16482c343fd099ba9668863778be40dc166a6856b1d470e0bc97cc6fd",
+      "stable_id": "aegis-2b20ef3b44a1826301fb37971a15b9602edbc17f44d8515d0d65f56d4423896b"
+    },
+    {
+      "id": "000000000000000018d82ecb33fa428e",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/minigames.ts",
+        "line": 307,
+        "column": 9110
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/data/minigames.ts:307:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-d4787f8f98537f3542af3a97d5c77cabc570e395b743160398cbccd0163d6cf0"
+    },
+    {
+      "id": "000000000000000018d82ecb33fa604b",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./src/data/minigames.ts",
+        "line": 294,
+        "column": 8633
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./src/data/minigames.ts:294:89409b3665da9d57fe83c7e60e27fac5c0741c8fa9928af82af5f916b76db72b",
+      "stable_id": "aegis-f17372d4d25cfe301e074d902a3ecc825bb2348e135149c8441c8bc4abd7b4ea"
+    },
+    {
+      "id": "000000000000000018d82ecb33fa7364",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./src/data/minigames.ts",
+        "line": 295,
+        "column": 8674
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./src/data/minigames.ts:295:a0ea3848c4d4a46b7a56579e5f1feea709621d1e04f777c49a0a0d827d12883d",
+      "stable_id": "aegis-b467cdef89b92132b6abfbd12e786807341a97e65d55c4ca918b5f67113322c9"
+    },
+    {
+      "id": "000000000000000018d82ecb357d0896",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/pvpArena.ts",
+        "line": 55,
+        "column": 1006
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/pvpArena.ts:55:39e5b4830d4d9c14db7368a95b65d5463ea3d09520373723430c03a5a453b5df",
+      "stable_id": "aegis-e4ac6cb1a0b0a850c2509a76c409ece8fe976bc7fe35daca4373779ffbc1389a"
+    },
+    {
+      "id": "000000000000000018d82ecb357d33f6",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/pvpArena.ts",
+        "line": 56,
+        "column": 1028
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/pvpArena.ts:56:451c393b61192bb5d276237bc7f26849553aec04f77963c03732e441bc6f3a5c",
+      "stable_id": "aegis-49740f4d984058b8a977b1c1f0083f2b1ee339fd05a6f9af5887d68e038317da"
+    },
+    {
+      "id": "000000000000000018d82ecb357d4de1",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/pvpArena.ts",
+        "line": 64,
+        "column": 1184
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/pvpArena.ts:64:876c9b16254e157d1eb645390dcfae6f29b9d3cd394e73a91de8ee5d0e67ee43",
+      "stable_id": "aegis-6038706de5b7143f1746f3c94b20a8b2e6bca28488887cf77fe35ae27f5fa747"
+    },
+    {
+      "id": "000000000000000018d82ecb357d696f",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/pvpArena.ts",
+        "line": 65,
+        "column": 1206
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/pvpArena.ts:65:ccbd1f83c9d8d9f3a36bf47f2ce6868e182fb39f787c41a977fc0028a7d41a43",
+      "stable_id": "aegis-c2c466658742b751a2e739e477f3d9633ff97eb8ae87893a91a930c079928d37"
+    },
+    {
+      "id": "000000000000000018d82ecb357d8171",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/pvpArena.ts",
+        "line": 73,
+        "column": 1374
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/pvpArena.ts:73:4948963369b682612d22b081bdc92c13d23fb921cdd44e50f45d7e86b4b52022",
+      "stable_id": "aegis-02e428b59cc2ef99398c8f2719e996757584104ed572e4be19119e63a5b330a9"
+    },
+    {
+      "id": "000000000000000018d82ecb38592d3e",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/pvpArena.ts",
+        "line": 312,
+        "column": 8201
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/data/pvpArena.ts:312:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-76af3abf74148c419238b324369109ac8abc17f9765caab4d29851bcf388659f"
+    },
+    {
+      "id": "000000000000000018d82ecb38595212",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/pvpArena.ts",
+        "line": 322,
+        "column": 8568
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/data/pvpArena.ts:322:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-dbf3a3619d0eafcc972494be14bda70479fb1f9ffd311822edc8c0781f552f68"
+    },
+    {
+      "id": "000000000000000018d82ecb38596fcf",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/pvpArena.ts",
+        "line": 323,
+        "column": 8644
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/data/pvpArena.ts:323:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-e022077d3e3c4720e5a32b1e7f84987b2086f5901f2b3099f0b7ac5f357789c1"
+    },
+    {
+      "id": "000000000000000018d82ecb385987d1",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/pvpArena.ts",
+        "line": 338,
+        "column": 9164
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/data/pvpArena.ts:338:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-df8713f6c95ebcae18cabfe43a1c6d9ab5f8ad7a2486d4ad3e187813c6a6a30a"
+    },
+    {
+      "id": "000000000000000018d82ecb3859a0a4",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/pvpArena.ts",
+        "line": 343,
+        "column": 9371
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/data/pvpArena.ts:343:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-7562fdcca1a5ec63c8a196902987eb7b2509f52950023f23b394441ec230555f"
+    },
+    {
+      "id": "000000000000000018d82ecb3859b8ec",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/pvpArena.ts",
+        "line": 348,
+        "column": 9514
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/data/pvpArena.ts:348:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-d7bca00033c59685fed58f1d22d5227f7016998bdc38b10f6b4eaf2c03f94a67"
+    },
+    {
+      "id": "000000000000000018d82ecb409a12a1",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/sidequests.ts",
+        "line": 207,
+        "column": 5650
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/data/sidequests.ts:207:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-2440252ce830afc85775c42f80fa7373f41c42f55be83e4606263a6bdd47dbb7"
+    },
+    {
+      "id": "000000000000000018d82ecb409a3ca4",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/sidequests.ts",
+        "line": 224,
+        "column": 6099
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/data/sidequests.ts:224:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-3645933a1ffef3d6587d97fbe8250d44bf2a43445100f43755fc2feeee963ed9"
+    },
+    {
+      "id": "000000000000000018d82ecb4707ae8f",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/social.ts",
+        "line": 84,
+        "column": 1663
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/social.ts:84:751965f4d8a6e3fe5fa61c1df1cf71bfb2699dc391ae5dd9e94df1b93a35bf12",
+      "stable_id": "aegis-18764046756f6b14d4ac3f971eb036781744fdff049c248066ee276daa1a3447"
+    },
+    {
+      "id": "000000000000000018d82ecb4707d964",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/social.ts",
+        "line": 164,
+        "column": 3231
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/social.ts:164:0812a4ef4ea9e800e2cb87a311317fdb06f80ab8700c7185b35588b3d6953739",
+      "stable_id": "aegis-d3f2d95bfb4402a17bf4407c61ae176607b682100aa6af4c8444113a74505902"
+    },
+    {
+      "id": "000000000000000018d82ecb4707f3da",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/social.ts",
+        "line": 173,
+        "column": 3371
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/social.ts:173:d4c999ae43633bd2036188d2bca68e1be8202b2cc1f3a1c42a728eaff7d2483d",
+      "stable_id": "aegis-2cc6ab88b0e90e073264658c2a71dea93ed0dfe410bce8c65c84c69731627a29"
+    },
+    {
+      "id": "000000000000000018d82ecb470809f3",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/social.ts",
+        "line": 182,
+        "column": 3507
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/social.ts:182:751965f4d8a6e3fe5fa61c1df1cf71bfb2699dc391ae5dd9e94df1b93a35bf12",
+      "stable_id": "aegis-4cebbf2d2eba4f510d14a50162624df41e60ac6d05ba80dd4af4f49e8066e3c2"
+    },
+    {
+      "id": "000000000000000018d82ecb47081e24",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/social.ts",
+        "line": 212,
+        "column": 3977
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/social.ts:212:c5d1866aabc15dda07995e73b08c4ccb514947dcd3a621cea851af5fe366f11b",
+      "stable_id": "aegis-cb2cc6d661a370bdf1bc08b8b93f1ccbc9382b6478d97589e4f6e4788caaa18b"
+    },
+    {
+      "id": "000000000000000018d82ecb47083be0",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/social.ts",
+        "line": 239,
+        "column": 4389
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/social.ts:239:e1b9c8731585bef2f9226397155c207bddc584d1664772da3c66d9d07b0b042e",
+      "stable_id": "aegis-3ce3899734b0b1fb82cbea53629b44970cae187f61acb5de65e3d603b318d299"
+    },
+    {
+      "id": "000000000000000018d82ecb4708509c",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/social.ts",
+        "line": 255,
+        "column": 4720
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/social.ts:255:d55d01d0341ed0ba2cd99b322e8c5b609254f47d10c7cd12b99b4922effeba44",
+      "stable_id": "aegis-bbeddc12b246bdc9fe1c890673338699466db842d71cc6336cecf89326bc3529"
+    },
+    {
+      "id": "000000000000000018d82ecb5363cfe4",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/terminalChallenges.ts",
+        "line": 323,
+        "column": 10430
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/data/terminalChallenges.ts:323:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-646226f44fd82b7d049e0631c06c85a5c9151dbd3974caeb95a3d4c1523807f8"
+    },
+    {
+      "id": "000000000000000018d82ecb5f29d6fe",
+      "pattern": "stored-xss",
+      "category": "web-security",
+      "severity": "high",
+      "confidence": "medium",
+      "location": {
+        "file": "./src/data/w3schools-content.ts",
+        "line": 295,
+        "column": 12239
+      },
+      "description": "Potential stored XSS via innerHTML",
+      "reference": "https://owasp.org/www-community/attacks/xss/",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "stored-xss:./src/data/w3schools-content.ts:295:bfd3f0d180099bcd177c13118d4108d98077e5ca5ab9beb8c0b893c3a4bc002b",
+      "stable_id": "aegis-fba7b2af67c1fc197227096a35910a4b45d51e689a1ded5f8cc19ea814cb99d6"
+    },
+    {
+      "id": "000000000000000018d82ecb61a3f3b1",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/w3schools-content.ts",
+        "line": 314,
+        "column": 12979
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/w3schools-content.ts:314:d902d1c684cab073526f906322c4831ea060a1ed220060f57ae13e27723b5aed",
+      "stable_id": "aegis-b9492776a3e73633162666282c6862a316832aea1f8179daa9e7bea68017590c"
+    },
+    {
+      "id": "000000000000000018d82ecb61a421cc",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/w3schools-content.ts",
+        "line": 1146,
+        "column": 42660
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/w3schools-content.ts:1146:5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5",
+      "stable_id": "aegis-6aed3f619c722f32d646ad1048a08cd44d243dd54dad245ac74ceda48d01e8e4"
+    },
+    {
+      "id": "000000000000000018d82ecb61a4435b",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/w3schools-content.ts",
+        "line": 1543,
+        "column": 64684
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/w3schools-content.ts:1543:5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5",
+      "stable_id": "aegis-b362d99512b266f64759cc7d47524f2f6e893c729cbb2df981b97e80bc9ff166"
+    },
+    {
+      "id": "000000000000000018d82ecb614c0233",
+      "pattern": "bearer-token-url",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/w3schools-content.ts",
+        "line": 1493,
+        "column": 62004
+      },
+      "description": "Bearer token detected in code",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "bearer-token-url:./src/data/w3schools-content.ts:1493:76314f176b7683929f498b286076158f0dc763b322369d0f55fd7e4e5d2b6b24",
+      "stable_id": "aegis-fb95c72049a048c116d3bebdae630360736a52f183c50514070b4f90d76faec9"
+    },
+    {
+      "id": "000000000000000018d82ecb614c2a93",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./src/data/w3schools-content.ts",
+        "line": 454,
+        "column": 18078
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./src/data/w3schools-content.ts:454:48a600c194fcf5c437ac4bdb0f639992b83d0fc8798888a355be8d8c430c1237",
+      "stable_id": "aegis-d08d8584b64686e98a3bab6b1b982957f1b6cf1beb964d262fa6777c44fd3a61"
+    },
+    {
+      "id": "000000000000000018d82ecb614c4667",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./src/data/w3schools-content.ts",
+        "line": 462,
+        "column": 18295
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./src/data/w3schools-content.ts:462:f801626d5f899f60368aa5ce7b9721da82cde8487f72fd07c69e57f8662eb26a",
+      "stable_id": "aegis-671f3ceba009f7e68bf67615a7e7df1e737bfe88b4cf1c44157f1048c7063705"
+    },
+    {
+      "id": "000000000000000018d82ecb614c5b23",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./src/data/w3schools-content.ts",
+        "line": 470,
+        "column": 18632
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./src/data/w3schools-content.ts:470:51edf34ed3320b0d380bae6e06f3fc78b8afe7ff162ad77a3372844e192dea1a",
+      "stable_id": "aegis-de3430d48fc0c2f4fb004eac2d1154e2086e562e6ccfc18a455d45f475d4e838"
+    },
+    {
+      "id": "000000000000000018d82ecb614c6e3c",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./src/data/w3schools-content.ts",
+        "line": 471,
+        "column": 18688
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./src/data/w3schools-content.ts:471:48a600c194fcf5c437ac4bdb0f639992b83d0fc8798888a355be8d8c430c1237",
+      "stable_id": "aegis-481faa94303060591e55cafb3588ad2cf57a590ce9b9fee0da0a297d830e948a"
+    },
+    {
+      "id": "000000000000000018d82ecb614c8a55",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./src/data/w3schools-content.ts",
+        "line": 472,
+        "column": 18729
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./src/data/w3schools-content.ts:472:2a2a4c3ec501f7e33d258cf09bb19525506f4926a2f87e2d118a50d57a034917",
+      "stable_id": "aegis-470f03fb629d9d5cc57baa8a330f6646c81b099290f1516489983f9e69d3ef42"
+    },
+    {
+      "id": "000000000000000018d82ecb614ca1cc",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./src/data/w3schools-content.ts",
+        "line": 489,
+        "column": 19390
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./src/data/w3schools-content.ts:489:48a600c194fcf5c437ac4bdb0f639992b83d0fc8798888a355be8d8c430c1237",
+      "stable_id": "aegis-b4647debe23d0147c8ea61865b56050bf89fc1503f6cded74049bea25c7348d6"
+    },
+    {
+      "id": "000000000000000018d82ecb614cb5fc",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./src/data/w3schools-content.ts",
+        "line": 490,
+        "column": 19454
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./src/data/w3schools-content.ts:490:48a600c194fcf5c437ac4bdb0f639992b83d0fc8798888a355be8d8c430c1237",
+      "stable_id": "aegis-46daefb17234f12ae5b08dc56f76de5d54468ebe24cf07a6c4033bc0733a03e0"
+    },
+    {
+      "id": "000000000000000018d82ecb614ccc5b",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./src/data/w3schools-content.ts",
+        "line": 495,
+        "column": 19580
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./src/data/w3schools-content.ts:495:a528595f0a1114cc5711822d1918d68fc801c1d4211860ee98ce3aa3fd3b650d",
+      "stable_id": "aegis-3a8287faefe922d7995f1924b4cc7071d73d09743b02ef7660c35b8d26a3d9d7"
+    },
+    {
+      "id": "000000000000000018d82ecb614ce646",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./src/data/w3schools-content.ts",
+        "line": 498,
+        "column": 19668
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./src/data/w3schools-content.ts:498:790299f38c34228f81ac4d58b70af3ff8ec66de9925b2ebd760728325fad3863",
+      "stable_id": "aegis-f643ca3f7ddbf9ab49850982473dac371bf274a7e044a73fe197353a2068e716"
+    },
+    {
+      "id": "000000000000000018d82ecb614cfb01",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./src/data/w3schools-content.ts",
+        "line": 499,
+        "column": 19713
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./src/data/w3schools-content.ts:499:49ba47f73b72d5e332aaa7ed23a45e10dd2ca5d06c646f7b799584472ac0246e",
+      "stable_id": "aegis-d315ac29f7553f7c05716fe240c2279d26cd85d6e5500817f019128360fb7ce0"
+    },
+    {
+      "id": "000000000000000018d82ecb614d1160",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./src/data/w3schools-content.ts",
+        "line": 503,
+        "column": 19850
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./src/data/w3schools-content.ts:503:790299f38c34228f81ac4d58b70af3ff8ec66de9925b2ebd760728325fad3863",
+      "stable_id": "aegis-d861b5cfd748d2ce23a7a1c7b7014e8580eb79c6fb5e61027883c13916572c17"
+    },
+    {
+      "id": "000000000000000018d82ecb614d261c",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./src/data/w3schools-content.ts",
+        "line": 529,
+        "column": 20870
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./src/data/w3schools-content.ts:529:bfa860e2db6e26aa880bbd5cee209a9a1e7a40b5b85ee177bc86935b0196c148",
+      "stable_id": "aegis-583f7e328db79568d9f75a4a03232a65f75b7541d005faea33399aadcf8ecb38"
+    },
+    {
+      "id": "000000000000000018d82ecb75f5bc54",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/collectibles.ts",
+        "line": 237,
+        "column": 5847
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/data/collectibles.ts:237:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-713be147e37a1927c50d3f0f4e667222235b8cebd34f4f0408e76d5aeee88cf4"
+    },
+    {
+      "id": "000000000000000018d82ecb75f5df40",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/collectibles.ts",
+        "line": 269,
+        "column": 6571
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/data/collectibles.ts:269:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-6b7bce993f2bb0123721cead2fb944b30778f2716da822c4702d101e557a734b"
+    },
+    {
+      "id": "000000000000000018d82ecb75f5f259",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/collectibles.ts",
+        "line": 297,
+        "column": 7324
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/data/collectibles.ts:297:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-2015c4238dad1cf13340d2e7c0a9d3d28e31ce88010ebe7522991f021e21f0e2"
+    },
+    {
+      "id": "000000000000000018d82ecb75f604e6",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/collectibles.ts",
+        "line": 305,
+        "column": 7598
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/data/collectibles.ts:305:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-624555ee5293859dd30f5dbaa1b1886e7543944000a9369567457e5f2c89925d"
+    },
+    {
+      "id": "000000000000000018d82ecb75f6172d",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/collectibles.ts",
+        "line": 309,
+        "column": 7857
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/data/collectibles.ts:309:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-67ea1fea73287420c411016b7355a67be8bec9cb54a50505a82e41e028f0ddd9"
+    },
+    {
+      "id": "000000000000000018d82ecb7865ff67",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/communityChallenges.ts",
+        "line": 59,
+        "column": 1796
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/communityChallenges.ts:59:60734f174b2035e5b2ba85fef8c648cc0cb18c5995b419d3cd1c025c5b09d0c7",
+      "stable_id": "aegis-f13b8a22d2c15f825af76ab54193c98e46943ca4ab6676e738df8e02c675cb88"
+    },
+    {
+      "id": "000000000000000018d82ecb7b1449a9",
+      "pattern": "stored-xss",
+      "category": "web-security",
+      "severity": "high",
+      "confidence": "medium",
+      "location": {
+        "file": "./src/data/quizzes.ts",
+        "line": 342,
+        "column": 11377
+      },
+      "description": "Potential stored XSS via innerHTML",
+      "reference": "https://owasp.org/www-community/attacks/xss/",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "stored-xss:./src/data/quizzes.ts:342:bfd3f0d180099bcd177c13118d4108d98077e5ca5ab9beb8c0b893c3a4bc002b",
+      "stable_id": "aegis-f48ece9efbe5096f489e51081480bb2cc32d7776d52fe55ac090abef5a46492a"
+    },
+    {
+      "id": "000000000000000018d82ecb7b21abf1",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/quizzes.ts",
+        "line": 367,
+        "column": 12297
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/quizzes.ts:367:d902d1c684cab073526f906322c4831ea060a1ed220060f57ae13e27723b5aed",
+      "stable_id": "aegis-dc0900e2a7937a894b39d3bb9e238938eab2e369cb94b3974ca34e8cd970563b"
+    },
+    {
+      "id": "000000000000000018d82ecb7b21c7c4",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/quizzes.ts",
+        "line": 370,
+        "column": 12437
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/quizzes.ts:370:d902d1c684cab073526f906322c4831ea060a1ed220060f57ae13e27723b5aed",
+      "stable_id": "aegis-d67874ce5b7797e3bb037a17ae7c90821b90494a8b92a8ea802f4f07125068cf"
+    },
+    {
+      "id": "000000000000000018d82ecb7b21da0c",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/quizzes.ts",
+        "line": 371,
+        "column": 12505
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/quizzes.ts:371:d902d1c684cab073526f906322c4831ea060a1ed220060f57ae13e27723b5aed",
+      "stable_id": "aegis-db6c302bc2f84f900bbbc662e99e3e8a77919c72fc42ae313ebb79241bd9511e"
+    },
+    {
+      "id": "000000000000000018d82ecb7b21f253",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/data/quizzes.ts",
+        "line": 372,
+        "column": 12546
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/data/quizzes.ts:372:d902d1c684cab073526f906322c4831ea060a1ed220060f57ae13e27723b5aed",
+      "stable_id": "aegis-d56517c9e886470c7d45cc8f38c10fd09d9200d5da6d15d7c24427710591696d"
+    },
+    {
+      "id": "000000000000000018d82ecb82e31668",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./src/data/quizzes.ts",
+        "line": 539,
+        "column": 18322
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./src/data/quizzes.ts:539:48a600c194fcf5c437ac4bdb0f639992b83d0fc8798888a355be8d8c430c1237",
+      "stable_id": "aegis-474a4e1d9c6c8eef8f6c2c7c556b8c155befde2ecc5b777252bde717fa99944d"
+    },
+    {
+      "id": "000000000000000018d82ecb82e33f0e",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./src/data/quizzes.ts",
+        "line": 541,
+        "column": 18431
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./src/data/quizzes.ts:541:48a600c194fcf5c437ac4bdb0f639992b83d0fc8798888a355be8d8c430c1237",
+      "stable_id": "aegis-5fbd978b37d6287202e986afc199fd1724b8aa9f16d4049b23220b709291ed11"
+    },
+    {
+      "id": "000000000000000018d82ecb82e358f9",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./src/data/quizzes.ts",
+        "line": 582,
+        "column": 19864
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./src/data/quizzes.ts:582:790299f38c34228f81ac4d58b70af3ff8ec66de9925b2ebd760728325fad3863",
+      "stable_id": "aegis-294c233882747b58c6105f1fa47dd5eaddde82c132b33f4ec005f62f4dc0bc2e"
+    },
+    {
+      "id": "000000000000000018d82ecb8646a217",
+      "pattern": "env-credential-assignment",
+      "category": "secrets",
+      "severity": "high",
+      "confidence": "medium",
+      "location": {
+        "file": "./src/hooks/useVoiceNarration.ts",
+        "line": 11,
+        "column": 220
+      },
+      "description": "Credential-like variable assigned a literal value",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "env-credential-assignment:./src/hooks/useVoiceNarration.ts:11:7cbc68b734e75060674279a0f6f24bb727b42d23b29b139a828811a5fc90f87f",
+      "stable_id": "aegis-228e6ac3ddd8161d4b92ba2b5c34915e2abcfc00f6a7938458cdab098f410718"
+    },
+    {
+      "id": "000000000000000018d82ecbaf4dd8ea",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/pages/LeaderboardPage.tsx",
+        "line": 68,
+        "column": 1622
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/pages/LeaderboardPage.tsx:68:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-52b7235ef3a9744c9a0dcc04e048945d8c2f710f286d423e7eb2b6a72319a546"
+    },
+    {
+      "id": "000000000000000018d82ecbaf4e0079",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/pages/LeaderboardPage.tsx",
+        "line": 76,
+        "column": 1894
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/pages/LeaderboardPage.tsx:76:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-065c68300b3133bd7ea2bf68a6e1e69a87b4117a64ce36ae6d264cbe856c01e7"
+    },
+    {
+      "id": "000000000000000018d82ecbaf4e1aaa",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/pages/LeaderboardPage.tsx",
+        "line": 84,
+        "column": 2152
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/pages/LeaderboardPage.tsx:84:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-057f28b32e071d131143b9a08f4b56265e3f7272d15d9835cfc3159f18a0f348"
+    },
+    {
+      "id": "000000000000000018d82ecbaf4e32ac",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/pages/LeaderboardPage.tsx",
+        "line": 85,
+        "column": 2222
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/pages/LeaderboardPage.tsx:85:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-22b9fb56d2a52a5f58b0d11ce1330e44f6110d302a07c0f9cb346f6d29979e31"
+    },
+    {
+      "id": "000000000000000018d82ecbaf4e48c5",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/pages/LeaderboardPage.tsx",
+        "line": 86,
+        "column": 2267
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/pages/LeaderboardPage.tsx:86:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-db9feba13c2d824638d7aa7ededb57ebe156c76935d0caed10ccbe360214aa73"
+    },
+    {
+      "id": "000000000000000018d82ecbaf4e610d",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/pages/LeaderboardPage.tsx",
+        "line": 87,
+        "column": 2320
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/pages/LeaderboardPage.tsx:87:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-0b1bb41638bd61cb400f07f0fc2e684cf6d48d481eba8ed33d1ee8f7e80cfc31"
+    },
+    {
+      "id": "000000000000000018d82ecbc104fca4",
+      "pattern": "gdpr-personal-data",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/pages/PrivacyPolicyPage.tsx",
+        "line": 120,
+        "column": 5811
+      },
+      "description": "Reference to personal data detected",
+      "reference": "https://gdpr.eu/article-4-definitions/",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "gdpr-personal-data:./src/pages/PrivacyPolicyPage.tsx:120:d85533ba786e27667c68f55c37f3d5a70d6cd7a1e1157262ac3353dd6b11b193",
+      "stable_id": "aegis-67c53547acc0392cd13cafde937a5a6f56cf3f6b2fba1b8efe33c2fa75621f53"
+    },
+    {
+      "id": "000000000000000018d82ecbfc38bba9",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/pages/WorldMapPage.tsx",
+        "line": 103,
+        "column": 3430
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/pages/WorldMapPage.tsx:103:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-e18bef910097cee4d70a32263a926017a0af3075313cc3e1827fe6e2997d5921"
+    },
+    {
+      "id": "000000000000000018d82ecbfc38de94",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/pages/WorldMapPage.tsx",
+        "line": 104,
+        "column": 3458
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/pages/WorldMapPage.tsx:104:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-be46bbd59982441a70609c39a801bd499d216930c78581a97edfecbb74b2aeae"
+    },
+    {
+      "id": "000000000000000018d82ecbfc38f6dc",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/pages/WorldMapPage.tsx",
+        "line": 105,
+        "column": 3487
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/pages/WorldMapPage.tsx:105:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-7c6771e282d10b27c50900ee1b7af2a08f8ab2a46eb2b238202aeddf619780b4"
+    },
+    {
+      "id": "000000000000000018d82ecbfc390cf5",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/pages/WorldMapPage.tsx",
+        "line": 106,
+        "column": 3517
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/pages/WorldMapPage.tsx:106:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-4d7e1de512cca3d272b37469ad55d9eff6d6a4202e6d07faf5aabfa2196d8b2f"
+    },
+    {
+      "id": "000000000000000018d82ecbfc39239a",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/pages/WorldMapPage.tsx",
+        "line": 657,
+        "column": 21440
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/pages/WorldMapPage.tsx:657:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-1c01102210121a26fcd81f951c35c365d2b826db623451cb201bac7530adbc55"
+    },
+    {
+      "id": "000000000000000018d82ecbfc393c27",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/pages/WorldMapPage.tsx",
+        "line": 660,
+        "column": 21584
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/pages/WorldMapPage.tsx:660:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-bbcc638a036e909f2522f3da45ed6b71c466adc97cf4375cdbe262375794d4c7"
+    },
+    {
+      "id": "000000000000000018d82ecbfe253930",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/pages/WorldMapPage.tsx",
+        "line": 77,
+        "column": 2235
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/pages/WorldMapPage.tsx:77:e6ce3865b58a05798457f54532b5a462f3e0e21238afef451f8a3c3e675c37bc",
+      "stable_id": "aegis-46f32bc0b1ddcb333e892e5bba3d4c092733ae938f0709aae1737e8e9a6590ce"
+    },
+    {
+      "id": "000000000000000018d82ecc75d2fe6a",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/pages/ChallengesPage.test.tsx",
+        "line": 95,
+        "column": 4172
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/pages/ChallengesPage.test.tsx:95:d4c999ae43633bd2036188d2bca68e1be8202b2cc1f3a1c42a728eaff7d2483d",
+      "stable_id": "aegis-40bea94d3f5d8607e4e0405a44003a92cadcd20821012b3be2c475e34c1fc1ed"
+    },
+    {
+      "id": "000000000000000018d82eccad93b9e0",
+      "pattern": "hardcoded-password",
+      "category": "secrets",
+      "severity": "high",
+      "confidence": "medium",
+      "location": {
+        "file": "./src/pages/BadgesPage.tsx",
+        "line": 17,
+        "column": 595
+      },
+      "description": "Hardcoded password detected",
+      "reference": "https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "hardcoded-password:./src/pages/BadgesPage.tsx:17:5c916cf9211f7fff86c47f0967b638500ca4d7eb010e5b0df6b566cb838b6c9d",
+      "stable_id": "aegis-248f8e03c7793af6a69dfc8aecbcb8ea3130f71624f147d0601a410b7e213838"
+    },
+    {
+      "id": "000000000000000018d82eccaf348219",
+      "pattern": "password-field",
+      "category": "pii",
+      "severity": "high",
+      "confidence": "high",
+      "location": {
+        "file": "./src/pages/BadgesPage.tsx",
+        "line": 17,
+        "column": 595
+      },
+      "description": "Password field with value detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "password-field:./src/pages/BadgesPage.tsx:17:88d64228119927eab4ce19277b9ad8348b4fc7207061b2b5a32191c46c10d5ef",
+      "stable_id": "aegis-dff0c4abb52b876571443c7abd12ad24e908dfe4e8cfb8ab91ce01e56f34dd9d"
+    },
+    {
+      "id": "000000000000000018d82eccf5bcf6cc",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/pages/BattleArenaPage.tsx",
+        "line": 30,
+        "column": 1292
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/pages/BattleArenaPage.tsx:30:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-dc8a3f6554b1d2df3a2d84048f5e4d23497dd24989a257c41ec91b87453d9098"
+    },
+    {
+      "id": "000000000000000018d82eccf5bd2ae8",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/pages/BattleArenaPage.tsx",
+        "line": 34,
+        "column": 1395
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/pages/BattleArenaPage.tsx:34:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-80fc1c9df770b16277b90f3b3155b25167a2fbdbcac7724bea838660f4fcf488"
+    },
+    {
+      "id": "000000000000000018d82ecd0ff812e7",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/pages/ChallengesPage.tsx",
+        "line": 76,
+        "column": 2053
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/pages/ChallengesPage.tsx:76:d4c999ae43633bd2036188d2bca68e1be8202b2cc1f3a1c42a728eaff7d2483d",
+      "stable_id": "aegis-0613c1e6481764c05f9cff1fa0aec8f6ee39a27312f2a0addfd9bc0d0743f5d8"
+    },
+    {
+      "id": "000000000000000018d82ecd0ff83c19",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/pages/ChallengesPage.tsx",
+        "line": 78,
+        "column": 2136
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/pages/ChallengesPage.tsx:78:d4c999ae43633bd2036188d2bca68e1be8202b2cc1f3a1c42a728eaff7d2483d",
+      "stable_id": "aegis-f67ea1566482f6a2043e85b17fabc31c37854a8e65f463aa01264b448dc03b70"
+    },
+    {
+      "id": "000000000000000018d82ecd197c41ab",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/utils/gameUtils.test.ts",
+        "line": 134,
+        "column": 4101
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/utils/gameUtils.test.ts:134:39e5b4830d4d9c14db7368a95b65d5463ea3d09520373723430c03a5a453b5df",
+      "stable_id": "aegis-6daafcfff27162900ec6424d7e5048d850d61294cb9e1c4cbda42f13eff7c9d3"
+    },
+    {
+      "id": "000000000000000018d82ecd197c6797",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./src/utils/gameUtils.test.ts",
+        "line": 145,
+        "column": 4426
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./src/utils/gameUtils.test.ts:145:d55d01d0341ed0ba2cd99b322e8c5b609254f47d10c7cd12b99b4922effeba44",
+      "stable_id": "aegis-53807511aeffb13da33425af6364c2251b860ef76a92342ac0787b420f651719"
+    },
+    {
+      "id": "000000000000000018d82ecd1a6043c1",
+      "pattern": "insecure-random",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./src/utils/gameUtils.ts",
+        "line": 9,
+        "column": 269
+      },
+      "description": "Insecure random number generation (Math.random)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "insecure-random:./src/utils/gameUtils.ts:9:70e9d248688717df77bfb739b2384e84959ac43eb35ff5df19415eb1ca72c7be",
+      "stable_id": "aegis-c52084397ef4df8fc9999e00d1101d5fd5870ecacf411338c405b58dd70c50a2"
+    },
+    {
+      "id": "000000000000000018d82ecd29f3ddff",
+      "pattern": "australian-tfn",
+      "category": "pii",
+      "severity": "high",
+      "confidence": "medium",
+      "location": {
+        "file": "./src/utils/dataExport.ts",
+        "line": 217,
+        "column": 6949
+      },
+      "description": "Australian Tax File Number (TFN) detected",
+      "reference": "https://www.ato.gov.au/individual/tax-file-number",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "australian-tfn:./src/utils/dataExport.ts:217:e59bbea6227c578f97fc467bc62dc3407d4885693d74e6e970f6cab44158fef4",
+      "stable_id": "aegis-457dff2d180dd0441ed1ae19b1d5320e7c05c9286aef00399dd67b1317e07750"
+    },
+    {
+      "id": "000000000000000018d82ecd29f40ed4",
+      "pattern": "ssn-no-dashes",
+      "category": "pii",
+      "severity": "high",
+      "confidence": "medium",
+      "location": {
+        "file": "./src/utils/dataExport.ts",
+        "line": 217,
+        "column": 6949
+      },
+      "description": "Possible SSN without dashes detected",
+      "reference": "https://www.ssa.gov/history/ssn.html",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssn-no-dashes:./src/utils/dataExport.ts:217:e59bbea6227c578f97fc467bc62dc3407d4885693d74e6e970f6cab44158fef4",
+      "stable_id": "aegis-da2f0c472c8f14785c8ad9e44bdcac5eb6a5de3eecd796a9691b84f8674f506d"
+    },
+    {
+      "id": "000000000000000018d82ecd29f42aa8",
+      "pattern": "bank-routing-number",
+      "category": "pii",
+      "severity": "high",
+      "confidence": "medium",
+      "location": {
+        "file": "./src/utils/dataExport.ts",
+        "line": 217,
+        "column": 6949
+      },
+      "description": "Bank routing number (ABA) detected",
+      "reference": "https://en.wikipedia.org/wiki/ABA_routing_transit_number",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "bank-routing-number:./src/utils/dataExport.ts:217:e59bbea6227c578f97fc467bc62dc3407d4885693d74e6e970f6cab44158fef4",
+      "stable_id": "aegis-01fc9f6fd96864e6c083068f0d12f227a730a16b06601de1d3c19998c8d7ea60"
+    },
+    {
+      "id": "000000000000000018d82ecd56fe6b83",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./worker/src/index.ts",
+        "line": 25,
+        "column": 463
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./worker/src/index.ts:25:49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763",
+      "stable_id": "aegis-491aca5dedd841bcaf49cd10d23942a275760c887801c8c0e3b58aa6f0241c1b"
+    },
+    {
+      "id": "000000000000000018d82ecd56fe999e",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./worker/src/index.ts",
+        "line": 46,
+        "column": 1228
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./worker/src/index.ts:46:49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763",
+      "stable_id": "aegis-e6466a7a3cd178ce4f35dc215c711e6ef4fa963729657c5f3dd6656179419ce9"
+    },
+    {
+      "id": "000000000000000018d82ecd57291403",
+      "pattern": "zip-code",
+      "category": "pii",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./worker/src/index.ts",
+        "line": 35,
+        "column": 956
+      },
+      "description": "US ZIP code detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "zip-code:./worker/src/index.ts:35:b045dd9c18caa8be1e17a4b902152cc1fd292b242b7b9dd74ba8c40896239424",
+      "stable_id": "aegis-aeb43a551df185c99adcb80c28804c106802f22bf5d301b399d26bfd8d282d5f"
+    },
+    {
+      "id": "000000000000000018d82ecd57bd25b7",
+      "pattern": "bearer-token-url",
+      "category": "security-hardening",
+      "severity": "medium",
+      "confidence": "high",
+      "location": {
+        "file": "./worker/src/index.ts",
+        "line": 70,
+        "column": 1791
+      },
+      "description": "Bearer token detected in code",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "bearer-token-url:./worker/src/index.ts:70:b22ac30e61f624d5d9ecfaec62edc932976e15d2f1599809297f5422ed3b396b",
+      "stable_id": "aegis-5784d1a4a815ae6598a500f498e544fbaf9e8b0b3cf12cb13c15e07eb815788e"
+    },
+    {
+      "id": "000000000000000018d82ecd57bd492f",
+      "pattern": "sql-query",
+      "category": "security-hardening",
+      "severity": "low",
+      "confidence": "low",
+      "location": {
+        "file": "./worker/src/index.ts",
+        "line": 156,
+        "column": 4162
+      },
+      "description": "SQL query detected (potential SQL injection)",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "sql-query:./worker/src/index.ts:156:99e1536aca1d1a4b515f8c782143a1aaca0d1d0a563c96ea270a935f562108f9",
+      "stable_id": "aegis-a0a411147aba35b6e0f408ebd49499243037aa29b8cf835d2c2a8dddf6f303db"
+    },
+    {
+      "id": "000000000000000018d82ec93a3829f6",
+      "pattern": "stack-trace-exposure",
+      "category": "web-security",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./worker/package-lock.json",
+        "line": 1459,
+        "column": 47859
+      },
+      "description": "Stack trace exposure detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "stack-trace-exposure:./worker/package-lock.json:1459:c121a754ce2e50b079ec1dbc57cbbe72fe77bc9a87eef4e81db776aff8b49c9e",
+      "stable_id": "aegis-4bae9458c4487554ffd7a79246db8aad6e798cf87e060589e164d80951800173"
+    },
+    {
+      "id": "000000000000000018d82ec93a3861e4",
+      "pattern": "stack-trace-exposure",
+      "category": "web-security",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./worker/package-lock.json",
+        "line": 1461,
+        "column": 47947
+      },
+      "description": "Stack trace exposure detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "stack-trace-exposure:./worker/package-lock.json:1461:c121a754ce2e50b079ec1dbc57cbbe72fe77bc9a87eef4e81db776aff8b49c9e",
+      "stable_id": "aegis-fdbf2a343d86d6ccde6ed5c0e8a8409b3d4d534ec2686b6def5eab7e61e8e575"
+    },
+    {
+      "id": "000000000000000018d82ec93a388a8a",
+      "pattern": "stack-trace-exposure",
+      "category": "web-security",
+      "severity": "low",
+      "confidence": "high",
+      "location": {
+        "file": "./worker/package-lock.json",
+        "line": 1613,
+        "column": 53140
+      },
+      "description": "Stack trace exposure detected",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "stack-trace-exposure:./worker/package-lock.json:1613:c121a754ce2e50b079ec1dbc57cbbe72fe77bc9a87eef4e81db776aff8b49c9e",
+      "stable_id": "aegis-5a4511b000c0276609c9c289329c7ea4f2ee1020af94e733e1f036ead57cdd21"
+    },
+    {
+      "id": "000000000000000018d82ec93998fe9f",
+      "pattern": "nist-framework",
+      "category": "compliance",
+      "severity": "low",
+      "confidence": "medium",
+      "location": {
+        "file": "./worker/package-lock.json",
+        "line": 98,
+        "column": 3188
+      },
+      "description": "NIST Cybersecurity Framework reference detected",
+      "reference": "https://www.nist.gov/cyberframework",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "nist-framework:./worker/package-lock.json:98:6e587f8a282ae34fc036e478efff045db54026dab8ee505a7dbd5a726de0ccbe",
+      "stable_id": "aegis-bf0c0702ff40e6d1fcbfee22c901c8365a65317b1a30874ef0c5d126d274998f"
+    },
+    {
+      "id": "000000000000000018d82ec9399925e8",
+      "pattern": "nist-framework",
+      "category": "compliance",
+      "severity": "low",
+      "confidence": "medium",
+      "location": {
+        "file": "./worker/package-lock.json",
+        "line": 1070,
+        "column": 33121
+      },
+      "description": "NIST Cybersecurity Framework reference detected",
+      "reference": "https://www.nist.gov/cyberframework",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "nist-framework:./worker/package-lock.json:1070:c0b4083c2e90c371564aa6cd1f4d19d0be17425dcf62bd53b0f654556ba993d8",
+      "stable_id": "aegis-6d9dc2ce9ad7907da24abbe96037bad2686cddcc74eb74cc2feee814bbaf336d"
+    },
+    {
+      "id": "000000000000000018d82ec95453e095",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./CLAUDE.md",
+        "line": 14,
+        "column": 800
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./CLAUDE.md:14:49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763",
+      "stable_id": "aegis-a6deb724a453a5a51bfdbae698b397584279b7878ef95f9bcaef7731789778a5"
+    },
+    {
+      "id": "000000000000000018d82ec938468bee",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./playwright.config.ts",
+        "line": 7,
+        "column": 375
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./playwright.config.ts:7:12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "stable_id": "aegis-d1b573c941cd5b697f1cec07fe5f727a1ea4af28ef177d1e25d5edd6a7ed24cd"
+    },
+    {
+      "id": "000000000000000018d82ec93846af65",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./playwright.config.ts",
+        "line": 8,
+        "column": 439
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./playwright.config.ts:8:49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763",
+      "stable_id": "aegis-4085ea0941f93608a95e9505291643dec0a6d058ef7b09453f365863ac251ff9"
+    },
+    {
+      "id": "000000000000000018d82ec93846c5c4",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./playwright.config.ts",
+        "line": 8,
+        "column": 485
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./playwright.config.ts:8:19e36255972107d42b8cecb77ef5622e842e8a50778a6ed8dd1ce94732daca9e",
+      "stable_id": "aegis-60f1f385599690d9f2663427e1149441ff7ca78167042991c0e2c865b65f96c0"
+    },
+    {
+      "id": "000000000000000018d82ec93846e10c",
+      "pattern": "ssrf-localhost",
+      "category": "web-security",
+      "severity": "medium",
+      "confidence": "medium",
+      "location": {
+        "file": "./playwright.config.ts",
+        "line": 10,
+        "column": 558
+      },
+      "description": "Potential SSRF targeting internal resources",
+      "reference": "https://owasp.org/www-community/attacks/Server_Side_Request_Forgery",
+      "tags": [],
+      "kind": "pattern",
+      "fingerprint": "ssrf-localhost:./playwright.config.ts:10:12ca17b49af2289436f303e0166030a21e525d266e209267433801a8fd4071a0",
+      "stable_id": "aegis-c776ec02aa94b1f1b0eced2341c51d560fc176ff496d9e73aec103909edcb6b5"
+    }
+  ],
+  "stats": {
+    "files_scanned": 257,
+    "files_skipped": 23391,
+    "files_failed": 0,
+    "bytes_scanned": 2415780,
+    "finding_count": 198,
+    "suppressed_count": 0,
+    "patterns_matched": 88,
+    "scan_time_ms": 41681,
+    "io_time_ms": 1144,
+    "workers_used": 16,
+    "files_by_extension": {},
+    "findings_by_severity": {
+      "medium": 98,
+      "low": 92,
+      "high": 8
+    },
+    "findings_by_category": {
+      "web-security": 35,
+      "pii": 67,
+      "compliance": 5,
+      "secrets": 2,
+      "security-hardening": 89
+    }
+  }
+}

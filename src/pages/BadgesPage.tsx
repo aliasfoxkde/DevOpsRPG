@@ -69,9 +69,20 @@ export default function BadgesPage() {
   const playerStats = useMemo((): PlayerStats => {
     // Calculate tech completed by checking which technologies have all quests completed
     const techCompleted: string[] = []
-    const techs = ['html', 'css', 'javascript', 'typescript', 'python', 'docker', 'kubernetes', 'aws', 'bash', 'cicd']
+    const techs = [
+      'html',
+      'css',
+      'javascript',
+      'typescript',
+      'python',
+      'docker',
+      'kubernetes',
+      'aws',
+      'bash',
+      'cicd',
+    ]
     for (const tech of techs) {
-      const allQuestsForTech = completedQuests.filter(q => q.technologyId === tech)
+      const allQuestsForTech = completedQuests.filter((q) => q.technologyId === tech)
       // We don't have access to total quests per tech, so just track if any are completed
       if (allQuestsForTech.length > 0) {
         techCompleted.push(tech)
@@ -79,15 +90,19 @@ export default function BadgesPage() {
     }
 
     // Calculate realm completed
-    const realmCompleted = completedQuests.filter(q =>
-      q.topicId.includes('realm') || completedRealms.length
-    ).length > 0 ? completedRealms.length : 0
+    const realmCompleted =
+      completedQuests.filter((q) => q.topicId.includes('realm') || completedRealms.length).length >
+      0
+        ? completedRealms.length
+        : 0
 
     return {
       questCount: completedQuests.length,
       streakDays: character.streakDays,
       level: character.level,
-      quizCount: completedQuests.filter(q => q.topicId.includes('quiz') || q.topicId.includes('test')).length,
+      quizCount: completedQuests.filter(
+        (q) => q.topicId.includes('quiz') || q.topicId.includes('test'),
+      ).length,
       minigameCount: 0, // Not tracked in GameState
       perfectQuiz: false, // Not tracked in GameState
       quizStreak: 0, // Not tracked in GameState
@@ -100,9 +115,12 @@ export default function BadgesPage() {
   }, [completedQuests, character.streakDays, character.level, completedRealms])
 
   // Check if badge is unlocked
-  const isUnlocked = useCallback((badge: Badge) => {
-    return badges.some(b => b.id === badge.id && b.unlockedAt)
-  }, [badges])
+  const isUnlocked = useCallback(
+    (badge: Badge) => {
+      return badges.some((b) => b.id === badge.id && b.unlockedAt)
+    },
+    [badges],
+  )
 
   // Get unlock progress for a badge (0-100)
   const getProgress = (badge: Badge) => {
@@ -130,7 +148,7 @@ export default function BadgesPage() {
 
   // Filter badges
   const filteredBadges = useMemo(() => {
-    return BADGES.filter(badge => {
+    return BADGES.filter((badge) => {
       if (filterCategory !== 'all' && badge.category !== filterCategory) return false
       if (filterRarity !== 'all' && badge.rarity !== filterRarity) return false
       if (filterStatus === 'unlocked' && !isUnlocked(badge)) return false
@@ -175,7 +193,9 @@ export default function BadgesPage() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-center sm:text-left">
               <p className="text-purple-400 font-bold text-lg">Collection Progress</p>
-              <p className="text-slate-400 text-sm">{unlockedCount} of {totalCount} badges earned</p>
+              <p className="text-slate-400 text-sm">
+                {unlockedCount} of {totalCount} badges earned
+              </p>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-center">
@@ -192,16 +212,20 @@ export default function BadgesPage() {
 
           {/* Category breakdown */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mt-4">
-            {(['quest', 'streak', 'skill', 'social', 'secret', 'seasonal'] as BadgeCategory[]).map(cat => {
-              const catBadges = BADGES.filter(b => b.category === cat)
-              const catUnlocked = catBadges.filter(b => isUnlocked(b)).length
-              return (
-                <div key={cat} className="text-center p-2 bg-slate-900/50 rounded-lg">
-                  <p className="text-xs text-slate-500">{CATEGORY_LABELS[cat]}</p>
-                  <p className="font-bold text-white">{catUnlocked}/{catBadges.length}</p>
-                </div>
-              )
-            })}
+            {(['quest', 'streak', 'skill', 'social', 'secret', 'seasonal'] as BadgeCategory[]).map(
+              (cat) => {
+                const catBadges = BADGES.filter((b) => b.category === cat)
+                const catUnlocked = catBadges.filter((b) => isUnlocked(b)).length
+                return (
+                  <div key={cat} className="text-center p-2 bg-slate-900/50 rounded-lg">
+                    <p className="text-xs text-slate-500">{CATEGORY_LABELS[cat]}</p>
+                    <p className="font-bold text-white">
+                      {catUnlocked}/{catBadges.length}
+                    </p>
+                  </div>
+                )
+              },
+            )}
           </div>
         </div>
 
@@ -212,7 +236,9 @@ export default function BadgesPage() {
             {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
               <button
                 key={key}
-                onClick={() => setFilterCategory(key as FilterCategory)}
+                onClick={() => {
+                  setFilterCategory(key as FilterCategory)
+                }}
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
                   filterCategory === key
                     ? 'bg-amber-600 text-white'
@@ -226,10 +252,12 @@ export default function BadgesPage() {
 
           {/* Status filter */}
           <div className="flex gap-1 bg-slate-800/80 rounded-lg p-1">
-            {(['all', 'unlocked', 'locked'] as FilterStatus[]).map(status => (
+            {(['all', 'unlocked', 'locked'] as FilterStatus[]).map((status) => (
               <button
                 key={status}
-                onClick={() => setFilterStatus(status)}
+                onClick={() => {
+                  setFilterStatus(status)
+                }}
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
                   filterStatus === status
                     ? 'bg-green-600 text-white'
@@ -244,7 +272,9 @@ export default function BadgesPage() {
           {/* Rarity filter */}
           <div className="flex gap-1 bg-slate-800/80 rounded-lg p-1">
             <button
-              onClick={() => setFilterRarity('all')}
+              onClick={() => {
+                setFilterRarity('all')
+              }}
               className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
                 filterRarity === 'all'
                   ? 'bg-purple-600 text-white'
@@ -253,10 +283,12 @@ export default function BadgesPage() {
             >
               All Rarities
             </button>
-            {RARITY_ORDER.map(rarity => (
+            {RARITY_ORDER.map((rarity) => (
               <button
                 key={rarity}
-                onClick={() => setFilterRarity(rarity)}
+                onClick={() => {
+                  setFilterRarity(rarity)
+                }}
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-all capitalize ${
                   filterRarity === rarity
                     ? 'bg-purple-600 text-white'
@@ -271,7 +303,7 @@ export default function BadgesPage() {
 
         {/* Badge Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {filteredBadges.map(badge => {
+          {filteredBadges.map((badge) => {
             const unlocked = isUnlocked(badge)
             const progress = getProgress(badge)
             const rarityClass = RARITY_COLORS[badge.rarity]
@@ -279,18 +311,20 @@ export default function BadgesPage() {
             return (
               <button
                 key={badge.id}
-                onClick={() => setSelectedBadge(badge)}
+                onClick={() => {
+                  setSelectedBadge(badge)
+                }}
                 className={`relative p-4 rounded-xl border transition-all hover:scale-105 ${
-                  unlocked
-                    ? rarityClass
-                    : 'bg-slate-800/80 border-slate-700 opacity-60 grayscale'
+                  unlocked ? rarityClass : 'bg-slate-800/80 border-slate-700 opacity-60 grayscale'
                 }`}
               >
                 <div className="text-4xl mb-2">{unlocked ? badge.icon : '❓'}</div>
                 <div className={`font-bold text-sm mb-1 ${unlocked ? '' : 'text-slate-400'}`}>
                   {unlocked ? badge.name : '???'}
                 </div>
-                <div className={`text-xs capitalize ${unlocked ? 'text-slate-300' : 'text-slate-500'}`}>
+                <div
+                  className={`text-xs capitalize ${unlocked ? 'text-slate-300' : 'text-slate-500'}`}
+                >
                   {badge.rarity}
                 </div>
 
@@ -298,21 +332,14 @@ export default function BadgesPage() {
                 {!unlocked && progress > 0 && (
                   <div className="mt-2">
                     <div className="h-1 bg-slate-700 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-amber-500"
-                        style={{ width: `${progress}%` }}
-                      />
+                      <div className="h-full bg-amber-500" style={{ width: `${progress}%` }} />
                     </div>
                     <p className="text-xs text-slate-500 mt-1">{Math.round(progress)}%</p>
                   </div>
                 )}
 
                 {/* Unlocked indicator */}
-                {unlocked && (
-                  <div className="absolute top-2 right-2 text-green-400">
-                    ✓
-                  </div>
-                )}
+                {unlocked && <div className="absolute top-2 right-2 text-green-400">✓</div>}
               </button>
             )
           })}
@@ -330,13 +357,23 @@ export default function BadgesPage() {
       {selectedBadge && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
           <div className="bg-slate-800 rounded-2xl border border-slate-600 shadow-2xl max-w-sm w-full overflow-hidden">
-            <div className={`p-6 text-center border-b border-slate-700 ${RarityBg(selectedBadge.rarity)}`}>
-              <div className="text-7xl mb-4">{isUnlocked(selectedBadge) ? selectedBadge.icon : '❓'}</div>
-              <h2 className="text-2xl font-bold text-white">{isUnlocked(selectedBadge) ? selectedBadge.name : '???'}</h2>
+            <div
+              className={`p-6 text-center border-b border-slate-700 ${RarityBg(selectedBadge.rarity)}`}
+            >
+              <div className="text-7xl mb-4">
+                {isUnlocked(selectedBadge) ? selectedBadge.icon : '❓'}
+              </div>
+              <h2 className="text-2xl font-bold text-white">
+                {isUnlocked(selectedBadge) ? selectedBadge.name : '???'}
+              </h2>
               <p className="text-slate-300 mt-1">{selectedBadge.description}</p>
-              <span className={`inline-block mt-2 px-3 py-1 rounded-full text-sm capitalize ${
-                isUnlocked(selectedBadge) ? RARITY_COLORS[selectedBadge.rarity] : 'bg-slate-700 text-slate-400'
-              }`}>
+              <span
+                className={`inline-block mt-2 px-3 py-1 rounded-full text-sm capitalize ${
+                  isUnlocked(selectedBadge)
+                    ? RARITY_COLORS[selectedBadge.rarity]
+                    : 'bg-slate-700 text-slate-400'
+                }`}
+              >
                 {selectedBadge.rarity}
               </span>
             </div>
@@ -359,7 +396,9 @@ export default function BadgesPage() {
                 <div>
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-slate-400">Progress</span>
-                    <span className="text-amber-400">{Math.round(getProgress(selectedBadge))}%</span>
+                    <span className="text-amber-400">
+                      {Math.round(getProgress(selectedBadge))}%
+                    </span>
                   </div>
                   <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
                     <div
@@ -376,7 +415,9 @@ export default function BadgesPage() {
               {/* Category */}
               <div className="flex justify-between text-sm">
                 <span className="text-slate-500">Category</span>
-                <span className="text-slate-300 capitalize">{CATEGORY_LABELS[selectedBadge.category]}</span>
+                <span className="text-slate-300 capitalize">
+                  {CATEGORY_LABELS[selectedBadge.category]}
+                </span>
               </div>
 
               {/* Status */}
@@ -402,7 +443,9 @@ export default function BadgesPage() {
 
             <div className="px-6 py-4 bg-slate-900/50 border-t border-slate-700">
               <button
-                onClick={() => setSelectedBadge(null)}
+                onClick={() => {
+                  setSelectedBadge(null)
+                }}
                 className="w-full py-2 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors"
               >
                 Close
@@ -417,10 +460,15 @@ export default function BadgesPage() {
 
 function RarityBg(rarity: Badge['rarity']): string {
   switch (rarity) {
-    case 'legendary': return 'bg-gradient-to-b from-amber-900/50 to-slate-900'
-    case 'epic': return 'bg-gradient-to-b from-purple-900/50 to-slate-900'
-    case 'rare': return 'bg-gradient-to-b from-blue-900/50 to-slate-900'
-    case 'uncommon': return 'bg-gradient-to-b from-green-900/50 to-slate-900'
-    default: return 'bg-gradient-to-b from-slate-800 to-slate-900'
+    case 'legendary':
+      return 'bg-gradient-to-b from-amber-900/50 to-slate-900'
+    case 'epic':
+      return 'bg-gradient-to-b from-purple-900/50 to-slate-900'
+    case 'rare':
+      return 'bg-gradient-to-b from-blue-900/50 to-slate-900'
+    case 'uncommon':
+      return 'bg-gradient-to-b from-green-900/50 to-slate-900'
+    case 'common':
+      return 'bg-gradient-to-b from-slate-800 to-slate-900'
   }
 }

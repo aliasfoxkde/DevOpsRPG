@@ -12,9 +12,7 @@ describe('FeedbackPage', () => {
   it('renders the feedback form with every field and the pipeline info', () => {
     renderSeededPage(<FeedbackPage />, { route: '/feedback', url: '/feedback' })
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Submit Feedback/ }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /Submit Feedback/ })).toBeInTheDocument()
     expect(screen.getByText('Feedback Type')).toBeInTheDocument()
     expect(screen.getByLabelText(/^Title/)).toBeInTheDocument()
     expect(screen.getByLabelText(/^Area/)).toBeInTheDocument()
@@ -59,10 +57,7 @@ describe('FeedbackPage', () => {
     expect(submit).toBeDisabled()
 
     await user.type(screen.getByLabelText(/^Title/), 'Quest progress resets')
-    await user.type(
-      screen.getByLabelText(/^Description/),
-      'Reloading the page loses my badges.',
-    )
+    await user.type(screen.getByLabelText(/^Description/), 'Reloading the page loses my badges.')
 
     expect(submit).toBeEnabled()
 

@@ -3,11 +3,16 @@ import { test, expect, type Page } from '@playwright/test'
 test.describe('Quest Flow', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByRole('progressbar', { name: /experience/i })).toBeVisible({ timeout: 15000 })
+    await expect(page.getByRole('progressbar', { name: /experience/i })).toBeVisible({
+      timeout: 15000,
+    })
   })
 
   test('quest journal lists available quests', async ({ page }) => {
-    await page.getByRole('navigation', { name: 'Primary navigation' }).getByRole('link', { name: 'Quests' }).click()
+    await page
+      .getByRole('navigation', { name: 'Primary navigation' })
+      .getByRole('link', { name: 'Quests' })
+      .click()
     await expect(page).toHaveURL(/quests/)
 
     // Quest cards link to individual quest pages
@@ -17,7 +22,10 @@ test.describe('Quest Flow', () => {
   })
 
   test('can start a quest from the journal', async ({ page }) => {
-    await page.getByRole('navigation', { name: 'Primary navigation' }).getByRole('link', { name: 'Quests' }).click()
+    await page
+      .getByRole('navigation', { name: 'Primary navigation' })
+      .getByRole('link', { name: 'Quests' })
+      .click()
     await expect(page).toHaveURL(/quests/)
 
     await page.locator('a[href^="/quest/"]').first().click()
@@ -34,7 +42,9 @@ test.describe('Quest Flow', () => {
 test.describe('Daily Rewards', () => {
   test('rewards page shows daily reward tiles', async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByRole('progressbar', { name: /experience/i })).toBeVisible({ timeout: 15000 })
+    await expect(page.getByRole('progressbar', { name: /experience/i })).toBeVisible({
+      timeout: 15000,
+    })
 
     await page.getByRole('button', { name: /more navigation options/i }).click()
     await page.getByRole('menuitem', { name: /rewards/i }).click()
@@ -50,11 +60,19 @@ test.describe('Victory Modal', () => {
   // STORAGE_KEYS.GAME = 'devopsquest_game'), then reloads so the app loads it.
   async function loadWithVictory(page: Page) {
     await page.goto('/')
-    await expect(page.getByRole('progressbar', { name: /experience/i })).toBeVisible({ timeout: 15000 })
+    await expect(page.getByRole('progressbar', { name: /experience/i })).toBeVisible({
+      timeout: 15000,
+    })
 
     await page.evaluate(() => {
       const key = 'devopsquest_game'
-      const state = JSON.parse(localStorage.getItem(key) || '{}')
+      // Structural slice of the app's persisted GameState: only the fields this
+      // seed touches are modelled, everything else is passed through untouched.
+      const isRecord = (value: unknown): value is Record<string, unknown> =>
+        typeof value === 'object' && value !== null
+      const raw = localStorage.getItem(key)
+      const parsed: unknown = raw ? JSON.parse(raw) : {}
+      const state = isRecord(parsed) ? parsed : {}
       state.hasSeenOnboarding = true
       state.showVictory = true
       state.lastVictory = { xp: 100, levelUp: false, newLevel: 2, milestone: null, badge: null }

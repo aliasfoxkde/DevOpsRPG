@@ -7,23 +7,6 @@
  */
 
 /**
- * Parses a JSON string as an unknown value; callers narrow with the helpers
- * below before reading fields.
- * @param {string} raw
- * @returns {unknown}
- */
-export function parseJson(raw) {
-  /** @type {unknown} */
-  let parsed
-  try {
-    parsed = JSON.parse(raw)
-  } catch {
-    return null
-  }
-  return parsed
-}
-
-/**
  * Narrows an unknown value to a plain object record, or null.
  * @param {unknown} value
  * @returns {Record<string, unknown> | null}

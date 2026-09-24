@@ -42,7 +42,8 @@ export const realms: Record<string, Realm> = {
     name: 'Forest of Scripts',
     icon: '🌲',
     color: '#0891b2',
-    description: 'The forest hums with automation. Bash through the undergrowth and conjure Python spirits.',
+    description:
+      'The forest hums with automation. Bash through the undergrowth and conjure Python spirits.',
     requiredLevel: 5,
     technologies: ['python', 'bash', 'docker'],
   },
@@ -78,7 +79,8 @@ export const realms: Record<string, Realm> = {
     name: 'AI Nexus',
     icon: '🧠',
     color: '#7c3aed',
-    description: 'The realm of machine learning, event streaming, and service meshes — where automation meets intelligence.',
+    description:
+      'The realm of machine learning, event streaming, and service meshes — where automation meets intelligence.',
     requiredLevel: 25,
     technologies: [
       'machine_learning',
@@ -189,7 +191,11 @@ export function getNextQuest(completedTopicIds: Set<string>): Quest | null {
 }
 
 // Check if a realm is unlocked
-export function isRealmUnlocked(realm: Realm, playerLevel: number, completedTopicIds: Set<string>): boolean {
+export function isRealmUnlocked(
+  realm: Realm,
+  playerLevel: number,
+  completedTopicIds: Set<string>,
+): boolean {
   // First realm always unlocked
   if (realm.requiredLevel === 1) return true
 
@@ -201,9 +207,9 @@ export function isRealmUnlocked(realm: Realm, playerLevel: number, completedTopi
   if (realmOrder === 0) return true
 
   const prevRealm = Object.values(realms)[realmOrder - 1]
-  const prevRealmCompleted = prevRealm.technologies.every(techId => {
-    const techQuests = allQuests.filter(q => q.technologyId === techId)
-    return techQuests.every(q => completedTopicIds.has(q.topicId))
+  const prevRealmCompleted = prevRealm.technologies.every((techId) => {
+    const techQuests = allQuests.filter((q) => q.technologyId === techId)
+    return techQuests.every((q) => completedTopicIds.has(q.topicId))
   })
 
   return prevRealmCompleted

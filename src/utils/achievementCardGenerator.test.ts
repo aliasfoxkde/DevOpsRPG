@@ -1,8 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import {
-  generateAchievementCardSVG,
-  type AchievementCardConfig
-} from './achievementCardGenerator'
+import { generateAchievementCardSVG, type AchievementCardConfig } from './achievementCardGenerator'
 
 describe('achievementCardGenerator', () => {
   describe('generateAchievementCardSVG', () => {

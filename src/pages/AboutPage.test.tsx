@@ -26,7 +26,7 @@ describe('AboutPage', () => {
   it('links out to the GitHub repository and the live game', () => {
     renderSeededPage(<AboutPage />)
     const links = screen.getAllByRole('link')
-    const hrefs = links.map(link => link.getAttribute('href'))
+    const hrefs = links.map((link) => link.getAttribute('href'))
     expect(hrefs).toContain('https://github.com/aliasfoxkde/DevOpsRPG')
     expect(hrefs).toContain('https://f7b4e42f.devopsquest.pages.dev')
   })

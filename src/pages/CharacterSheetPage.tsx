@@ -8,23 +8,30 @@ export default function CharacterSheetPage() {
   const { character, companions, activeCompanion } = game
   const { achievements } = game
 
-  const unlockedAchievements = achievements.filter(a => a.unlockedAt)
-  const lockedAchievements = achievements.filter(a => !a.unlockedAt)
+  const unlockedAchievements = achievements.filter((a) => a.unlockedAt)
+  const lockedAchievements = achievements.filter((a) => !a.unlockedAt)
 
   // Get equipped items with full data
   const equippedItems = character.equippedItems
-    .map(id => EQUIPMENT_ITEMS.find(item => item.id === id))
+    .map((id) => EQUIPMENT_ITEMS.find((item) => item.id === id))
     .filter((item): item is EquipmentItem => item !== undefined)
 
   // Get equipment bonuses
   const equipmentBonuses = getEquipmentBonuses()
 
   // Group equipped items by slot
-  const equippedBySlot = equippedItems.reduce((acc, item) => {
-    if (!acc[item.slot]) acc[item.slot] = []
-    acc[item.slot].push(item)
-    return acc
-  }, {} as Record<string, EquipmentItem[]>)
+  const equippedBySlot = equippedItems.reduce<Record<string, EquipmentItem[] | undefined>>(
+    (acc, item) => {
+      const bucket = acc[item.slot]
+      if (bucket) {
+        bucket.push(item)
+      } else {
+        acc[item.slot] = [item]
+      }
+      return acc
+    },
+    {},
+  )
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
@@ -88,7 +95,9 @@ export default function CharacterSheetPage() {
           <div className="mb-6">
             <div className="flex items-center justify-between text-sm mb-2">
               <span className="text-slate-400">Overall Completion</span>
-              <span className="text-slate-200">{completedCount}/{totalQuests} Quests</span>
+              <span className="text-slate-200">
+                {completedCount}/{totalQuests} Quests
+              </span>
             </div>
             <div className="w-full h-4 bg-slate-700 rounded-full overflow-hidden">
               <div
@@ -111,7 +120,9 @@ export default function CharacterSheetPage() {
             </div>
             <div className="p-4 bg-slate-700/50 rounded-lg">
               <div className="text-3xl mb-2">📚</div>
-              <div className="text-2xl font-bold text-slate-100">{totalQuests - completedCount}</div>
+              <div className="text-2xl font-bold text-slate-100">
+                {totalQuests - completedCount}
+              </div>
               <div className="text-sm text-slate-400">Quests Remaining</div>
             </div>
           </div>
@@ -122,7 +133,9 @@ export default function CharacterSheetPage() {
           <h3 className="text-xl font-bold text-slate-100 mb-4">Equipment Loadout</h3>
 
           {/* Active Bonuses */}
-          {(equipmentBonuses.xpBonus > 0 || equipmentBonuses.goldBonus > 0 || Object.keys(equipmentBonuses.techBonuses).length > 0) && (
+          {(equipmentBonuses.xpBonus > 0 ||
+            equipmentBonuses.goldBonus > 0 ||
+            Object.keys(equipmentBonuses.techBonuses).length > 0) && (
             <div className="mb-4 p-3 bg-green-900/30 border border-green-700/50 rounded-lg">
               <h4 className="text-sm font-semibold text-green-400 mb-2">Active Bonuses</h4>
               <div className="flex flex-wrap gap-2">
@@ -137,7 +150,10 @@ export default function CharacterSheetPage() {
                   </span>
                 )}
                 {Object.entries(equipmentBonuses.techBonuses).map(([techId, bonus]) => (
-                  <span key={techId} className="px-2 py-1 bg-blue-900/50 rounded text-sm text-blue-300">
+                  <span
+                    key={techId}
+                    className="px-2 py-1 bg-blue-900/50 rounded text-sm text-blue-300"
+                  >
                     +{Math.round(bonus * 100)}% {techId.toUpperCase()} XP
                   </span>
                 ))}
@@ -147,18 +163,23 @@ export default function CharacterSheetPage() {
 
           {/* Equipped Items */}
           {equippedItems.length === 0 ? (
-            <p className="text-slate-400 text-sm">No equipment equipped. Visit the Store to buy gear!</p>
+            <p className="text-slate-400 text-sm">
+              No equipment equipped. Visit the Store to buy gear!
+            </p>
           ) : (
             <div className="space-y-4">
               {Object.entries(equippedBySlot).map(([slot, items]) => (
                 <div key={slot}>
                   <h4 className="text-sm text-slate-400 mb-2 capitalize">{slot}</h4>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {items.map(item => (
+                    {(items ?? []).map((item) => (
                       <div
                         key={item.id}
                         className="p-3 rounded-lg border relative group"
-                        style={{ borderColor: RARITY_COLORS[item.rarity], backgroundColor: `${RARITY_COLORS[item.rarity]}15` }}
+                        style={{
+                          borderColor: RARITY_COLORS[item.rarity],
+                          backgroundColor: `${RARITY_COLORS[item.rarity]}15`,
+                        }}
                       >
                         <button
                           onClick={() => unequipItem(item.id)}
@@ -171,20 +192,32 @@ export default function CharacterSheetPage() {
                           <span className="text-2xl">{item.icon}</span>
                           <div>
                             <div className="text-sm font-semibold text-slate-100">{item.name}</div>
-                            <div className="text-xs capitalize" style={{ color: RARITY_COLORS[item.rarity] }}>{item.rarity}</div>
+                            <div
+                              className="text-xs capitalize"
+                              style={{ color: RARITY_COLORS[item.rarity] }}
+                            >
+                              {item.rarity}
+                            </div>
                           </div>
                         </div>
                         <p className="text-xs text-slate-400 mt-1">{item.description}</p>
                         {/* Show bonuses */}
                         <div className="mt-2 flex flex-wrap gap-1">
                           {item.bonuses.xpBonus && (
-                            <span className="text-xs px-1 py-0.5 bg-blue-900/50 text-blue-300 rounded">+{Math.round(item.bonuses.xpBonus * 100)}% XP</span>
+                            <span className="text-xs px-1 py-0.5 bg-blue-900/50 text-blue-300 rounded">
+                              +{Math.round(item.bonuses.xpBonus * 100)}% XP
+                            </span>
                           )}
                           {item.bonuses.goldBonus && (
-                            <span className="text-xs px-1 py-0.5 bg-yellow-900/50 text-yellow-300 rounded">+{Math.round(item.bonuses.goldBonus * 100)}% Gold</span>
+                            <span className="text-xs px-1 py-0.5 bg-yellow-900/50 text-yellow-300 rounded">
+                              +{Math.round(item.bonuses.goldBonus * 100)}% Gold
+                            </span>
                           )}
                           {item.techBonus && (
-                            <span className="text-xs px-1 py-0.5 bg-purple-900/50 text-purple-300 rounded">+{Math.round(item.techBonus.bonus * 100)}% {item.techBonus.technologyId.toUpperCase()}</span>
+                            <span className="text-xs px-1 py-0.5 bg-purple-900/50 text-purple-300 rounded">
+                              +{Math.round(item.techBonus.bonus * 100)}%{' '}
+                              {item.techBonus.technologyId.toUpperCase()}
+                            </span>
                           )}
                         </div>
                       </div>
@@ -201,10 +234,12 @@ export default function CharacterSheetPage() {
           <h3 className="text-xl font-bold text-slate-100 mb-4">Companions</h3>
 
           {companions.length === 0 ? (
-            <p className="text-slate-400 text-sm">No companions yet. Visit the Store to buy companions!</p>
+            <p className="text-slate-400 text-sm">
+              No companions yet. Visit the Store to buy companions!
+            </p>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {companions.map(companion => (
+              {companions.map((companion) => (
                 <div
                   key={companion.id}
                   className={`p-4 rounded-lg border ${
@@ -218,11 +253,22 @@ export default function CharacterSheetPage() {
                     <div>
                       <div className="text-sm font-bold text-slate-100">{companion.name}</div>
                       <div className="text-xs text-slate-400">
-                        {companion.xpBonus > 0 && <span className="text-green-400">+{Math.round(companion.xpBonus * 100)}% XP</span>}
-                        {companion.goldBonus > 0 && <span className="text-yellow-400"> +{Math.round(companion.goldBonus * 100)}% Gold</span>}
+                        {companion.xpBonus > 0 && (
+                          <span className="text-green-400">
+                            +{Math.round(companion.xpBonus * 100)}% XP
+                          </span>
+                        )}
+                        {companion.goldBonus > 0 && (
+                          <span className="text-yellow-400">
+                            {' '}
+                            +{Math.round(companion.goldBonus * 100)}% Gold
+                          </span>
+                        )}
                       </div>
                       {companion.specialAbility && (
-                        <div className="text-xs text-purple-400 mt-1">{companion.specialAbility}</div>
+                        <div className="text-xs text-purple-400 mt-1">
+                          {companion.specialAbility}
+                        </div>
                       )}
                     </div>
                   </div>
@@ -246,7 +292,7 @@ export default function CharacterSheetPage() {
             <div className="mb-6">
               <h4 className="text-sm text-slate-400 mb-3">Unlocked</h4>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {unlockedAchievements.map(achievement => (
+                {unlockedAchievements.map((achievement) => (
                   <div
                     key={achievement.id}
                     className="p-3 bg-gradient-to-br from-amber-900/30 to-amber-950/30 rounded-lg border border-amber-600/50"
@@ -265,7 +311,7 @@ export default function CharacterSheetPage() {
             <div>
               <h4 className="text-sm text-slate-500 mb-3">Locked</h4>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {lockedAchievements.map(achievement => (
+                {lockedAchievements.map((achievement) => (
                   <div
                     key={achievement.id}
                     className="p-3 bg-slate-700/30 rounded-lg border border-slate-600/30 opacity-60"

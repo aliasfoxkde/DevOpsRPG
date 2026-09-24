@@ -99,8 +99,8 @@ export default function StorylinesPage() {
                 {/* Arc Header */}
                 <button
                   onClick={() => {
-                  setSelectedArc(selectedArc?.id === arc.id ? null : arc)
-                }}
+                    setSelectedArc(selectedArc?.id === arc.id ? null : arc)
+                  }}
                   className="w-full p-6 text-left"
                 >
                   <div className="flex items-start justify-between">

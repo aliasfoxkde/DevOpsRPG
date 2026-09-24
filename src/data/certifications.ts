@@ -2,7 +2,8 @@
 // "Certification Collection: AWS Practitioner, AWS Associate, Terraform Associate, CKA, Security+"
 // "These become endgame milestones."
 
-export type CertificationProvider = 'aws' | 'terraform' | 'kubernetes' | 'security' | 'docker' | 'google' | 'microsoft' | 'linux'
+type CertificationProvider =
+  'aws' | 'terraform' | 'kubernetes' | 'security' | 'docker' | 'google' | 'microsoft' | 'linux'
 
 export interface Certification {
   id: string
@@ -40,7 +41,7 @@ export const CERTIFICATIONS: Certification[] = [
     goldReward: 250,
     badgeId: 'aws_practitioner',
     difficulty: 'foundation',
-    flavorText: '"Your first step into the AWS cloud."'
+    flavorText: '"Your first step into the AWS cloud."',
   },
   {
     id: 'aws_solutions_architect',
@@ -56,7 +57,7 @@ export const CERTIFICATIONS: Certification[] = [
     goldReward: 500,
     badgeId: 'aws_solutions_architect',
     difficulty: 'associate',
-    flavorText: '"Architecting resilient solutions on AWS."'
+    flavorText: '"Architecting resilient solutions on AWS."',
   },
   {
     id: 'aws_developer',
@@ -72,7 +73,7 @@ export const CERTIFICATIONS: Certification[] = [
     goldReward: 500,
     badgeId: 'aws_developer',
     difficulty: 'associate',
-    flavorText: '"Code, build, and deploy on AWS."'
+    flavorText: '"Code, build, and deploy on AWS."',
   },
   {
     id: 'aws_sysops',
@@ -88,7 +89,7 @@ export const CERTIFICATIONS: Certification[] = [
     goldReward: 500,
     badgeId: 'aws_sysops',
     difficulty: 'associate',
-    flavorText: '"Keep the cloud running smoothly."'
+    flavorText: '"Keep the cloud running smoothly."',
   },
 
   // Terraform Certifications
@@ -106,7 +107,7 @@ export const CERTIFICATIONS: Certification[] = [
     goldReward: 400,
     badgeId: 'terraform_associate',
     difficulty: 'associate',
-    flavorText: '"IaC is the future of infrastructure."'
+    flavorText: '"IaC is the future of infrastructure."',
   },
 
   // Kubernetes Certifications
@@ -124,7 +125,7 @@ export const CERTIFICATIONS: Certification[] = [
     goldReward: 750,
     badgeId: 'cka_certified',
     difficulty: 'professional',
-    flavorText: '"Master of Kubernetes clusters."'
+    flavorText: '"Master of Kubernetes clusters."',
   },
   {
     id: 'cks',
@@ -140,7 +141,7 @@ export const CERTIFICATIONS: Certification[] = [
     goldReward: 1000,
     badgeId: 'cks_certified',
     difficulty: 'expert',
-    flavorText: '"Security in the container world."'
+    flavorText: '"Security in the container world."',
   },
 
   // Docker Certifications
@@ -158,7 +159,7 @@ export const CERTIFICATIONS: Certification[] = [
     goldReward: 400,
     badgeId: 'docker_certified',
     difficulty: 'associate',
-    flavorText: '"Container expertise certified."'
+    flavorText: '"Container expertise certified."',
   },
 
   // Security Certifications
@@ -176,7 +177,7 @@ export const CERTIFICATIONS: Certification[] = [
     goldReward: 400,
     badgeId: 'security_plus',
     difficulty: 'associate',
-    flavorText: '"Security fundamentals certified."'
+    flavorText: '"Security fundamentals certified."',
   },
 
   // Linux Certification
@@ -194,7 +195,7 @@ export const CERTIFICATIONS: Certification[] = [
     goldReward: 400,
     badgeId: 'linux_foundation',
     difficulty: 'associate',
-    flavorText: '"Master the command line."'
+    flavorText: '"Master the command line."',
   },
 
   // Google Cloud
@@ -212,7 +213,7 @@ export const CERTIFICATIONS: Certification[] = [
     goldReward: 750,
     badgeId: 'gcp_architect',
     difficulty: 'professional',
-    flavorText: '"Google Cloud architecture expertise."'
+    flavorText: '"Google Cloud architecture expertise."',
   },
 
   // DevOps
@@ -230,26 +231,16 @@ export const CERTIFICATIONS: Certification[] = [
     goldReward: 750,
     badgeId: 'devops_master',
     difficulty: 'professional',
-    flavorText: '"Bridging development and operations."'
+    flavorText: '"Bridging development and operations."',
   },
 ]
 
-// Get certification by ID
-export function getCertificationById(id: string): Certification | undefined {
-  return CERTIFICATIONS.find(cert => cert.id === id)
-}
-
-// Get certifications by provider
-export function getCertificationsByProvider(provider: CertificationProvider): Certification[] {
-  return CERTIFICATIONS.filter(cert => cert.provider === provider)
-}
-
 // Difficulty colors
 export const DIFFICULTY_COLORS: Record<Certification['difficulty'], string> = {
-  foundation: '#22c55e',  // Green
-  associate: '#3b82f6',   // Blue
+  foundation: '#22c55e', // Green
+  associate: '#3b82f6', // Blue
   professional: '#a855f7', // Purple
-  expert: '#f59e0b',     // Gold
+  expert: '#f59e0b', // Gold
 }
 
 // Difficulty labels
@@ -258,16 +249,4 @@ export const DIFFICULTY_LABELS: Record<Certification['difficulty'], string> = {
   associate: 'Associate',
   professional: 'Professional',
   expert: 'Expert',
-}
-
-// Provider icons
-export const PROVIDER_ICONS: Record<CertificationProvider, string> = {
-  aws: '☁️',
-  terraform: '🏗️',
-  kubernetes: '☸️',
-  security: '🔒',
-  docker: '🐳',
-  google: '🌐',
-  microsoft: '🪟',
-  linux: '🐧',
 }

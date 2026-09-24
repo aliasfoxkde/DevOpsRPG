@@ -65,27 +65,45 @@ export interface GuildRank {
 }
 
 // Available guild ranks
-export const GUILD_RANKS: GuildRank[] = [
+const GUILD_RANKS: GuildRank[] = [
   {
     id: 'leader',
     name: 'Guild Master',
     icon: '👑',
     color: '#ffd700',
-    permissions: { canInvite: true, canKick: true, canManageChallenges: true, canEditGuild: true, canPromote: true },
+    permissions: {
+      canInvite: true,
+      canKick: true,
+      canManageChallenges: true,
+      canEditGuild: true,
+      canPromote: true,
+    },
   },
   {
     id: 'officer',
     name: 'Officer',
     icon: '⚔️',
     color: '#ff6b6b',
-    permissions: { canInvite: true, canKick: false, canManageChallenges: true, canEditGuild: false, canPromote: true },
+    permissions: {
+      canInvite: true,
+      canKick: false,
+      canManageChallenges: true,
+      canEditGuild: false,
+      canPromote: true,
+    },
   },
   {
     id: 'member',
     name: 'Member',
     icon: '🛡️',
     color: '#60a5fa',
-    permissions: { canInvite: false, canKick: false, canManageChallenges: false, canEditGuild: false, canPromote: false },
+    permissions: {
+      canInvite: false,
+      canKick: false,
+      canManageChallenges: false,
+      canEditGuild: false,
+      canPromote: false,
+    },
   },
 ]
 
@@ -94,7 +112,8 @@ export const MOCK_GUILD: Guild = {
   id: 'guild_1',
   name: 'DevOps Masters',
   icon: '🐉',
-  description: 'A elite guild for DevOps enthusiasts! We master CI/CD, Cloud, and Container technologies together.',
+  description:
+    'A elite guild for DevOps enthusiasts! We master CI/CD, Cloud, and Container technologies together.',
   level: 15,
   xp: 8500,
   xpToNextLevel: 10000,
@@ -314,7 +333,7 @@ export const FEATURED_GUILDS: Guild[] = [
 ]
 
 export function getGuildRankInfo(role: GuildMember['role']): GuildRank {
-  return GUILD_RANKS.find(r => r.id === role) || GUILD_RANKS[2]
+  return GUILD_RANKS.find((r) => r.id === role) || GUILD_RANKS[2]
 }
 
 export function formatDaysRemaining(expiresAt: string): string {

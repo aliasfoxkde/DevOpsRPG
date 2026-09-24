@@ -31,7 +31,11 @@ export default function LearnPage() {
             <h2 id={`phase-${phase}-heading`} className="text-2xl font-semibold mb-4">
               <span /* istanbul ignore next */ aria-hidden="true">{icon}</span> {name}
             </h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" role="list" aria-label={`${name} technologies`}>
+            <div
+              className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+              role="list"
+              aria-label={`${name} technologies`}
+            >
               {phaseTechs.map((tech) => (
                 <Link
                   key={tech.key}
@@ -42,13 +46,13 @@ export default function LearnPage() {
                   aria-label={`Learn ${tech.name}: ${tech.description}. ${tech.topics.length} topics`}
                 >
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-2xl" aria-hidden="true">{tech.icon}</span>
+                    <span className="text-2xl" aria-hidden="true">
+                      {tech.icon}
+                    </span>
                     <h3 className="font-semibold">{tech.name}</h3>
                   </div>
                   <p className="text-sm text-muted-foreground">{tech.description}</p>
-                  <p className="mt-3 text-xs text-muted-foreground">
-                    {tech.topics.length} topics
-                  </p>
+                  <p className="mt-3 text-xs text-muted-foreground">{tech.topics.length} topics</p>
                 </Link>
               ))}
             </div>

@@ -87,12 +87,14 @@ export default function MarketplacePage() {
   const [category, setCategory] = useState('all')
   const [selectedListing, setSelectedListing] = useState<MarketplaceListing | null>(null)
   const [showCreateListing, setShowCreateListing] = useState(false)
-  const [notification, setNotification] = useState<{ type: 'error' | 'info'; message: string } | null>(null)
+  const [notification, setNotification] = useState<{
+    type: 'error' | 'info'
+    message: string
+  } | null>(null)
 
   // Filter listings by category
-  const filteredListings = category === 'all'
-    ? MOCK_LISTINGS
-    : MOCK_LISTINGS.filter(l => l.itemType === category)
+  const filteredListings =
+    category === 'all' ? MOCK_LISTINGS : MOCK_LISTINGS.filter((l) => l.itemType === category)
 
   const formatTimeAgo = (dateStr: string): string => {
     const date = new Date(dateStr)
@@ -108,12 +110,19 @@ export default function MarketplacePage() {
   const handlePurchase = (listing: MarketplaceListing) => {
     if (character.gold < listing.price) {
       setNotification({ type: 'error', message: `Not enough gold! Need ${listing.price} gold.` })
-      setTimeout(() => setNotification(null), 3000)
+      setTimeout(() => {
+        setNotification(null)
+      }, 3000)
       return
     }
     // In a real implementation, this would call backend API
-    setNotification({ type: 'info', message: `Would purchase "${listing.itemName}" from ${listing.sellerName} for ${listing.price} gold. (Requires backend)` })
-    setTimeout(() => setNotification(null), 4000)
+    setNotification({
+      type: 'info',
+      message: `Would purchase "${listing.itemName}" from ${listing.sellerName} for ${listing.price} gold. (Requires backend)`,
+    })
+    setTimeout(() => {
+      setNotification(null)
+    }, 4000)
     setSelectedListing(null)
   }
 
@@ -134,11 +143,13 @@ export default function MarketplacePage() {
 
         {/* Notification Banner */}
         {notification && (
-          <div className={`mb-6 p-4 rounded-lg border ${
-            notification.type === 'error'
-              ? 'bg-red-900/30 border-red-600 text-red-300'
-              : 'bg-blue-900/30 border-blue-600 text-blue-300'
-          }`}>
+          <div
+            className={`mb-6 p-4 rounded-lg border ${
+              notification.type === 'error'
+                ? 'bg-red-900/30 border-red-600 text-red-300'
+                : 'bg-blue-900/30 border-blue-600 text-blue-300'
+            }`}
+          >
             {notification.message}
           </div>
         )}
@@ -159,16 +170,20 @@ export default function MarketplacePage() {
 
         {/* Your Gold */}
         <div className="bg-slate-800/80 rounded-xl border border-amber-600/30 p-4 mb-8 text-center">
-          <span className="text-yellow-400 text-2xl font-bold">💰 {character.gold.toLocaleString()}</span>
+          <span className="text-yellow-400 text-2xl font-bold">
+            💰 {character.gold.toLocaleString()}
+          </span>
           <span className="text-slate-400 ml-2">Your Gold</span>
         </div>
 
         {/* Category Filter */}
         <div className="flex flex-wrap justify-center gap-2 mb-8">
-          {CATEGORIES.map(cat => (
+          {CATEGORIES.map((cat) => (
             <button
               key={cat.id}
-              onClick={() => setCategory(cat.id)}
+              onClick={() => {
+                setCategory(cat.id)
+              }}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                 category === cat.id
                   ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/30'
@@ -188,7 +203,9 @@ export default function MarketplacePage() {
             return (
               <div
                 key={listing.id}
-                onClick={() => setSelectedListing(listing)}
+                onClick={() => {
+                  setSelectedListing(listing)
+                }}
                 className={`${rarityStyle.bg} rounded-xl border ${rarityStyle.border} overflow-hidden cursor-pointer transition-all hover:scale-102 hover:shadow-lg`}
               >
                 <div className="p-4">
@@ -200,7 +217,9 @@ export default function MarketplacePage() {
                       <div className="text-slate-400 text-xs">{listing.itemType}</div>
                     </div>
                     {listing.rarity && (
-                      <span className={`text-xs px-2 py-0.5 rounded ${rarityStyle.bg} ${rarityStyle.border} ${rarityStyle.text}`}>
+                      <span
+                        className={`text-xs px-2 py-0.5 rounded ${rarityStyle.bg} ${rarityStyle.border} ${rarityStyle.text}`}
+                      >
                         {listing.rarity.toUpperCase()}
                       </span>
                     )}
@@ -212,7 +231,9 @@ export default function MarketplacePage() {
                   {/* Price */}
                   <div className="flex items-center justify-between">
                     <span className="text-yellow-400 font-bold text-lg">💰 {listing.price}</span>
-                    <span className="text-slate-500 text-xs">{formatTimeAgo(listing.listedAt)}</span>
+                    <span className="text-slate-500 text-xs">
+                      {formatTimeAgo(listing.listedAt)}
+                    </span>
                   </div>
 
                   {/* Seller Info */}
@@ -230,7 +251,9 @@ export default function MarketplacePage() {
         {/* Create Listing Button */}
         <div className="text-center mb-8">
           <button
-            onClick={() => setShowCreateListing(true)}
+            onClick={() => {
+              setShowCreateListing(true)
+            }}
             className="px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-medium transition-colors shadow-lg shadow-amber-600/30"
           >
             📝 Create New Listing
@@ -248,10 +271,7 @@ export default function MarketplacePage() {
 
         {/* Back Link */}
         <div className="text-center mt-8">
-          <Link
-            to="/"
-            className="text-amber-400 hover:text-amber-300 transition-colors"
-          >
+          <Link to="/" className="text-amber-400 hover:text-amber-300 transition-colors">
             ← Back to Home
           </Link>
         </div>
@@ -264,7 +284,9 @@ export default function MarketplacePage() {
             <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-6 py-4 border-b border-slate-700 flex items-center justify-between">
               <h2 className="text-lg font-bold text-white">Confirm Purchase</h2>
               <button
-                onClick={() => setSelectedListing(null)}
+                onClick={() => {
+                  setSelectedListing(null)
+                }}
                 className="text-slate-400 hover:text-white text-2xl leading-none"
               >
                 ×
@@ -285,7 +307,9 @@ export default function MarketplacePage() {
               <div className="bg-slate-900/50 rounded-lg p-3 mb-4">
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-500">Seller:</span>
-                  <span className="text-slate-300">{selectedListing.sellerName} (Lv.{selectedListing.sellerLevel})</span>
+                  <span className="text-slate-300">
+                    {selectedListing.sellerName} (Lv.{selectedListing.sellerLevel})
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm mt-2">
                   <span className="text-slate-500">Listed:</span>
@@ -296,25 +320,33 @@ export default function MarketplacePage() {
               {/* Price */}
               <div className="flex items-center justify-between p-4 bg-yellow-900/20 rounded-lg border border-yellow-600/30 mb-6">
                 <span className="text-slate-300">Price:</span>
-                <span className="text-yellow-400 font-bold text-xl">💰 {selectedListing.price}</span>
+                <span className="text-yellow-400 font-bold text-xl">
+                  💰 {selectedListing.price}
+                </span>
               </div>
 
               {/* Your Balance */}
               <div className="flex items-center justify-between p-3 bg-slate-900/50 rounded-lg mb-6">
                 <span className="text-slate-500">Your Balance:</span>
-                <span className="text-slate-300 font-medium">💰 {character.gold.toLocaleString()}</span>
+                <span className="text-slate-300 font-medium">
+                  💰 {character.gold.toLocaleString()}
+                </span>
               </div>
 
               {/* Buttons */}
               <div className="flex gap-3">
                 <button
-                  onClick={() => setSelectedListing(null)}
+                  onClick={() => {
+                    setSelectedListing(null)
+                  }}
                   className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors"
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={() => handlePurchase(selectedListing)}
+                  onClick={() => {
+                    handlePurchase(selectedListing)
+                  }}
                   disabled={character.gold < selectedListing.price}
                   className={`flex-1 py-3 font-medium rounded-lg transition-colors ${
                     character.gold >= selectedListing.price
@@ -337,7 +369,9 @@ export default function MarketplacePage() {
             <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-6 py-4 border-b border-slate-700 flex items-center justify-between">
               <h2 className="text-lg font-bold text-white">Create New Listing</h2>
               <button
-                onClick={() => setShowCreateListing(false)}
+                onClick={() => {
+                  setShowCreateListing(false)
+                }}
                 className="text-slate-400 hover:text-white text-2xl leading-none"
               >
                 ×
@@ -352,7 +386,8 @@ export default function MarketplacePage() {
                   Listing creation will be available once the backend server is implemented.
                 </p>
                 <p className="text-slate-600 text-sm">
-                  You'll be able to list your badges, titles, equipment, and collectibles for other players to purchase.
+                  You&apos;ll be able to list your badges, titles, equipment, and collectibles for
+                  other players to purchase.
                 </p>
               </div>
 
@@ -379,7 +414,9 @@ export default function MarketplacePage() {
               </div>
 
               <button
-                onClick={() => setShowCreateListing(false)}
+                onClick={() => {
+                  setShowCreateListing(false)
+                }}
                 className="w-full py-3 bg-amber-600 hover:bg-amber-500 text-white font-medium rounded-lg transition-colors"
               >
                 Close

@@ -13,9 +13,7 @@ describe('BadgesPage', () => {
   it('renders the badge collection header', () => {
     renderSeededPage(<BadgesPage />, { route: '/badges', url: '/badges' })
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Badge Collection/ }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /Badge Collection/ })).toBeInTheDocument()
     expect(screen.getByText('Collection Progress')).toBeInTheDocument()
     // The count reflects actual unlocks (zero for a fresh account), not the
     // length of the stored badges array, which pre-seeds the whole catalog.

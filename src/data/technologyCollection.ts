@@ -18,7 +18,15 @@ export interface TechnologyCard {
   // Card flavor text
   flavorText: string
   // Category
-  category: 'fundamentals' | 'containers' | 'cloud' | 'orchestration' | 'infrastructure' | 'security' | 'programming' | 'databases'
+  category:
+    | 'fundamentals'
+    | 'containers'
+    | 'cloud'
+    | 'orchestration'
+    | 'infrastructure'
+    | 'security'
+    | 'programming'
+    | 'databases'
 }
 
 export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
@@ -33,7 +41,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 8,
     completedQuests: 0,
     flavorText: '"Linux is everywhere. From Android phones to servers, Linux runs the world."',
-    category: 'fundamentals'
+    category: 'fundamentals',
   },
   {
     id: 'git',
@@ -45,7 +53,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 6,
     completedQuests: 0,
     flavorText: '"Git is the backbone of modern software development."',
-    category: 'fundamentals'
+    category: 'fundamentals',
   },
   {
     id: 'networking',
@@ -57,7 +65,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 8,
     completedQuests: 0,
     flavorText: '"In the world of DevOps, networking is the circulatory system."',
-    category: 'fundamentals'
+    category: 'fundamentals',
   },
   {
     id: 'security',
@@ -69,7 +77,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 8,
     completedQuests: 0,
     flavorText: '"Security is not a product, but a process."',
-    category: 'security'
+    category: 'security',
   },
 
   // Containers
@@ -83,7 +91,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 8,
     completedQuests: 0,
     flavorText: '"Build once, run anywhere - the container revolution."',
-    category: 'containers'
+    category: 'containers',
   },
   {
     id: 'kubernetes',
@@ -95,7 +103,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 10,
     completedQuests: 0,
     flavorText: '"The operating system of the cloud."',
-    category: 'orchestration'
+    category: 'orchestration',
   },
 
   // Cloud
@@ -109,19 +117,19 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 10,
     completedQuests: 0,
     flavorText: '"The cloud that started it all."',
-    category: 'cloud'
+    category: 'cloud',
   },
   {
     id: 'azure',
     name: 'Azure',
     icon: '🔷',
-    description: 'Microsoft\'s cloud platform for building, deploying, and managing applications.',
+    description: "Microsoft's cloud platform for building, deploying, and managing applications.",
     rarity: 'rare',
     requiredQuests: 6,
     totalQuests: 8,
     completedQuests: 0,
     flavorText: '"Microsoft\'s enterprise cloud solution."',
-    category: 'cloud'
+    category: 'cloud',
   },
 
   // Infrastructure as Code
@@ -135,7 +143,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 8,
     completedQuests: 0,
     flavorText: '"Infrastructure as code, version controlled and repeatable."',
-    category: 'infrastructure'
+    category: 'infrastructure',
   },
   {
     id: 'ansible',
@@ -147,7 +155,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 6,
     completedQuests: 0,
     flavorText: '"Agentless automation for the masses."',
-    category: 'infrastructure'
+    category: 'infrastructure',
   },
 
   // CI/CD
@@ -161,7 +169,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 8,
     completedQuests: 0,
     flavorText: '"Automate everything. Ship with confidence."',
-    category: 'infrastructure'
+    category: 'infrastructure',
   },
   {
     id: 'github_actions',
@@ -173,7 +181,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 6,
     completedQuests: 0,
     flavorText: '"GitHub\'s powerful automation engine."',
-    category: 'infrastructure'
+    category: 'infrastructure',
   },
   {
     id: 'jenkins',
@@ -185,7 +193,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 5,
     completedQuests: 0,
     flavorText: '"The old faithful of CI/CD servers."',
-    category: 'infrastructure'
+    category: 'infrastructure',
   },
 
   // Programming
@@ -199,7 +207,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 6,
     completedQuests: 0,
     flavorText: '"The Swiss Army knife of programming languages."',
-    category: 'programming'
+    category: 'programming',
   },
   {
     id: 'javascript',
@@ -211,7 +219,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 6,
     completedQuests: 0,
     flavorText: '"JavaScript: The only language that runs everywhere."',
-    category: 'programming'
+    category: 'programming',
   },
   {
     id: 'bash',
@@ -223,7 +231,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 5,
     completedQuests: 0,
     flavorText: '"The command line is your best friend."',
-    category: 'programming'
+    category: 'programming',
   },
   {
     id: 'sql',
@@ -235,7 +243,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 6,
     completedQuests: 0,
     flavorText: '"Data is the new oil, SQL is the pipeline."',
-    category: 'databases'
+    category: 'databases',
   },
 
   // Monitoring
@@ -249,7 +257,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 6,
     completedQuests: 0,
     flavorText: '"You can\'t fix what you can\'t see."',
-    category: 'infrastructure'
+    category: 'infrastructure',
   },
   {
     id: 'prometheus',
@@ -261,7 +269,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 6,
     completedQuests: 0,
     flavorText: '"The metrics-based monitoring solution."',
-    category: 'infrastructure'
+    category: 'infrastructure',
   },
   {
     id: 'grafana',
@@ -273,7 +281,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 5,
     completedQuests: 0,
     flavorText: '"Beautiful dashboards for your metrics."',
-    category: 'infrastructure'
+    category: 'infrastructure',
   },
 
   // Advanced
@@ -287,7 +295,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 6,
     completedQuests: 0,
     flavorText: '"Kubernetes packaging made easy."',
-    category: 'orchestration'
+    category: 'orchestration',
   },
   {
     id: 'gitops',
@@ -299,7 +307,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 7,
     completedQuests: 0,
     flavorText: '"GitOps: Infrastructure as Code meets Version Control."',
-    category: 'infrastructure'
+    category: 'infrastructure',
   },
   {
     id: 'argocd',
@@ -311,7 +319,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 6,
     completedQuests: 0,
     flavorText: '"GitOps at its finest on Kubernetes."',
-    category: 'orchestration'
+    category: 'orchestration',
   },
   {
     id: 'vault',
@@ -323,7 +331,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 6,
     completedQuests: 0,
     flavorText: '"Security starts with proper secrets management."',
-    category: 'security'
+    category: 'security',
   },
   {
     id: 'docker_swarm',
@@ -335,7 +343,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 5,
     completedQuests: 0,
     flavorText: '"Simpler container orchestration."',
-    category: 'containers'
+    category: 'containers',
   },
   {
     id: 'vagrant',
@@ -347,7 +355,7 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 4,
     completedQuests: 0,
     flavorText: '"Create consistent development environments."',
-    category: 'infrastructure'
+    category: 'infrastructure',
   },
   {
     id: 'packer',
@@ -359,32 +367,17 @@ export const TECHNOLOGY_COLLECTION: TechnologyCard[] = [
     totalQuests: 5,
     completedQuests: 0,
     flavorText: '"One config, multiple platforms."',
-    category: 'infrastructure'
+    category: 'infrastructure',
   },
 ]
 
 // Rarity colors for display
 export const RARITY_COLORS: Record<TechRarity, string> = {
-  common: '#9ca3af',      // Gray
-  uncommon: '#22c55e',     // Green
-  rare: '#3b82f6',         // Blue
-  epic: '#a855f7',         // Purple
-  legendary: '#f59e0b',    // Gold
-}
-
-// Get all cards by category
-export function getCardsByCategory(category: TechnologyCard['category']): TechnologyCard[] {
-  return TECHNOLOGY_COLLECTION.filter(card => card.category === category)
-}
-
-// Get card by ID
-export function getCardById(id: string): TechnologyCard | undefined {
-  return TECHNOLOGY_COLLECTION.find(card => card.id === id)
-}
-
-// Get total collection count
-export function getTotalCards(): number {
-  return TECHNOLOGY_COLLECTION.length
+  common: '#9ca3af', // Gray
+  uncommon: '#22c55e', // Green
+  rare: '#3b82f6', // Blue
+  epic: '#a855f7', // Purple
+  legendary: '#f59e0b', // Gold
 }
 
 // Category display names

@@ -11,9 +11,7 @@ describe('CertificationsPage', () => {
 
   it('renders the page heading and tagline', () => {
     renderSeededPage(<CertificationsPage />)
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Certifications/ }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /Certifications/ })).toBeInTheDocument()
     expect(
       screen.getByText('Earn certifications as proof of your DevOps expertise!'),
     ).toBeInTheDocument()
@@ -31,10 +29,10 @@ describe('CertificationsPage', () => {
     const labels = Object.values(DIFFICULTY_LABELS)
     const renderedHeadings = screen
       .getAllByRole('heading', { level: 2 })
-      .map(heading => heading.textContent)
+      .map((heading) => heading.textContent)
 
     for (const label of labels) {
-      expect(renderedHeadings.some(text => text?.includes(label))).toBe(true)
+      expect(renderedHeadings.some((text) => text.includes(label))).toBe(true)
     }
   })
 

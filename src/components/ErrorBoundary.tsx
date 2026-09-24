@@ -43,10 +43,13 @@ export class ErrorBoundary extends Component<Props, State> {
             role="alert"
             aria-live="assertive"
           >
-            <div className="text-6xl mb-4" aria-hidden="true">⚠️</div>
+            <div className="text-6xl mb-4" aria-hidden="true">
+              ⚠️
+            </div>
             <h1 className="text-2xl font-bold mb-2">Something went wrong</h1>
             <p className="text-muted-foreground mb-6 max-w-md">
-              We encountered an unexpected error. This has been logged and we'll work to fix it.
+              We encountered an unexpected error. This has been logged and we&apos;ll work to fix
+              it.
             </p>
             <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-6 max-w-lg w-full">
               <p className="text-sm font-mono text-destructive text-left break-all">
@@ -54,10 +57,11 @@ export class ErrorBoundary extends Component<Props, State> {
               </p>
             </div>
             <div className="flex gap-4">
-              <Button onClick={this.handleRetry}>
-                Try Again
-              </Button>
-              <Button variant="outline" onClick={/* istanbul ignore next */ () => window.location.href = '/'}>
+              <Button onClick={this.handleRetry}>Try Again</Button>
+              <Button
+                variant="outline"
+                onClick={/* istanbul ignore next */ () => (window.location.href = '/')}
+              >
                 Go Home
               </Button>
             </div>

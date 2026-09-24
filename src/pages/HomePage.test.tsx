@@ -5,11 +5,13 @@ import { GameProvider } from '../contexts/GameContext'
 import HomePage from './HomePage'
 
 function renderWithRouter(ui: React.ReactElement) {
-  return render(ui, { wrapper: ({ children }) => (
-    <MemoryRouter>
-      <GameProvider>{children}</GameProvider>
-    </MemoryRouter>
-  )})
+  return render(ui, {
+    wrapper: ({ children }) => (
+      <MemoryRouter>
+        <GameProvider>{children}</GameProvider>
+      </MemoryRouter>
+    ),
+  })
 }
 
 describe('HomePage', () => {

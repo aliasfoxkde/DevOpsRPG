@@ -26,7 +26,8 @@ export const SEASONAL_EVENTS: SeasonalEvent[] = [
   {
     id: 'summer-quest-2026',
     name: 'Summer Quest Challenge',
-    description: 'The sun shines bright on DevOps heroes! Complete summer-themed quests for bonus XP.',
+    description:
+      'The sun shines bright on DevOps heroes! Complete summer-themed quests for bonus XP.',
     icon: '☀️',
     startDate: '2026-06-01',
     endDate: '2026-08-31',
@@ -40,7 +41,8 @@ export const SEASONAL_EVENTS: SeasonalEvent[] = [
   {
     id: 'autumn-harvest-2026',
     name: 'Autumn Harvest Festival',
-    description: 'Reap the rewards of your DevOps journey! Special autumn quests with golden rewards.',
+    description:
+      'Reap the rewards of your DevOps journey! Special autumn quests with golden rewards.',
     icon: '🍂',
     startDate: '2026-09-01',
     endDate: '2026-11-30',
@@ -160,7 +162,7 @@ export const SEASONAL_EVENTS: SeasonalEvent[] = [
 // Get currently active events
 export function getActiveEvents(): SeasonalEvent[] {
   const now = new Date()
-  return SEASONAL_EVENTS.filter(event => {
+  return SEASONAL_EVENTS.filter((event) => {
     const start = new Date(event.startDate)
     const end = new Date(event.endDate)
     return now >= start && now <= end
@@ -169,7 +171,7 @@ export function getActiveEvents(): SeasonalEvent[] {
 
 // Check if a specific event is active
 export function isEventActive(eventId: string): boolean {
-  const event = SEASONAL_EVENTS.find(e => e.id === eventId)
+  const event = SEASONAL_EVENTS.find((e) => e.id === eventId)
   if (!event) return false
   const now = new Date()
   const start = new Date(event.startDate)
@@ -180,9 +182,9 @@ export function isEventActive(eventId: string): boolean {
 // Get the next upcoming event
 export function getNextEvent(): SeasonalEvent | null {
   const now = new Date()
-  const upcoming = SEASONAL_EVENTS
-    .filter(event => new Date(event.startDate) > now)
-    .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+  const upcoming = SEASONAL_EVENTS.filter((event) => new Date(event.startDate) > now).sort(
+    (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
+  )
   return upcoming[0] || null
 }
 

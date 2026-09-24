@@ -85,11 +85,11 @@ function AppContent() {
   useKeyboardShortcuts()
 
   const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(t => t.id !== id))
+    setToasts((prev) => prev.filter((t) => t.id !== id))
   }
 
   const addToast = (toast: Toast) => {
-    setToasts(prev => [...prev, toast])
+    setToasts((prev) => [...prev, toast])
   }
 
   // Show toasts for recent badge unlocks
@@ -105,7 +105,9 @@ function AppContent() {
       // Trigger confetti for legendary/epic badges
       if (badge.rarity === 'legendary' || badge.rarity === 'epic') {
         setShowConfetti(true)
-        setTimeout(() => setShowConfetti(false), 3000)
+        setTimeout(() => {
+          setShowConfetti(false)
+        }, 3000)
       }
     })
     if (game.recentBadgeUnlocks.length > 0) {
@@ -141,13 +143,17 @@ function AppContent() {
 
   // Expose toast function globally for other components
   useEffect(() => {
-    (window as unknown as { addToast?: (t: Toast) => void }).addToast = addToast
+    ;(window as unknown as { addToast?: (t: Toast) => void }).addToast = addToast
   }, [])
 
   return (
     <div className="min-h-screen bg-slate-900 text-white">
       {showOnboarding && (
-        <OnboardingWizard onComplete={() => setShowOnboarding(false)} />
+        <OnboardingWizard
+          onComplete={() => {
+            setShowOnboarding(false)
+          }}
+        />
       )}
       <HUD />
       <Suspense fallback={<PageLoader />}>
@@ -189,15 +195,17 @@ function AppContent() {
       </Suspense>
       <VictoryModal />
       {game.showRealmCompletion && (
-        <RealmCompletionModal
-          realmId={game.showRealmCompletion}
-          onClose={dismissRealmCompletion}
-        />
+        <RealmCompletionModal realmId={game.showRealmCompletion} onClose={dismissRealmCompletion} />
       )}
       <ToastManager toasts={toasts} onRemove={removeToast} />
       <Confetti active={showConfetti} />
       {showLevelUp && (
-        <LevelUpEffect level={levelUpNumber} onComplete={() => setShowLevelUp(false)} />
+        <LevelUpEffect
+          level={levelUpNumber}
+          onComplete={() => {
+            setShowLevelUp(false)
+          }}
+        />
       )}
       <MentorChat />
       <KeyboardShortcutsHelp />

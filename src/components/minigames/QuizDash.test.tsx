@@ -20,7 +20,7 @@ function setup() {
 
 function optionButtons() {
   // Every answer option is a full-width button labelled A-D.
-  return screen.getAllByRole('button').filter((el) => /^[ABCD]/.test(el.textContent ?? ''))
+  return screen.getAllByRole('button').filter((el) => /^[ABCD]/.test(el.textContent))
 }
 
 function answer(index: number) {
@@ -78,7 +78,9 @@ describe('QuizDashGame', () => {
 
     const options = optionButtons()
     expect(options[question.correctAnswer]).toHaveTextContent('✓')
-    options.forEach((option) => expect(option).toBeDisabled())
+    options.forEach((option) => {
+      expect(option).toBeDisabled()
+    })
 
     // Nothing has advanced yet - the reveal delay is still running.
     expect(screen.getByText(`Question 1/${questions.length}`)).toBeInTheDocument()

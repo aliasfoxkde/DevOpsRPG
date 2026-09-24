@@ -1,19 +1,37 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, act, fireEvent } from '@testing-library/react'
-import { GameProvider } from '../../contexts/GameContext'
+import { GameProvider, type GameState } from '../../contexts/GameContext'
 import { IncidentSimulator } from './IncidentSimulator'
-import { INCIDENT_SCENARIOS } from '../../data/incidentScenarios'
+import {
+  INCIDENT_SCENARIOS,
+  type DiagnosticStep,
+  type ResolutionStep,
+} from '../../data/incidentScenarios'
 import { STORAGE_KEYS } from '../../utils/gameUtils'
 
+/** Look up an authored scenario by id, failing loudly if the data ever changes. */
+function scenarioById(id: string) {
+  const scenario = INCIDENT_SCENARIOS.find((s) => s.id === id)
+  if (!scenario) throw new Error(`Missing incident scenario: ${id}`)
+  return scenario
+}
+
 /** A short, fully command-driven scenario: 3 diagnostics + 3 resolutions. */
-const SCENARIO = INCIDENT_SCENARIOS.find((s) => s.id === 'ssl-certificate-expiry')!
+const SCENARIO = scenarioById('ssl-certificate-expiry')
 /** The critical scenario whose final step originally shipped with no command. */
-const HIGH_CPU = INCIDENT_SCENARIOS.find((s) => s.id === 'high-cpu-production')!
+const HIGH_CPU = scenarioById('high-cpu-production')
 
 const ALL_STEPS = [...SCENARIO.diagnostics, ...SCENARIO.resolution]
 
+/** Every step this suite drives has to expose the command the player types. */
+function commandOf(step: DiagnosticStep | ResolutionStep): string {
+  const { command } = step
+  if (!command) throw new Error(`Step "${step.action}" has no command to type`)
+  return command
+}
+
 function renderGame() {
-  const onComplete = vi.fn()
+  const onComplete = vi.fn<(score: number, xpEarned: number) => void>()
   const view = render(
     <GameProvider>
       <IncidentSimulator onComplete={onComplete} />
@@ -22,14 +40,20 @@ function renderGame() {
   return { ...view, onComplete }
 }
 
-function storedCharacter() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEYS.GAME)!).character
+function storedCharacter(): GameState['character'] {
+  const raw = localStorage.getItem(STORAGE_KEYS.GAME)
+  if (!raw) throw new Error('No game state was persisted to localStorage')
+  const state = JSON.parse(raw) as Partial<GameState>
+  if (!state.character) throw new Error('Persisted game state has no character')
+  return state.character
 }
 
-function storedBadgeUnlock(badgeId: string) {
-  const state = JSON.parse(localStorage.getItem(STORAGE_KEYS.GAME)!)
+function storedBadgeUnlock(badgeId: string): string | undefined {
+  const raw = localStorage.getItem(STORAGE_KEYS.GAME)
+  if (!raw) throw new Error('No game state was persisted to localStorage')
+  const state = JSON.parse(raw) as Partial<GameState>
   // Every badge is pre-seeded in the save file; only `unlockedAt` marks progress.
-  return state.badges?.find((badge: { id: string }) => badge.id === badgeId)?.unlockedAt
+  return state.badges?.find((badge) => badge.id === badgeId)?.unlockedAt
 }
 
 function typeCommand(value: string) {
@@ -76,9 +100,7 @@ describe('IncidentSimulator', () => {
     expect(screen.getByText('Incident Response Training')).toBeInTheDocument()
     INCIDENT_SCENARIOS.forEach((scenario) => {
       expect(screen.getByText(scenario.title)).toBeInTheDocument()
-      expect(
-        screen.getAllByText(`+${scenario.xpReward} XP`).length,
-      ).toBeGreaterThan(0)
+      expect(screen.getAllByText(`+${scenario.xpReward} XP`).length).toBeGreaterThan(0)
       expect(
         screen.getAllByText(`Est. ${Math.floor(scenario.estimatedTime / 60)}m`).length,
       ).toBeGreaterThan(0)
@@ -107,7 +129,7 @@ describe('IncidentSimulator', () => {
     renderGame()
     startScenario(SCENARIO.title)
 
-    typeCommand(SCENARIO.diagnostics[0].command!)
+    typeCommand(commandOf(SCENARIO.diagnostics[0]))
 
     expect(screen.getByText(SCENARIO.diagnostics[0].revealsClue)).toBeInTheDocument()
     expect(screen.getByText('Completed:')).toBeInTheDocument()
@@ -123,9 +145,7 @@ describe('IncidentSimulator', () => {
 
     typeCommand('kubectl delete pod everything')
 
-    expect(
-      screen.getByText('Incorrect command. Try again or use a hint.'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('Incorrect command. Try again or use a hint.')).toBeInTheDocument()
     expect(screen.getByText('+10s penalty')).toBeInTheDocument()
     // The step did not advance; the player can retry immediately.
     expect(screen.getByText(SCENARIO.diagnostics[0].action)).toBeInTheDocument()
@@ -139,7 +159,7 @@ describe('IncidentSimulator', () => {
     fireEvent.click(screen.getByRole('button', { name: /need a hint/i }))
 
     expect(
-      screen.getByText(SCENARIO.diagnostics[0].command!, { selector: 'code' }),
+      screen.getByText(commandOf(SCENARIO.diagnostics[0]), { selector: 'code' }),
     ).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /need a hint/i })).not.toBeInTheDocument()
     // The advertised cost is actually charged to the clock.
@@ -162,7 +182,7 @@ describe('IncidentSimulator', () => {
 
     // Run all six steps: three diagnostics then three resolutions.
     ALL_STEPS.forEach((step) => {
-      typeCommand(step.command!)
+      typeCommand(commandOf(step))
       letFeedbackSettle()
     })
 
@@ -196,7 +216,7 @@ describe('IncidentSimulator', () => {
     startScenario(SCENARIO.title)
 
     SCENARIO.diagnostics.forEach((step) => {
-      typeCommand(step.command!)
+      typeCommand(commandOf(step))
       letFeedbackSettle()
     })
 
@@ -228,7 +248,7 @@ describe('IncidentSimulator', () => {
     expect(HIGH_CPU.resolution[2].command).toBe('kubectl top nodes')
     const steps = [...HIGH_CPU.diagnostics, ...HIGH_CPU.resolution]
     steps.forEach((step) => {
-      typeCommand(step.command!)
+      typeCommand(commandOf(step))
       letFeedbackSettle()
     })
 

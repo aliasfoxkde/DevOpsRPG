@@ -6,9 +6,7 @@ import { CAREER_PATHS } from '@/data/careerPaths'
 import { renderSeededPage } from './test-utils'
 
 function pathCard(name: string): HTMLElement {
-  const card = screen
-    .getAllByRole('button')
-    .find(btn => btn.textContent?.includes(name))
+  const card = screen.getAllByRole('button').find((btn) => btn.textContent.includes(name))
   if (!card) throw new Error(`No career path card found for "${name}"`)
   return card
 }
@@ -21,9 +19,7 @@ describe('CareerPathPage', () => {
   it('renders the career paths header, intro and every path card', () => {
     renderSeededPage(<CareerPathPage />, { route: '/career-path', url: '/career-path' })
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Career Paths/ }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /Career Paths/ })).toBeInTheDocument()
     expect(screen.getByText('Your DevOps Career Journey')).toBeInTheDocument()
     for (const label of ['All Paths', 'High Demand', 'Growing']) {
       expect(screen.getByRole('button', { name: label })).toBeInTheDocument()
@@ -43,8 +39,8 @@ describe('CareerPathPage', () => {
 
     await user.click(screen.getByRole('button', { name: 'High Demand' }))
 
-    const highDemand = CAREER_PATHS.filter(p => p.demandLevel === 'high')
-    const notHighDemand = CAREER_PATHS.filter(p => p.demandLevel !== 'high')
+    const highDemand = CAREER_PATHS.filter((p) => p.demandLevel === 'high')
+    const notHighDemand = CAREER_PATHS.filter((p) => p.demandLevel !== 'high')
     expect(screen.getAllByText('Salary Range')).toHaveLength(highDemand.length)
     for (const path of highDemand) {
       expect(screen.getByText(path.name)).toBeInTheDocument()
@@ -55,7 +51,7 @@ describe('CareerPathPage', () => {
 
     await user.click(screen.getByRole('button', { name: 'Growing' }))
 
-    const growing = CAREER_PATHS.filter(p => p.demandLevel === 'growing')
+    const growing = CAREER_PATHS.filter((p) => p.demandLevel === 'growing')
     expect(growing.length).toBeGreaterThan(0)
     expect(screen.getAllByText('Salary Range')).toHaveLength(growing.length)
 
@@ -79,9 +75,7 @@ describe('CareerPathPage', () => {
       expect(screen.getByText(tech.name)).toBeInTheDocument()
     }
     // A new player has made no progress on any technology yet
-    expect(screen.getAllByText('0% complete')).toHaveLength(
-      path.technologies.length,
-    )
+    expect(screen.getAllByText('0% complete')).toHaveLength(path.technologies.length)
     for (const milestone of path.milestones) {
       expect(screen.getByText(milestone.name)).toBeInTheDocument()
     }

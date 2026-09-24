@@ -17,7 +17,7 @@ function renderQuest(questId: string) {
 function quizToggle(): HTMLElement {
   const toggle = screen
     .getAllByRole('button', { name: /Quiz/ })
-    .find(button => button.textContent === '📝 Quiz')
+    .find((button) => button.textContent === '📝 Quiz')
   if (!toggle) throw new Error('Quiz mode toggle not found')
   return toggle
 }
@@ -31,9 +31,7 @@ describe('BattleArenaPage', () => {
     seedDefaultGame()
     renderQuest('quest_html_intro')
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'HTML Introduction' }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: 'HTML Introduction' })).toBeInTheDocument()
     expect(screen.getByText('📋 Intel Briefing')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'What is HTML?' })).toBeInTheDocument()
     expect(screen.getByText('Quest Details')).toBeInTheDocument()
@@ -84,12 +82,11 @@ describe('BattleArenaPage', () => {
   it('renders a not-found state for an unknown quest id', () => {
     renderQuest('quest_does_not_exist')
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Quest Not Found' }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('link', { name: /Return to Quest Journal/ }),
-    ).toHaveAttribute('href', '/quests')
+    expect(screen.getByRole('heading', { level: 1, name: 'Quest Not Found' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Return to Quest Journal/ })).toHaveAttribute(
+      'href',
+      '/quests',
+    )
   })
 
   it('marks an already completed quest as completed', () => {
@@ -113,9 +110,7 @@ describe('BattleArenaPage', () => {
 
     expect(screen.getByText('Completed')).toBeInTheDocument()
     expect(screen.queryByText('In Progress')).not.toBeInTheDocument()
-    expect(
-      screen.queryByRole('button', { name: /Take Quiz to Complete/ }),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Take Quiz to Complete/ })).not.toBeInTheDocument()
     expect(screen.getByText('Quest Completed!')).toBeInTheDocument()
   })
 })

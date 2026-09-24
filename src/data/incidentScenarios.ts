@@ -38,7 +38,8 @@ export const INCIDENT_SCENARIOS: IncidentScenario[] = [
     icon: '🔥',
     severity: 'critical',
     category: 'infrastructure',
-    description: 'Production web servers are showing 95%+ CPU utilization. Users are experiencing slow response times and timeouts.',
+    description:
+      'Production web servers are showing 95%+ CPU utilization. Users are experiencing slow response times and timeouts.',
     symptoms: [
       'Response times increased from 200ms to 5000ms+',
       'Users reporting "Gateway Timeout" errors',
@@ -103,7 +104,8 @@ export const INCIDENT_SCENARIOS: IncidentScenario[] = [
     icon: '🗄️',
     severity: 'critical',
     category: 'database',
-    description: 'Application is unable to establish new database connections. Users are seeing "Connection refused" errors.',
+    description:
+      'Application is unable to establish new database connections. Users are seeing "Connection refused" errors.',
     symptoms: [
       'Database connection pool at 100% capacity',
       'New user requests failing with connection errors',
@@ -124,7 +126,7 @@ export const INCIDENT_SCENARIOS: IncidentScenario[] = [
       {
         id: 'd2',
         action: 'Check idle connections',
-        command: 'SELECT count(*) FROM pg_stat_activity WHERE state = \'idle\';',
+        command: "SELECT count(*) FROM pg_stat_activity WHERE state = 'idle';",
         expectedResult: '120+ idle connections',
         revealsClue: 'Connections are not being properly released',
         timePenalty: 15,
@@ -154,7 +156,8 @@ export const INCIDENT_SCENARIOS: IncidentScenario[] = [
       {
         id: 'r3',
         action: 'Terminate idle connections',
-        command: 'SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE state = \'idle\' AND query_start < now() - interval \'10 minutes\';',
+        command:
+          "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE state = 'idle' AND query_start < now() - interval '10 minutes';",
         verification: 'Connection count drops to healthy level',
       },
     ],
@@ -168,7 +171,8 @@ export const INCIDENT_SCENARIOS: IncidentScenario[] = [
     icon: '🌐',
     severity: 'high',
     category: 'network',
-    description: 'Microservices cannot communicate with each other. Orders are being placed but not processed.',
+    description:
+      'Microservices cannot communicate with each other. Orders are being placed but not processed.',
     symptoms: [
       'API gateway returning 503 Service Unavailable',
       'Order service cannot reach payment service',
@@ -197,7 +201,7 @@ export const INCIDENT_SCENARIOS: IncidentScenario[] = [
       {
         id: 'd3',
         action: 'Check recent changes to network policies',
-        command: 'kubectl get events --sort-by=\'.lastTimestamp\' | tail -20',
+        command: "kubectl get events --sort-by='.lastTimestamp' | tail -20",
         expectedResult: 'Network policy deletion event found',
         revealsClue: 'Policies were deleted 30 minutes ago',
         timePenalty: 15,
@@ -233,10 +237,11 @@ export const INCIDENT_SCENARIOS: IncidentScenario[] = [
     icon: '🔐',
     severity: 'high',
     category: 'security',
-    description: 'SSL certificate for production domain expires in 24 hours. Automated renewal has failed.',
+    description:
+      'SSL certificate for production domain expires in 24 hours. Automated renewal has failed.',
     symptoms: [
       'SSL certificate expiry alert received',
-      'Let\'s Encrypt renewal cron job failing',
+      "Let's Encrypt renewal cron job failing",
       'Certificate expires tomorrow at midnight UTC',
       'Browser warnings starting for some users',
     ],
@@ -246,8 +251,9 @@ export const INCIDENT_SCENARIOS: IncidentScenario[] = [
       {
         id: 'd1',
         action: 'Check current certificate status',
-        command: 'openssl s_client -connect api.example.com:443 -servername api.example.com 2>/dev/null | openssl x509 -noout -dates',
-        expectedResult: 'NotAfter shows tomorrow\'s date',
+        command:
+          'openssl s_client -connect api.example.com:443 -servername api.example.com 2>/dev/null | openssl x509 -noout -dates',
+        expectedResult: "NotAfter shows tomorrow's date",
         revealsClue: 'Certificate expires in less than 24 hours',
         timePenalty: 10,
       },
@@ -256,7 +262,7 @@ export const INCIDENT_SCENARIOS: IncidentScenario[] = [
         action: 'Check cert-manager logs',
         command: 'kubectl logs -n cert-manager deployment/cert-manager | grep -i error',
         expectedResult: 'Rate limit exceeded error',
-        revealsClue: 'Let\'s Encrypt rate limit has been exceeded',
+        revealsClue: "Let's Encrypt rate limit has been exceeded",
         timePenalty: 15,
       },
       {
@@ -298,7 +304,8 @@ export const INCIDENT_SCENARIOS: IncidentScenario[] = [
     icon: '💾',
     severity: 'medium',
     category: 'application',
-    description: 'Order service memory usage steadily climbing over the past week. Garbage collection not reclaiming memory.',
+    description:
+      'Order service memory usage steadily climbing over the past week. Garbage collection not reclaiming memory.',
     symptoms: [
       'Memory usage increasing 5% per hour',
       'GC pauses causing latency spikes',
@@ -363,7 +370,8 @@ export const INCIDENT_SCENARIOS: IncidentScenario[] = [
     icon: '📡',
     severity: 'high',
     category: 'network',
-    description: 'Internal DNS is intermittently failing. Some services cannot find each other by hostname.',
+    description:
+      'Internal DNS is intermittently failing. Some services cannot find each other by hostname.',
     symptoms: [
       'Random 404 errors for internal service calls',
       'CoreDNS pods showing restarts',
@@ -425,16 +433,23 @@ export const INCIDENT_SCENARIOS: IncidentScenario[] = [
 ]
 
 export const SEVERITY_COLORS = {
-  critical: { bg: 'bg-red-900/50', text: 'text-red-300', border: 'border-red-600', label: '🔴 Critical' },
-  high: { bg: 'bg-orange-900/50', text: 'text-orange-300', border: 'border-orange-600', label: '🟠 High' },
-  medium: { bg: 'bg-yellow-900/50', text: 'text-yellow-300', border: 'border-yellow-600', label: '🟡 Medium' },
+  critical: {
+    bg: 'bg-red-900/50',
+    text: 'text-red-300',
+    border: 'border-red-600',
+    label: '🔴 Critical',
+  },
+  high: {
+    bg: 'bg-orange-900/50',
+    text: 'text-orange-300',
+    border: 'border-orange-600',
+    label: '🟠 High',
+  },
+  medium: {
+    bg: 'bg-yellow-900/50',
+    text: 'text-yellow-300',
+    border: 'border-yellow-600',
+    label: '🟡 Medium',
+  },
   low: { bg: 'bg-blue-900/50', text: 'text-blue-300', border: 'border-blue-600', label: '🔵 Low' },
-}
-
-export const CATEGORY_ICONS: Record<IncidentScenario['category'], string> = {
-  infrastructure: '🖥️',
-  application: '💻',
-  network: '🌐',
-  security: '🔒',
-  database: '🗄️',
 }

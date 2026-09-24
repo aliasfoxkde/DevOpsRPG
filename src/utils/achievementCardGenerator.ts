@@ -31,12 +31,18 @@ const RARITY_COLORS = {
 export function generateAchievementCardSVG(config: AchievementCardConfig): string {
   const colors = RARITY_COLORS[config.rarity || 'rare']
   const timestamp = config.timestamp || new Date()
-  const dateStr = timestamp.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  const dateStr = timestamp.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
 
   const statsLines = config.stats
     ? Object.entries(config.stats)
-        .filter(([_, v]) => v !== undefined)
-        .map(([k, v]) => `        <text x="250" y="${620 + Object.keys(config.stats!).indexOf(k) * 35}" font-family="system-ui, sans-serif" font-size="18" fill="#94a3b8" text-anchor="middle">${k.charAt(0).toUpperCase() + k.slice(1)}: ${v}</text>`)
+        .map(
+          ([k, v], index) =>
+            `        <text x="250" y="${620 + index * 35}" font-family="system-ui, sans-serif" font-size="18" fill="#94a3b8" text-anchor="middle">${k.charAt(0).toUpperCase() + k.slice(1)}: ${v}</text>`,
+        )
         .join('\n')
     : ''
 
@@ -86,13 +92,17 @@ export function generateAchievementCardSVG(config: AchievementCardConfig): strin
   ${statsLines}
 
   <!-- Player Name (if provided) -->
-  ${config.playerName ? `
+  ${
+    config.playerName
+      ? `
   <!-- Divider -->
   <line x1="50" y1="${config.stats ? 680 : 560}" x2="450" y2="${config.stats ? 680 : 560}" stroke="${colors.border}" stroke-width="1" opacity="0.5"/>
 
   <!-- Player info -->
   <text x="250" y="${config.stats ? 700 : 585}" font-family="system-ui, sans-serif" font-size="14" fill="#64748b" text-anchor="middle">${config.playerName}</text>
-  ` : ''}
+  `
+      : ''
+  }
 
   <!-- Date -->
   <text x="250" y="${config.stats ? 718 : 605}" font-family="system-ui, sans-serif" font-size="12" fill="#475569" text-anchor="middle">${dateStr}</text>
@@ -102,7 +112,7 @@ export function generateAchievementCardSVG(config: AchievementCardConfig): strin
 </svg>`
 }
 
-export function downloadAchievementCard(config: AchievementCardConfig, filename?: string): void {
+function downloadAchievementCard(config: AchievementCardConfig, filename?: string): void {
   const svg = generateAchievementCardSVG(config)
   const blob = new Blob([svg], { type: 'image/svg+xml' })
   const url = URL.createObjectURL(blob)
@@ -123,66 +133,13 @@ export function generateBadgeCard(badge: Badge, playerName?: string): void {
     subtitle: 'Badge Earned',
     icon: badge.icon,
     iconBgColor: '',
-    borderColor: badge.rarity === 'legendary' ? '#f59e0b' : badge.rarity === 'epic' ? '#8b5cf6' : '#3b82f6',
+    borderColor:
+      badge.rarity === 'legendary' ? '#f59e0b' : badge.rarity === 'epic' ? '#8b5cf6' : '#3b82f6',
     achievementName: badge.name,
     achievementDescription: badge.description,
-    rarity: badge.rarity as AchievementCardConfig['rarity'],
+    rarity: badge.rarity,
     playerName,
     timestamp: badge.unlockedAt ? new Date(badge.unlockedAt) : undefined,
-  }
-  downloadAchievementCard(config)
-}
-
-// Realm completion card generator
-export function generateRealmCard(realmName: string, icon: string, playerName?: string): void {
-  const config: AchievementCardConfig = {
-    type: 'realm_complete',
-    title: 'Realm Conquered!',
-    subtitle: realmName,
-    icon,
-    iconBgColor: '#581c87',
-    borderColor: '#8b5cf6',
-    achievementName: 'Realm Master',
-    achievementDescription: `Completed all quests in ${realmName}`,
-    rarity: 'legendary',
-    playerName,
-    timestamp: new Date(),
-  }
-  downloadAchievementCard(config)
-}
-
-// Level up card generator
-export function generateLevelUpCard(level: number, playerName?: string): void {
-  const config: AchievementCardConfig = {
-    type: 'level_up',
-    title: 'Level Up!',
-    icon: '⭐',
-    iconBgColor: '#78350f',
-    borderColor: '#f59e0b',
-    achievementName: `Level ${level}`,
-    achievementDescription: 'Reached a new level!',
-    rarity: level >= 50 ? 'legendary' : level >= 30 ? 'epic' : level >= 10 ? 'rare' : 'uncommon',
-    stats: { level },
-    playerName,
-    timestamp: new Date(),
-  }
-  downloadAchievementCard(config)
-}
-
-// Streak card generator
-export function generateStreakCard(streakDays: number, playerName?: string): void {
-  const config: AchievementCardConfig = {
-    type: 'streak',
-    title: 'Streak Milestone!',
-    icon: '🔥',
-    iconBgColor: '#7c2d12',
-    borderColor: '#f97316',
-    achievementName: `${streakDays} Day Streak`,
-    achievementDescription: 'Incredible consistency!',
-    rarity: streakDays >= 30 ? 'legendary' : streakDays >= 14 ? 'epic' : streakDays >= 7 ? 'rare' : 'uncommon',
-    stats: { streak: streakDays },
-    playerName,
-    timestamp: new Date(),
   }
   downloadAchievementCard(config)
 }

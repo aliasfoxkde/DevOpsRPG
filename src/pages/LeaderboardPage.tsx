@@ -17,14 +17,41 @@ interface LeaderboardEntry {
 }
 
 // Generate mock leaderboard data
-function generateMockLeaderboard(playerName: string, playerLevel: number, playerXP: number, playerBadges: number): LeaderboardEntry[] {
+function generateMockLeaderboard(
+  playerName: string,
+  playerLevel: number,
+  playerXP: number,
+  playerBadges: number,
+): LeaderboardEntry[] {
   const classes: CharacterClass[] = ['Cloud Knight', 'Script Warrior', 'Data Mage', 'DevOps Sage']
-  const realms = ['Village of Foundations', 'Forest of Scripts', 'Castle of Frameworks', 'Mountains of Cloud', 'Citadel of DevOps']
+  const realms = [
+    'Village of Foundations',
+    'Forest of Scripts',
+    'Castle of Frameworks',
+    'Mountains of Cloud',
+    'Citadel of DevOps',
+  ]
   const names = [
-    'ShadowCoder', 'ByteRunner', 'CloudNinja', 'DataWizard', 'GitGuru',
-    'DockMaster', 'K8sCommander', 'PipelineKing', 'InfraSage', 'ScriptWizard',
-    'CodeNinja', 'TerminalHero', 'DeployDemon', 'MonitorMaven', 'LogLegend',
-    'BugSlayer', 'StackOverflow', 'APIPhantom', 'ContainerCaptain', 'VaultVictor'
+    'ShadowCoder',
+    'ByteRunner',
+    'CloudNinja',
+    'DataWizard',
+    'GitGuru',
+    'DockMaster',
+    'K8sCommander',
+    'PipelineKing',
+    'InfraSage',
+    'ScriptWizard',
+    'CodeNinja',
+    'TerminalHero',
+    'DeployDemon',
+    'MonitorMaven',
+    'LogLegend',
+    'BugSlayer',
+    'StackOverflow',
+    'APIPhantom',
+    'ContainerCaptain',
+    'VaultVictor',
   ]
 
   const entries: LeaderboardEntry[] = []
@@ -40,7 +67,7 @@ function generateMockLeaderboard(playerName: string, playerLevel: number, player
     badges: playerBadges,
     streak: Math.floor(Math.random() * 7),
     lastActive: 'Just now',
-    realm: realms[Math.min(Math.floor(playerLevel / 5), realms.length - 1)]
+    realm: realms[Math.min(Math.floor(playerLevel / 5), realms.length - 1)],
   }
 
   // Generate mock entries
@@ -58,7 +85,7 @@ function generateMockLeaderboard(playerName: string, playerLevel: number, player
       badges: Math.floor(level / 3) + Math.floor(Math.random() * 5),
       streak: Math.floor(Math.random() * 14),
       lastActive: `${Math.floor(Math.random() * 24)}h ago`,
-      realm: realms[Math.min(Math.floor(level / 5), realms.length - 1)]
+      realm: realms[Math.min(Math.floor(level / 5), realms.length - 1)],
     })
   }
 
@@ -83,7 +110,12 @@ export default function LeaderboardPage() {
   const [selectedPlayer, setSelectedPlayer] = useState<LeaderboardEntry | null>(null)
 
   const leaderboardData = useMemo(() => {
-    const data = generateMockLeaderboard(character.name, character.level, character.xp, badges.length)
+    const data = generateMockLeaderboard(
+      character.name,
+      character.level,
+      character.xp,
+      badges.length,
+    )
     return data
   }, [character.name, character.level, character.xp, badges.length])
 
@@ -107,11 +139,11 @@ export default function LeaderboardPage() {
     return sorted
   }, [leaderboardData, sortKey, sortDirection])
 
-  const playerRank = sortedData.findIndex(e => e.id === 'player') + 1
+  const playerRank = sortedData.findIndex((e) => e.id === 'player') + 1
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
-      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')
+      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'))
     } else {
       setSortKey(key)
       setSortDirection('desc')
@@ -130,7 +162,7 @@ export default function LeaderboardPage() {
       'Cloud Knight': 'text-slate-400',
       'Script Warrior': 'text-green-400',
       'Data Mage': 'text-blue-400',
-      'DevOps Sage': 'text-purple-400'
+      'DevOps Sage': 'text-purple-400',
     }
     return colors[charClass] || 'text-slate-400'
   }
@@ -163,7 +195,9 @@ export default function LeaderboardPage() {
               </div>
               <div>
                 <p className="text-amber-400 font-bold text-lg">{character.name}</p>
-                <p className="text-slate-400 text-sm">Level {character.level} {character.class}</p>
+                <p className="text-slate-400 text-sm">
+                  Level {character.level} {character.class}
+                </p>
               </div>
             </div>
             <div className="text-center sm:text-right">
@@ -175,10 +209,12 @@ export default function LeaderboardPage() {
 
         {/* Timeframe Tabs */}
         <div className="flex gap-2 mb-4">
-          {(['all', 'weekly', 'daily'] as const).map(tf => (
+          {(['all', 'weekly', 'daily'] as const).map((tf) => (
             <button
               key={tf}
-              onClick={() => setTimeframe(tf)}
+              onClick={() => {
+                setTimeframe(tf)
+              }}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 timeframe === tf
                   ? 'bg-amber-600 text-white'
@@ -195,22 +231,52 @@ export default function LeaderboardPage() {
           {/* Table Header */}
           <div className="hidden md:grid grid-cols-12 gap-2 px-4 py-3 bg-slate-900/50 border-b border-slate-700 text-sm font-bold text-slate-400">
             <div className="col-span-1">Rank</div>
-            <div className="col-span-3 cursor-pointer hover:text-white" onClick={() => handleSort('name')}>
+            <div
+              className="col-span-3 cursor-pointer hover:text-white"
+              onClick={() => {
+                handleSort('name')
+              }}
+            >
               Player {sortKey === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
             </div>
-            <div className="col-span-2 cursor-pointer hover:text-white text-center" onClick={() => handleSort('level')}>
+            <div
+              className="col-span-2 cursor-pointer hover:text-white text-center"
+              onClick={() => {
+                handleSort('level')
+              }}
+            >
               Level {sortKey === 'level' && (sortDirection === 'asc' ? '↑' : '↓')}
             </div>
-            <div className="col-span-2 cursor-pointer hover:text-white text-right" onClick={() => handleSort('xp')}>
+            <div
+              className="col-span-2 cursor-pointer hover:text-white text-right"
+              onClick={() => {
+                handleSort('xp')
+              }}
+            >
               XP {sortKey === 'xp' && (sortDirection === 'asc' ? '↑' : '↓')}
             </div>
-            <div className="col-span-2 cursor-pointer hover:text-white text-center" onClick={() => handleSort('completedQuests')}>
+            <div
+              className="col-span-2 cursor-pointer hover:text-white text-center"
+              onClick={() => {
+                handleSort('completedQuests')
+              }}
+            >
               Quests {sortKey === 'completedQuests' && (sortDirection === 'asc' ? '↑' : '↓')}
             </div>
-            <div className="col-span-1 cursor-pointer hover:text-white text-center" onClick={() => handleSort('badges')}>
+            <div
+              className="col-span-1 cursor-pointer hover:text-white text-center"
+              onClick={() => {
+                handleSort('badges')
+              }}
+            >
               Badges {sortKey === 'badges' && (sortDirection === 'asc' ? '↑' : '↓')}
             </div>
-            <div className="col-span-1 cursor-pointer hover:text-white text-center" onClick={() => handleSort('streak')}>
+            <div
+              className="col-span-1 cursor-pointer hover:text-white text-center"
+              onClick={() => {
+                handleSort('streak')
+              }}
+            >
               🔥 {sortKey === 'streak' && (sortDirection === 'asc' ? '↑' : '↓')}
             </div>
           </div>
@@ -224,7 +290,9 @@ export default function LeaderboardPage() {
               return (
                 <div
                   key={entry.id}
-                  onClick={() => setSelectedPlayer(entry)}
+                  onClick={() => {
+                    setSelectedPlayer(entry)
+                  }}
                   className={`grid grid-cols-12 gap-2 px-4 py-3 items-center cursor-pointer transition-all ${
                     isPlayer
                       ? 'bg-amber-900/20 border-l-4 border-amber-500'
@@ -232,18 +300,14 @@ export default function LeaderboardPage() {
                   }`}
                 >
                   {/* Rank */}
-                  <div className="col-span-1 text-lg">
-                    {getRankIcon(rank)}
-                  </div>
+                  <div className="col-span-1 text-lg">{getRankIcon(rank)}</div>
 
                   {/* Name & Class */}
                   <div className="col-span-3">
                     <p className={`font-bold ${isPlayer ? 'text-amber-400' : 'text-white'}`}>
                       {entry.name}
                     </p>
-                    <p className={`text-xs ${getClassColor(entry.class)}`}>
-                      {entry.class}
-                    </p>
+                    <p className={`text-xs ${getClassColor(entry.class)}`}>{entry.class}</p>
                   </div>
 
                   {/* Level */}
@@ -300,7 +364,15 @@ export default function LeaderboardPage() {
           <div className="bg-slate-800/80 rounded-lg p-4 text-center border border-slate-700">
             <p className="text-slate-500 text-sm mb-1">Current Realm</p>
             <p className="text-lg font-bold text-amber-400">
-              {character.level < 5 ? '🏘️' : character.level < 10 ? '🌲' : character.level < 15 ? '🏰' : character.level < 20 ? '⛰️' : '🏛️'}
+              {character.level < 5
+                ? '🏘️'
+                : character.level < 10
+                  ? '🌲'
+                  : character.level < 15
+                    ? '🏰'
+                    : character.level < 20
+                      ? '⛰️'
+                      : '🏛️'}
             </p>
           </div>
         </div>
@@ -317,11 +389,15 @@ export default function LeaderboardPage() {
                 </div>
                 <div>
                   <h2 className="text-lg font-bold text-white">{selectedPlayer.name}</h2>
-                  <p className={`text-sm ${getClassColor(selectedPlayer.class)}`}>{selectedPlayer.class}</p>
+                  <p className={`text-sm ${getClassColor(selectedPlayer.class)}`}>
+                    {selectedPlayer.class}
+                  </p>
                 </div>
               </div>
               <button
-                onClick={() => setSelectedPlayer(null)}
+                onClick={() => {
+                  setSelectedPlayer(null)
+                }}
                 className="text-slate-400 hover:text-white text-2xl leading-none"
               >
                 ×
@@ -336,11 +412,15 @@ export default function LeaderboardPage() {
                 </div>
                 <div className="text-center p-3 bg-slate-900/50 rounded-lg">
                   <p className="text-slate-500 text-xs mb-1">XP</p>
-                  <p className="text-xl font-bold text-green-400">{selectedPlayer.xp.toLocaleString()}</p>
+                  <p className="text-xl font-bold text-green-400">
+                    {selectedPlayer.xp.toLocaleString()}
+                  </p>
                 </div>
                 <div className="text-center p-3 bg-slate-900/50 rounded-lg">
                   <p className="text-slate-500 text-xs mb-1">Quests</p>
-                  <p className="text-xl font-bold text-blue-400">{selectedPlayer.completedQuests}</p>
+                  <p className="text-xl font-bold text-blue-400">
+                    {selectedPlayer.completedQuests}
+                  </p>
                 </div>
                 <div className="text-center p-3 bg-slate-900/50 rounded-lg">
                   <p className="text-slate-500 text-xs mb-1">🔥 Streak</p>
@@ -366,7 +446,9 @@ export default function LeaderboardPage() {
 
             <div className="px-6 py-4 bg-slate-900/50 border-t border-slate-700">
               <button
-                onClick={() => setSelectedPlayer(null)}
+                onClick={() => {
+                  setSelectedPlayer(null)
+                }}
                 className="w-full py-2 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors"
               >
                 Close

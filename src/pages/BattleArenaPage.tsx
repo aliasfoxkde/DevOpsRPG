@@ -7,15 +7,38 @@ import { technologies } from '../data/technologies'
 import Quiz from '../components/ui/Quiz'
 import QuickMiniGame from '../components/ui/QuickMiniGame'
 import TreasureChest, { getRandomLoot, type LootDrop } from '../components/ui/TreasureChest'
-import CelebrationOverlay, { StreakBonus, MilestonePopup } from '../components/ui/CelebrationOverlay'
+import CelebrationOverlay, {
+  StreakBonus,
+  MilestonePopup,
+} from '../components/ui/CelebrationOverlay'
 import { RealmCompletionModal } from '../components/ui/RealmCompletionModal'
 
 type ViewMode = 'study' | 'quiz'
 
+interface PersistedGameState {
+  completedQuests: { topicId: string }[]
+}
+
+// Not every quest technology has scraped study content, so a record lookup by
+// quest id can genuinely miss and must surface as `undefined`.
+function findRecordValue<T>(record: Record<string, T>, id: string): T | undefined {
+  return Object.prototype.hasOwnProperty.call(record, id) ? record[id] : undefined
+}
+
+// Randomness lives outside the component so the render stays pure.
+function rollChance(chance: number): boolean {
+  return Math.random() < chance
+}
+
+function rollInRange(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
 export default function BattleArenaPage() {
   const { questId } = useParams<{ questId: string }>()
   const navigate = useNavigate()
-  const { game, completeQuest, isQuestCompleted, getNextQuest, addXP, addGold, incrementStat } = useGame()
+  const { game, completeQuest, isQuestCompleted, getNextQuest, addXP, addGold, incrementStat } =
+    useGame()
   const [viewMode, setViewMode] = useState<ViewMode>('study')
   const [justCompleted, setJustCompleted] = useState(false)
   const [showMiniGame, setShowMiniGame] = useState(false)
@@ -28,9 +51,18 @@ export default function BattleArenaPage() {
   const [showStreak, setShowStreak] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
   const [showMilestone, setShowMilestone] = useState(false)
-  const [milestoneData, setMilestoneData] = useState<{ icon: string; title: string; message: string; xpBonus: number } | null>(null)
+  const [milestoneData, setMilestoneData] = useState<{
+    icon: string
+    title: string
+    message: string
+    xpBonus: number
+  } | null>(null)
   const [showBadge, setShowBadge] = useState(false)
-  const [badgeData, setBadgeData] = useState<{ icon: string; name: string; description: string } | null>(null)
+  const [badgeData, setBadgeData] = useState<{
+    icon: string
+    name: string
+    description: string
+  } | null>(null)
   const [showRealmComplete, setShowRealmComplete] = useState(false)
 
   // Timer refs for cleanup
@@ -48,7 +80,7 @@ export default function BattleArenaPage() {
   // Lock to prevent multiple navigations
   const navigationLockRef = useRef(false)
 
-  const quest = allQuests.find(q => q.id === questId)
+  const quest = allQuests.find((q) => q.id === questId)
   const nextQuest = quest ? getNextQuest() : null
 
   // All hooks must be called before any early returns
@@ -59,14 +91,18 @@ export default function BattleArenaPage() {
       requestAnimationFrame(() => {
         setMilestoneData({ icon: m.icon, title: m.title, message: m.message, xpBonus: m.xpBonus })
       })
-      milestoneTimerRef.current = setTimeout(() => setShowMilestone(true), 2000)
+      milestoneTimerRef.current = setTimeout(() => {
+        setShowMilestone(true)
+      }, 2000)
     }
     if (game.lastVictory?.badge) {
       const b = game.lastVictory.badge
       requestAnimationFrame(() => {
         setBadgeData({ icon: b.icon, name: b.name, description: b.description })
       })
-      badgeTimerRef.current = setTimeout(() => setShowBadge(true), 2500)
+      badgeTimerRef.current = setTimeout(() => {
+        setShowBadge(true)
+      }, 2500)
     }
 
     return () => {
@@ -78,7 +114,9 @@ export default function BattleArenaPage() {
   // Watch for realm completion
   useEffect(() => {
     if (game.showRealmCompletion) {
-      realmTimerRef.current = setTimeout(() => setShowRealmComplete(true), 3000)
+      realmTimerRef.current = setTimeout(() => {
+        setShowRealmComplete(true)
+      }, 3000)
     }
     return () => {
       if (realmTimerRef.current) clearTimeout(realmTimerRef.current)
@@ -97,26 +135,28 @@ export default function BattleArenaPage() {
         try {
           const saved = localStorage.getItem('devopsquest_game')
           if (saved) {
-            const freshGame = JSON.parse(saved)
-            const completedIds = new Set<string>(freshGame.completedQuests.map((q: { topicId: string }) => q.topicId))
+            const freshGame = JSON.parse(saved) as PersistedGameState
+            const completedIds = new Set<string>(freshGame.completedQuests.map((q) => q.topicId))
             // Always exclude the just-completed quest to avoid showing it as "next"
             if (completedQuestId) {
               completedIds.add(completedQuestId)
             }
             const nextQ = getNextQuestFromData(completedIds)
             if (nextQ) {
-              navigate(`/quest/${nextQ.id}`)
+              void navigate(`/quest/${nextQ.id}`)
             } else {
-              navigate('/quests')
+              void navigate('/quests')
             }
           } else {
-            navigate('/quests')
+            void navigate('/quests')
           }
         } catch {
-          navigate('/quests')
+          void navigate('/quests')
         }
       }, 2500) // Increased delay to ensure state is persisted
-      return () => clearTimeout(timer)
+      return () => {
+        clearTimeout(timer)
+      }
     } else {
       // Reset navigation lock when not completing
       navigationLockRef.current = false
@@ -152,10 +192,10 @@ export default function BattleArenaPage() {
   }
 
   const realm = realms[quest.realmId]
-  const techContent = w3schoolsContent.technologies[quest.technologyId]
-  const topicContent = techContent?.topics.find(t => t.id === quest.topicId)
-  const techData = technologies[quest.technologyId]
-  const topicUrl = techData?.topics.find(t => t.id === quest.topicId)?.url
+  const techContent = findRecordValue(w3schoolsContent.technologies, quest.technologyId)
+  const topicContent = techContent?.topics.find((t) => t.id === quest.topicId)
+  const techData = findRecordValue(technologies, quest.technologyId)
+  const topicUrl = techData?.topics.find((t) => t.id === quest.topicId)?.url
 
   // Guard against missing content - show error state
   if (!techContent || !techData) {
@@ -170,7 +210,11 @@ export default function BattleArenaPage() {
   }
   const isCompleted = isQuestCompleted(quest.id)
 
-  const handleComplete = (isPerfect: boolean, wrongAnswers: number = 0, passedWith80: boolean = false) => {
+  const handleComplete = (
+    isPerfect: boolean,
+    wrongAnswers: number = 0,
+    passedWith80: boolean = false,
+  ) => {
     // CRITICAL: Double-check quest isn't already completed - this prevents re-completing after refresh
     if (isQuestCompleted(quest.id)) {
       console.warn('Quest already completed, preventing re-completion')
@@ -182,28 +226,36 @@ export default function BattleArenaPage() {
 
     // Track quiz stats before completing (includes wrong answers for no_mistakes badge)
     // Also track topic for spaced repetition system
-    incrementStat('quiz', isPerfect, wrongAnswers, passedWith80, quest?.topicId)
+    incrementStat('quiz', isPerfect, wrongAnswers, passedWith80, quest.topicId)
     completeQuest(quest.id)
     setJustCompleted(true)
 
     // Show confetti on completion
     setShowConfetti(true)
-    confettiTimerRef.current = setTimeout(() => setShowConfetti(false), 3000)
+    confettiTimerRef.current = setTimeout(() => {
+      setShowConfetti(false)
+    }, 3000)
 
     // Check for streak milestone
     const streak = game.character.streakDays
     if (streak >= 3 && streak % 7 === 0) {
-      streakShowTimerRef.current = setTimeout(() => setShowStreak(true), 500)
-      streakHideTimerRef.current = setTimeout(() => setShowStreak(false), 2500)
+      streakShowTimerRef.current = setTimeout(() => {
+        setShowStreak(true)
+      }, 500)
+      streakHideTimerRef.current = setTimeout(() => {
+        setShowStreak(false)
+      }, 2500)
     }
 
     // 25% chance for bonus mini-game
-    if (Math.random() < 0.25) {
-      minigameTimerRef.current = setTimeout(() => setShowMiniGame(true), 800)
+    if (rollChance(0.25)) {
+      minigameTimerRef.current = setTimeout(() => {
+        setShowMiniGame(true)
+      }, 800)
     }
 
     // 30% chance for treasure chest
-    if (Math.random() < 0.30) {
+    if (rollChance(0.3)) {
       const loot = getRandomLoot(quest.difficulty)
       setChestLoot(loot)
       chestTimerRef.current = setTimeout(() => {
@@ -212,9 +264,9 @@ export default function BattleArenaPage() {
     }
 
     // 20% chance for random encounter
-    if (Math.random() < 0.20) {
-      const encounterXPAmount = Math.floor(Math.random() * 30) + 20
-      const encounterGoldAmount = Math.floor(Math.random() * 15) + 10
+    if (rollChance(0.2)) {
+      const encounterXPAmount = rollInRange(20, 49)
+      const encounterGoldAmount = rollInRange(10, 24)
       setEncounterXP(encounterXPAmount)
       setEncounterGold(encounterGoldAmount)
       encounterTimerRef.current = setTimeout(() => {
@@ -239,9 +291,9 @@ export default function BattleArenaPage() {
 
   const handleContinue = () => {
     if (nextQuest) {
-      navigate(`/quest/${nextQuest.id}`)
+      void navigate(`/quest/${nextQuest.id}`)
     } else {
-      navigate('/quests')
+      void navigate('/quests')
     }
   }
 
@@ -261,9 +313,7 @@ export default function BattleArenaPage() {
               <span className="text-lg">{realm.icon}</span>
               <span className="text-slate-300 hidden sm:inline">{realm.name}</span>
             </div>
-            <div className="text-amber-400 font-bold">
-              {quest.xpReward} XP
-            </div>
+            <div className="text-amber-400 font-bold">{quest.xpReward} XP</div>
           </div>
         </div>
       </header>
@@ -279,7 +329,7 @@ export default function BattleArenaPage() {
             {quest.title}
           </h1>
           <p className="text-slate-400 text-sm sm:text-base">
-            {techContent?.description || quest.description}
+            {techContent.description || quest.description}
           </p>
         </div>
 
@@ -288,8 +338,11 @@ export default function BattleArenaPage() {
           <div className="flex items-center gap-2">
             <span className="text-slate-400">Difficulty:</span>
             <div className="flex gap-1">
-              {[1, 2, 3, 4, 5].map(i => (
-                <span key={i} className={`text-sm ${i <= quest.difficulty ? 'text-red-400' : 'text-slate-700'}`}>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <span
+                  key={i}
+                  className={`text-sm ${i <= quest.difficulty ? 'text-red-400' : 'text-slate-700'}`}
+                >
                   ●
                 </span>
               ))}
@@ -314,7 +367,9 @@ export default function BattleArenaPage() {
           <div className="flex justify-center mb-6">
             <div className="inline-flex bg-slate-800 rounded-lg p-1">
               <button
-                onClick={() => setViewMode('study')}
+                onClick={() => {
+                  setViewMode('study')
+                }}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
                   viewMode === 'study'
                     ? 'bg-amber-600 text-white'
@@ -324,7 +379,9 @@ export default function BattleArenaPage() {
                 📖 Study
               </button>
               <button
-                onClick={() => setViewMode('quiz')}
+                onClick={() => {
+                  setViewMode('quiz')
+                }}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
                   viewMode === 'quiz'
                     ? 'bg-amber-600 text-white'
@@ -352,9 +409,7 @@ export default function BattleArenaPage() {
                   <div className="space-y-6">
                     {topicContent.sections.map((section, idx) => (
                       <div key={idx} className="border-l-2 border-amber-600/50 pl-4">
-                        <h3 className="text-lg font-bold text-amber-400 mb-2">
-                          {section.heading}
-                        </h3>
+                        <h3 className="text-lg font-bold text-amber-400 mb-2">{section.heading}</h3>
                         <p className="text-slate-300 leading-relaxed text-sm sm:text-base">
                           {section.content}
                         </p>
@@ -363,18 +418,14 @@ export default function BattleArenaPage() {
 
                     {topicContent.codeExamples.length > 0 && (
                       <div className="mt-6">
-                        <h3 className="text-lg font-bold text-amber-400 mb-3">
-                          💻 Code Examples
-                        </h3>
+                        <h3 className="text-lg font-bold text-amber-400 mb-3">💻 Code Examples</h3>
                         <div className="space-y-4">
                           {topicContent.codeExamples.map((code, idx) => (
                             <pre
                               key={idx}
                               className="bg-slate-900/80 rounded-lg p-3 sm:p-4 overflow-x-auto border border-slate-700 text-xs sm:text-sm"
                             >
-                              <code className="text-green-400 font-mono">
-                                {code}
-                              </code>
+                              <code className="text-green-400 font-mono">{code}</code>
                             </pre>
                           ))}
                         </div>
@@ -394,15 +445,27 @@ export default function BattleArenaPage() {
                           className="inline-flex items-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg shadow-lg transition-colors"
                         >
                           📖 Open Learning Resource
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                            />
                           </svg>
                         </a>
                       </>
                     ) : (
                       <p className="text-amber-400">Study material available via quiz.</p>
                     )}
-                    <p className="text-slate-500 text-sm mt-4">Complete the quiz below to earn XP!</p>
+                    <p className="text-slate-500 text-sm mt-4">
+                      Complete the quiz below to earn XP!
+                    </p>
                   </div>
                 )}
               </div>
@@ -412,9 +475,13 @@ export default function BattleArenaPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               {isCompleted ? (
                 <>
-                  <div className={`text-center p-4 rounded-xl border ${justCompleted ? 'bg-green-900/50 border-green-500/50 animate-pulse' : 'bg-green-900/30 border-green-700/50'}`}>
+                  <div
+                    className={`text-center p-4 rounded-xl border ${justCompleted ? 'bg-green-900/50 border-green-500/50 animate-pulse' : 'bg-green-900/30 border-green-700/50'}`}
+                  >
                     <span className="text-3xl">{justCompleted ? '🎉' : '✅'}</span>
-                    <p className={`font-bold mt-2 ${justCompleted ? 'text-green-300' : 'text-green-400'}`}>
+                    <p
+                      className={`font-bold mt-2 ${justCompleted ? 'text-green-300' : 'text-green-400'}`}
+                    >
                       {justCompleted ? 'Excellent! Moving to next quest...' : 'Quest Completed!'}
                     </p>
                     {justCompleted && nextQuest && (
@@ -447,7 +514,9 @@ export default function BattleArenaPage() {
               ) : (
                 <>
                   <button
-                    onClick={() => setViewMode('quiz')}
+                    onClick={() => {
+                      setViewMode('quiz')
+                    }}
                     className="px-6 sm:px-8 py-3 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-bold rounded-lg shadow-lg transform transition-all hover:scale-105 text-sm sm:text-base"
                   >
                     📝 Take Quiz to Complete (+{quest.xpReward} XP)
@@ -461,7 +530,9 @@ export default function BattleArenaPage() {
           <Quiz
             topicId={quest.topicId}
             onPass={handleComplete}
-            onSkip={() => setViewMode('study')}
+            onSkip={() => {
+              setViewMode('study')
+            }}
           />
         )}
 
@@ -469,7 +540,9 @@ export default function BattleArenaPage() {
         {showMiniGame && (
           <QuickMiniGame
             onComplete={handleMiniGameComplete}
-            onSkip={() => setShowMiniGame(false)}
+            onSkip={() => {
+              setShowMiniGame(false)
+            }}
           />
         )}
 
@@ -477,14 +550,20 @@ export default function BattleArenaPage() {
         {showChest && chestLoot && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div className="text-center">
-              <TreasureChest questDifficulty={quest.difficulty} preGeneratedLoot={chestLoot} onChestOpen={(loot) => {
-                if (loot.type === 'xp') addXP(loot.value)
-                if (loot.type === 'gold') addGold(loot.value)
-              }} />
+              <TreasureChest
+                questDifficulty={quest.difficulty}
+                preGeneratedLoot={chestLoot}
+                onChestOpen={(loot) => {
+                  if (loot.type === 'xp') addXP(loot.value)
+                  if (loot.type === 'gold') addGold(loot.value)
+                }}
+              />
               <p className="mt-4 text-2xl font-bold text-amber-400">{chestLoot.name}!</p>
               <p className="text-slate-400 mt-2 capitalize">{chestLoot.rarity} loot acquired!</p>
               <button
-                onClick={() => setShowChest(false)}
+                onClick={() => {
+                  setShowChest(false)
+                }}
                 className="mt-4 px-6 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg"
               >
                 Awesome!
@@ -501,8 +580,12 @@ export default function BattleArenaPage() {
               <p className="mt-4 text-2xl font-bold text-orange-400">Random Event!</p>
               <p className="text-slate-300 mt-2">You discovered a bonus reward!</p>
               <div className="mt-4 flex items-center justify-center gap-4">
-                <span className="px-4 py-2 bg-amber-900/50 rounded-full text-amber-400 font-bold">+{encounterXP} XP</span>
-                <span className="px-4 py-2 bg-yellow-900/50 rounded-full text-yellow-400 font-bold">+{encounterGold} Gold</span>
+                <span className="px-4 py-2 bg-amber-900/50 rounded-full text-amber-400 font-bold">
+                  +{encounterXP} XP
+                </span>
+                <span className="px-4 py-2 bg-yellow-900/50 rounded-full text-yellow-400 font-bold">
+                  +{encounterGold} Gold
+                </span>
               </div>
               <button
                 onClick={handleEncounterComplete}
@@ -527,7 +610,9 @@ export default function BattleArenaPage() {
             title={milestoneData.title}
             message={milestoneData.message}
             xpBonus={milestoneData.xpBonus}
-            onComplete={() => setShowMilestone(false)}
+            onComplete={() => {
+              setShowMilestone(false)
+            }}
           />
         )}
 
@@ -542,7 +627,9 @@ export default function BattleArenaPage() {
               <h2 className="text-3xl font-bold text-white mb-2">{badgeData.name}</h2>
               <p className="text-slate-300 text-lg mb-4">{badgeData.description}</p>
               <button
-                onClick={() => setShowBadge(false)}
+                onClick={() => {
+                  setShowBadge(false)
+                }}
                 className="mt-4 px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold rounded-lg shadow-lg"
               >
                 Awesome!
@@ -555,7 +642,9 @@ export default function BattleArenaPage() {
         {showRealmComplete && game.showRealmCompletion && (
           <RealmCompletionModal
             realmId={game.showRealmCompletion}
-            onClose={() => setShowRealmComplete(false)}
+            onClose={() => {
+              setShowRealmComplete(false)
+            }}
           />
         )}
 
@@ -575,8 +664,11 @@ export default function BattleArenaPage() {
             <div className="p-3 bg-slate-800/50 rounded-lg">
               <div className="text-slate-500 mb-1">Difficulty</div>
               <div className="flex gap-0.5">
-                {[1, 2, 3, 4, 5].map(i => (
-                  <span key={i} className={i <= quest.difficulty ? 'text-red-400' : 'text-slate-700'}>
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <span
+                    key={i}
+                    className={i <= quest.difficulty ? 'text-red-400' : 'text-slate-700'}
+                  >
                     💀
                   </span>
                 ))}

@@ -9,6 +9,8 @@ interface CommandTyperProps {
   onSkip: () => void
 }
 
+type CharState = 'correct' | 'wrong' | 'pending'
+
 export function CommandTyper({ category, rounds = 5, onComplete, onSkip }: CommandTyperProps) {
   const [gameCommands] = useState<Command[]>(() => getRandomCommands(rounds, category))
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -19,13 +21,15 @@ export function CommandTyper({ category, rounds = 5, onComplete, onSkip }: Comma
   const [wrongCount, setWrongCount] = useState(0)
   const [gameState, setGameState] = useState<'playing' | 'finished'>('playing')
   // Initialize charStates based on first command - must stay in sync with gameCommands
-  const [charStates, setCharStates] = useState<('correct' | 'wrong' | 'pending')[]>(() =>
-    new Array(gameCommands[0]?.command.length || 0).fill('pending')
+  const [charStates, setCharStates] = useState<CharState[]>(() =>
+    new Array<CharState>(gameCommands[0]?.command.length || 0).fill('pending'),
   )
   const inputRef = useRef<HTMLInputElement>(null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
-  const currentCommand = gameCommands[currentIndex]
+  // Honest optional type: the dealt pool can be empty or exhausted, so indexing
+  // can miss and the `currentCommand` guards below are load-bearing.
+  const currentCommand = currentIndex < gameCommands.length ? gameCommands[currentIndex] : undefined
   const maxScore = rounds * 100
 
   // Declare callbacks before useEffect that depends on them
@@ -44,18 +48,18 @@ export function CommandTyper({ category, rounds = 5, onComplete, onSkip }: Comma
     const isCorrect = input.trim() === currentCommand.command
 
     if (isCorrect) {
-      setCorrectCount(c => c + 1)
+      setCorrectCount((c) => c + 1)
       // Base score + time bonus
       const timeBonus = Math.floor(timeLeft / 3) * 10
       const roundScore = 100 + timeBonus
-      setScore(s => s + roundScore)
+      setScore((s) => s + roundScore)
     } else {
-      setWrongCount(c => c + 1)
+      setWrongCount((c) => c + 1)
     }
 
     // Move to next or finish
     if (currentIndex < gameCommands.length - 1) {
-      setCurrentIndex(i => i + 1)
+      setCurrentIndex((i) => i + 1)
       setInput('')
     } else {
       handleFinish()
@@ -72,9 +76,9 @@ export function CommandTyper({ category, rounds = 5, onComplete, onSkip }: Comma
     if (gameState !== 'playing') return
 
     timerRef.current = setInterval(() => {
-      setTimeLeft(prev => {
+      setTimeLeft((prev) => {
         if (prev <= 1) {
-          clearInterval(timerRef.current!)
+          if (timerRef.current) clearInterval(timerRef.current)
           handleFinish()
           return 0
         }
@@ -92,7 +96,7 @@ export function CommandTyper({ category, rounds = 5, onComplete, onSkip }: Comma
     if (!currentCommand) return
 
     const target = currentCommand.command
-    const newCharStates: ('correct' | 'wrong' | 'pending')[] = []
+    const newCharStates: CharState[] = []
 
     for (let i = 0; i < target.length; i++) {
       if (i < input.length) {
@@ -122,7 +126,9 @@ export function CommandTyper({ category, rounds = 5, onComplete, onSkip }: Comma
   useEffect(() => {
     const handleClick = () => inputRef.current?.focus()
     window.addEventListener('click', handleClick)
-    return () => window.removeEventListener('click', handleClick)
+    return () => {
+      window.removeEventListener('click', handleClick)
+    }
   }, [])
 
   if (gameCommands.length === 0) {
@@ -169,9 +175,7 @@ export function CommandTyper({ category, rounds = 5, onComplete, onSkip }: Comma
           </div>
 
           {passed && (
-            <div className="text-green-400 mb-4">
-              +{Math.round(score / 2)} Bonus XP earned!
-            </div>
+            <div className="text-green-400 mb-4">+{Math.round(score / 2)} Bonus XP earned!</div>
           )}
 
           <div className="flex items-center justify-center gap-4">
@@ -202,8 +206,12 @@ export function CommandTyper({ category, rounds = 5, onComplete, onSkip }: Comma
           <div className="flex items-center gap-4 text-sm">
             <span className="text-green-400">✓ {correctCount}</span>
             <span className="text-red-400">✗ {wrongCount}</span>
-            <span className="text-slate-400">{currentIndex + 1}/{rounds}</span>
-            <span className={`font-bold ${timeLeft <= 10 ? 'text-red-400 animate-pulse' : 'text-amber-400'}`}>
+            <span className="text-slate-400">
+              {currentIndex + 1}/{rounds}
+            </span>
+            <span
+              className={`font-bold ${timeLeft <= 10 ? 'text-red-400 animate-pulse' : 'text-amber-400'}`}
+            >
               ⏱ {timeLeft}s
             </span>
           </div>
@@ -220,9 +228,11 @@ export function CommandTyper({ category, rounds = 5, onComplete, onSkip }: Comma
               <span
                 key={i}
                 className={
-                  state === 'correct' ? 'text-green-400' :
-                  state === 'wrong' ? 'text-red-400 bg-red-900/30' :
-                  'text-slate-500'
+                  state === 'correct'
+                    ? 'text-green-400'
+                    : state === 'wrong'
+                      ? 'text-red-400 bg-red-900/30'
+                      : 'text-slate-500'
                 }
               >
                 {currentCommand?.command[i] || ' '}
@@ -261,14 +271,21 @@ export function CommandTyper({ category, rounds = 5, onComplete, onSkip }: Comma
 
         {/* Category indicator */}
         <div className="text-center">
-          <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
-            currentCommand?.category === 'git' ? 'bg-orange-900/50 text-orange-400' :
-            currentCommand?.category === 'docker' ? 'bg-blue-900/50 text-blue-400' :
-            currentCommand?.category === 'bash' ? 'bg-green-900/50 text-green-400' :
-            currentCommand?.category === 'kubernetes' ? 'bg-purple-900/50 text-purple-400' :
-            currentCommand?.category === 'aws' ? 'bg-yellow-900/50 text-yellow-400' :
-            'bg-slate-700 text-slate-400'
-          }`}>
+          <span
+            className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
+              currentCommand?.category === 'git'
+                ? 'bg-orange-900/50 text-orange-400'
+                : currentCommand?.category === 'docker'
+                  ? 'bg-blue-900/50 text-blue-400'
+                  : currentCommand?.category === 'bash'
+                    ? 'bg-green-900/50 text-green-400'
+                    : currentCommand?.category === 'kubernetes'
+                      ? 'bg-purple-900/50 text-purple-400'
+                      : currentCommand?.category === 'aws'
+                        ? 'bg-yellow-900/50 text-yellow-400'
+                        : 'bg-slate-700 text-slate-400'
+            }`}
+          >
             {currentCommand?.category.toUpperCase()}
           </span>
         </div>

@@ -10,7 +10,9 @@ test.describe('Fresh User Experience', () => {
     await page.goto('/')
 
     // HUD renders the character's XP progress
-    await expect(page.getByRole('progressbar', { name: /experience/i })).toBeVisible({ timeout: 15000 })
+    await expect(page.getByRole('progressbar', { name: /experience/i })).toBeVisible({
+      timeout: 15000,
+    })
     // Home page greets the new hero
     await expect(page.getByRole('heading', { name: /welcome/i })).toBeVisible()
   })
@@ -26,7 +28,10 @@ test.describe('Fresh User Experience', () => {
 test.describe('Navigation', () => {
   test('can navigate to the quest journal', async ({ page }) => {
     await page.goto('/')
-    await page.getByRole('navigation', { name: 'Primary navigation' }).getByRole('link', { name: 'Quests' }).click()
+    await page
+      .getByRole('navigation', { name: 'Primary navigation' })
+      .getByRole('link', { name: 'Quests' })
+      .click()
     await expect(page).toHaveURL(/quests/)
   })
 
@@ -40,7 +45,10 @@ test.describe('Navigation', () => {
 
   test('can navigate to the character sheet', async ({ page }) => {
     await page.goto('/')
-    await page.getByRole('navigation', { name: 'Primary navigation' }).getByRole('link', { name: 'Hero' }).click()
+    await page
+      .getByRole('navigation', { name: 'Primary navigation' })
+      .getByRole('link', { name: 'Hero' })
+      .click()
     await expect(page).toHaveURL(/character/)
   })
 })

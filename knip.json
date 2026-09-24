@@ -5,12 +5,10 @@
     "worker/src/index.ts",
     "scripts/*.mjs",
     "scripts/*.js",
-    "e2e/*.spec.ts",
-    "eslint.config.js"
+    "e2e/*.spec.ts"
   ],
-  "project": ["src/**/*.{ts,tsx}", "worker/src/**/*.ts", "scripts/**/*.{mjs,js}"],
-  "ignore": ["src/data/w3schools-content.ts"],
-  "ignoreDependencies": ["tailwindcss"],
+  "project": ["src/**/*.{ts,tsx,css}", "worker/src/**/*.ts", "scripts/**/*.{mjs,js}"],
+  "ignoreBinaries": ["aegis"],
   "playwright": true,
   "vitest": true
 }

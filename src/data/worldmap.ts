@@ -27,13 +27,62 @@ export interface SDLCPhase {
 
 // SDLC phases that run through all realms
 export const sdlcPhases: SDLCPhase[] = [
-  { id: 1, name: 'Plan', icon: '📋', description: 'Planning and requirements', color: '#6366f1', textColor: '#a5b4fc' },
-  { id: 2, name: 'Code', icon: '💻', description: 'Writing and reviewing code', color: '#8b5cf6', textColor: '#c4b5fd' },
-  { id: 3, name: 'Build', icon: '🔨', description: 'Compiling and building', color: '#ec4899', textColor: '#f9a8d4' },
-  { id: 4, name: 'Test', icon: '🧪', description: 'Testing and quality assurance', color: '#f59e0b', textColor: '#fcd34d' },
-  { id: 5, name: 'Deploy', icon: '🚀', description: 'Deployment and release', color: '#22c55e', textColor: '#86efac' },
-  { id: 6, name: 'Operate', icon: '⚙️', description: 'Operating and maintaining', color: '#06b6d4', textColor: '#67e8f9' },
-  { id: 7, name: 'Monitor', icon: '📊', description: 'Monitoring and feedback', color: '#ef4444', textColor: '#fca5a5' },
+  {
+    id: 1,
+    name: 'Plan',
+    icon: '📋',
+    description: 'Planning and requirements',
+    color: '#6366f1',
+    textColor: '#a5b4fc',
+  },
+  {
+    id: 2,
+    name: 'Code',
+    icon: '💻',
+    description: 'Writing and reviewing code',
+    color: '#8b5cf6',
+    textColor: '#c4b5fd',
+  },
+  {
+    id: 3,
+    name: 'Build',
+    icon: '🔨',
+    description: 'Compiling and building',
+    color: '#ec4899',
+    textColor: '#f9a8d4',
+  },
+  {
+    id: 4,
+    name: 'Test',
+    icon: '🧪',
+    description: 'Testing and quality assurance',
+    color: '#f59e0b',
+    textColor: '#fcd34d',
+  },
+  {
+    id: 5,
+    name: 'Deploy',
+    icon: '🚀',
+    description: 'Deployment and release',
+    color: '#22c55e',
+    textColor: '#86efac',
+  },
+  {
+    id: 6,
+    name: 'Operate',
+    icon: '⚙️',
+    description: 'Operating and maintaining',
+    color: '#06b6d4',
+    textColor: '#67e8f9',
+  },
+  {
+    id: 7,
+    name: 'Monitor',
+    icon: '📊',
+    description: 'Monitoring and feedback',
+    color: '#ef4444',
+    textColor: '#fca5a5',
+  },
 ]
 
 // World map locations representing the journey
@@ -200,9 +249,3 @@ export const worldMapLocations: MapLocation[] = [
     connectedTo: ['sdlc_waypoint_6', 'summit'],
   },
 ]
-
-// Calculate path progress for a player
-export function calculateMapProgress(completedQuests: Set<string>, totalQuests: number): number {
-  if (totalQuests === 0) return 0
-  return Math.round((completedQuests.size / totalQuests) * 100)
-}

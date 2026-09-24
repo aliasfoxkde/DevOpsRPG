@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type SyntheticEvent } from 'react'
 import { useGame } from '../contexts/GameContext'
 
 type FeedbackType = 'bug' | 'feature' | 'change' | 'praise'
@@ -37,7 +37,7 @@ export default function FeedbackPage() {
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
     setError(null)
@@ -72,7 +72,7 @@ ${formData.description}
       const response = await fetch('https://api.github.com/repos/aliasfoxkde/DevOpsRPG/issues', {
         method: 'POST',
         headers: {
-          'Accept': 'application/vnd.github+json',
+          Accept: 'application/vnd.github+json',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -102,7 +102,8 @@ ${formData.description}
           <div className="text-6xl mb-4">✅</div>
           <h1 className="text-2xl font-bold text-amber-400 mb-4">Thank You!</h1>
           <p className="text-slate-300 mb-6">
-            Your feedback has been submitted as a GitHub issue. Our team will review it and respond accordingly.
+            Your feedback has been submitted as a GitHub issue. Our team will review it and respond
+            accordingly.
           </p>
           <p className="text-slate-400 text-sm mb-6">
             You can track your feedback at:{' '}
@@ -134,7 +135,7 @@ ${formData.description}
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-2">📝 Submit Feedback</h1>
         <p className="text-slate-400">
-          Don't like something? Found a bug? Want a feature added? Let us know!
+          Don&apos;t like something? Found a bug? Want a feature added? Let us know!
         </p>
         <p className="text-slate-500 text-sm mt-2">
           Your feedback becomes a GitHub issue and will be handled by our automated workflow.
@@ -147,27 +148,32 @@ ${formData.description}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-slate-800 rounded-xl border border-slate-700 p-6 space-y-6">
+      <form
+        onSubmit={(e) => {
+          void handleSubmit(e)
+        }}
+        className="bg-slate-800 rounded-xl border border-slate-700 p-6 space-y-6"
+      >
         {/* Feedback Type */}
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-2">
-            Feedback Type
-          </label>
+          <label className="block text-sm font-medium text-slate-300 mb-2">Feedback Type</label>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {(['bug', 'feature', 'change', 'praise'] as FeedbackType[]).map((type) => (
               <button
                 key={type}
                 type="button"
-                onClick={() => setFormData({ ...formData, type })}
+                onClick={() => {
+                  setFormData({ ...formData, type })
+                }}
                 className={`px-4 py-2 rounded-lg font-medium transition-all ${
                   formData.type === type
                     ? type === 'bug'
                       ? 'bg-red-600 text-white'
                       : type === 'feature'
-                      ? 'bg-amber-600 text-white'
-                      : type === 'change'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-green-600 text-white'
+                        ? 'bg-amber-600 text-white'
+                        : type === 'change'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-green-600 text-white'
                     : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                 }`}
               >
@@ -191,7 +197,9 @@ ${formData.description}
             id="title"
             required
             value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            onChange={(e) => {
+              setFormData({ ...formData, title: e.target.value })
+            }}
             placeholder="Brief summary of your feedback"
             className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500"
           />
@@ -205,7 +213,9 @@ ${formData.description}
           <select
             id="area"
             value={formData.area}
-            onChange={(e) => setFormData({ ...formData, area: e.target.value })}
+            onChange={(e) => {
+              setFormData({ ...formData, area: e.target.value })
+            }}
             className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-amber-500"
           >
             {FEEDBACK_AREAS.map((area) => (
@@ -225,15 +235,17 @@ ${formData.description}
             id="description"
             required
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            onChange={(e) => {
+              setFormData({ ...formData, description: e.target.value })
+            }}
             placeholder={
               formData.type === 'bug'
                 ? 'Describe what happened, what you expected, and steps to reproduce...'
                 : formData.type === 'feature'
-                ? 'Describe the problem you want solved or the feature you want...'
-                : formData.type === 'change'
-                ? 'Describe the current behavior and what you would like changed...'
-                : 'Tell us what you love about DevOpsQuest!'
+                  ? 'Describe the problem you want solved or the feature you want...'
+                  : formData.type === 'change'
+                    ? 'Describe the current behavior and what you would like changed...'
+                    : 'Tell us what you love about DevOpsQuest!'
             }
             rows={6}
             className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500 resize-none"
@@ -250,8 +262,20 @@ ${formData.description}
             {isSubmitting ? (
               <span className="flex items-center justify-center gap-2">
                 <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    fill="none"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
                 </svg>
                 Submitting...
               </span>
@@ -291,7 +315,8 @@ ${formData.description}
           <li>Qualified fixes are merged automatically</li>
         </ol>
         <p className="text-slate-500 text-xs mt-4">
-          No need to code, no environment setup required — simply share your ideas and watch them come to life!
+          No need to code, no environment setup required — simply share your ideas and watch them
+          come to life!
         </p>
       </div>
     </div>

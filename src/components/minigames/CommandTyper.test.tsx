@@ -26,7 +26,7 @@ function setup(rounds = ROUNDS) {
   const onComplete = vi.fn()
   const onSkip = vi.fn()
   const view = render(<CommandTyper rounds={rounds} onComplete={onComplete} onSkip={onSkip} />)
-  const input = screen.getByPlaceholderText('Type the command...') as HTMLInputElement
+  const input = screen.getByPlaceholderText('Type the command...')
   return { ...view, onComplete, onSkip, input }
 }
 
@@ -164,9 +164,7 @@ describe('CommandTyper', () => {
     expect(screen.getByText('✓ 2')).toBeInTheDocument()
     playRound(sequence[4])
 
-    expect(
-      screen.getByText('You typed 3 out of 5 commands correctly (60%)'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('You typed 3 out of 5 commands correctly (60%)')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: /claim rewards/i }))
     expect(onComplete).toHaveBeenCalledWith(FULL_TIME_ROUND_SCORE * 3, ROUNDS * 100)

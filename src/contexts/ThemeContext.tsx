@@ -6,7 +6,7 @@ export type Theme = 'light' | 'dark' | 'system'
 // palette is not yet coherently themed (components hardcode dark surfaces),
 // so first-time visitors default to dark; the setting remains fully
 // user-overridable. See docs/planning/003-QUALITY_PLAN.md Phase 3.
-export const DEFAULT_THEME: Theme = 'dark'
+const DEFAULT_THEME: Theme = 'dark'
 
 interface ThemeContextType {
   theme: Theme
@@ -20,7 +20,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
     /* istanbul ignore if */
     if (typeof window !== 'undefined') {
-      return (localStorage.getItem('theme') as Theme) || DEFAULT_THEME
+      const stored = localStorage.getItem('theme')
+      return stored === 'light' || stored === 'dark' || stored === 'system' ? stored : DEFAULT_THEME
     }
     return DEFAULT_THEME
   })
@@ -32,7 +33,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
       }
       /* istanbul ignore next */
-      return theme as 'light' | 'dark'
+      return theme
     }
     return 'light'
   })
@@ -56,9 +57,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     if (theme === 'system') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-      const handler = () => updateResolvedTheme()
+      const handler = () => {
+        updateResolvedTheme()
+      }
       mediaQuery.addEventListener('change', handler)
-      return () => mediaQuery.removeEventListener('change', handler)
+      return () => {
+        mediaQuery.removeEventListener('change', handler)
+      }
     }
   }, [theme])
 

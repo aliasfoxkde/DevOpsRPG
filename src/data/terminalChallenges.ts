@@ -9,7 +9,7 @@ export interface TerminalChallenge {
   expectedOutput?: string
 }
 
-export const TERMINAL_CHALLENGES: TerminalChallenge[] = [
+const TERMINAL_CHALLENGES: TerminalChallenge[] = [
   // Git Challenges
   {
     id: 'git_status',
@@ -110,7 +110,8 @@ export const TERMINAL_CHALLENGES: TerminalChallenge[] = [
     description: 'Run a new container',
     command: 'docker run -d nginx',
     hint: '-d runs in detached mode',
-    explanation: 'docker run creates and starts a new container from an image. -d runs it in background.',
+    explanation:
+      'docker run creates and starts a new container from an image. -d runs it in background.',
   },
   {
     id: 'docker_build',
@@ -231,7 +232,8 @@ export const TERMINAL_CHALLENGES: TerminalChallenge[] = [
     description: 'Search for pattern in file',
     command: 'grep -r "error" ./logs',
     hint: '-r searches recursively',
-    explanation: 'grep searches for patterns in files. -r searches recursively through directories.',
+    explanation:
+      'grep searches for patterns in files. -r searches recursively through directories.',
   },
   {
     id: 'bash_chmod',
@@ -289,7 +291,8 @@ export const TERMINAL_CHALLENGES: TerminalChallenge[] = [
     description: 'Initialize Terraform working directory',
     command: 'terraform init',
     hint: 'init is always the first command',
-    explanation: 'terraform init initializes a Terraform working directory containing configuration files.',
+    explanation:
+      'terraform init initializes a Terraform working directory containing configuration files.',
   },
   {
     id: 'tf_plan',
@@ -311,12 +314,8 @@ export const TERMINAL_CHALLENGES: TerminalChallenge[] = [
   },
 ]
 
-export function getChallengesByCategory(category: TerminalChallenge['category']) {
-  return TERMINAL_CHALLENGES.filter(c => c.category === category)
-}
-
-export function getChallengesByDifficulty(difficulty: TerminalChallenge['difficulty']) {
-  return TERMINAL_CHALLENGES.filter(c => c.difficulty === difficulty)
+function getChallengesByCategory(category: TerminalChallenge['category']) {
+  return TERMINAL_CHALLENGES.filter((c) => c.category === category)
 }
 
 export function getRandomChallenges(count: number, category?: TerminalChallenge['category']) {
@@ -332,10 +331,4 @@ export const CATEGORY_COLORS: Record<TerminalChallenge['category'], string> = {
   bash: '#4eaa25',
   terraform: '#7b42bc',
   aws: '#ff9900',
-}
-
-export const DIFFICULTY_LABELS: Record<TerminalChallenge['difficulty'], string> = {
-  beginner: '🌱 Beginner',
-  intermediate: '⚡ Intermediate',
-  advanced: '🔥 Advanced',
 }

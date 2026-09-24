@@ -14,7 +14,7 @@ export interface StoryArc {
   }
 }
 
-export interface StoryEpisode {
+interface StoryEpisode {
   id: string
   title: string
   description: string
@@ -29,21 +29,23 @@ export const STORY_ARCS: StoryArc[] = [
     title: 'The Migration Chronicles',
     subtitle: 'A Tale of Two Data Centers',
     icon: '🏰',
-    description: 'The old data center is being deprecated. You\'ve been tasked with migrating critical services to the cloud. Follow the journey from planning to production.',
+    description:
+      "The old data center is being deprecated. You've been tasked with migrating critical services to the cloud. Follow the journey from planning to production.",
     difficulty: 'intermediate',
     estimatedTime: '2-3 hours',
     episodes: [
       {
         id: 'migration-1',
         title: 'Chapter 1: The Inheritance',
-        description: 'You\'ve just taken over the legacy data center. First, you need to understand what you\'ve inherited.',
+        description:
+          "You've just taken over the legacy data center. First, you need to understand what you've inherited.",
         questIds: ['audit-server', 'document-services', 'map-dependencies'],
         unlocksAt: 1,
       },
       {
         id: 'migration-2',
         title: 'Chapter 2: The Plan',
-        description: 'With the inventory complete, it\'s time to plan the migration strategy.',
+        description: "With the inventory complete, it's time to plan the migration strategy.",
         questIds: ['assess-workloads', 'choose-strategy', 'design-architecture'],
         unlocksAt: 2,
       },
@@ -57,7 +59,8 @@ export const STORY_ARCS: StoryArc[] = [
       {
         id: 'migration-4',
         title: 'Chapter 4: The Hurdles',
-        description: 'Unexpected challenges arise. Data sync issues and configuration conflicts threaten the timeline.',
+        description:
+          'Unexpected challenges arise. Data sync issues and configuration conflicts threaten the timeline.',
         questIds: ['resolve-sync', 'fix-configs', 'optimize-performance'],
         unlocksAt: 4,
       },
@@ -80,7 +83,8 @@ export const STORY_ARCS: StoryArc[] = [
     title: 'Operation: Zero Trust',
     subtitle: 'When the Walls Come Down',
     icon: '🛡️',
-    description: 'A security audit has revealed vulnerabilities. Work through the incident response and security hardening journey.',
+    description:
+      'A security audit has revealed vulnerabilities. Work through the incident response and security hardening journey.',
     difficulty: 'advanced',
     estimatedTime: '3-4 hours',
     episodes: [
@@ -138,7 +142,8 @@ export const STORY_ARCS: StoryArc[] = [
     title: 'The Automation Frontier',
     subtitle: 'Rise of the Machines',
     icon: '🤖',
-    description: 'Manual processes are slowing everyone down. Embark on a journey to automate all the things.',
+    description:
+      'Manual processes are slowing everyone down. Embark on a journey to automate all the things.',
     difficulty: 'beginner',
     estimatedTime: '1-2 hours',
     episodes: [
@@ -189,7 +194,8 @@ export const STORY_ARCS: StoryArc[] = [
     title: 'Chaos Engineering',
     subtitle: 'Breaking Things on Purpose',
     icon: '💥',
-    description: 'Learn to embrace failure by intentionally introducing chaos to test system resilience.',
+    description:
+      'Learn to embrace failure by intentionally introducing chaos to test system resilience.',
     difficulty: 'advanced',
     estimatedTime: '2-3 hours',
     episodes: [
@@ -233,7 +239,8 @@ export const STORY_ARCS: StoryArc[] = [
     title: 'The Observability Journey',
     subtitle: 'See Everything, Understand Anything',
     icon: '🔭',
-    description: 'You can\'t fix what you can\'t see. Build a comprehensive observability stack from scratch.',
+    description:
+      "You can't fix what you can't see. Build a comprehensive observability stack from scratch.",
     difficulty: 'intermediate',
     estimatedTime: '2 hours',
     episodes: [

@@ -5,9 +5,7 @@ import LearnPage from './LearnPage'
 import { technologies } from '../data/technologies'
 
 function renderWithRouter(ui: React.ReactElement) {
-  return render(ui, { wrapper: ({ children }) => (
-    <MemoryRouter>{children}</MemoryRouter>
-  )})
+  return render(ui, { wrapper: ({ children }) => <MemoryRouter>{children}</MemoryRouter> })
 }
 
 describe('LearnPage', () => {

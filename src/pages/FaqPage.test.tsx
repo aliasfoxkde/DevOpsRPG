@@ -14,9 +14,7 @@ describe('FaqPage', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: /Frequently Asked Questions/ }),
     ).toBeInTheDocument()
-    expect(
-      screen.getByText('Everything you need to know about DevOpsQuest'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('Everything you need to know about DevOpsQuest')).toBeInTheDocument()
   })
 
   it('renders one filter button per FAQ category', () => {

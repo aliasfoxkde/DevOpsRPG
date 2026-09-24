@@ -24,6 +24,36 @@ jobs:
       - name: Run ESLint
         run: npm run lint
 
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Detect unused code
+        run: npm run knip
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # aegis ships with the local harness; on GitForge (primary CI) the gate
+      # is mandatory, here it degrades to a warning when the binary is absent.
+      - name: Aegis secret/pattern scan (baseline ratchet)
+        run: |
+          if command -v aegis >/dev/null 2>&1; then
+            npm run audit:secrets
+          else
+            echo "::warning::aegis is not installed on this runner — gate enforced on GitForge."
+          fi
+
   typecheck:
     name: Type Check
     runs-on: ubuntu-latest
@@ -122,7 +152,7 @@ jobs:
 
   deploy-preview:
     name: Deploy Preview
-    needs: [lint, typecheck, test, e2e, build]
+    needs: [lint, typecheck, test, security, e2e, build]
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     environment:
@@ -171,7 +201,7 @@ jobs:
 
   deploy-production:
     name: Deploy Production
-    needs: [lint, typecheck, test, e2e, build]
+    needs: [lint, typecheck, test, security, e2e, build]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:

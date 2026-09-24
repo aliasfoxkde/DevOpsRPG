@@ -27,14 +27,6 @@ export interface SentGift {
   sentAt: string
 }
 
-export interface ReceivedGift {
-  id: string
-  fromFriendId: string
-  giftId: string
-  receivedAt: string
-  claimed: boolean
-}
-
 // Mock friends data
 export const MOCK_FRIENDS: Friend[] = [
   {
@@ -137,7 +129,7 @@ export const AVAILABLE_GIFTS: Gift[] = [
     type: 'streak_shield',
     name: 'Streak Shield',
     icon: '🛡️',
-    description: 'Protect a friend\'s streak for one day',
+    description: "Protect a friend's streak for one day",
     cooldownDays: 14,
   },
   {
@@ -163,16 +155,99 @@ export interface LeaderboardEntry {
 }
 
 export const MOCK_LEADERBOARD: LeaderboardEntry[] = [
-  { rank: 1, id: 'lb_1', name: 'DevOpsLegend', avatar: '🐉', level: 50, totalXP: 25000, streakDays: 90 },
-  { rank: 2, id: 'lb_2', name: 'CloudMaster', avatar: '☁️', level: 35, totalXP: 15000, streakDays: 45 },
-  { rank: 3, id: 'lb_3', name: 'K8sKnight', avatar: '🏰', level: 25, totalXP: 10500, streakDays: 45, isFriend: true },
-  { rank: 4, id: 'lb_4', name: 'GitGuru99', avatar: '🧙', level: 18, totalXP: 6100, streakDays: 7, isFriend: true },
-  { rank: 5, id: 'lb_5', name: 'DockerDiva', avatar: '🐳', level: 12, totalXP: 3200, streakDays: 3, isFriend: true },
-  { rank: 6, id: 'lb_6', name: 'TerraformTitan', avatar: '🗿', level: 28, totalXP: 12000, streakDays: 21 },
-  { rank: 7, id: 'lb_7', name: 'PipelinePro', avatar: '⚙️', level: 20, totalXP: 7800, streakDays: 14 },
-  { rank: 8, id: 'lb_8', name: 'AnsibleAce', avatar: '🎯', level: 16, totalXP: 5200, streakDays: 5 },
-  { rank: 9, id: 'lb_9', name: 'LinuxLegend', avatar: '🦁', level: 30, totalXP: 14000, streakDays: 30 },
-  { rank: 10, id: 'lb_10', name: 'SecuritySage', avatar: '🦊', level: 22, totalXP: 9000, streakDays: 18 },
+  {
+    rank: 1,
+    id: 'lb_1',
+    name: 'DevOpsLegend',
+    avatar: '🐉',
+    level: 50,
+    totalXP: 25000,
+    streakDays: 90,
+  },
+  {
+    rank: 2,
+    id: 'lb_2',
+    name: 'CloudMaster',
+    avatar: '☁️',
+    level: 35,
+    totalXP: 15000,
+    streakDays: 45,
+  },
+  {
+    rank: 3,
+    id: 'lb_3',
+    name: 'K8sKnight',
+    avatar: '🏰',
+    level: 25,
+    totalXP: 10500,
+    streakDays: 45,
+    isFriend: true,
+  },
+  {
+    rank: 4,
+    id: 'lb_4',
+    name: 'GitGuru99',
+    avatar: '🧙',
+    level: 18,
+    totalXP: 6100,
+    streakDays: 7,
+    isFriend: true,
+  },
+  {
+    rank: 5,
+    id: 'lb_5',
+    name: 'DockerDiva',
+    avatar: '🐳',
+    level: 12,
+    totalXP: 3200,
+    streakDays: 3,
+    isFriend: true,
+  },
+  {
+    rank: 6,
+    id: 'lb_6',
+    name: 'TerraformTitan',
+    avatar: '🗿',
+    level: 28,
+    totalXP: 12000,
+    streakDays: 21,
+  },
+  {
+    rank: 7,
+    id: 'lb_7',
+    name: 'PipelinePro',
+    avatar: '⚙️',
+    level: 20,
+    totalXP: 7800,
+    streakDays: 14,
+  },
+  {
+    rank: 8,
+    id: 'lb_8',
+    name: 'AnsibleAce',
+    avatar: '🎯',
+    level: 16,
+    totalXP: 5200,
+    streakDays: 5,
+  },
+  {
+    rank: 9,
+    id: 'lb_9',
+    name: 'LinuxLegend',
+    avatar: '🦁',
+    level: 30,
+    totalXP: 14000,
+    streakDays: 30,
+  },
+  {
+    rank: 10,
+    id: 'lb_10',
+    name: 'SecuritySage',
+    avatar: '🦊',
+    level: 22,
+    totalXP: 9000,
+    streakDays: 18,
+  },
 ]
 
 export function formatLastActive(timestamp: string): string {

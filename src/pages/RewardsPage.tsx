@@ -437,8 +437,8 @@ export default function RewardsPage() {
                 </div>
                 <button
                   onClick={() => {
-                      handleOpenMystery(collectible)
-                    }}
+                    handleOpenMystery(collectible)
+                  }}
                   className={`mt-2 w-full py-1 px-3 rounded text-sm font-bold ${
                     collectible.type === 'mystery_box'
                       ? 'bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400'
@@ -514,8 +514,8 @@ export default function RewardsPage() {
                     {canClaim && (
                       <button
                         onClick={() => {
-                        handleClaimTier(tier)
-                      }}
+                          handleClaimTier(tier)
+                        }}
                         className="w-full py-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 rounded-lg font-bold text-sm text-white"
                       >
                         🎁 CLAIM PACK!

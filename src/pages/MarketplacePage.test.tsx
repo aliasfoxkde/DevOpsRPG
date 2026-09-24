@@ -13,9 +13,7 @@ describe('MarketplacePage', () => {
     const { character } = seedDefaultGame()
     renderSeededPage(<MarketplacePage />, { route: '/marketplace', url: '/marketplace' })
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Marketplace/ }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /Marketplace/ })).toBeInTheDocument()
     expect(screen.getByText('Backend Required')).toBeInTheDocument()
     expect(screen.getByText('Your Gold')).toBeInTheDocument()
     expect(screen.getByText(`💰 ${character.gold.toLocaleString()}`)).toBeInTheDocument()
@@ -53,9 +51,7 @@ describe('MarketplacePage', () => {
 
     await user.click(screen.getByText('Docker Expert'))
 
-    expect(
-      screen.getByRole('heading', { name: 'Confirm Purchase' }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Confirm Purchase' })).toBeInTheDocument()
     // The price shows on the card behind the modal and inside the modal itself
     expect(screen.getAllByText('💰 500')).toHaveLength(2)
     const balance = screen.getByText('Your Balance:').nextElementSibling
@@ -65,9 +61,7 @@ describe('MarketplacePage', () => {
     expect(buyButton).toBeDisabled()
 
     await user.click(screen.getByRole('button', { name: 'Cancel' }))
-    expect(
-      screen.queryByRole('heading', { name: 'Confirm Purchase' }),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Confirm Purchase' })).not.toBeInTheDocument()
   })
 
   it('shows the placeholder flow for creating a new listing', async () => {
@@ -76,18 +70,12 @@ describe('MarketplacePage', () => {
 
     await user.click(screen.getByRole('button', { name: /Create New Listing/ }))
 
-    expect(
-      screen.getByRole('heading', { name: 'Create New Listing' }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Create New Listing' })).toBeInTheDocument()
     expect(screen.getByText('Coming Soon')).toBeInTheDocument()
-    expect(
-      screen.getByText('Login required to list items'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('Login required to list items')).toBeInTheDocument()
     expect(screen.getByPlaceholderText('Enter price')).toBeDisabled()
 
     await user.click(screen.getAllByRole('button', { name: 'Close' })[0])
-    expect(
-      screen.queryByRole('heading', { name: 'Create New Listing' }),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Create New Listing' })).not.toBeInTheDocument()
   })
 })

@@ -166,8 +166,8 @@ export default function QuestJournalPage() {
                 placeholder="🔍 Search quests..."
                 value={searchQuery}
                 onChange={(e) => {
-                setSearchQuery(e.target.value)
-              }}
+                  setSearchQuery(e.target.value)
+                }}
                 className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-amber-500"
               />
             </div>

@@ -1,7 +1,7 @@
 // Equipment system - non-combat items that provide gameplay bonuses
 // Per BRAINSTORM.md: Keep simple. Not combat gear. Use: Laptop, Keyboard, Monitor, Backpack, Coffee Mug, Server Rack
 
-export type EquipmentSlot = 'workstation' | 'accessory' | 'cosmetic' | 'special'
+type EquipmentSlot = 'workstation' | 'accessory' | 'cosmetic' | 'special'
 export type EquipmentRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
 
 export interface EquipmentItem {
@@ -13,8 +13,8 @@ export interface EquipmentItem {
   rarity: EquipmentRarity
   price: number
   bonuses: {
-    xpBonus?: number      // e.g., 0.05 = +5% XP
-    goldBonus?: number     // e.g., 0.05 = +5% Gold
+    xpBonus?: number // e.g., 0.05 = +5% XP
+    goldBonus?: number // e.g., 0.05 = +5% Gold
     quizScoreBonus?: number // e.g., 0.1 = +10% quiz score
     streakProtection?: number // e.g., 1 = protects 1 day
   }
@@ -66,7 +66,7 @@ export const EQUIPMENT_ITEMS: EquipmentItem[] = [
     rarity: 'rare',
     price: 600,
     bonuses: {},
-    techBonus: { technologyId: 'aws', bonus: 0.10 },
+    techBonus: { technologyId: 'aws', bonus: 0.1 },
   },
   {
     id: 'server_rack',
@@ -109,7 +109,7 @@ export const EQUIPMENT_ITEMS: EquipmentItem[] = [
     slot: 'accessory',
     rarity: 'uncommon',
     price: 400,
-    bonuses: { quizScoreBonus: 0.10 },
+    bonuses: { quizScoreBonus: 0.1 },
   },
   {
     id: 'noise_cancelling',
@@ -195,7 +195,7 @@ export const EQUIPMENT_ITEMS: EquipmentItem[] = [
     slot: 'special',
     rarity: 'epic',
     price: 800,
-    bonuses: { goldBonus: 0.10, xpBonus: 0.05 },
+    bonuses: { goldBonus: 0.1, xpBonus: 0.05 },
   },
   {
     id: 'ancient_grimoire',
@@ -222,21 +222,16 @@ export const EQUIPMENT_ITEMS: EquipmentItem[] = [
 
 // Get equipment by rarity color
 export const RARITY_COLORS: Record<EquipmentRarity, string> = {
-  common: '#9ca3af',    // Gray
-  uncommon: '#22c55e',  // Green
-  rare: '#3b82f6',      // Blue
-  epic: '#a855f7',      // Purple
+  common: '#9ca3af', // Gray
+  uncommon: '#22c55e', // Green
+  rare: '#3b82f6', // Blue
+  epic: '#a855f7', // Purple
   legendary: '#f59e0b', // Gold
-}
-
-// Get all equipment in a specific slot
-export function getEquipmentBySlot(slot: EquipmentSlot): EquipmentItem[] {
-  return EQUIPMENT_ITEMS.filter(item => item.slot === slot)
 }
 
 // Get equipment by ID
 export function getEquipmentById(id: string): EquipmentItem | undefined {
-  return EQUIPMENT_ITEMS.find(item => item.id === id)
+  return EQUIPMENT_ITEMS.find((item) => item.id === id)
 }
 
 // Calculate total bonuses from equipped items

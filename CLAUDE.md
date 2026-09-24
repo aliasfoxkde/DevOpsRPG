@@ -25,6 +25,7 @@ npm run build        # tsc -b && vite build (typechecks as part of build)
 Validation before claiming completion: `npm run lint && npm run typecheck && npm run test`.
 
 Worker/deploy:
+
 ```bash
 npm run dev:worker    # Wrangler dev for worker/
 npm run deploy:worker # Deploy worker

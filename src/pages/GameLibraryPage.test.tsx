@@ -14,12 +14,8 @@ describe('GameLibraryPage', () => {
 
   it('renders the page heading and tagline', () => {
     renderSeededPage(<GameLibraryPage />)
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Game Library/ }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText('Browse and discover all our learning games'),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /Game Library/ })).toBeInTheDocument()
+    expect(screen.getByText('Browse and discover all our learning games')).toBeInTheDocument()
   })
 
   it('lists the full catalogue with a matching result count', () => {

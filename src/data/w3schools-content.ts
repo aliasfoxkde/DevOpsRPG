@@ -1,19 +1,19 @@
 // Pre-scraped W3Schools content - stored as static data
 // This content is scraped via scripts/scrape-w3schools.js and stored here
 
-export interface Section {
+interface Section {
   heading: string
   content: string
 }
 
-export interface TopicContent {
+interface TopicContent {
   id: string
   name: string
   sections: Section[]
   codeExamples: string[]
 }
 
-export interface TechnologyContent {
+interface TechnologyContent {
   name: string
   icon: string
   description: string

@@ -8,7 +8,7 @@ import { renderPage, renderSeededPage, seedDefaultGame } from './test-utils'
 
 const realmList = Object.values(realms)
 const firstRealm = realmList[0]
-const firstRealmQuests = allQuests.filter(q => q.realmId === firstRealm.id)
+const firstRealmQuests = allQuests.filter((q) => q.realmId === firstRealm.id)
 
 describe('AnalyticsPage', () => {
   beforeEach(() => {
@@ -51,9 +51,7 @@ describe('AnalyticsPage', () => {
       expect(screen.getByText(realm.name)).toBeInTheDocument()
     }
     // Nothing completed in the first realm yet
-    expect(
-      screen.getByText(`0/${firstRealmQuests.length}`),
-    ).toBeInTheDocument()
+    expect(screen.getByText(`0/${firstRealmQuests.length}`)).toBeInTheDocument()
   })
 
   it('counts a completed quest in its realm and technology breakdown', () => {
@@ -76,9 +74,7 @@ describe('AnalyticsPage', () => {
     expect(screen.getByText(`1/${firstRealmQuests.length}`)).toBeInTheDocument()
     // The finished technology appears in the breakdown list (the page uppercases
     // it via a CSS class, so the raw lowercase id is what ends up in the DOM)
-    expect(
-      screen.getByText(new RegExp(`^${quest.technologyId}$`, 'i')),
-    ).toBeInTheDocument()
+    expect(screen.getByText(new RegExp(`^${quest.technologyId}$`, 'i'))).toBeInTheDocument()
   })
 
   it('reports performance metrics and badge collection progress', () => {

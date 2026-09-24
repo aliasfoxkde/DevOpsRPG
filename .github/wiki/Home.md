@@ -22,14 +22,14 @@ DevOpsRPG is a gamified DevOps learning platform built with React 19, TypeScript
 
 ### Tech Stack
 
-| Component | Technology |
-|-----------|------------|
-| Frontend | React 19 + TypeScript |
-| Build | Vite 6 |
-| Styling | TailwindCSS |
-| State | React Context |
-| Hosting | Cloudflare Pages |
-| CI/CD | GitHub Actions |
+| Component | Technology            |
+| --------- | --------------------- |
+| Frontend  | React 19 + TypeScript |
+| Build     | Vite 6                |
+| Styling   | TailwindCSS           |
+| State     | React Context         |
+| Hosting   | Cloudflare Pages      |
+| CI/CD     | GitHub Actions        |
 
 ## Recent Changes
 

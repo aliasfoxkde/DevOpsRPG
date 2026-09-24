@@ -20,7 +20,12 @@ export function generateQuizQuestions(count: number): QuizQuestion[] {
   const sampleQuestions: Omit<QuizQuestion, 'id'>[] = [
     {
       question: 'What does CD stand for in DevOps?',
-      options: ['Continuous Deployment', 'Container Docker', 'Code Development', 'Central Database'],
+      options: [
+        'Continuous Deployment',
+        'Container Docker',
+        'Code Development',
+        'Central Database',
+      ],
       correctAnswer: 0,
     },
     {
@@ -35,7 +40,12 @@ export function generateQuizQuestions(count: number): QuizQuestion[] {
     },
     {
       question: 'What does IaC stand for?',
-      options: ['Infrastructure as Code', 'Internet as Computer', 'Integrated Application Controller', 'Internal API Cache'],
+      options: [
+        'Infrastructure as Code',
+        'Internet as Computer',
+        'Integrated Application Controller',
+        'Internal API Cache',
+      ],
       correctAnswer: 0,
     },
     {
@@ -45,7 +55,12 @@ export function generateQuizQuestions(count: number): QuizQuestion[] {
     },
     {
       question: 'What does CPU stand for?',
-      options: ['Central Processing Unit', 'Computer Personal Unit', 'Central Program Utility', 'Core Processing Utility'],
+      options: [
+        'Central Processing Unit',
+        'Computer Personal Unit',
+        'Central Program Utility',
+        'Core Processing Utility',
+      ],
       correctAnswer: 0,
     },
     {
@@ -55,7 +70,12 @@ export function generateQuizQuestions(count: number): QuizQuestion[] {
     },
     {
       question: 'What does API stand for?',
-      options: ['Application Programming Interface', 'Automated Program Integration', 'Application Process Integration', 'Advanced Programming Internet'],
+      options: [
+        'Application Programming Interface',
+        'Automated Program Integration',
+        'Application Process Integration',
+        'Advanced Programming Internet',
+      ],
       correctAnswer: 0,
     },
   ]
@@ -86,34 +106,37 @@ export function QuizDashGame({ onComplete, onSkip }: QuizDashProps) {
   const currentQuestion = questions[currentIndex]
   const maxScore = questions.length
 
-  const handleAnswer = useCallback((answerIndex: number) => {
-    if (showResult) return
+  const handleAnswer = useCallback(
+    (answerIndex: number) => {
+      if (showResult) return
 
-    setSelectedAnswer(answerIndex)
-    setShowResult(true)
+      setSelectedAnswer(answerIndex)
+      setShowResult(true)
 
-    const isCorrect = answerIndex === currentQuestion.correctAnswer
-    if (isCorrect) {
-      setScore((prev) => prev + 1)
-      setStreak((prev) => prev + 1)
-    } else {
-      setStreak(0)
-    }
-
-    // Move to next question after delay
-    setTimeout(() => {
-      setShowResult(false)
-      setSelectedAnswer(null)
-      setTimeLeft(10)
-
-      if (currentIndex < questions.length - 1) {
-        setCurrentIndex((prev) => prev + 1)
+      const isCorrect = answerIndex === currentQuestion.correctAnswer
+      if (isCorrect) {
+        setScore((prev) => prev + 1)
+        setStreak((prev) => prev + 1)
       } else {
-        setIsComplete(true)
-        onComplete(score + (isCorrect ? 1 : 0), maxScore)
+        setStreak(0)
       }
-    }, 1000)
-  }, [currentQuestion, currentIndex, questions.length, score, maxScore, showResult, onComplete])
+
+      // Move to next question after delay
+      setTimeout(() => {
+        setShowResult(false)
+        setSelectedAnswer(null)
+        setTimeLeft(10)
+
+        if (currentIndex < questions.length - 1) {
+          setCurrentIndex((prev) => prev + 1)
+        } else {
+          setIsComplete(true)
+          onComplete(score + (isCorrect ? 1 : 0), maxScore)
+        }
+      }, 1000)
+    },
+    [currentQuestion, currentIndex, questions.length, score, maxScore, showResult, onComplete],
+  )
 
   // Timer effect
   useEffect(() => {
@@ -130,7 +153,9 @@ export function QuizDashGame({ onComplete, onSkip }: QuizDashProps) {
       })
     }, 1000)
 
-    return () => clearInterval(timer)
+    return () => {
+      clearInterval(timer)
+    }
   }, [currentIndex, showResult, isComplete, handleAnswer])
 
   const getOptionClass = (index: number) => {
@@ -153,13 +178,19 @@ export function QuizDashGame({ onComplete, onSkip }: QuizDashProps) {
     const percentage = (score / maxScore) * 100
     return (
       <div className="p-6 text-center">
-        <div className="text-6xl mb-4">{percentage >= 80 ? '🏆' : percentage >= 60 ? '👍' : '💪'}</div>
+        <div className="text-6xl mb-4">
+          {percentage >= 80 ? '🏆' : percentage >= 60 ? '👍' : '💪'}
+        </div>
         <h3 className="text-2xl font-bold text-white mb-2">Quiz Complete!</h3>
         <div className="text-4xl font-bold text-amber-400 mb-2">
           {score} / {maxScore}
         </div>
         <p className="text-slate-400 mb-6">
-          {percentage >= 80 ? 'Excellent work!' : percentage >= 60 ? 'Good job!' : 'Keep practicing!'}
+          {percentage >= 80
+            ? 'Excellent work!'
+            : percentage >= 60
+              ? 'Good job!'
+              : 'Keep practicing!'}
         </p>
         <div className="flex gap-3 justify-center">
           <button
@@ -169,7 +200,9 @@ export function QuizDashGame({ onComplete, onSkip }: QuizDashProps) {
             Back to Menu
           </button>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              window.location.reload()
+            }}
             className="px-6 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg transition-colors"
           >
             Play Again
@@ -184,10 +217,7 @@ export function QuizDashGame({ onComplete, onSkip }: QuizDashProps) {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-4">
-          <button
-            onClick={onSkip}
-            className="text-slate-400 hover:text-white transition-colors"
-          >
+          <button onClick={onSkip} className="text-slate-400 hover:text-white transition-colors">
             ✕
           </button>
           <span className="text-slate-400">
@@ -195,12 +225,12 @@ export function QuizDashGame({ onComplete, onSkip }: QuizDashProps) {
           </span>
         </div>
         <div className="flex items-center gap-4">
-          {streak >= 2 && (
-            <span className="text-orange-400 animate-pulse">🔥 {streak}</span>
-          )}
-          <div className={`px-3 py-1 rounded-full font-bold ${
-            timeLeft <= 3 ? 'bg-red-600 text-white animate-pulse' : 'bg-slate-700 text-white'
-          }`}>
+          {streak >= 2 && <span className="text-orange-400 animate-pulse">🔥 {streak}</span>}
+          <div
+            className={`px-3 py-1 rounded-full font-bold ${
+              timeLeft <= 3 ? 'bg-red-600 text-white animate-pulse' : 'bg-slate-700 text-white'
+            }`}
+          >
             {timeLeft}s
           </div>
         </div>
@@ -222,7 +252,9 @@ export function QuizDashGame({ onComplete, onSkip }: QuizDashProps) {
           {currentQuestion.options.map((option, index) => (
             <button
               key={index}
-              onClick={() => handleAnswer(index)}
+              onClick={() => {
+                handleAnswer(index)
+              }}
               disabled={showResult}
               className={`w-full p-4 rounded-lg border-2 text-left font-medium transition-all ${getOptionClass(index)}`}
             >
@@ -233,9 +265,9 @@ export function QuizDashGame({ onComplete, onSkip }: QuizDashProps) {
               {showResult && index === currentQuestion.correctAnswer && (
                 <span className="float-right">✓</span>
               )}
-              {showResult && index === selectedAnswer && index !== currentQuestion.correctAnswer && (
-                <span className="float-right">✗</span>
-              )}
+              {showResult &&
+                index === selectedAnswer &&
+                index !== currentQuestion.correctAnswer && <span className="float-right">✗</span>}
             </button>
           ))}
         </div>

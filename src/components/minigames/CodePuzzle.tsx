@@ -18,7 +18,9 @@ export function CodePuzzleGame({ rounds = 5, onComplete, onSkip }: CodePuzzleGam
   const [wrongCount, setWrongCount] = useState(0)
   const [gameState, setGameState] = useState<'playing' | 'finished'>('playing')
 
-  const currentPuzzle = gamePuzzles[currentIndex]
+  // Honest optional type: the dealt pool can be empty or exhausted, so indexing
+  // can miss and the `currentPuzzle` guards below are load-bearing.
+  const currentPuzzle = currentIndex < gamePuzzles.length ? gamePuzzles[currentIndex] : undefined
   const maxScore = rounds * 100
 
   const handleSelectAnswer = (answer: string) => {
@@ -30,16 +32,16 @@ export function CodePuzzleGame({ rounds = 5, onComplete, onSkip }: CodePuzzleGam
     const isCorrect = answer === currentPuzzle.answer
 
     if (isCorrect) {
-      setCorrectCount(c => c + 1)
-      setScore(s => s + 100)
+      setCorrectCount((c) => c + 1)
+      setScore((s) => s + 100)
     } else {
-      setWrongCount(c => c + 1)
+      setWrongCount((c) => c + 1)
     }
   }
 
   const handleNext = () => {
     if (currentIndex < gamePuzzles.length - 1) {
-      setCurrentIndex(i => i + 1)
+      setCurrentIndex((i) => i + 1)
       setSelectedAnswer(null)
       setShowResult(false)
     } else {
@@ -95,9 +97,7 @@ export function CodePuzzleGame({ rounds = 5, onComplete, onSkip }: CodePuzzleGam
           </div>
 
           {passed && (
-            <div className="text-green-400 mb-4">
-              +{Math.round(score / 2)} Bonus XP earned!
-            </div>
+            <div className="text-green-400 mb-4">+{Math.round(score / 2)} Bonus XP earned!</div>
           )}
 
           <div className="flex items-center justify-center gap-4">
@@ -146,7 +146,9 @@ export function CodePuzzleGame({ rounds = 5, onComplete, onSkip }: CodePuzzleGam
           <div className="flex items-center gap-4 text-sm">
             <span className="text-green-400">✓ {correctCount}</span>
             <span className="text-red-400">✗ {wrongCount}</span>
-            <span className="text-slate-400">{currentIndex + 1}/{rounds}</span>
+            <span className="text-slate-400">
+              {currentIndex + 1}/{rounds}
+            </span>
           </div>
         </div>
       </div>
@@ -182,7 +184,9 @@ export function CodePuzzleGame({ rounds = 5, onComplete, onSkip }: CodePuzzleGam
             currentPuzzle.options.map((option, index) => (
               <button
                 key={index}
-                onClick={() => handleSelectAnswer(option)}
+                onClick={() => {
+                  handleSelectAnswer(option)
+                }}
                 disabled={showResult}
                 className={`w-full text-left p-4 rounded-lg border transition-all ${getOptionClass(option)}`}
               >
@@ -199,19 +203,24 @@ export function CodePuzzleGame({ rounds = 5, onComplete, onSkip }: CodePuzzleGam
 
         {/* Result feedback */}
         {showResult && (
-          <div className={`mb-4 p-4 rounded-lg ${
-            selectedAnswer === currentPuzzle?.answer
-              ? 'bg-green-900/30 border border-green-700'
-              : 'bg-amber-900/30 border border-amber-700'
-          }`}>
-            <p className={`font-bold mb-1 ${
-              selectedAnswer === currentPuzzle?.answer ? 'text-green-400' : 'text-amber-400'
-            }`}>
+          <div
+            className={`mb-4 p-4 rounded-lg ${
+              selectedAnswer === currentPuzzle?.answer
+                ? 'bg-green-900/30 border border-green-700'
+                : 'bg-amber-900/30 border border-amber-700'
+            }`}
+          >
+            <p
+              className={`font-bold mb-1 ${
+                selectedAnswer === currentPuzzle?.answer ? 'text-green-400' : 'text-amber-400'
+              }`}
+            >
               {selectedAnswer === currentPuzzle?.answer ? '✓ Correct!' : '✗ Incorrect'}
             </p>
             {selectedAnswer !== currentPuzzle?.answer && (
               <p className="text-slate-300 text-sm">
-                Correct answer: <span className="text-green-400 font-bold">{currentPuzzle?.answer}</span>
+                Correct answer:{' '}
+                <span className="text-green-400 font-bold">{currentPuzzle?.answer}</span>
               </p>
             )}
           </div>

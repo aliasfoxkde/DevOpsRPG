@@ -1,6 +1,6 @@
 name: Change Request
 description: Request a change to existing functionality
-labels: ["change-request", "needs-triage"]
+labels: ['change-request', 'needs-triage']
 body:
   - type: markdown
     attributes:

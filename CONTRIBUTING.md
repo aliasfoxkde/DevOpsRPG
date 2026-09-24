@@ -161,15 +161,15 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 ### Types
 
-| Type | Description |
-|------|-------------|
-| `feat` | New feature |
-| `fix` | Bug fix |
-| `docs` | Documentation |
-| `style` | Formatting (no code change) |
-| `refactor` | Code restructuring |
-| `test` | Adding tests |
-| `chore` | Maintenance |
+| Type       | Description                 |
+| ---------- | --------------------------- |
+| `feat`     | New feature                 |
+| `fix`      | Bug fix                     |
+| `docs`     | Documentation               |
+| `style`    | Formatting (no code change) |
+| `refactor` | Code restructuring          |
+| `test`     | Adding tests                |
+| `chore`    | Maintenance                 |
 
 ### Examples
 
@@ -189,18 +189,22 @@ git commit -m "test(hooks): add tests for useKeyboardShortcuts"
 
 ```markdown
 ## Description
+
 Brief description of changes
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Breaking change
 - [ ] Documentation update
 
 ## Testing
+
 Describe testing performed
 
 ## Checklist
+
 - [ ] Code follows project standards
 - [ ] Tests pass locally
 - [ ] Documentation updated (if needed)

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, type SubmitEvent } from 'react'
 import { useGame } from '../../contexts/GameContext'
 import {
   getRandomChallenges,
@@ -32,8 +32,10 @@ export function TerminalSimulator({ onComplete, category }: TerminalSimulatorPro
 
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const currentChallenge = challenges[currentIndex]
-  const progress = challenges.length > 0 ? ((currentIndex) / challenges.length) * 100 : 0
+  // Honest optional type: the challenge list can be empty, so indexing can miss
+  // and the `currentChallenge` guards below are load-bearing.
+  const currentChallenge = currentIndex < challenges.length ? challenges[currentIndex] : undefined
+  const progress = challenges.length > 0 ? (currentIndex / challenges.length) * 100 : 0
 
   // Start a new game
   const startGame = useCallback(() => {
@@ -59,17 +61,17 @@ export function TerminalSimulator({ onComplete, category }: TerminalSimulatorPro
   }
 
   // Handle submit
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!currentChallenge || !input.trim()) return
 
     const isCorrect = input.trim() === currentChallenge.command
 
     if (isCorrect) {
-      setCorrectCount(prev => prev + 1)
-      setStreak(prev => {
+      setCorrectCount((prev) => prev + 1)
+      setStreak((prev) => {
         const newStreak = prev + 1
-        setMaxStreak(max => Math.max(max, newStreak))
+        setMaxStreak((max) => Math.max(max, newStreak))
         return newStreak
       })
       setWrongAttempts(0)
@@ -77,13 +79,13 @@ export function TerminalSimulator({ onComplete, category }: TerminalSimulatorPro
 
       // Move to next challenge or end game
       if (currentIndex < challenges.length - 1) {
-        setCurrentIndex(prev => prev + 1)
+        setCurrentIndex((prev) => prev + 1)
         setInput('')
       } else {
         finishGame()
       }
     } else {
-      setWrongAttempts(prev => prev + 1)
+      setWrongAttempts((prev) => prev + 1)
       setStreak(0)
 
       // Shake animation feedback
@@ -142,10 +144,10 @@ export function TerminalSimulator({ onComplete, category }: TerminalSimulatorPro
         </div>
         {gameState === 'playing' && (
           <div className="flex items-center gap-4">
-            <span className="text-green-400 text-sm">✓ {correctCount}/{challenges.length}</span>
-            {streak > 0 && (
-              <span className="text-amber-400 text-sm">🔥 {streak}</span>
-            )}
+            <span className="text-green-400 text-sm">
+              ✓ {correctCount}/{challenges.length}
+            </span>
+            {streak > 0 && <span className="text-amber-400 text-sm">🔥 {streak}</span>}
           </div>
         )}
       </div>
@@ -172,7 +174,10 @@ export function TerminalSimulator({ onComplete, category }: TerminalSimulatorPro
             </p>
 
             {category && (
-              <div className="inline-block px-4 py-2 rounded-lg mb-6" style={{ backgroundColor: `${CATEGORY_COLORS[category]}20` }}>
+              <div
+                className="inline-block px-4 py-2 rounded-lg mb-6"
+                style={{ backgroundColor: `${CATEGORY_COLORS[category]}20` }}
+              >
                 <span style={{ color: CATEGORY_COLORS[category] }}>
                   📁 {category.toUpperCase()} Mode
                 </span>
@@ -211,7 +216,10 @@ export function TerminalSimulator({ onComplete, category }: TerminalSimulatorPro
               <div className="flex items-center justify-between mb-2">
                 <span
                   className="px-3 py-1 rounded-full text-sm font-medium"
-                  style={{ backgroundColor: `${CATEGORY_COLORS[currentChallenge.category]}30`, color: CATEGORY_COLORS[currentChallenge.category] }}
+                  style={{
+                    backgroundColor: `${CATEGORY_COLORS[currentChallenge.category]}30`,
+                    color: CATEGORY_COLORS[currentChallenge.category],
+                  }}
                 >
                   {currentChallenge.category.toUpperCase()}
                 </span>
@@ -224,16 +232,16 @@ export function TerminalSimulator({ onComplete, category }: TerminalSimulatorPro
 
             {/* Terminal output area */}
             <div className="bg-slate-950 rounded-lg p-4 mb-4 font-mono text-sm min-h-[120px]">
-              <div className="text-slate-500 mb-2">$ {currentChallenge.command.split(' ')[0]} <span className="animate-pulse">_</span></div>
+              <div className="text-slate-500 mb-2">
+                $ {currentChallenge.command.split(' ')[0]} <span className="animate-pulse">_</span>
+              </div>
               {wrongAttempts > 0 && (
                 <div className="text-red-400 text-sm mb-2">
                   ✗ Incorrect! {wrongAttempts} attempt{wrongAttempts > 1 ? 's' : ''}
                 </div>
               )}
               {showHint && currentChallenge.hint && (
-                <div className="text-amber-400 text-sm">
-                  💡 Hint: {currentChallenge.hint}
-                </div>
+                <div className="text-amber-400 text-sm">💡 Hint: {currentChallenge.hint}</div>
               )}
             </div>
 
@@ -263,7 +271,9 @@ export function TerminalSimulator({ onComplete, category }: TerminalSimulatorPro
             {/* Hint button */}
             {!showHint && (
               <button
-                onClick={() => setShowHint(true)}
+                onClick={() => {
+                  setShowHint(true)
+                }}
                 className="mt-3 text-sm text-slate-500 hover:text-amber-400 transition-colors"
               >
                 💡 Show Hint
@@ -282,25 +292,35 @@ export function TerminalSimulator({ onComplete, category }: TerminalSimulatorPro
         {/* Result State */}
         {gameState === 'result' && (
           <div className="text-center">
-            <div className={`text-6xl mb-4 ${correctCount === challenges.length ? 'animate-bounce' : ''}`}>
-              {correctCount === challenges.length ? '🏆' : correctCount >= challenges.length * 0.7 ? '⭐' : '💪'}
+            <div
+              className={`text-6xl mb-4 ${correctCount === challenges.length ? 'animate-bounce' : ''}`}
+            >
+              {correctCount === challenges.length
+                ? '🏆'
+                : correctCount >= challenges.length * 0.7
+                  ? '⭐'
+                  : '💪'}
             </div>
             <h2 className="text-2xl font-bold text-white mb-2">
               {correctCount === challenges.length
                 ? 'Perfect Score!'
                 : correctCount >= challenges.length * 0.7
-                ? 'Great Job!'
-                : 'Keep Practicing!'}
+                  ? 'Great Job!'
+                  : 'Keep Practicing!'}
             </h2>
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4 max-w-md mx-auto mb-6">
               <div className="bg-slate-800/50 rounded-lg p-4">
-                <div className="text-2xl font-bold text-green-400">{correctCount}/{challenges.length}</div>
+                <div className="text-2xl font-bold text-green-400">
+                  {correctCount}/{challenges.length}
+                </div>
                 <div className="text-xs text-slate-400">Correct</div>
               </div>
               <div className="bg-slate-800/50 rounded-lg p-4">
-                <div className="text-2xl font-bold text-amber-400">{Math.round(totalTime / 1000)}s</div>
+                <div className="text-2xl font-bold text-amber-400">
+                  {Math.round(totalTime / 1000)}s
+                </div>
                 <div className="text-xs text-slate-400">Time</div>
               </div>
               <div className="bg-slate-800/50 rounded-lg p-4">
@@ -336,5 +356,3 @@ export function TerminalSimulator({ onComplete, category }: TerminalSimulatorPro
     </div>
   )
 }
-
-export default TerminalSimulator

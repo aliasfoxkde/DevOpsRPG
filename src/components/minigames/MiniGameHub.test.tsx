@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { useState } from 'react'
 import { render, screen, act, fireEvent } from '@testing-library/react'
-import { GameProvider } from '../../contexts/GameContext'
+import { GameProvider, type GameState } from '../../contexts/GameContext'
 import { MiniGameHub } from './MiniGameHub'
 import { mathChallenges } from '../../data/minigames'
 import { STORAGE_KEYS } from '../../utils/gameUtils'
@@ -20,19 +20,31 @@ function seedLevel(level: number) {
   localStorage.setItem(STORAGE_KEYS.GAME, JSON.stringify({ character: { level }, badges: [] }))
 }
 
-function storedState() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEYS.GAME)!)
+function storedState(): Partial<GameState> {
+  const raw = localStorage.getItem(STORAGE_KEYS.GAME)
+  if (!raw) throw new Error('No game state was persisted to localStorage')
+  return JSON.parse(raw) as Partial<GameState>
+}
+
+function storedCharacter(): GameState['character'] {
+  const { character } = storedState()
+  if (!character) throw new Error('Persisted game state has no character')
+  return character
+}
+
+/** Read one numeric stat counter back out of the persisted save file. */
+function storedStat(stat: 'memoryCount' | 'mathCount' | 'quizCount'): number {
+  return storedState().stats?.[stat] ?? 0
 }
 
 function storedBadgeUnlock(badgeId: string) {
-  return storedState().badges?.find((badge: { id: string }) => badge.id === badgeId)?.unlockedAt
+  // Every badge is pre-seeded in the save file; only `unlockedAt` marks progress.
+  return storedState().badges?.find((badge) => badge.id === badgeId)?.unlockedAt
 }
 
 /** Memory Match cards are the only square buttons in the hub. */
 function boardCards() {
-  return screen
-    .getAllByRole('button')
-    .filter((el) => el.className.includes('aspect-square'))
+  return screen.getAllByRole('button').filter((el) => el.className.includes('aspect-square'))
 }
 
 function flipPair(index: number) {
@@ -63,7 +75,7 @@ const TILE_TITLES: Record<string, string> = {
 function gameTile(label: string) {
   const tile = screen
     .getAllByRole('button')
-    .find((button) => button.textContent?.includes(TILE_TITLES[label]))
+    .find((button) => button.textContent.includes(TILE_TITLES[label]))
   if (!tile) throw new Error(`No mini-game tile rendered for "${label}"`)
   return tile
 }
@@ -141,9 +153,7 @@ describe('MiniGameHub', () => {
     expect(
       screen.getByText(`🔒 Unlocks at Level ${UNLOCK_LEVEL} (Current: Level 1)`),
     ).toBeInTheDocument()
-    expect(
-      screen.getByText('Complete more quests to unlock mini-games!'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('Complete more quests to unlock mini-games!')).toBeInTheDocument()
 
     for (const label of ['command typer', 'memory match', 'math challenge', 'quiz dash']) {
       const tile = gameTile(label)
@@ -190,10 +200,10 @@ describe('MiniGameHub', () => {
     expect(screen.getByText('+38 XP')).toBeInTheDocument()
     expect(screen.getByText('+19 🪙')).toBeInTheDocument()
 
-    const character = storedState().character
+    const character = storedCharacter()
     expect(character.xp).toBe(38)
     expect(character.gold).toBe(19)
-    expect(storedState().stats.memoryCount).toBe(1)
+    expect(storedStat('memoryCount')).toBe(1)
     // 77% is under the 80% bar for the speed badge.
     expect(storedBadgeUnlock('speed_demon')).toBeUndefined()
   })
@@ -216,10 +226,10 @@ describe('MiniGameHub', () => {
     expect(screen.getByText('+78 XP')).toBeInTheDocument()
     expect(screen.getByText('+39 🪙')).toBeInTheDocument()
 
-    const state = storedState()
-    expect(state.character.xp).toBe(78)
-    expect(state.character.gold).toBe(39)
-    expect(state.stats.mathCount).toBe(1)
+    const character = storedCharacter()
+    expect(character.xp).toBe(78)
+    expect(character.gold).toBe(39)
+    expect(storedStat('mathCount')).toBe(1)
     expect(storedBadgeUnlock('speed_demon')).toBeTruthy()
   })
 
@@ -232,8 +242,8 @@ describe('MiniGameHub', () => {
     fireEvent.click(screen.getByRole('button', { name: '✕' }))
 
     expect(title('🎮 Mini-Games').length).toBeGreaterThan(0)
-    expect(storedState().character.xp).toBe(0)
-    expect(storedState().stats.quizCount).toBe(0)
+    expect(storedCharacter().xp).toBe(0)
+    expect(storedStat('quizCount')).toBe(0)
   })
 
   it('returns to the game list from the results screen', () => {

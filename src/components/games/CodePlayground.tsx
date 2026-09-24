@@ -20,7 +20,7 @@ const challenges: Challenge[] = [
     initialCode: '<!-- Create a heading that says "Hello DevOps!" -->\n',
     expectedOutput: 'Hello DevOps!',
     hints: ['Use <h1> tag', 'Tags need opening and closing', '<h1>Your text</h1>'],
-    xpReward: 10
+    xpReward: 10,
   },
   {
     id: 'html-paragraph',
@@ -30,7 +30,7 @@ const challenges: Challenge[] = [
     initialCode: '<!-- Create a paragraph about yourself -->\n',
     expectedOutput: 'paragraph',
     hints: ['Use <p> tag', 'Paragraphs can contain any text'],
-    xpReward: 10
+    xpReward: 10,
   },
   {
     id: 'css-color',
@@ -40,7 +40,7 @@ const challenges: Challenge[] = [
     initialCode: 'div {\n  /* Set background-color to lightblue */\n  \n}',
     expectedOutput: 'lightblue',
     hints: ['Use background-color property', 'Color names are quoted strings'],
-    xpReward: 15
+    xpReward: 15,
   },
   {
     id: 'css-padding',
@@ -50,7 +50,7 @@ const challenges: Challenge[] = [
     initialCode: '.box {\n  /* Add 20px padding */\n  \n}',
     expectedOutput: '20px',
     hints: ['Use padding property', 'Values can be "20px" or "20px 20px 20px 20px"'],
-    xpReward: 15
+    xpReward: 15,
   },
   {
     id: 'js-variable',
@@ -60,7 +60,7 @@ const challenges: Challenge[] = [
     initialCode: '// Create a variable called serverName\n',
     expectedOutput: 'production',
     hints: ['Use let or const', 'let serverName = "production"'],
-    xpReward: 15
+    xpReward: 15,
   },
   {
     id: 'js-function',
@@ -70,7 +70,7 @@ const challenges: Challenge[] = [
     initialCode: '// Create a deploy function\nfunction deploy() {\n  \n}',
     expectedOutput: 'Deployed!',
     hints: ['Use return statement', 'Function should return a string'],
-    xpReward: 20
+    xpReward: 20,
   },
   {
     id: 'js-array',
@@ -80,7 +80,7 @@ const challenges: Challenge[] = [
     initialCode: '// Create servers array\n',
     expectedOutput: 'web,api,database',
     hints: ['Use square brackets', 'Separate items with commas'],
-    xpReward: 15
+    xpReward: 15,
   },
   {
     id: 'html-list',
@@ -90,7 +90,7 @@ const challenges: Challenge[] = [
     initialCode: '<!-- Create an unordered list with CI and CD -->\n',
     expectedOutput: 'CI',
     hints: ['Use <ul> for unordered list', 'Use <li> for each item'],
-    xpReward: 15
+    xpReward: 15,
   },
   {
     id: 'css-font',
@@ -100,7 +100,7 @@ const challenges: Challenge[] = [
     initialCode: 'p {\n  /* Set font-size to 24px and color to blue */\n  \n}',
     expectedOutput: '24px',
     hints: ['font-size property', 'color property', 'Use 24px (not "24px") for numbers'],
-    xpReward: 15
+    xpReward: 15,
   },
   {
     id: 'js-object',
@@ -110,8 +110,8 @@ const challenges: Challenge[] = [
     initialCode: '// Create config object\nconst config = {\n  \n};',
     expectedOutput: 'production',
     hints: ['Use key: value syntax', 'env: "production"'],
-    xpReward: 20
-  }
+    xpReward: 20,
+  },
 ]
 
 interface CodePlaygroundProps {
@@ -207,12 +207,14 @@ ${code}
     // Check if answer is correct
     const normalizedCode = code.replace(/\s/g, '').toLowerCase()
     if (activeChallenge.expectedOutput) {
-      const isCorrect = normalizedCode.includes(activeChallenge.expectedOutput.toLowerCase().replace(/\s/g, ''))
+      const isCorrect = normalizedCode.includes(
+        activeChallenge.expectedOutput.toLowerCase().replace(/\s/g, ''),
+      )
       if (isCorrect) {
         setShowSuccess(true)
         const xpEarned = Math.max(5, activeChallenge.xpReward - hintsUsed * 2)
-        setTotalXP(prev => prev + xpEarned)
-        setCompletedChallenges(prev => [...prev, activeChallenge.id])
+        setTotalXP((prev) => prev + xpEarned)
+        setCompletedChallenges((prev) => [...prev, activeChallenge.id])
         if (onComplete) onComplete(xpEarned)
       }
     }
@@ -220,7 +222,7 @@ ${code}
 
   const useHint = () => {
     if (!activeChallenge || hintsUsed >= activeChallenge.hints.length) return
-    setHintsUsed(prev => prev + 1)
+    setHintsUsed((prev) => prev + 1)
     setOutput(`💡 Hint ${hintsUsed + 1}: ${activeChallenge.hints[hintsUsed]}`)
   }
 
@@ -249,7 +251,9 @@ ${code}
               return (
                 <button
                   key={challenge.id}
-                  onClick={() => selectChallenge(challenge)}
+                  onClick={() => {
+                    selectChallenge(challenge)
+                  }}
                   className={`p-4 rounded-lg border text-left transition-all ${
                     isCompleted
                       ? 'bg-green-900/30 border-green-600/50'
@@ -273,7 +277,9 @@ ${code}
           {totalXP > 0 && (
             <div className="mt-6 text-center p-4 bg-amber-900/30 rounded-lg border border-amber-600/50">
               <span className="text-2xl">🏆</span>
-              <p className="text-amber-400 font-bold">You've earned {totalXP} XP in Code Playground!</p>
+              <p className="text-amber-400 font-bold">
+                You&apos;ve earned {totalXP} XP in Code Playground!
+              </p>
             </div>
           )}
         </div>
@@ -283,7 +289,9 @@ ${code}
           <div className="flex items-center justify-between mb-4">
             <div>
               <button
-                onClick={() => setActiveChallenge(null)}
+                onClick={() => {
+                  setActiveChallenge(null)
+                }}
                 className="text-amber-400 hover:text-amber-300 text-sm mb-1"
               >
                 ← Back to Challenges
@@ -293,9 +301,7 @@ ${code}
             </div>
             <div className="text-right">
               <div className="text-amber-400 font-bold">+{activeChallenge.xpReward} XP</div>
-              <div className="text-xs text-slate-400">
-                {activeChallenge.language.toUpperCase()}
-              </div>
+              <div className="text-xs text-slate-400">{activeChallenge.language.toUpperCase()}</div>
             </div>
           </div>
 
@@ -326,7 +332,9 @@ ${code}
               </div>
               <textarea
                 value={code}
-                onChange={(e) => setCode(e.target.value)}
+                onChange={(e) => {
+                  setCode(e.target.value)
+                }}
                 className="w-full h-48 bg-slate-900 border border-slate-600 rounded-lg p-3 text-green-400 font-mono text-sm focus:outline-none focus:border-amber-500 resize-none"
                 spellCheck={false}
               />
@@ -355,7 +363,9 @@ ${code}
                     <div className="text-center">
                       <span className="text-5xl">🎉</span>
                       <p className="text-green-300 font-bold mt-2">Correct!</p>
-                      <p className="text-green-400 text-sm">+{Math.max(5, activeChallenge.xpReward - hintsUsed * 2)} XP</p>
+                      <p className="text-green-400 text-sm">
+                        +{Math.max(5, activeChallenge.xpReward - hintsUsed * 2)} XP
+                      </p>
                       <button
                         onClick={() => {
                           setShowSuccess(false)

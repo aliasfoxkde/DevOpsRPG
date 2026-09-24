@@ -34,13 +34,15 @@ export default function GuildPage() {
   const playerRank = getGuildRankInfo(playerRole)
 
   // Calculate player's weekly contribution based on their character stats
-  const playerWeeklyXP = game.skillXp ? Object.values(game.skillXp).reduce((sum, xp) => sum + (xp as number), 0) : 0
+  const playerWeeklyXP = Object.values(game.skillXp).reduce((sum, xp) => sum + xp, 0)
   const playerTotalQuests = game.completedQuests.length
 
   // Check if player meets guild requirements
   const canJoinGuild = (guild: Guild): boolean => {
-    return character.level >= guild.requirements.minLevel &&
-           game.completedQuests.length >= guild.requirements.minQuests
+    return (
+      character.level >= guild.requirements.minLevel &&
+      game.completedQuests.length >= guild.requirements.minQuests
+    )
   }
 
   // Real members with player's actual stats mixed in
@@ -65,7 +67,7 @@ export default function GuildPage() {
   ]
 
   // Real challenges with player progress mixed in
-  const challenges: GuildChallenge[] = MOCK_GUILD_CHALLENGES.map(c => ({
+  const challenges: GuildChallenge[] = MOCK_GUILD_CHALLENGES.map((c) => ({
     ...c,
     progress: c.progress + Math.floor(playerTotalQuests / 10),
   }))
@@ -84,9 +86,15 @@ export default function GuildPage() {
   })
 
   // Calculate player's contribution to community challenges
-  const playerContributionPercent = communityChallenges.length > 0
-    ? Math.min(100, Math.round((game.communityStats.weeklyQuestsCompleted / communityChallenges[0].target) * 100))
-    : 0
+  const playerContributionPercent =
+    communityChallenges.length > 0
+      ? Math.min(
+          100,
+          Math.round(
+            (game.communityStats.weeklyQuestsCompleted / communityChallenges[0].target) * 100,
+          ),
+        )
+      : 0
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
@@ -100,65 +108,73 @@ export default function GuildPage() {
             ← Back to Home
           </Link>
           <h1 className="text-4xl font-bold mb-2 text-amber-400">🏰 Guild Hall</h1>
-          <p className="text-slate-400">Team up with other adventurers to complete challenges and earn guild rewards!</p>
+          <p className="text-slate-400">
+            Team up with other adventurers to complete challenges and earn guild rewards!
+          </p>
         </div>
 
-      {/* Current Guild Banner */}
-      {joinedGuild ? (
-        <div className="bg-gradient-to-r from-purple-900/50 to-indigo-900/50 rounded-xl border border-purple-500/30 p-6 mb-8">
-          <div className="flex items-center gap-4">
-            <div className="text-6xl">{joinedGuild.icon}</div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <h2 className="text-2xl font-bold text-white">{joinedGuild.name}</h2>
-                <span className="px-2 py-1 bg-purple-600/30 text-purple-300 text-xs rounded">
-                  Rank #{joinedGuild.rank}
+        {/* Current Guild Banner */}
+        {joinedGuild ? (
+          <div className="bg-gradient-to-r from-purple-900/50 to-indigo-900/50 rounded-xl border border-purple-500/30 p-6 mb-8">
+            <div className="flex items-center gap-4">
+              <div className="text-6xl">{joinedGuild.icon}</div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl font-bold text-white">{joinedGuild.name}</h2>
+                  <span className="px-2 py-1 bg-purple-600/30 text-purple-300 text-xs rounded">
+                    Rank #{joinedGuild.rank}
+                  </span>
+                </div>
+                <p className="text-slate-300">{joinedGuild.description}</p>
+                <div className="flex gap-4 mt-2 text-sm text-slate-400">
+                  <span>Level {joinedGuild.level}</span>
+                  <span>•</span>
+                  <span>
+                    {joinedGuild.memberCount}/{joinedGuild.maxMembers} members
+                  </span>
+                  <span>•</span>
+                  <span>🏆 {joinedGuild.totalQuests} total quests</span>
+                </div>
+              </div>
+              <div className="text-right hidden md:block">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">{playerRank.icon}</span>
+                  <span className="font-bold" style={{ color: playerRank.color }}>
+                    {playerRank.name}
+                  </span>
+                </div>
+                <p className="text-sm text-slate-400 mt-1">Your Role</p>
+              </div>
+            </div>
+
+            {/* Guild XP Progress */}
+            <div className="mt-4">
+              <div className="flex justify-between text-sm mb-1">
+                <span className="text-slate-400">Guild XP</span>
+                <span className="text-purple-400">
+                  {joinedGuild.xp} / {joinedGuild.xpToNextLevel}
                 </span>
               </div>
-              <p className="text-slate-300">{joinedGuild.description}</p>
-              <div className="flex gap-4 mt-2 text-sm text-slate-400">
-                <span>Level {joinedGuild.level}</span>
-                <span>•</span>
-                <span>{joinedGuild.memberCount}/{joinedGuild.maxMembers} members</span>
-                <span>•</span>
-                <span>🏆 {joinedGuild.totalQuests} total quests</span>
+              <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-purple-600 to-indigo-500 transition-all"
+                  style={{ width: `${(joinedGuild.xp / joinedGuild.xpToNextLevel) * 100}%` }}
+                />
               </div>
             </div>
-            <div className="text-right hidden md:block">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">{playerRank.icon}</span>
-                <span className="font-bold" style={{ color: playerRank.color }}>{playerRank.name}</span>
-              </div>
-              <p className="text-sm text-slate-400 mt-1">Your Role</p>
-            </div>
           </div>
-
-          {/* Guild XP Progress */}
-          <div className="mt-4">
-            <div className="flex justify-between text-sm mb-1">
-              <span className="text-slate-400">Guild XP</span>
-              <span className="text-purple-400">{joinedGuild.xp} / {joinedGuild.xpToNextLevel}</span>
-            </div>
-            <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-purple-600 to-indigo-500 transition-all"
-                style={{ width: `${(joinedGuild.xp / joinedGuild.xpToNextLevel) * 100}%` }}
-              />
-            </div>
+        ) : (
+          <div className="bg-card rounded-xl border border-border p-8 mb-8 text-center">
+            <div className="text-6xl mb-4">🏰</div>
+            <h2 className="text-2xl font-bold mb-2">Join a Guild!</h2>
+            <p className="text-slate-400 mb-4">
+              Team up with other players to complete group challenges and earn guild rewards.
+            </p>
+            <p className="text-sm text-slate-500">
+              Your Level: {character.level} | Quests: {game.completedQuests.length}
+            </p>
           </div>
-        </div>
-      ) : (
-        <div className="bg-card rounded-xl border border-border p-8 mb-8 text-center">
-          <div className="text-6xl mb-4">🏰</div>
-          <h2 className="text-2xl font-bold mb-2">Join a Guild!</h2>
-          <p className="text-slate-400 mb-4">
-            Team up with other players to complete group challenges and earn guild rewards.
-          </p>
-          <p className="text-sm text-slate-500">
-            Your Level: {character.level} | Quests: {game.completedQuests.length}
-          </p>
-        </div>
-      )}
+        )}
       </div>
 
       {/* Tabs */}
@@ -169,10 +185,12 @@ export default function GuildPage() {
           { id: 'challenges' as Tab, label: '⚔️ Challenges' },
           { id: 'community' as Tab, label: '🌐 Community' },
           { id: 'discover' as Tab, label: '🔍 Discover' },
-        ].map(tab => (
+        ].map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => {
+              setActiveTab(tab.id)
+            }}
             className={`px-4 py-2 rounded-lg font-medium transition-all ${
               activeTab === tab.id
                 ? 'bg-purple-600 text-white'
@@ -200,7 +218,9 @@ export default function GuildPage() {
                 <div className="text-xs text-slate-400">Your Quests</div>
               </div>
               <div className="text-center p-3 bg-slate-800/50 rounded-lg">
-                <div className="text-2xl font-bold text-purple-400">{Math.floor(character.xp * 0.01)}</div>
+                <div className="text-2xl font-bold text-purple-400">
+                  {Math.floor(character.xp * 0.01)}
+                </div>
                 <div className="text-xs text-slate-400">Guild XP Contributed</div>
               </div>
               <div className="text-center p-3 bg-slate-800/50 rounded-lg">
@@ -220,15 +240,21 @@ export default function GuildPage() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
                   <span className="text-slate-400">Total XP</span>
-                  <span className="font-bold text-purple-400">{joinedGuild.xp.toLocaleString()}</span>
+                  <span className="font-bold text-purple-400">
+                    {joinedGuild.xp.toLocaleString()}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
                   <span className="text-slate-400">Total Quests</span>
-                  <span className="font-bold text-green-400">{joinedGuild.totalQuests.toLocaleString()}</span>
+                  <span className="font-bold text-green-400">
+                    {joinedGuild.totalQuests.toLocaleString()}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
                   <span className="text-slate-400">This Week</span>
-                  <span className="font-bold text-amber-400">{joinedGuild.weeklyQuests} quests</span>
+                  <span className="font-bold text-amber-400">
+                    {joinedGuild.weeklyQuests} quests
+                  </span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
                   <span className="text-slate-400">Guild Rank</span>
@@ -236,7 +262,9 @@ export default function GuildPage() {
                 </div>
                 <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
                   <span className="text-slate-400">Member Count</span>
-                  <span className="font-bold text-blue-400">{joinedGuild.memberCount}/{joinedGuild.maxMembers}</span>
+                  <span className="font-bold text-blue-400">
+                    {joinedGuild.memberCount}/{joinedGuild.maxMembers}
+                  </span>
                 </div>
               </div>
             </div>
@@ -245,9 +273,22 @@ export default function GuildPage() {
             <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-6">
               <h3 className="text-lg font-bold mb-4">🏆 Guild Achievements</h3>
               <div className="space-y-2">
-                {['🏅 Guild Founded', '🔥 30-Day Streak', '⚔️ 1000 Quests Completed', '👑 Weekly Champion'].map((achievement, i) => (
+                {[
+                  '🏅 Guild Founded',
+                  '🔥 30-Day Streak',
+                  '⚔️ 1000 Quests Completed',
+                  '👑 Weekly Champion',
+                ].map((achievement, i) => (
                   <div key={i} className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
-                    <span className="text-2xl">{achievement.includes('Guild') ? '🏅' : achievement.includes('30') ? '🔥' : achievement.includes('1000') ? '⚔️' : '👑'}</span>
+                    <span className="text-2xl">
+                      {achievement.includes('Guild')
+                        ? '🏅'
+                        : achievement.includes('30')
+                          ? '🔥'
+                          : achievement.includes('1000')
+                            ? '⚔️'
+                            : '👑'}
+                    </span>
                     <span className="text-slate-300">{achievement}</span>
                   </div>
                 ))}
@@ -269,7 +310,7 @@ export default function GuildPage() {
             <div className="col-span-2 text-right">Quests</div>
           </div>
 
-          {members.map(member => {
+          {members.map((member) => {
             const rank = getGuildRankInfo(member.role)
             return (
               <div
@@ -320,10 +361,12 @@ export default function GuildPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold">⚔️ Active Challenges</h3>
-            <span className="text-sm text-slate-400">Complete challenges to earn guild XP & Gold!</span>
+            <span className="text-sm text-slate-400">
+              Complete challenges to earn guild XP & Gold!
+            </span>
           </div>
 
-          {challenges.map(challenge => {
+          {challenges.map((challenge) => {
             const progress = Math.min(100, (challenge.progress / challenge.target) * 100)
             const isComplete = challenge.progress >= challenge.target
             const typeIcons: Record<string, string> = {
@@ -338,9 +381,7 @@ export default function GuildPage() {
               <div
                 key={challenge.id}
                 className={`rounded-xl border-2 p-4 ${
-                  isComplete
-                    ? 'border-green-500/50 bg-green-900/20'
-                    : 'border-slate-700 bg-card'
+                  isComplete ? 'border-green-500/50 bg-green-900/20' : 'border-slate-700 bg-card'
                 }`}
               >
                 <div className="flex items-start gap-4">
@@ -367,7 +408,9 @@ export default function GuildPage() {
                       <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
                         <div
                           className={`h-full transition-all ${
-                            isComplete ? 'bg-green-500' : 'bg-gradient-to-r from-amber-600 to-amber-400'
+                            isComplete
+                              ? 'bg-green-500'
+                              : 'bg-gradient-to-r from-amber-600 to-amber-400'
                           }`}
                           style={{ width: `${progress}%` }}
                         />
@@ -401,20 +444,28 @@ export default function GuildPage() {
               <div className="text-5xl">🌐</div>
               <div>
                 <h3 className="text-xl font-bold text-green-400">Community Challenges</h3>
-                <p className="text-slate-400 text-sm">Work together with the community to achieve weekly goals!</p>
+                <p className="text-slate-400 text-sm">
+                  Work together with the community to achieve weekly goals!
+                </p>
               </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-3 bg-slate-800/50 rounded-lg">
-                <div className="text-2xl font-bold text-green-400">{game.communityStats.weeklyQuestsCompleted}</div>
+                <div className="text-2xl font-bold text-green-400">
+                  {game.communityStats.weeklyQuestsCompleted}
+                </div>
                 <div className="text-xs text-slate-400">Your Weekly Quests</div>
               </div>
               <div className="text-center p-3 bg-slate-800/50 rounded-lg">
-                <div className="text-2xl font-bold text-amber-400">{game.communityStats.weeklyXPCompleted.toLocaleString()}</div>
+                <div className="text-2xl font-bold text-amber-400">
+                  {game.communityStats.weeklyXPCompleted.toLocaleString()}
+                </div>
                 <div className="text-xs text-slate-400">Your Weekly XP</div>
               </div>
               <div className="text-center p-3 bg-slate-800/50 rounded-lg">
-                <div className="text-2xl font-bold text-purple-400">{playerContributionPercent}%</div>
+                <div className="text-2xl font-bold text-purple-400">
+                  {playerContributionPercent}%
+                </div>
                 <div className="text-xs text-slate-400">Your Contribution</div>
               </div>
               <div className="text-center p-3 bg-slate-800/50 rounded-lg">
@@ -431,7 +482,7 @@ export default function GuildPage() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
-            {communityChallenges.map(challenge => {
+            {communityChallenges.map((challenge) => {
               const progress = Math.min(100, (challenge.current / challenge.target) * 100)
               const isComplete = challenge.current >= challenge.target
 
@@ -502,8 +553,10 @@ export default function GuildPage() {
                     <div className="flex justify-between text-xs">
                       <span className="text-slate-500">Your contribution:</span>
                       <span className="text-green-400">
-                        {challenge.type === 'quests' && `${game.communityStats.weeklyQuestsCompleted} quests`}
-                        {challenge.type === 'xp' && `${game.communityStats.weeklyXPCompleted.toLocaleString()} XP`}
+                        {challenge.type === 'quests' &&
+                          `${game.communityStats.weeklyQuestsCompleted} quests`}
+                        {challenge.type === 'xp' &&
+                          `${game.communityStats.weeklyXPCompleted.toLocaleString()} XP`}
                         {challenge.type === 'streak' && `${character.streakDays} days`}
                         {challenge.type === 'quiz' && `${game.stats.quizPerfectCount} perfect`}
                       </span>
@@ -521,8 +574,9 @@ export default function GuildPage() {
               <div>
                 <h4 className="font-bold text-blue-400 mb-1">How Community Challenges Work</h4>
                 <p className="text-sm text-slate-400">
-                  Every quest you complete contributes to the community total. Help your guild and fellow players
-                  reach weekly goals to earn bonus XP and Gold rewards. The community progress resets every Monday!
+                  Every quest you complete contributes to the community total. Help your guild and
+                  fellow players reach weekly goals to earn bonus XP and Gold rewards. The community
+                  progress resets every Monday!
                 </p>
               </div>
             </div>
@@ -539,14 +593,11 @@ export default function GuildPage() {
           </p>
 
           <div className="space-y-4">
-            {FEATURED_GUILDS.map(guild => {
+            {FEATURED_GUILDS.map((guild) => {
               const meetsRequirements = canJoinGuild(guild)
 
               return (
-                <div
-                  key={guild.id}
-                  className="bg-card rounded-xl border border-border p-4"
-                >
+                <div key={guild.id} className="bg-card rounded-xl border border-border p-4">
                   <div className="flex items-center gap-4">
                     <div className="text-5xl">{guild.icon}</div>
                     <div className="flex-1">
@@ -560,9 +611,14 @@ export default function GuildPage() {
                       <div className="flex gap-4 mt-2 text-xs text-slate-500">
                         <span>Level {guild.level}</span>
                         <span>•</span>
-                        <span>{guild.memberCount}/{guild.maxMembers} members</span>
+                        <span>
+                          {guild.memberCount}/{guild.maxMembers} members
+                        </span>
                         <span>•</span>
-                        <span>Requires: Lv.{guild.requirements.minLevel}, {guild.requirements.minQuests} quests</span>
+                        <span>
+                          Requires: Lv.{guild.requirements.minLevel}, {guild.requirements.minQuests}{' '}
+                          quests
+                        </span>
                       </div>
                     </div>
                     <div>
@@ -575,7 +631,9 @@ export default function GuildPage() {
                         </button>
                       ) : meetsRequirements ? (
                         <button
-                          onClick={() => setShowJoinConfirm(guild.id)}
+                          onClick={() => {
+                            setShowJoinConfirm(guild.id)
+                          }}
                           className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition-colors"
                         >
                           Join Guild
@@ -600,7 +658,9 @@ export default function GuildPage() {
                       </p>
                       <div className="flex gap-3 justify-center">
                         <button
-                          onClick={() => setShowJoinConfirm(null)}
+                          onClick={() => {
+                            setShowJoinConfirm(null)
+                          }}
                           className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
                         >
                           Cancel
@@ -628,12 +688,12 @@ export default function GuildPage() {
       {!joinedGuild && activeTab === 'overview' && (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">🏰</div>
-          <h2 className="text-xl font-bold mb-2">You're not in a guild yet!</h2>
-          <p className="text-slate-400 mb-6">
-            Visit the Discover tab to find and join a guild.
-          </p>
+          <h2 className="text-xl font-bold mb-2">You&apos;re not in a guild yet!</h2>
+          <p className="text-slate-400 mb-6">Visit the Discover tab to find and join a guild.</p>
           <button
-            onClick={() => setActiveTab('discover')}
+            onClick={() => {
+              setActiveTab('discover')
+            }}
             className="px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium transition-colors"
           >
             Find a Guild

@@ -1,6 +1,11 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, type SubmitEvent } from 'react'
 import { useGame } from '../../contexts/GameContext'
-import { INCIDENT_SCENARIOS, SEVERITY_COLORS, type IncidentScenario, type DiagnosticStep, type ResolutionStep } from '../../data/incidentScenarios'
+import {
+  INCIDENT_SCENARIOS,
+  SEVERITY_COLORS,
+  type IncidentScenario,
+  type DiagnosticStep,
+} from '../../data/incidentScenarios'
 
 interface IncidentSimulatorProps {
   onComplete?: (score: number, xpEarned: number) => void
@@ -24,20 +29,29 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
   const [timer, setTimer] = useState<TimerState>({ remaining: 0, penalty: 0 })
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [input, setInput] = useState('')
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error' | 'hint'; message: string } | null>(null)
+  const [feedback, setFeedback] = useState<{
+    type: 'success' | 'error' | 'hint'
+    message: string
+  } | null>(null)
   const [completedSteps, setCompletedSteps] = useState<string[]>([])
   const [showHint, setShowHint] = useState(false)
   const [finalScore, setFinalScore] = useState(0)
 
-  const currentSteps = phase === 'diagnostics' ? selectedScenario?.diagnostics || [] : selectedScenario?.resolution || []
-  const currentStep = currentSteps[currentStepIndex]
+  const currentSteps =
+    phase === 'diagnostics'
+      ? selectedScenario?.diagnostics || []
+      : selectedScenario?.resolution || []
+  // Honest optional type: the step list can be exhausted, so indexing can miss
+  // and the `currentStep` guards below are load-bearing.
+  const currentStep =
+    currentStepIndex < currentSteps.length ? currentSteps[currentStepIndex] : undefined
 
   // Timer effect
   useEffect(() => {
     if (gameState !== 'diagnosing' && gameState !== 'resolving') return
 
     const interval = setInterval(() => {
-      setTimer(prev => {
+      setTimer((prev) => {
         if (prev.remaining <= 0) {
           clearInterval(interval)
           // Timer expired - complete will be handled via gameState change
@@ -51,19 +65,30 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
       })
     }, 1000)
 
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(interval)
+    }
   }, [gameState])
 
   // Handle time expiration - triggered when timer reaches 0
   useEffect(() => {
-    if (timer.remaining <= 0 && (gameState === 'diagnosing' || gameState === 'resolving') && selectedScenario) {
+    if (
+      timer.remaining <= 0 &&
+      (gameState === 'diagnosing' || gameState === 'resolving') &&
+      selectedScenario
+    ) {
       // Use setTimeout to avoid calling handleComplete synchronously
       const timeout = setTimeout(() => {
-        if (!selectedScenario) return
-
-        const timeBonus = Math.max(0, Math.round((timer.remaining / selectedScenario.estimatedTime) * 100))
-        const accuracyBonus = Math.round((completedSteps.length / (selectedScenario.diagnostics.length + selectedScenario.resolution.length)) * 100)
-        const penaltyFactor = Math.max(0, 1 - (timer.penalty / 60))
+        const timeBonus = Math.max(
+          0,
+          Math.round((timer.remaining / selectedScenario.estimatedTime) * 100),
+        )
+        const accuracyBonus = Math.round(
+          (completedSteps.length /
+            (selectedScenario.diagnostics.length + selectedScenario.resolution.length)) *
+            100,
+        )
+        const penaltyFactor = Math.max(0, 1 - timer.penalty / 60)
         const score = Math.round((timeBonus * 0.3 + accuracyBonus * 0.7) * penaltyFactor)
 
         setFinalScore(score)
@@ -76,9 +101,20 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
         addGold(goldEarned)
         onComplete?.(score, xpEarned)
       }, 0)
-      return () => clearTimeout(timeout)
+      return () => {
+        clearTimeout(timeout)
+      }
     }
-  }, [timer.remaining, gameState, selectedScenario, timer.penalty, completedSteps, addXP, addGold, onComplete])
+  }, [
+    timer.remaining,
+    gameState,
+    selectedScenario,
+    timer.penalty,
+    completedSteps,
+    addXP,
+    addGold,
+    onComplete,
+  ])
 
   const startGame = useCallback((scenario: IncidentScenario) => {
     setSelectedScenario(scenario)
@@ -92,7 +128,7 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
     setGameState('diagnosing')
   }, [])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!currentStep || !input.trim()) return
 
@@ -101,14 +137,14 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
     if (isCorrect) {
       const clue = 'revealsClue' in currentStep ? currentStep.revealsClue : 'Correct!'
       setFeedback({ type: 'success', message: clue })
-      setCompletedSteps(prev => [...prev, currentStep.id])
+      setCompletedSteps((prev) => [...prev, currentStep.id])
       setInput('')
       setShowHint(false)
 
       // Move to next step or next phase
       if (currentStepIndex < currentSteps.length - 1) {
         setTimeout(() => {
-          setCurrentStepIndex(prev => prev + 1)
+          setCurrentStepIndex((prev) => prev + 1)
           setFeedback(null)
         }, 1500)
       } else if (phase === 'diagnostics') {
@@ -130,30 +166,43 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
       }
     } else {
       setFeedback({ type: 'error', message: 'Incorrect command. Try again or use a hint.' })
-      setTimer(prev => ({ ...prev, penalty: prev.penalty + (currentStep as DiagnosticStep).timePenalty }))
+      setTimer((prev) => ({
+        ...prev,
+        penalty: prev.penalty + (currentStep as DiagnosticStep).timePenalty,
+      }))
       setInput('')
     }
   }
 
-  const handleComplete = useCallback((stepsOverride?: string[]) => {
-    if (!selectedScenario) return
+  const handleComplete = useCallback(
+    (stepsOverride?: string[]) => {
+      if (!selectedScenario) return
 
-    const steps = stepsOverride ?? completedSteps
-    const timeBonus = Math.max(0, Math.round((timer.remaining / selectedScenario.estimatedTime) * 100))
-    const accuracyBonus = Math.round((steps.length / (selectedScenario.diagnostics.length + selectedScenario.resolution.length)) * 100)
-    const penaltyFactor = Math.max(0, 1 - (timer.penalty / 60)) // Reduce score for penalties
-    const score = Math.round((timeBonus * 0.3 + accuracyBonus * 0.7) * penaltyFactor)
+      const steps = stepsOverride ?? completedSteps
+      const timeBonus = Math.max(
+        0,
+        Math.round((timer.remaining / selectedScenario.estimatedTime) * 100),
+      )
+      const accuracyBonus = Math.round(
+        (steps.length /
+          (selectedScenario.diagnostics.length + selectedScenario.resolution.length)) *
+          100,
+      )
+      const penaltyFactor = Math.max(0, 1 - timer.penalty / 60) // Reduce score for penalties
+      const score = Math.round((timeBonus * 0.3 + accuracyBonus * 0.7) * penaltyFactor)
 
-    setFinalScore(score)
-    setGameState('complete')
+      setFinalScore(score)
+      setGameState('complete')
 
-    const xpEarned = Math.round((score / 100) * selectedScenario.xpReward)
-    const goldEarned = Math.round((score / 100) * selectedScenario.goldReward)
+      const xpEarned = Math.round((score / 100) * selectedScenario.xpReward)
+      const goldEarned = Math.round((score / 100) * selectedScenario.goldReward)
 
-    addXP(xpEarned)
-    addGold(goldEarned)
-    onComplete?.(score, xpEarned)
-  }, [selectedScenario, timer, completedSteps, addXP, addGold, onComplete])
+      addXP(xpEarned)
+      addGold(goldEarned)
+      onComplete?.(score, xpEarned)
+    },
+    [selectedScenario, timer, completedSteps, addXP, addGold, onComplete],
+  )
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(Math.abs(seconds) / 60)
@@ -176,7 +225,9 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
         </div>
         {selectedScenario && gameState !== 'menu' && (
           <div className="flex items-center gap-4">
-            <span className={`font-mono text-sm ${timer.remaining < 30 ? 'text-red-400 animate-pulse' : 'text-slate-400'}`}>
+            <span
+              className={`font-mono text-sm ${timer.remaining < 30 ? 'text-red-400 animate-pulse' : 'text-slate-400'}`}
+            >
               ⏱️ {formatTime(timer.remaining)}
             </span>
             {timer.penalty > 0 && (
@@ -202,12 +253,14 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
 
             {/* Scenario Selection */}
             <div className="space-y-3 max-w-2xl mx-auto">
-              {INCIDENT_SCENARIOS.map(scenario => {
+              {INCIDENT_SCENARIOS.map((scenario) => {
                 const severity = SEVERITY_COLORS[scenario.severity]
                 return (
                   <button
                     key={scenario.id}
-                    onClick={() => startGame(scenario)}
+                    onClick={() => {
+                      startGame(scenario)
+                    }}
                     className={`w-full p-4 rounded-xl border text-left transition-all hover:scale-[1.01] ${severity.bg} ${severity.border}`}
                   >
                     <div className="flex items-start justify-between">
@@ -223,9 +276,7 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
                             <span className="text-xs text-slate-500">
                               Est. {Math.floor(scenario.estimatedTime / 60)}m
                             </span>
-                            <span className="text-xs text-amber-400">
-                              +{scenario.xpReward} XP
-                            </span>
+                            <span className="text-xs text-amber-400">+{scenario.xpReward} XP</span>
                           </div>
                         </div>
                       </div>
@@ -242,11 +293,15 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
           <div>
             {/* Phase indicator */}
             <div className="flex items-center justify-center gap-4 mb-6">
-              <div className={`px-4 py-2 rounded-lg ${phase === 'diagnostics' ? 'bg-amber-600' : 'bg-slate-700'}`}>
+              <div
+                className={`px-4 py-2 rounded-lg ${phase === 'diagnostics' ? 'bg-amber-600' : 'bg-slate-700'}`}
+              >
                 <span className="text-white font-medium">🔍 Diagnostics</span>
               </div>
               <div className="text-slate-500">→</div>
-              <div className={`px-4 py-2 rounded-lg ${phase === 'resolution' ? 'bg-green-600' : 'bg-slate-700'}`}>
+              <div
+                className={`px-4 py-2 rounded-lg ${phase === 'resolution' ? 'bg-green-600' : 'bg-slate-700'}`}
+              >
                 <span className="text-white font-medium">✅ Resolution</span>
               </div>
             </div>
@@ -255,18 +310,24 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
             <div className="mb-4">
               <div className="flex justify-between text-sm mb-1">
                 <span className="text-slate-400">Progress</span>
-                <span className="text-white">{currentStepIndex + 1} / {currentSteps.length}</span>
+                <span className="text-white">
+                  {currentStepIndex + 1} / {currentSteps.length}
+                </span>
               </div>
               <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-amber-600 to-green-500 transition-all"
-                  style={{ width: `${((currentStepIndex + (phase === 'resolution' ? selectedScenario.diagnostics.length : 0)) / (selectedScenario.diagnostics.length + selectedScenario.resolution.length)) * 100}%` }}
+                  style={{
+                    width: `${((currentStepIndex + (phase === 'resolution' ? selectedScenario.diagnostics.length : 0)) / (selectedScenario.diagnostics.length + selectedScenario.resolution.length)) * 100}%`,
+                  }}
                 />
               </div>
             </div>
 
             {/* Scenario Info */}
-            <div className={`p-4 rounded-xl mb-4 ${SEVERITY_COLORS[selectedScenario.severity].bg} border ${SEVERITY_COLORS[selectedScenario.severity].border}`}>
+            <div
+              className={`p-4 rounded-xl mb-4 ${SEVERITY_COLORS[selectedScenario.severity].bg} border ${SEVERITY_COLORS[selectedScenario.severity].border}`}
+            >
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-2xl">{selectedScenario.icon}</span>
                 <h3 className="text-lg font-bold text-white">{selectedScenario.title}</h3>
@@ -305,7 +366,7 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
                     )}
                     {'verification' in currentStep && phase === 'resolution' && (
                       <p className="text-sm text-blue-400 mt-1">
-                        Expected: {(currentStep as ResolutionStep).verification}
+                        Expected: {currentStep.verification}
                       </p>
                     )}
                   </div>
@@ -318,8 +379,11 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
               <div className="mb-4">
                 <p className="text-sm text-slate-500 mb-2">Completed:</p>
                 <div className="flex flex-wrap gap-2">
-                  {completedSteps.map(stepId => (
-                    <span key={stepId} className="px-2 py-1 bg-green-900/50 text-green-400 rounded text-sm">
+                  {completedSteps.map((stepId) => (
+                    <span
+                      key={stepId}
+                      className="px-2 py-1 bg-green-900/50 text-green-400 rounded text-sm"
+                    >
                       ✓
                     </span>
                   ))}
@@ -329,11 +393,15 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
 
             {/* Feedback */}
             {feedback && (
-              <div className={`p-4 rounded-lg mb-4 ${
-                feedback.type === 'success' ? 'bg-green-900/50 border border-green-600' :
-                feedback.type === 'error' ? 'bg-red-900/50 border border-red-600' :
-                'bg-amber-900/50 border border-amber-600'
-              }`}>
+              <div
+                className={`p-4 rounded-lg mb-4 ${
+                  feedback.type === 'success'
+                    ? 'bg-green-900/50 border border-green-600'
+                    : feedback.type === 'error'
+                      ? 'bg-red-900/50 border border-red-600'
+                      : 'bg-amber-900/50 border border-amber-600'
+                }`}
+              >
                 <p className={feedback.type === 'success' ? 'text-green-400' : 'text-red-400'}>
                   {feedback.message}
                 </p>
@@ -348,7 +416,9 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
                   <input
                     type="text"
                     value={input}
-                    onChange={e => setInput(e.target.value)}
+                    onChange={(e) => {
+                      setInput(e.target.value)
+                    }}
                     className={`w-full bg-slate-800 border-2 ${feedback?.type === 'error' ? 'border-red-500' : 'border-slate-700 focus:border-amber-500'} rounded-lg pl-8 pr-4 py-3 text-white font-mono focus:outline-none`}
                     placeholder="Enter command..."
                     autoComplete="off"
@@ -368,7 +438,7 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
             {!showHint && currentStep && (
               <button
                 onClick={() => {
-                  setTimer(prev => ({ ...prev, penalty: prev.penalty + 10 }))
+                  setTimer((prev) => ({ ...prev, penalty: prev.penalty + 10 }))
                   setShowHint(true)
                 }}
                 className="text-sm text-slate-500 hover:text-amber-400 transition-colors"
@@ -381,7 +451,8 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
             {showHint && currentStep && (
               <div className="mt-3 p-3 bg-amber-900/30 rounded-lg border border-amber-600/30">
                 <p className="text-amber-400 text-sm">
-                  💡 Hint: Try using <code className="font-mono bg-slate-800 px-1 rounded">{currentStep.command}</code>
+                  💡 Hint: Try using{' '}
+                  <code className="font-mono bg-slate-800 px-1 rounded">{currentStep.command}</code>
                 </p>
               </div>
             )}
@@ -399,11 +470,19 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
         {/* Complete State */}
         {gameState === 'complete' && selectedScenario && (
           <div className="text-center">
-            <div className="text-6xl mb-4">{finalScore >= 80 ? '🏆' : finalScore >= 50 ? '⭐' : '💪'}</div>
+            <div className="text-6xl mb-4">
+              {finalScore >= 80 ? '🏆' : finalScore >= 50 ? '⭐' : '💪'}
+            </div>
             <h2 className="text-2xl font-bold text-white mb-2">
-              {finalScore >= 80 ? 'Incident Resolved!' : finalScore >= 50 ? 'Good Effort!' : 'Keep Training!'}
+              {finalScore >= 80
+                ? 'Incident Resolved!'
+                : finalScore >= 50
+                  ? 'Good Effort!'
+                  : 'Keep Training!'}
             </h2>
-            <p className="text-slate-400 mb-6">You handled the {selectedScenario.title} incident!</p>
+            <p className="text-slate-400 mb-6">
+              You handled the {selectedScenario.title} incident!
+            </p>
 
             {/* Score Breakdown */}
             <div className="bg-slate-800/50 rounded-xl p-6 mb-6 max-w-md mx-auto">
@@ -421,7 +500,10 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Steps completed</span>
-                  <span className="text-green-400">{completedSteps.length} / {selectedScenario.diagnostics.length + selectedScenario.resolution.length}</span>
+                  <span className="text-green-400">
+                    {completedSteps.length} /{' '}
+                    {selectedScenario.diagnostics.length + selectedScenario.resolution.length}
+                  </span>
                 </div>
               </div>
             </div>
@@ -451,7 +533,9 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
             {/* Actions */}
             <div className="flex gap-3 justify-center">
               <button
-                onClick={() => startGame(selectedScenario)}
+                onClick={() => {
+                  startGame(selectedScenario)
+                }}
                 className="px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg transition-colors"
               >
                 🔄 Try Another
@@ -469,5 +553,3 @@ export function IncidentSimulator({ onComplete }: IncidentSimulatorProps) {
     </div>
   )
 }
-
-export default IncidentSimulator

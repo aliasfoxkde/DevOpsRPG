@@ -51,7 +51,7 @@ export const SKILL_TREES: SkillTree[] = [
         currentLevel: 0,
         xpInvested: 0,
         requires: ['containerization'],
-        benefits: ['+5% XP on quiz completion', '+10% faster builds', 'Unlock deploy quests']
+        benefits: ['+5% XP on quiz completion', '+10% faster builds', 'Unlock deploy quests'],
       },
       {
         id: 'containerization',
@@ -62,7 +62,11 @@ export const SKILL_TREES: SkillTree[] = [
         maxLevel: 10,
         currentLevel: 0,
         xpInvested: 0,
-        benefits: ['+3% XP on all quests', '+5% Gold on container quests', 'Unlock Docker-specific content']
+        benefits: [
+          '+3% XP on all quests',
+          '+5% Gold on container quests',
+          'Unlock Docker-specific content',
+        ],
       },
       {
         id: 'infrastructure',
@@ -74,7 +78,11 @@ export const SKILL_TREES: SkillTree[] = [
         currentLevel: 0,
         xpInvested: 0,
         requires: ['ci_cd'],
-        benefits: ['+5% XP on IaC quests', '+10% efficiency on deployments', 'Unlock Terraform content']
+        benefits: [
+          '+5% XP on IaC quests',
+          '+10% efficiency on deployments',
+          'Unlock Terraform content',
+        ],
       },
       {
         id: 'monitoring',
@@ -86,7 +94,11 @@ export const SKILL_TREES: SkillTree[] = [
         currentLevel: 0,
         xpInvested: 0,
         requires: ['infrastructure'],
-        benefits: ['+5% XP on monitoring quests', '+3% streak protection', 'Unlock alerting content']
+        benefits: [
+          '+5% XP on monitoring quests',
+          '+3% streak protection',
+          'Unlock alerting content',
+        ],
       },
     ],
   },
@@ -106,7 +118,11 @@ export const SKILL_TREES: SkillTree[] = [
         maxLevel: 10,
         currentLevel: 0,
         xpInvested: 0,
-        benefits: ['+3% XP on Python quests', '+5% faster script completion', 'Unlock ML/AI content']
+        benefits: [
+          '+3% XP on Python quests',
+          '+5% faster script completion',
+          'Unlock ML/AI content',
+        ],
       },
       {
         id: 'javascript',
@@ -118,7 +134,7 @@ export const SKILL_TREES: SkillTree[] = [
         currentLevel: 0,
         xpInvested: 0,
         requires: ['bash'],
-        benefits: ['+3% XP on JS quests', '+5% faster Node quests', 'Unlock React content']
+        benefits: ['+3% XP on JS quests', '+5% faster Node quests', 'Unlock React content'],
       },
       {
         id: 'bash',
@@ -129,7 +145,11 @@ export const SKILL_TREES: SkillTree[] = [
         maxLevel: 10,
         currentLevel: 0,
         xpInvested: 0,
-        benefits: ['+2% XP on all quests', '+10% faster command completion', 'Unlock server quests']
+        benefits: [
+          '+2% XP on all quests',
+          '+10% faster command completion',
+          'Unlock server quests',
+        ],
       },
       {
         id: 'sql',
@@ -140,7 +160,11 @@ export const SKILL_TREES: SkillTree[] = [
         maxLevel: 10,
         currentLevel: 0,
         xpInvested: 0,
-        benefits: ['+3% XP on database quests', '+5% faster queries', 'Unlock data engineering content']
+        benefits: [
+          '+3% XP on database quests',
+          '+5% faster queries',
+          'Unlock data engineering content',
+        ],
       },
     ],
   },
@@ -161,7 +185,7 @@ export const SKILL_TREES: SkillTree[] = [
         currentLevel: 0,
         xpInvested: 0,
         requires: ['networking'],
-        benefits: ['+5% XP on AWS quests', '+10% faster deployments', 'Unlock S3/EC2 content']
+        benefits: ['+5% XP on AWS quests', '+10% faster deployments', 'Unlock S3/EC2 content'],
       },
       {
         id: 'kubernetes',
@@ -173,7 +197,7 @@ export const SKILL_TREES: SkillTree[] = [
         currentLevel: 0,
         xpInvested: 0,
         requires: ['aws', 'serverless'],
-        benefits: ['+5% XP on K8s quests', '+10% faster scaling', 'Unlock Helm content']
+        benefits: ['+5% XP on K8s quests', '+10% faster scaling', 'Unlock Helm content'],
       },
       {
         id: 'serverless',
@@ -185,7 +209,11 @@ export const SKILL_TREES: SkillTree[] = [
         currentLevel: 0,
         xpInvested: 0,
         requires: ['aws'],
-        benefits: ['+4% XP on serverless quests', '+15% cost savings awareness', 'Unlock Lambda content']
+        benefits: [
+          '+4% XP on serverless quests',
+          '+15% cost savings awareness',
+          'Unlock Lambda content',
+        ],
       },
       {
         id: 'networking',
@@ -196,7 +224,11 @@ export const SKILL_TREES: SkillTree[] = [
         maxLevel: 10,
         currentLevel: 0,
         xpInvested: 0,
-        benefits: ['+3% XP on networking quests', '+5% faster troubleshooting', 'Unlock VPC content']
+        benefits: [
+          '+3% XP on networking quests',
+          '+5% faster troubleshooting',
+          'Unlock VPC content',
+        ],
       },
     ],
   },
@@ -216,7 +248,11 @@ export const SKILL_TREES: SkillTree[] = [
         maxLevel: 5,
         currentLevel: 0,
         xpInvested: 0,
-        benefits: ['+1% streak protection per level', '+2% quiz score at low health', 'Reduce wrong answer penalties']
+        benefits: [
+          '+1% streak protection per level',
+          '+2% quiz score at low health',
+          'Reduce wrong answer penalties',
+        ],
       },
       {
         id: 'curiosity',
@@ -228,7 +264,11 @@ export const SKILL_TREES: SkillTree[] = [
         currentLevel: 0,
         xpInvested: 0,
         requires: ['persistence'],
-        benefits: ['+5% bonus XP on first attempt', '+2% chance for bonus gold', 'Unlock hidden quests']
+        benefits: [
+          '+5% bonus XP on first attempt',
+          '+2% chance for bonus gold',
+          'Unlock hidden quests',
+        ],
       },
       {
         id: 'speed',
@@ -240,7 +280,11 @@ export const SKILL_TREES: SkillTree[] = [
         currentLevel: 0,
         xpInvested: 0,
         requires: ['curiosity'],
-        benefits: ['+3% XP on timed challenges', '+5% faster quiz completion', 'Reduce daily quest timers']
+        benefits: [
+          '+3% XP on timed challenges',
+          '+5% faster quiz completion',
+          'Reduce daily quest timers',
+        ],
       },
       {
         id: 'wisdom',
@@ -252,37 +296,13 @@ export const SKILL_TREES: SkillTree[] = [
         currentLevel: 0,
         xpInvested: 0,
         requires: ['speed'],
-        benefits: ['+5% quiz accuracy bonus', '+10% hint quality', 'Unlock mentor quests']
+        benefits: ['+5% quiz accuracy bonus', '+10% hint quality', 'Unlock mentor quests'],
       },
     ],
   },
 ]
 
 // XP cost per skill level (exponential scaling)
-export function getXpForLevel(currentLevel: number): number {
-  return Math.floor(50 * Math.pow(1.5, currentLevel))
-}
-
-// Total XP needed to reach a level
-export function getTotalXpForLevel(targetLevel: number): number {
-  let total = 0
-  for (let i = 0; i < targetLevel; i++) {
-    total += getXpForLevel(i)
-  }
-  return total
-}
-
-// Available skill points from XP spent
-export function getAvailableSkillPoints(totalXpSpent: number): number {
-  return Math.floor(totalXpSpent / 100)
-}
-
-// Check if a skill can be upgraded
-export function canUpgradeSkill(skill: Skill, availablePoints: number): boolean {
-  if (skill.currentLevel >= skill.maxLevel) return false
-  if (availablePoints < 1) return false
-  return true
-}
 
 // Calculate active bonuses from allocated skill points
 export function getSkillBonuses(skillAllocations: Record<string, number>): SkillBonus[] {
@@ -300,7 +320,7 @@ export function getSkillBonuses(skillAllocations: Record<string, number>): Skill
           skillName: skill.name,
           bonusType: 'xp',
           bonusValue: level * 2, // +2% per level
-          description: `+${level * 2}% XP on ${skill.name} quests`
+          description: `+${level * 2}% XP on ${skill.name} quests`,
         })
       }
 
@@ -311,7 +331,7 @@ export function getSkillBonuses(skillAllocations: Record<string, number>): Skill
           skillName: skill.name,
           bonusType: 'streak',
           bonusValue: level,
-          description: `+${level}% streak protection`
+          description: `+${level}% streak protection`,
         })
       }
 
@@ -321,7 +341,7 @@ export function getSkillBonuses(skillAllocations: Record<string, number>): Skill
           skillName: skill.name,
           bonusType: 'quiz',
           bonusValue: level * 2,
-          description: `+${level * 2}% quiz accuracy`
+          description: `+${level * 2}% quiz accuracy`,
         })
       }
     }
@@ -333,20 +353,20 @@ export function getSkillBonuses(skillAllocations: Record<string, number>): Skill
 // Check if a skill's requirements are met
 export function meetsRequirements(skill: Skill, skillAllocations: Record<string, number>): boolean {
   if (!skill.requires || skill.requires.length === 0) return true
-  return skill.requires.every(reqId => (skillAllocations[reqId] || 0) > 0)
+  return skill.requires.every((reqId) => (skillAllocations[reqId] || 0) > 0)
 }
 
 // Get the next recommended skill to unlock
 export function getRecommendedSkill(
   tree: SkillTree,
   skillAllocations: Record<string, number>,
-  availablePoints: number
+  availablePoints: number,
 ): Skill | null {
   if (availablePoints <= 0) return null
   if (!tree.recommendedPath) return null
 
   for (const skillId of tree.recommendedPath) {
-    const skill = tree.skills.find(s => s.id === skillId)
+    const skill = tree.skills.find((s) => s.id === skillId)
     if (!skill) continue
     const currentLevel = skillAllocations[skillId] || 0
     if (currentLevel >= skill.maxLevel) continue

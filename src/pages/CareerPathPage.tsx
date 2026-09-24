@@ -1,7 +1,12 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useGame } from '../contexts/GameContext'
-import { CAREER_PATHS, CATEGORY_COLORS, DIFFICULTY_CONFIG, type CareerPath } from '../data/careerPaths'
+import {
+  CAREER_PATHS,
+  CATEGORY_COLORS,
+  DIFFICULTY_CONFIG,
+  type CareerPath,
+} from '../data/careerPaths'
 
 type FilterDemand = 'all' | 'high' | 'medium' | 'growing'
 
@@ -18,8 +23,8 @@ export default function CareerPathPage() {
     for (const path of CAREER_PATHS) {
       for (const tech of path.technologies) {
         // Check how many quests for this technology the player has completed
-        const techQuests = completedQuests.filter(q =>
-          q.technologyId === tech.id || q.topicId.toLowerCase().includes(tech.id)
+        const techQuests = completedQuests.filter(
+          (q) => q.technologyId === tech.id || q.topicId.toLowerCase().includes(tech.id),
         )
         // For now, estimate progress based on completed quests (would need total quest count per tech)
         progress[tech.id] = Math.min(100, techQuests.length * 25)
@@ -39,7 +44,7 @@ export default function CareerPathPage() {
   // Filter paths by demand level
   const filteredPaths = useMemo(() => {
     if (filterDemand === 'all') return CAREER_PATHS
-    return CAREER_PATHS.filter(p => p.demandLevel === filterDemand)
+    return CAREER_PATHS.filter((p) => p.demandLevel === filterDemand)
   }, [filterDemand])
 
   const DEMAND_COLORS = {
@@ -71,14 +76,16 @@ export default function CareerPathPage() {
         <div className="bg-gradient-to-r from-blue-900/30 via-slate-800 to-purple-900/30 rounded-xl border border-blue-600/50 p-6 mb-6">
           <h2 className="text-2xl font-bold text-white mb-2">Your DevOps Career Journey</h2>
           <p className="text-slate-400 mb-4">
-            Explore different career paths in DevOps. Each path shows the technologies you need to master,
-            estimated time to proficiency, and potential salary ranges.
+            Explore different career paths in DevOps. Each path shows the technologies you need to
+            master, estimated time to proficiency, and potential salary ranges.
           </p>
 
           {/* Demand filter */}
           <div className="flex flex-wrap gap-2">
             <button
-              onClick={() => setFilterDemand('all')}
+              onClick={() => {
+                setFilterDemand('all')
+              }}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 filterDemand === 'all'
                   ? 'bg-blue-600 text-white'
@@ -88,7 +95,9 @@ export default function CareerPathPage() {
               All Paths
             </button>
             <button
-              onClick={() => setFilterDemand('high')}
+              onClick={() => {
+                setFilterDemand('high')
+              }}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 filterDemand === 'high'
                   ? 'bg-red-600 text-white'
@@ -98,7 +107,9 @@ export default function CareerPathPage() {
               High Demand
             </button>
             <button
-              onClick={() => setFilterDemand('growing')}
+              onClick={() => {
+                setFilterDemand('growing')
+              }}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 filterDemand === 'growing'
                   ? 'bg-green-600 text-white'
@@ -112,13 +123,15 @@ export default function CareerPathPage() {
 
         {/* Career Path Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filteredPaths.map(path => {
+          {filteredPaths.map((path) => {
             const progress = getPathProgress(path)
 
             return (
               <button
                 key={path.id}
-                onClick={() => setSelectedPath(path)}
+                onClick={() => {
+                  setSelectedPath(path)
+                }}
                 className="bg-slate-800/80 rounded-xl border border-slate-700 p-6 text-left hover:border-amber-600/50 hover:scale-[1.02] transition-all"
               >
                 <div className="flex items-start justify-between mb-4">
@@ -126,9 +139,14 @@ export default function CareerPathPage() {
                     <span className="text-4xl">{path.icon}</span>
                     <div>
                       <h3 className="text-xl font-bold text-white">{path.name}</h3>
-                      <span className={`inline-block mt-1 px-2 py-0.5 rounded text-xs border ${DEMAND_COLORS[path.demandLevel]}`}>
-                        {path.demandLevel === 'high' ? '🔥 High Demand' :
-                         path.demandLevel === 'growing' ? '📈 Growing' : '💼 Medium'}
+                      <span
+                        className={`inline-block mt-1 px-2 py-0.5 rounded text-xs border ${DEMAND_COLORS[path.demandLevel]}`}
+                      >
+                        {path.demandLevel === 'high'
+                          ? '🔥 High Demand'
+                          : path.demandLevel === 'growing'
+                            ? '📈 Growing'
+                            : '💼 Medium'}
                       </span>
                     </div>
                   </div>
@@ -189,14 +207,21 @@ export default function CareerPathPage() {
                   <span className="text-5xl">{selectedPath.icon}</span>
                   <div>
                     <h2 className="text-2xl font-bold text-white">{selectedPath.name}</h2>
-                    <span className={`inline-block mt-1 px-2 py-0.5 rounded text-xs border ${DEMAND_COLORS[selectedPath.demandLevel]}`}>
-                      {selectedPath.demandLevel === 'high' ? '🔥 High Demand' :
-                       selectedPath.demandLevel === 'growing' ? '📈 Growing' : '💼 Medium'}
+                    <span
+                      className={`inline-block mt-1 px-2 py-0.5 rounded text-xs border ${DEMAND_COLORS[selectedPath.demandLevel]}`}
+                    >
+                      {selectedPath.demandLevel === 'high'
+                        ? '🔥 High Demand'
+                        : selectedPath.demandLevel === 'growing'
+                          ? '📈 Growing'
+                          : '💼 Medium'}
                     </span>
                   </div>
                 </div>
                 <button
-                  onClick={() => setSelectedPath(null)}
+                  onClick={() => {
+                    setSelectedPath(null)
+                  }}
                   className="text-slate-400 hover:text-white text-2xl leading-none"
                 >
                   ×
@@ -214,11 +239,15 @@ export default function CareerPathPage() {
                   <p className="text-xs text-slate-500">Salary Range</p>
                 </div>
                 <div className="bg-slate-900/50 rounded-lg p-4 text-center">
-                  <p className="text-xl font-bold text-blue-400">{selectedPath.estimatedMonths} months</p>
+                  <p className="text-xl font-bold text-blue-400">
+                    {selectedPath.estimatedMonths} months
+                  </p>
                   <p className="text-xs text-slime-500">Time to Proficiency</p>
                 </div>
                 <div className="bg-slate-900/50 rounded-lg p-4 text-center">
-                  <p className="text-xl font-bold text-green-400">{getPathProgress(selectedPath)}%</p>
+                  <p className="text-xl font-bold text-green-400">
+                    {getPathProgress(selectedPath)}%
+                  </p>
                   <p className="text-xs text-slate-500">Your Progress</p>
                 </div>
               </div>
@@ -228,7 +257,10 @@ export default function CareerPathPage() {
                 <h3 className="text-lg font-bold text-white mb-2">📋 Prerequisites</h3>
                 <div className="flex flex-wrap gap-2">
                   {selectedPath.prerequisites.map((prereq, i) => (
-                    <span key={i} className="px-3 py-1 bg-slate-700 rounded-lg text-sm text-slate-300">
+                    <span
+                      key={i}
+                      className="px-3 py-1 bg-slate-700 rounded-lg text-sm text-slate-300"
+                    >
                       {prereq}
                     </span>
                   ))}
@@ -239,7 +271,7 @@ export default function CareerPathPage() {
               <div>
                 <h3 className="text-lg font-bold text-white mb-4">🛠️ Technology Skill Tree</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {selectedPath.technologies.map(tech => {
+                  {selectedPath.technologies.map((tech) => {
                     const progress = techProgress[tech.id] || 0
                     const difficulty = DIFFICULTY_CONFIG[tech.difficulty]
 
@@ -253,10 +285,7 @@ export default function CareerPathPage() {
                             <span className="text-2xl">{tech.icon}</span>
                             <div>
                               <p className="font-medium text-white">{tech.name}</p>
-                              <p
-                                className="text-xs"
-                                style={{ color: difficulty.color }}
-                              >
+                              <p className="text-xs" style={{ color: difficulty.color }}>
                                 {difficulty.label}
                               </p>
                             </div>
@@ -276,8 +305,8 @@ export default function CareerPathPage() {
                             className="h-full transition-all"
                             style={{
                               width: `${progress}%`,
-                              backgroundColor: progress === 100 ? '#10b981' :
-                                              progress > 0 ? '#f59e0b' : '#6b7280',
+                              backgroundColor:
+                                progress === 100 ? '#10b981' : progress > 0 ? '#f59e0b' : '#6b7280',
                             }}
                           />
                         </div>
@@ -292,7 +321,7 @@ export default function CareerPathPage() {
               <div>
                 <h3 className="text-lg font-bold text-white mb-3">🏆 Milestones</h3>
                 <div className="space-y-3">
-                  {selectedPath.milestones.map(milestone => (
+                  {selectedPath.milestones.map((milestone) => (
                     <div
                       key={milestone.id}
                       className="bg-slate-900/50 rounded-lg p-4 border border-slate-700 flex items-start gap-3"
@@ -307,10 +336,13 @@ export default function CareerPathPage() {
                         </div>
                         <p className="text-sm text-slate-400 mt-1">{milestone.description}</p>
                         <p className="text-xs text-slate-500 mt-2">
-                          Requires: {milestone.requiredTechnologies.map(t => {
-                            const tech = selectedPath.technologies.find(tc => tc.id === t)
-                            return tech ? `${tech.icon} ${tech.name}` : t
-                          }).join(', ')}
+                          Requires:{' '}
+                          {milestone.requiredTechnologies
+                            .map((t) => {
+                              const tech = selectedPath.technologies.find((tc) => tc.id === t)
+                              return tech ? `${tech.icon} ${tech.name}` : t
+                            })
+                            .join(', ')}
                         </p>
                       </div>
                     </div>
@@ -322,7 +354,9 @@ export default function CareerPathPage() {
             {/* Footer */}
             <div className="px-6 py-4 bg-slate-900/50 border-t border-slate-700">
               <button
-                onClick={() => setSelectedPath(null)}
+                onClick={() => {
+                  setSelectedPath(null)
+                }}
                 className="w-full py-2 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors"
               >
                 Close

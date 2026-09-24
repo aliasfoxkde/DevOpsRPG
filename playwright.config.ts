@@ -8,7 +8,7 @@ import { defineConfig, devices } from '@playwright/test'
 // resolves localhost to IPv4, and other servers may hold 0.0.0.0.
 const port = Number(process.env.E2E_PORT) || 5299
 const host = '127.0.0.1'
-const baseURL = `http://${host}:${port}`
+const baseURL = `http://${host}:${String(port)}`
 
 export default defineConfig({
   testDir: './e2e',
@@ -36,7 +36,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `npm run dev -- --port ${port} --host ${host} --strictPort`,
+    command: `npm run dev -- --port ${String(port)} --host ${host} --strictPort`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
   },

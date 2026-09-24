@@ -13,7 +13,7 @@ function openChallenge(title: string) {
 }
 
 function editor() {
-  return screen.getByRole('textbox') as HTMLTextAreaElement
+  return screen.getByRole('textbox')
 }
 
 function writeCode(code: string) {
@@ -142,9 +142,7 @@ describe('CodePlayground', () => {
 
     const listCard = screen.getByRole('button', { name: /create a heading/i })
     expect(within(listCard).getByText('✓ Completed')).toBeInTheDocument()
-    expect(
-      screen.getByText("You've earned 10 XP in Code Playground!"),
-    ).toBeInTheDocument()
+    expect(screen.getByText("You've earned 10 XP in Code Playground!")).toBeInTheDocument()
     expect(onComplete).toHaveBeenCalledTimes(1)
   })
 

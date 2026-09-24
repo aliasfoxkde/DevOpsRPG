@@ -10,16 +10,21 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').then(
       (registration) => {
-        console.log('ServiceWorker registration successful:', registration.scope)
+        console.warn('ServiceWorker registration successful:', registration.scope)
       },
-      (error) => {
-        console.log('ServiceWorker registration failed:', error)
-      }
+      (error: unknown) => {
+        console.error('ServiceWorker registration failed:', error)
+      },
     )
   })
 }
 
-createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root')
+if (!rootElement) {
+  throw new Error('Root element #root is missing from the document')
+}
+
+createRoot(rootElement).render(
   <StrictMode>
     <BrowserRouter>
       <App />

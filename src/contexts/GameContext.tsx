@@ -1,18 +1,44 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
-import { allQuests, getNextQuest, isRealmUnlocked, realms, type Quest, type Realm } from '../data/quests'
+import {
+  allQuests,
+  getNextQuest,
+  isRealmUnlocked,
+  realms,
+  type Quest,
+  type Realm,
+} from '../data/quests'
 import { BADGES, shouldUnlockBadge, type Badge } from '../data/badges'
 import { MILESTONES, checkMilestone, type Milestone } from '../data/milestones'
-import { generateDailyQuests, generateWeeklyQuests, generateSecretQuests, type SideQuest } from '../data/sidequests'
-import { getRandomCollectible, COLLECTIBLES_POOL, DAILY_REWARDS, spinWheel as doSpin, type Collectible } from '../data/collectibles'
+import {
+  generateDailyQuests,
+  generateWeeklyQuests,
+  generateSecretQuests,
+  type SideQuest,
+} from '../data/sidequests'
+import {
+  getRandomCollectible,
+  COLLECTIBLES_POOL,
+  DAILY_REWARDS,
+  spinWheel as doSpin,
+  type Collectible,
+  type DailyReward,
+} from '../data/collectibles'
 import { technologies } from '../data/technologies'
 import { TITLES, FRAMES } from '../data/titles'
 import { getEquipmentById, calculateEquipmentBonuses } from '../data/equipment'
-import { STORAGE_KEYS, XP_PER_LEVEL, MAX_HP, MAX_MP, COLLECTIBLE_DROP_RATE, GOLD_XP_RATIO } from '../utils/gameUtils'
+import {
+  STORAGE_KEYS,
+  XP_PER_LEVEL,
+  MAX_HP,
+  MAX_MP,
+  COLLECTIBLE_DROP_RATE,
+  GOLD_XP_RATIO,
+} from '../utils/gameUtils'
 
 export type CharacterClass = 'Cloud Knight' | 'Script Warrior' | 'Data Mage' | 'DevOps Sage'
 
 // Companion interface
-export interface Companion {
+interface Companion {
   id: string
   name: string
   icon: string
@@ -25,18 +51,26 @@ export interface Companion {
   maxBondLevel: number // Level at which evolution triggers
 }
 
+// Spaced-repetition tracking for a topic the player keeps missing
+interface WeakTopicEntry {
+  wrongCount: number
+  lastReviewed: string
+  nextReview: string
+  masteryLevel: number // 0-3, higher = more confident
+}
+
 // Evolved companions data (internal to the game state module)
 const EVOLVED_COMPANIONS: Record<string, Companion> = {
   owl_elder: {
     id: 'owl_elder',
     name: 'Elder Owl',
     icon: '🦉',
-    xpBonus: 0.10,
+    xpBonus: 0.1,
     goldBonus: 0.05,
     specialAbility: 'Wisdom: +10% XP permanently',
     bondLevel: 1,
     totalQuestsCompleted: 0,
-    maxBondLevel: 10
+    maxBondLevel: 10,
   },
   cat_shadow: {
     id: 'cat_shadow',
@@ -47,41 +81,82 @@ const EVOLVED_COMPANIONS: Record<string, Companion> = {
     specialAbility: 'Lucky: +12% Gold permanently',
     bondLevel: 1,
     totalQuestsCompleted: 0,
-    maxBondLevel: 10
+    maxBondLevel: 10,
   },
   dragon_elder: {
     id: 'dragon_elder',
     name: 'Elder Dragon',
     icon: '🐲',
-    xpBonus: 0.20,
-    goldBonus: 0.20,
+    xpBonus: 0.2,
+    goldBonus: 0.2,
     specialAbility: 'Fire Breath: +20% XP & Gold permanently',
     bondLevel: 1,
     totalQuestsCompleted: 0,
-    maxBondLevel: 10
+    maxBondLevel: 10,
   },
   phoenix_legendary: {
     id: 'phoenix_legendary',
     name: 'Legendary Phoenix',
     icon: '🔥',
-    xpBonus: 0.30,
-    goldBonus: 0.20,
+    xpBonus: 0.3,
+    goldBonus: 0.2,
     specialAbility: 'Rebirth: Weekly Streak Shield + 2x XP on streak days',
     bondLevel: 1,
     totalQuestsCompleted: 0,
-    maxBondLevel: 10
+    maxBondLevel: 10,
   },
 }
 
 // Base companions available for purchase in the store
 const COMPANIONS_DATA: Record<string, Companion> = {
-  owl: { id: 'owl', name: 'Wise Owl', icon: '🦉', xpBonus: 0.05, goldBonus: 0, bondLevel: 1, totalQuestsCompleted: 0, evolvedForm: 'owl_elder', maxBondLevel: 10 },
-  cat: { id: 'cat', name: 'Lucky Cat', icon: '🐱', xpBonus: 0, goldBonus: 0.05, bondLevel: 1, totalQuestsCompleted: 0, evolvedForm: 'cat_shadow', maxBondLevel: 10 },
-  dragon: { id: 'dragon', name: 'Baby Dragon', icon: '🐲', xpBonus: 0.10, goldBonus: 0.10, bondLevel: 1, totalQuestsCompleted: 0, evolvedForm: 'dragon_elder', maxBondLevel: 10 },
-  phoenix: { id: 'phoenix', name: 'Phoenix', icon: '🦅', xpBonus: 0.20, goldBonus: 0.10, specialAbility: 'Weekly Streak Shield', bondLevel: 1, totalQuestsCompleted: 0, evolvedForm: 'phoenix_legendary', maxBondLevel: 10 },
+  owl: {
+    id: 'owl',
+    name: 'Wise Owl',
+    icon: '🦉',
+    xpBonus: 0.05,
+    goldBonus: 0,
+    bondLevel: 1,
+    totalQuestsCompleted: 0,
+    evolvedForm: 'owl_elder',
+    maxBondLevel: 10,
+  },
+  cat: {
+    id: 'cat',
+    name: 'Lucky Cat',
+    icon: '🐱',
+    xpBonus: 0,
+    goldBonus: 0.05,
+    bondLevel: 1,
+    totalQuestsCompleted: 0,
+    evolvedForm: 'cat_shadow',
+    maxBondLevel: 10,
+  },
+  dragon: {
+    id: 'dragon',
+    name: 'Baby Dragon',
+    icon: '🐲',
+    xpBonus: 0.1,
+    goldBonus: 0.1,
+    bondLevel: 1,
+    totalQuestsCompleted: 0,
+    evolvedForm: 'dragon_elder',
+    maxBondLevel: 10,
+  },
+  phoenix: {
+    id: 'phoenix',
+    name: 'Phoenix',
+    icon: '🦅',
+    xpBonus: 0.2,
+    goldBonus: 0.1,
+    specialAbility: 'Weekly Streak Shield',
+    bondLevel: 1,
+    totalQuestsCompleted: 0,
+    evolvedForm: 'phoenix_legendary',
+    maxBondLevel: 10,
+  },
 }
 
-export interface Character {
+interface Character {
   name: string
   class: CharacterClass
   avatar: string
@@ -111,7 +186,7 @@ export interface Character {
   equippedItems: string[] // List of equipped equipment item IDs
 }
 
-export interface TopicProgress {
+interface TopicProgress {
   topicId: string
   technologyId: string
   questId: string
@@ -121,7 +196,7 @@ export interface TopicProgress {
 }
 
 // Learning topic progress (for w3schools content) - separate from quest completion
-export interface LearningTopicProgress {
+interface LearningTopicProgress {
   topicId: string
   technologyId: string
   completed: boolean
@@ -129,7 +204,7 @@ export interface LearningTopicProgress {
   completedAt?: string
 }
 
-export interface Achievement {
+interface Achievement {
   id: string
   name: string
   description: string
@@ -145,7 +220,13 @@ export interface GameState {
   currentQuestStartTime: number | null // Timestamp when current quest started
   achievements: Achievement[]
   showVictory: boolean
-  lastVictory: { xp: number; levelUp: boolean; newLevel: number; milestone?: Milestone; badge?: Badge } | null
+  lastVictory: {
+    xp: number
+    levelUp: boolean
+    newLevel: number
+    milestone?: Milestone
+    badge?: Badge
+  } | null
   // New engagement systems
   sideQuests: SideQuest[]
   badges: Badge[]
@@ -183,12 +264,7 @@ export interface GameState {
     quizMasterScore: number // Quizzes passed with 80%+ score
   }
   // Weak topic tracking for spaced repetition
-  weakTopics: Record<string, {
-    wrongCount: number
-    lastReviewed: string
-    nextReview: string
-    masteryLevel: number // 0-3, higher = more confident
-  }>
+  weakTopics: Record<string, WeakTopicEntry>
   // Prestige system
   prestigeLevel: number // Times player has prestiged (reset progress for permanent bonuses)
   prestigeMultiplier: number // Permanent XP/Gold multiplier from prestige (starts at 1.0, increases with each prestige)
@@ -233,7 +309,14 @@ interface GameContextType {
   getCompletedLearningTopicIds: () => Set<string>
   // Badge/Sidequest/Milestone/Collectible methods
   claimDailyReward: (day: number) => { type: string; value?: number; collectible?: Collectible }
-  spinWheel: () => { segment: { id: string; label: string; icon: string; reward: { type: string; value?: number; collectibleId?: string } } }
+  spinWheel: () => {
+    segment: {
+      id: string
+      label: string
+      icon: string
+      reward: { type: string; value?: number; collectibleId?: string }
+    }
+  }
   consumeCollectible: (collectibleId: string) => boolean
   getActiveCollectibles: () => Collectible[]
   checkAndUnlockBadges: () => Badge[]
@@ -250,10 +333,21 @@ interface GameContextType {
   getSkillXp: (techId: string) => number
   getSkillLevelFromXp: (xp: number) => number
   // Stats tracking for badges
-  incrementStat: (stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame' | 'challenge', isPerfect?: boolean, wrongAnswers?: number, passedWith80?: boolean, topicId?: string) => void
+  incrementStat: (
+    stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame' | 'challenge',
+    isPerfect?: boolean,
+    wrongAnswers?: number,
+    passedWith80?: boolean,
+    topicId?: string,
+  ) => void
   resetQuizStreak: () => void
   // Spaced repetition
-  getWeakTopics: () => Array<{ topicId: string; masteryLevel: number; wrongCount: number; nextReview: string }>
+  getWeakTopics: () => Array<{
+    topicId: string
+    masteryLevel: number
+    wrongCount: number
+    nextReview: string
+  }>
   getTopicsDueForReview: () => string[]
   // Prestige system
   canPrestige: () => boolean
@@ -280,20 +374,50 @@ interface GameContextType {
   purchaseItem: (itemId: string, price: number) => boolean
   equipCompanion: (companionId: string) => void
   // Titles & Frames
-  checkAndUnlockTitlesFrames: () => { unlockedTitles: string[], unlockedFrames: string[] }
+  checkAndUnlockTitlesFrames: () => { unlockedTitles: string[]; unlockedFrames: string[] }
   equipTitle: (titleId: string) => boolean
   equipFrame: (frameId: string) => boolean
   // Equipment
   equipItem: (itemId: string) => boolean
   unequipItem: (itemId: string) => boolean
   getEquippedItems: () => string[]
-  getEquipmentBonuses: () => { xpBonus: number; goldBonus: number; techBonuses: Record<string, number> }
+  getEquipmentBonuses: () => {
+    xpBonus: number
+    goldBonus: number
+    techBonuses: Record<string, number>
+  }
 }
 
 // Game balance constants live in utils/gameUtils.ts (import GAME_BALANCE from there)
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+// Achievement record as persisted in a save; only the fields the loader reads
+// back are declared.
+interface StoredAchievement {
+  id: string
+  unlockedAt?: string
+}
+
+function isStoredAchievementList(value: unknown): value is StoredAchievement[] {
+  return (
+    Array.isArray(value) &&
+    value.every((entry) => isPlainObject(entry) && typeof entry.id === 'string')
+  )
+}
+
+// Keyed game data is looked up with values that come from user input or other
+// records, so a miss is always possible at runtime even though index-access
+// typing reports the value type as always present. These helpers surface the
+// miss in their return types.
+function lookupRecordValue<T>(record: Record<string, T>, key: string): T | undefined {
+  return record[key]
+}
+
+function lookupDailyReward(day: number): DailyReward | undefined {
+  return DAILY_REWARDS[day - 1]
 }
 
 // Deep merge utility for game state recovery
@@ -337,7 +461,12 @@ function getTitle(level: number): string {
 
 const ACHIEVEMENTS: Achievement[] = [
   { id: 'first_steps', name: 'First Steps', description: 'Complete your first quest', icon: '🎯' },
-  { id: 'dedicated', name: 'Dedicated Learner', description: 'Maintain a 7-day streak', icon: '🔥' },
+  {
+    id: 'dedicated',
+    name: 'Dedicated Learner',
+    description: 'Maintain a 7-day streak',
+    icon: '🔥',
+  },
   { id: 'level_5', name: 'Rising Star', description: 'Reach level 5', icon: '⭐' },
   { id: 'level_10', name: 'Seasoned Adventurer', description: 'Reach level 10', icon: '🌟' },
   { id: 'level_15', name: 'DevOps Expert', description: 'Reach level 15', icon: '💫' },
@@ -345,9 +474,19 @@ const ACHIEVEMENTS: Achievement[] = [
   { id: 'xp_1000', name: 'XP Master', description: 'Earn 1000 XP', icon: '👑' },
   { id: 'topics_10', name: 'Knowledge Seeker', description: 'Complete 10 quests', icon: '📚' },
   { id: 'topics_25', name: 'Halfway There', description: 'Complete 25 quests', icon: '🏆' },
-  { id: 'all_foundations', name: 'Foundation Master', description: 'Complete all Foundations quests', icon: '🏠' },
+  {
+    id: 'all_foundations',
+    name: 'Foundation Master',
+    description: 'Complete all Foundations quests',
+    icon: '🏠',
+  },
   { id: 'streak_7', name: 'Weekly Warrior', description: '7-day learning streak', icon: '📅' },
-  { id: 'streak_30', name: 'Monthly Dedication', description: '30-day learning streak', icon: '🗓️' },
+  {
+    id: 'streak_30',
+    name: 'Monthly Dedication',
+    description: '30-day learning streak',
+    icon: '🗓️',
+  },
 ]
 
 function createDefaultCharacter(): Character {
@@ -388,13 +527,13 @@ function createDefaultGame(): GameState {
     completedTopics: [], // Learning content topic completions
     currentQuestId: null,
     currentQuestStartTime: null,
-    achievements: ACHIEVEMENTS.map(a => ({ ...a })),
+    achievements: ACHIEVEMENTS.map((a) => ({ ...a })),
     showVictory: false,
     lastVictory: null,
     // Engagement systems - initialized fresh
     sideQuests: [...generateDailyQuests(), ...generateWeeklyQuests(), ...generateSecretQuests()],
-    badges: BADGES.map(b => ({ ...b })),
-    milestones: MILESTONES.map(m => ({ ...m })),
+    badges: BADGES.map((b) => ({ ...b })),
+    milestones: MILESTONES.map((m) => ({ ...m })),
     collectibles: [],
     dailyRewardsClaimed: [],
     lastDailyReset: today,
@@ -454,9 +593,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const loadAndValidateGame = (storedJson: string | null): GameState | null => {
     if (!storedJson) return null
     try {
-      const parsed = JSON.parse(storedJson)
+      const parsed: unknown = JSON.parse(storedJson)
       // Basic validation - check for required top-level properties
-      if (!parsed || typeof parsed.character !== 'object' || !Array.isArray(parsed.badges)) {
+      if (
+        !isPlainObject(parsed) ||
+        !isPlainObject(parsed.character) ||
+        !Array.isArray(parsed.badges)
+      ) {
         console.warn('Game data validation failed: missing required fields')
         return null
       }
@@ -464,13 +607,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
       // Merge stored data with defaults to ensure all fields exist
       const merged = deepMerge(defaults, parsed)
       // Ensure achievements are properly restored
-      merged.achievements = ACHIEVEMENTS.map(a => {
-        const stored = parsed.achievements?.find((ua: Achievement) => ua.id === a.id)
+      const storedAchievements = isStoredAchievementList(parsed.achievements)
+        ? parsed.achievements
+        : []
+      merged.achievements = ACHIEVEMENTS.map((a) => {
+        const stored = storedAchievements.find((ua) => ua.id === a.id)
         return stored?.unlockedAt ? { ...a, unlockedAt: stored.unlockedAt } : a
       })
       // Ensure arrays exist
-      if (!merged.recentBadgeUnlocks) merged.recentBadgeUnlocks = []
-      if (!merged.recentMilestoneUnlocks) merged.recentMilestoneUnlocks = []
+      if (!Array.isArray(merged.recentBadgeUnlocks)) merged.recentBadgeUnlocks = []
+      if (!Array.isArray(merged.recentMilestoneUnlocks)) merged.recentMilestoneUnlocks = []
       if (!Array.isArray(merged.badges)) merged.badges = []
       if (!Array.isArray(merged.collectibles)) merged.collectibles = []
       if (!Array.isArray(merged.completedRealms)) merged.completedRealms = []
@@ -502,14 +648,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const backup = localStorage.getItem(STORAGE_KEYS.BACKUP)
       loaded = loadAndValidateGame(backup)
       if (loaded) {
-        console.info('Restored game from backup')
+        console.warn('Restored game from backup')
         return loaded
       }
 
       // Both failed - start fresh. A first visit (no data at all) is normal;
       // only warn when data existed but was unreadable.
       if (stored !== null || backup !== null) {
-        console.warn('Game data was unreadable, starting fresh. Previous data may be recoverable from browser storage.')
+        console.warn(
+          'Game data was unreadable, starting fresh. Previous data may be recoverable from browser storage.',
+        )
       }
     }
     return createDefaultGame()
@@ -532,13 +680,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === STORAGE_KEYS.GAME && e.newValue) {
         try {
-          const parsed = JSON.parse(e.newValue)
+          const parsed: unknown = JSON.parse(e.newValue)
+          if (!isPlainObject(parsed)) return
           // Deep merge with defaults to ensure all fields exist
           const defaults = createDefaultGame()
           const merged = deepMerge(defaults, parsed)
-          if (!merged.achievements) merged.achievements = defaults.achievements
-          if (!merged.recentBadgeUnlocks) merged.recentBadgeUnlocks = []
-          if (!merged.recentMilestoneUnlocks) merged.recentMilestoneUnlocks = []
+          if (!Array.isArray(merged.achievements)) merged.achievements = defaults.achievements
+          if (!Array.isArray(merged.recentBadgeUnlocks)) merged.recentBadgeUnlocks = []
+          if (!Array.isArray(merged.recentMilestoneUnlocks)) merged.recentMilestoneUnlocks = []
           setGame(merged)
         } catch {
           // Ignore parse errors
@@ -546,17 +695,19 @@ export function GameProvider({ children }: { children: ReactNode }) {
       }
     }
     window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+    }
   }, [])
 
   const completeQuest = useCallback((questId: string) => {
-    setGame(prev => {
+    setGame((prev) => {
       // Find the quest
-      const quest = allQuests.find(q => q.id === questId)
+      const quest = allQuests.find((q) => q.id === questId)
       if (!quest) return prev
 
       // Check if already completed
-      if (prev.completedQuests.some(q => q.questId === questId)) return prev
+      if (prev.completedQuests.some((q) => q.questId === questId)) return prev
 
       const today = new Date().toISOString().split('T')[0]
       const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
@@ -565,8 +716,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const companionXpBonus = prev.activeCompanion ? prev.activeCompanion.xpBonus : 0
       const companionGoldBonus = prev.activeCompanion ? prev.activeCompanion.goldBonus : 0
       const prestigeMultiplier = prev.prestigeMultiplier
-      const xpReward = Math.floor(quest.xpReward * prev.character.xpMultiplier * (1 + companionXpBonus) * prestigeMultiplier)
-      const goldReward = Math.floor(quest.xpReward * GOLD_XP_RATIO * prev.character.goldMultiplier * (1 + companionGoldBonus) * prestigeMultiplier)
+      const xpReward = Math.floor(
+        quest.xpReward * prev.character.xpMultiplier * (1 + companionXpBonus) * prestigeMultiplier,
+      )
+      const goldReward = Math.floor(
+        quest.xpReward *
+          GOLD_XP_RATIO *
+          prev.character.goldMultiplier *
+          (1 + companionGoldBonus) *
+          prestigeMultiplier,
+      )
 
       // Calculate new XP and level
       const newXp = prev.character.xp + xpReward
@@ -590,7 +749,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
       // Check for new achievements
       const completedCount = prev.completedQuests.length + 1
-      const newAchievements = prev.achievements.map(a => {
+      const newAchievements = prev.achievements.map((a) => {
         if (a.unlockedAt) return a
 
         let unlocked = false
@@ -625,9 +784,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
             break
           case 'all_foundations': {
             // Check if all foundations quests are complete
-            const foundationsQuests = allQuests.filter(q => q.realmId === 'foundations')
+            const foundationsQuests = allQuests.filter((q) => q.realmId === 'foundations')
             const allFoundationsDone = foundationsQuests.every(
-              fq => prev.completedQuests.some(cq => cq.questId === fq.id) || fq.id === questId
+              (fq) => prev.completedQuests.some((cq) => cq.questId === fq.id) || fq.id === questId,
             )
             unlocked = allFoundationsDone
             break
@@ -642,7 +801,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
       // Determine next quest
       const nextQuest = getNextQuest(
-        new Set([...prev.completedQuests.map(q => q.topicId), quest.topicId])
+        new Set([...prev.completedQuests.map((q) => q.topicId), quest.topicId]),
       )
 
       // Check for realm completion first
@@ -651,9 +810,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
       for (const realm of Object.values(realms)) {
         if (completedRealmIds.includes(realm.id)) continue
-        const realmQuests = allQuests.filter(q => q.realmId === realm.id)
-        const allComplete = realmQuests.every(rq =>
-          prev.completedQuests.some(cq => cq.questId === rq.id) || rq.id === questId
+        const realmQuests = allQuests.filter((q) => q.realmId === realm.id)
+        const allComplete = realmQuests.every(
+          (rq) => prev.completedQuests.some((cq) => cq.questId === rq.id) || rq.id === questId,
         )
         if (allComplete) {
           completedRealmIds.push(realm.id)
@@ -665,11 +824,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
       }
 
       // Calculate completed technologies
-      const completedTechIds = [...new Set(prev.completedQuests.map(q => q.technologyId))]
+      const completedTechIds = [...new Set(prev.completedQuests.map((q) => q.technologyId))]
       if (!completedTechIds.includes(quest.technologyId)) {
-        const techQuests = allQuests.filter(q => q.technologyId === quest.technologyId)
-        const allTechComplete = techQuests.every(tq =>
-          prev.completedQuests.some(cq => cq.questId === tq.id) || tq.id === questId
+        const techQuests = allQuests.filter((q) => q.technologyId === quest.technologyId)
+        const allTechComplete = techQuests.every(
+          (tq) => prev.completedQuests.some((cq) => cq.questId === tq.id) || tq.id === questId,
         )
         if (allTechComplete) completedTechIds.push(quest.technologyId)
       }
@@ -677,7 +836,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       // Check for new badges with proper stats (use actual game stats)
       // Calculate earned categories from already-unlocked badges
       const earnedCategories = new Set(
-        prev.badges.filter(b => b.unlockedAt).map(b => b.category)
+        prev.badges.filter((b) => b.unlockedAt).map((b) => b.category),
       )
       const badgeStats = {
         questCount: completedCount,
@@ -698,7 +857,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         allRealms: completedRealmIds.length >= Object.keys(realms).length,
         allTechnologies: completedTechIds.length >= Object.keys(technologies).length,
         goldHoard: prev.character.gold,
-        badgesEarned: prev.badges.filter(b => b.unlockedAt).length,
+        badgesEarned: prev.badges.filter((b) => b.unlockedAt).length,
         earnedCategories: Array.from(earnedCategories),
         challengeComplete: prev.stats.challengeComplete,
         sidequestComplete: prev.stats.sidequestComplete,
@@ -706,16 +865,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
         quizMasterScore: prev.stats.quizMasterScore,
         // Companion stats for evolution badges
         companionOwned: prev.companions.length,
-        companionEvolution: prev.companions.filter(c =>
-          c.id.includes('_elder') || c.id.includes('_shadow') || c.id.includes('_legendary')
+        companionEvolution: prev.companions.filter(
+          (c) => c.id.includes('_elder') || c.id.includes('_shadow') || c.id.includes('_legendary'),
         ).length,
-        maxBondLevel: Math.max(1, ...prev.companions.map(c => c.bondLevel)),
+        maxBondLevel: Math.max(1, ...prev.companions.map((c) => c.bondLevel)),
         // Prestige stats for prestige badges
         prestigeLevel: prev.prestigeLevel,
       }
 
       let newBadge: Badge | undefined
-      const updatedBadges = prev.badges.map(b => {
+      const updatedBadges = prev.badges.map((b) => {
         if (b.unlockedAt) return b
         if (!newBadge && shouldUnlockBadge(b, badgeStats)) {
           newBadge = { ...b, unlockedAt: new Date().toISOString() }
@@ -738,7 +897,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       }
 
       let newMilestone: Milestone | undefined
-      const updatedMilestones = prev.milestones.map(m => {
+      const updatedMilestones = prev.milestones.map((m) => {
         if (m.unlocked) return m
         if (!newMilestone && checkMilestone(m, milestoneState)) {
           newMilestone = { ...m, unlocked: true, unlockedAt: new Date().toISOString() }
@@ -805,7 +964,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         completedRealms: completedRealmIds,
         showRealmCompletion: newShowRealmCompletion,
         // Update side quest progress
-        sideQuests: prev.sideQuests.map(sq => {
+        sideQuests: prev.sideQuests.map((sq) => {
           if (sq.completed) return sq
           // Increment progress for quest completion type
           if (sq.requirement.type === 'complete_quests') {
@@ -826,22 +985,33 @@ export function GameProvider({ children }: { children: ReactNode }) {
         stats: {
           ...prev.stats,
           sessionQuestCount: prev.stats.sessionQuestCount + 1,
-          earlyQuests: new Date().getHours() < 8 ? prev.stats.earlyQuests + 1 : prev.stats.earlyQuests,
-          nightQuests: new Date().getHours() >= 22 ? prev.stats.nightQuests + 1 : prev.stats.nightQuests,
+          earlyQuests:
+            new Date().getHours() < 8 ? prev.stats.earlyQuests + 1 : prev.stats.earlyQuests,
+          nightQuests:
+            new Date().getHours() >= 22 ? prev.stats.nightQuests + 1 : prev.stats.nightQuests,
           // Track fastest quest time for speed_demon badge
           fastestQuestTime: prev.currentQuestStartTime
-            ? Math.min(prev.stats.fastestQuestTime, (Date.now() - prev.currentQuestStartTime) / 1000)
+            ? Math.min(
+                prev.stats.fastestQuestTime,
+                (Date.now() - prev.currentQuestStartTime) / 1000,
+              )
             : prev.stats.fastestQuestTime,
         },
         // Companion bond system - increase bond level and check for evolution
         companions: prev.activeCompanion
-          ? prev.companions.map(c => {
+          ? prev.companions.map((c) => {
               if (c.id !== prev.activeCompanion?.id) return c
               const newBondLevel = Math.min(c.bondLevel + 1, c.maxBondLevel)
               const newTotalQuests = c.totalQuestsCompleted + 1
               // Check if companion should evolve
-              if (newBondLevel >= c.maxBondLevel && c.evolvedForm && !c.id.includes('_elder') && !c.id.includes('_shadow') && !c.id.includes('_legendary')) {
-                const evolvedCompanion = EVOLVED_COMPANIONS[c.evolvedForm]
+              if (
+                newBondLevel >= c.maxBondLevel &&
+                c.evolvedForm &&
+                !c.id.includes('_elder') &&
+                !c.id.includes('_shadow') &&
+                !c.id.includes('_legendary')
+              ) {
+                const evolvedCompanion = lookupRecordValue(EVOLVED_COMPANIONS, c.evolvedForm)
                 if (evolvedCompanion) {
                   return {
                     ...evolvedCompanion,
@@ -859,10 +1029,18 @@ export function GameProvider({ children }: { children: ReactNode }) {
           : prev.companions,
         activeCompanion: prev.activeCompanion
           ? (() => {
-              const updated = prev.companions.find(c => c.id === prev.activeCompanion?.id)
+              const updated = prev.companions.find((c) => c.id === prev.activeCompanion?.id)
               // If evolved, switch to the evolved form
-              if (updated && updated.bondLevel >= updated.maxBondLevel && updated.evolvedForm && !updated.id.includes('_elder') && !updated.id.includes('_shadow') && !updated.id.includes('_legendary')) {
-                return EVOLVED_COMPANIONS[updated.evolvedForm] || updated
+              if (
+                updated &&
+                updated.bondLevel >= updated.maxBondLevel &&
+                updated.evolvedForm &&
+                !updated.id.includes('_elder') &&
+                !updated.id.includes('_shadow') &&
+                !updated.id.includes('_legendary')
+              ) {
+                const evolved = lookupRecordValue(EVOLVED_COMPANIONS, updated.evolvedForm)
+                return evolved ?? updated
               }
               return updated || null
             })()
@@ -877,9 +1055,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
           // Auto-complete dash when all 5 quests done
           if (newCompletedQuests.length >= 5) {
             const elapsed = Math.floor((Date.now() - prev.dailyDash.startTime) / 1000)
-            const newBestTime = prev.dailyDash.bestTime === null || elapsed < prev.dailyDash.bestTime
-              ? elapsed
-              : prev.dailyDash.bestTime
+            const newBestTime =
+              prev.dailyDash.bestTime === null || elapsed < prev.dailyDash.bestTime
+                ? elapsed
+                : prev.dailyDash.bestTime
             return {
               active: false,
               startTime: null,
@@ -898,11 +1077,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
         communityStats: (() => {
           const now = new Date()
           const lastReset = new Date(prev.communityStats.lastWeekReset)
-          const needsReset = now.getDay() === 1 && now.getTime() - lastReset.getTime() > 6 * 24 * 60 * 60 * 1000
+          const needsReset =
+            now.getDay() === 1 && now.getTime() - lastReset.getTime() > 6 * 24 * 60 * 60 * 1000
 
           return {
             weeklyQuestsCompleted: needsReset ? 1 : prev.communityStats.weeklyQuestsCompleted + 1,
-            weeklyXPCompleted: needsReset ? xpReward : prev.communityStats.weeklyXPCompleted + xpReward,
+            weeklyXPCompleted: needsReset
+              ? xpReward
+              : prev.communityStats.weeklyXPCompleted + xpReward,
             lastWeekReset: needsReset ? now.toISOString() : prev.communityStats.lastWeekReset,
           }
         })(),
@@ -911,81 +1093,100 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const setCurrentQuest = useCallback((questId: string | null) => {
-    setGame(prev => ({ ...prev, currentQuestId: questId, currentQuestStartTime: questId ? Date.now() : null }))
+    setGame((prev) => ({
+      ...prev,
+      currentQuestId: questId,
+      currentQuestStartTime: questId ? Date.now() : null,
+    }))
   }, [])
 
   const dismissVictory = useCallback(() => {
-    setGame(prev => ({ ...prev, showVictory: false, lastVictory: null }))
+    setGame((prev) => ({ ...prev, showVictory: false, lastVictory: null }))
   }, [])
 
-  const isQuestCompleted = useCallback((questId: string) => {
-    return game.completedQuests.some(q => q.questId === questId)
-  }, [game.completedQuests])
+  const isQuestCompleted = useCallback(
+    (questId: string) => {
+      return game.completedQuests.some((q) => q.questId === questId)
+    },
+    [game.completedQuests],
+  )
 
   const getNextQuestInternal = useCallback(() => {
-    const completedIds = new Set(game.completedQuests.map(q => q.topicId))
+    const completedIds = new Set(game.completedQuests.map((q) => q.topicId))
     return getNextQuest(completedIds)
   }, [game.completedQuests])
 
   const getAvailableQuests = useCallback(() => {
-    const completedIds = new Set(game.completedQuests.map(q => q.questId))
-    return allQuests.filter(q => !completedIds.has(q.id))
+    const completedIds = new Set(game.completedQuests.map((q) => q.questId))
+    return allQuests.filter((q) => !completedIds.has(q.id))
   }, [game.completedQuests])
 
   const getCompletedTopicIds = useCallback(() => {
-    return new Set(game.completedQuests.map(q => q.topicId))
+    return new Set(game.completedQuests.map((q) => q.topicId))
   }, [game.completedQuests])
 
   // Learning topic methods (for w3schools content)
-  const completeLearningTopic = useCallback((topicId: string, technologyId: string, xpEarned: number) => {
-    setGame(prev => {
-      // Check if already completed
-      if (prev.completedTopics.some(t => t.topicId === topicId)) return prev
+  const completeLearningTopic = useCallback(
+    (topicId: string, technologyId: string, xpEarned: number) => {
+      setGame((prev) => {
+        // Check if already completed
+        if (prev.completedTopics.some((t) => t.topicId === topicId)) return prev
 
-      const newXp = prev.character.xp + xpEarned
-      const newLevel = calculateLevel(newXp)
+        const newXp = prev.character.xp + xpEarned
+        const newLevel = calculateLevel(newXp)
 
-      return {
-        ...prev,
-        completedTopics: [
-          ...prev.completedTopics,
-          {
-            topicId,
-            technologyId,
-            completed: true,
-            xpEarned,
-            completedAt: new Date().toISOString(),
+        return {
+          ...prev,
+          completedTopics: [
+            ...prev.completedTopics,
+            {
+              topicId,
+              technologyId,
+              completed: true,
+              xpEarned,
+              completedAt: new Date().toISOString(),
+            },
+          ],
+          character: {
+            ...prev.character,
+            xp: newXp,
+            level: newLevel,
           },
-        ],
-        character: {
-          ...prev.character,
-          xp: newXp,
-          level: newLevel,
-        },
-      }
-    })
-  }, [])
+        }
+      })
+    },
+    [],
+  )
 
-  const isLearningTopicCompleted = useCallback((topicId: string) => {
-    return game.completedTopics.some(t => t.topicId === topicId)
-  }, [game.completedTopics])
+  const isLearningTopicCompleted = useCallback(
+    (topicId: string) => {
+      return game.completedTopics.some((t) => t.topicId === topicId)
+    },
+    [game.completedTopics],
+  )
 
   const getCompletedLearningTopicIds = useCallback(() => {
-    return new Set(game.completedTopics.map(t => t.topicId))
+    return new Set(game.completedTopics.map((t) => t.topicId))
   }, [game.completedTopics])
 
-  const isRealmUnlockedInternal = useCallback((realm: Realm) => {
-    const completedIds = getCompletedTopicIds()
-    return isRealmUnlocked(realm, game.character.level, completedIds)
-  }, [game.character.level, getCompletedTopicIds])
+  const isRealmUnlockedInternal = useCallback(
+    (realm: Realm) => {
+      const completedIds = getCompletedTopicIds()
+      return isRealmUnlocked(realm, game.character.level, completedIds)
+    },
+    [game.character.level, getCompletedTopicIds],
+  )
 
-  const getRealmProgress = useCallback((realmId: string) => {
-    const realmQuests = allQuests.filter(q => q.realmId === realmId)
-    const completed = realmQuests.filter(q =>
-      game.completedQuests.some(cq => cq.questId === q.id)
-    ).length
-    return { completed, total: realmQuests.length }
-  }, [game.completedQuests])
+  const getRealmProgress = useCallback(
+    (realmId: string) => {
+      const realmQuests = allQuests.filter((q) => q.realmId === realmId)
+      const completed = realmQuests.filter((q) =>
+        game.completedQuests.some((cq) => cq.questId === q.id),
+      ).length
+      return { completed, total: realmQuests.length }
+    },
+    [game.completedQuests],
+  )
 
   // Set initial current quest on first load
   useEffect(() => {
@@ -993,7 +1194,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const next = getNextQuestInternal()
       if (next) {
         requestAnimationFrame(() => {
-          setGame(prev => ({ ...prev, currentQuestId: next.id }))
+          setGame((prev) => ({ ...prev, currentQuestId: next.id }))
         })
       }
     }
@@ -1006,9 +1207,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
     if (game.lastDailyReset !== today) {
       // Reset daily quests and daily rewards for new day
       requestAnimationFrame(() => {
-        setGame(prev => ({
+        setGame((prev) => ({
           ...prev,
-          sideQuests: [...generateDailyQuests(), ...generateWeeklyQuests(), ...generateSecretQuests()],
+          sideQuests: [
+            ...generateDailyQuests(),
+            ...generateWeeklyQuests(),
+            ...generateSecretQuests(),
+          ],
           dailyRewardsClaimed: [], // Reset daily rewards on new day
           lastDailyReset: today,
         }))
@@ -1019,23 +1224,25 @@ export function GameProvider({ children }: { children: ReactNode }) {
   // Badge/Sidequest/Milestone/Collectible methods
   const claimDailyReward = useCallback((day: number) => {
     let result = { type: 'xp' as const, value: 50 }
-    setGame(prev => {
+    setGame((prev) => {
       if (prev.dailyRewardsClaimed.includes(day)) return prev
-      const reward = DAILY_REWARDS[day - 1]
+      const reward = lookupDailyReward(day)
       if (!reward) return prev
       result = reward.reward as typeof result
 
       // Calculate streak bonus (scales with streak length)
       const streakBonus = Math.min(prev.character.streakDays, 30) // Cap at 30x bonus
-      const streakMultiplier = 1 + (streakBonus * 0.05) // 5% bonus per streak day
+      const streakMultiplier = 1 + streakBonus * 0.05 // 5% bonus per streak day
 
       const newCollectibles = [...prev.collectibles]
       if (reward.reward.collectibleId) {
-        const collectible = COLLECTIBLES_POOL.find(c => c.id === reward.reward.collectibleId)
+        const collectible = COLLECTIBLES_POOL.find((c) => c.id === reward.reward.collectibleId)
         if (collectible) {
           // Higher streak = chance for better collectible
           if (prev.character.streakDays >= 7 && Math.random() < 0.3) {
-            const upgradedCollectible = COLLECTIBLES_POOL.find(c => c.id === 'xp_medium' || c.id === 'gold_medium')
+            const upgradedCollectible = COLLECTIBLES_POOL.find(
+              (c) => c.id === 'xp_medium' || c.id === 'gold_medium',
+            )
             if (upgradedCollectible) newCollectibles.push({ ...upgradedCollectible, used: false })
           } else {
             newCollectibles.push({ ...collectible, used: false })
@@ -1072,10 +1279,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const spinWheel = useCallback(() => {
     const segment = doSpin()
-    setGame(prev => {
+    setGame((prev) => {
       const newCollectibles = [...prev.collectibles]
       if (segment.reward.collectibleId) {
-        const collectible = COLLECTIBLES_POOL.find(c => c.id === segment.reward.collectibleId)
+        const collectible = COLLECTIBLES_POOL.find((c) => c.id === segment.reward.collectibleId)
         if (collectible) newCollectibles.push({ ...collectible, used: false })
       }
       // Track jackpot spin (500+ gold)
@@ -1086,7 +1293,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
         character: {
           ...prev.character,
           xp: prev.character.xp + (segment.reward.value || 0),
-          gold: prev.character.gold + (segment.reward.type === 'gold' ? segment.reward.value || 0 : 0),
+          gold:
+            prev.character.gold + (segment.reward.type === 'gold' ? segment.reward.value || 0 : 0),
         },
         stats: {
           ...prev.stats,
@@ -1099,12 +1307,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const consumeCollectible = useCallback((collectibleId: string): boolean => {
     let found = false
-    setGame(prev => {
-      const collectible = COLLECTIBLES_POOL.find(c => c.id === collectibleId)
+    setGame((prev) => {
+      const collectible = COLLECTIBLES_POOL.find((c) => c.id === collectibleId)
       if (!collectible) return prev
 
       const updates: Partial<GameState> = {
-        collectibles: prev.collectibles.map(c => {
+        collectibles: prev.collectibles.map((c) => {
           if (c.id === collectibleId && !c.used) {
             found = true
             return { ...c, used: true }
@@ -1156,18 +1364,18 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const getActiveCollectibles = useCallback((): Collectible[] => {
-    return game.collectibles.filter(c => !c.used)
+    return game.collectibles.filter((c) => !c.used)
   }, [game.collectibles])
 
   const checkAndUnlockBadges = useCallback((): Badge[] => {
     const newlyUnlocked: Badge[] = []
-    setGame(prev => {
+    setGame((prev) => {
       // Compute completed technologies from completed quests
-      const completedTopicIds = new Set(prev.completedQuests.map(q => q.topicId))
+      const completedTopicIds = new Set(prev.completedQuests.map((q) => q.topicId))
       const techCompleted: string[] = []
       for (const tech of Object.values(technologies)) {
-        const techQuests = allQuests.filter(q => q.technologyId === tech.id)
-        if (techQuests.length > 0 && techQuests.every(q => completedTopicIds.has(q.topicId))) {
+        const techQuests = allQuests.filter((q) => q.technologyId === tech.id)
+        if (techQuests.length > 0 && techQuests.every((q) => completedTopicIds.has(q.topicId))) {
           techCompleted.push(tech.id)
         }
       }
@@ -1187,7 +1395,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         mathCount: prev.stats.mathCount,
       }
       const newRecentBadges: Badge[] = []
-      const updated = prev.badges.map(b => {
+      const updated = prev.badges.map((b) => {
         if (b.unlockedAt) return b
         if (shouldUnlockBadge(b, stats)) {
           const unlocked = { ...b, unlockedAt: new Date().toISOString() }
@@ -1206,84 +1414,94 @@ export function GameProvider({ children }: { children: ReactNode }) {
     return newlyUnlocked
   }, [])
 
-  const incrementStat = useCallback((stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame' | 'challenge', isPerfect?: boolean, wrongAnswers?: number, passedWith80?: boolean, topicId?: string) => {
-    setGame(prev => {
-      const updates: Partial<GameState['stats']> = {}
-      switch (stat) {
-        case 'quiz':
-          updates.quizCount = prev.stats.quizCount + 1
-          if (isPerfect) {
-            updates.quizPerfectCount = prev.stats.quizPerfectCount + 1
-            updates.quizStreak = prev.stats.quizStreak + 1
-            updates.perfectQuiz = true
-          } else {
-            updates.quizStreak = 0
-          }
-          // Track wrong answers for no_mistakes badge (legacy tracking)
-          if (wrongAnswers !== undefined) {
-            updates.wrongAnswerCount = (prev.stats.wrongAnswerCount || 0) + wrongAnswers
-            // Track perfect quests (0 wrong answers) for flawless badge
-            if (wrongAnswers === 0) {
-              updates.perfectQuestCount = (prev.stats.perfectQuestCount || 0) + 1
+  const incrementStat = useCallback(
+    (
+      stat: 'quiz' | 'typer' | 'memory' | 'math' | 'minigame' | 'challenge',
+      isPerfect?: boolean,
+      wrongAnswers?: number,
+      passedWith80?: boolean,
+      topicId?: string,
+    ) => {
+      setGame((prev) => {
+        const updates: Partial<GameState['stats']> = {}
+        switch (stat) {
+          case 'quiz':
+            updates.quizCount = prev.stats.quizCount + 1
+            if (isPerfect) {
+              updates.quizPerfectCount = prev.stats.quizPerfectCount + 1
+              updates.quizStreak = prev.stats.quizStreak + 1
+              updates.perfectQuiz = true
+            } else {
+              updates.quizStreak = 0
             }
-          }
-          // Track 80%+ scores for quiz_master badge
-          if (passedWith80) {
-            updates.quizMasterScore = (prev.stats.quizMasterScore || 0) + 1
-          }
-          break
-        case 'typer':
-          updates.typerCount = prev.stats.typerCount + 1
-          break
-        case 'memory':
-          updates.memoryCount = prev.stats.memoryCount + 1
-          break
-        case 'math':
-          updates.mathCount = prev.stats.mathCount + 1
-          break
-        case 'minigame':
-          updates.minigameCount = prev.stats.minigameCount + 1
-          break
-        case 'challenge':
-          updates.challengeComplete = (prev.stats.challengeComplete || 0) + 1
-          break
-      }
+            // Track wrong answers for no_mistakes badge (legacy tracking)
+            if (wrongAnswers !== undefined) {
+              updates.wrongAnswerCount = (prev.stats.wrongAnswerCount || 0) + wrongAnswers
+              // Track perfect quests (0 wrong answers) for flawless badge
+              if (wrongAnswers === 0) {
+                updates.perfectQuestCount = (prev.stats.perfectQuestCount || 0) + 1
+              }
+            }
+            // Track 80%+ scores for quiz_master badge
+            if (passedWith80) {
+              updates.quizMasterScore = (prev.stats.quizMasterScore || 0) + 1
+            }
+            break
+          case 'typer':
+            updates.typerCount = prev.stats.typerCount + 1
+            break
+          case 'memory':
+            updates.memoryCount = prev.stats.memoryCount + 1
+            break
+          case 'math':
+            updates.mathCount = prev.stats.mathCount + 1
+            break
+          case 'minigame':
+            updates.minigameCount = prev.stats.minigameCount + 1
+            break
+          case 'challenge':
+            updates.challengeComplete = (prev.stats.challengeComplete || 0) + 1
+            break
+        }
 
-      // Update weak topics for spaced repetition
-      let weakTopicsUpdate = prev.weakTopics
-      if (stat === 'quiz' && topicId && wrongAnswers !== undefined) {
-        const now = new Date().toISOString()
-        const existing = prev.weakTopics[topicId] || { wrongCount: 0, lastReviewed: now, nextReview: now, masteryLevel: 0 }
-        const newWrongCount = existing.wrongCount + (wrongAnswers > 0 ? 1 : 0)
-        // Mastery levels: 0=new, 1=learning, 2=reviewing, 3=mastered
-        // Decrease mastery if wrong, increase if correct
-        const masteryDelta = wrongAnswers === 0 ? 1 : -1
-        const newMastery = Math.max(0, Math.min(3, existing.masteryLevel + masteryDelta))
+        // Update weak topics for spaced repetition
+        let weakTopicsUpdate = prev.weakTopics
+        if (stat === 'quiz' && topicId && wrongAnswers !== undefined) {
+          const now = new Date().toISOString()
+          const existing = lookupRecordValue(prev.weakTopics, topicId)
+          const previous = existing ?? { wrongCount: 0, masteryLevel: 0 }
+          const newWrongCount = previous.wrongCount + (wrongAnswers > 0 ? 1 : 0)
+          // Mastery levels: 0=new, 1=learning, 2=reviewing, 3=mastered
+          // Decrease mastery if wrong, increase if correct
+          const masteryDelta = wrongAnswers === 0 ? 1 : -1
+          const newMastery = Math.max(0, Math.min(3, previous.masteryLevel + masteryDelta))
 
-        // Spaced repetition intervals: 1 day, 3 days, 7 days, 14 days
-        const intervals = [1, 3, 7, 14]
-        const intervalDays = intervals[Math.min(newMastery, intervals.length - 1)]
-        const nextReview = new Date(Date.now() + intervalDays * 24 * 60 * 60 * 1000).toISOString()
+          // Spaced repetition intervals: 1 day, 3 days, 7 days, 14 days
+          const intervals = [1, 3, 7, 14]
+          const intervalDays = intervals[Math.min(newMastery, intervals.length - 1)]
+          const nextReview = new Date(Date.now() + intervalDays * 24 * 60 * 60 * 1000).toISOString()
 
-        weakTopicsUpdate = {
-          ...prev.weakTopics,
-          [topicId]: {
-            wrongCount: newWrongCount,
-            lastReviewed: now,
-            nextReview,
-            masteryLevel: newMastery,
+          weakTopicsUpdate = {
+            ...prev.weakTopics,
+            [topicId]: {
+              wrongCount: newWrongCount,
+              lastReviewed: now,
+              nextReview,
+              masteryLevel: newMastery,
+            },
           }
         }
-      }
 
-      return { ...prev, stats: { ...prev.stats, ...updates }, weakTopics: weakTopicsUpdate }
-    })
-  }, [])
+        return { ...prev, stats: { ...prev.stats, ...updates }, weakTopics: weakTopicsUpdate }
+      })
+    },
+    [],
+  )
 
   const resetQuizStreak = useCallback(() => {
-    setGame(prev => ({
+    setGame((prev) => ({
       ...prev,
-      stats: { ...prev.stats, quizStreak: 0 }
+      stats: { ...prev.stats, quizStreak: 0 },
     }))
   }, [])
 
@@ -1324,9 +1542,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
   // Perform prestige reset
   const doPrestige = useCallback(() => {
     const newPrestigeLevel = game.prestigeLevel + 1
-    const newMultiplier = 1 + (newPrestigeLevel * 0.05) // +5% per prestige level
+    const newMultiplier = 1 + newPrestigeLevel * 0.05 // +5% per prestige level
 
-    setGame(prev => ({
+    setGame((prev) => ({
       ...prev,
       // Keep character basics but reset progress
       character: {
@@ -1348,7 +1566,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       currentQuestId: null,
       completedRealms: [],
       // Keep companions but reset their bond progress
-      companions: prev.companions.map(c => ({
+      companions: prev.companions.map((c) => ({
         ...c,
         bondLevel: 1,
         totalQuestsCompleted: 0,
@@ -1357,10 +1575,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       // Reset collectibles
       collectibles: [],
       // Reset side quests
-      sideQuests: generateDailyQuests().concat(
-        generateWeeklyQuests(),
-        generateSecretQuests()
-      ),
+      sideQuests: generateDailyQuests().concat(generateWeeklyQuests(), generateSecretQuests()),
       // Update prestige state
       prestigeLevel: newPrestigeLevel,
       prestigeMultiplier: newMultiplier,
@@ -1409,13 +1624,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const checkAndUnlockMilestones = useCallback((): Milestone[] => {
     const newlyUnlocked: Milestone[] = []
-    setGame(prev => {
+    setGame((prev) => {
       // Compute completed technologies from completed quests
-      const completedTopicIds = new Set(prev.completedQuests.map(q => q.topicId))
+      const completedTopicIds = new Set(prev.completedQuests.map((q) => q.topicId))
       const completedTechnologies: string[] = []
       for (const tech of Object.values(technologies)) {
-        const techQuests = allQuests.filter(q => q.technologyId === tech.id)
-        if (techQuests.length > 0 && techQuests.every(q => completedTopicIds.has(q.topicId))) {
+        const techQuests = allQuests.filter((q) => q.technologyId === tech.id)
+        if (techQuests.length > 0 && techQuests.every((q) => completedTopicIds.has(q.topicId))) {
           completedTechnologies.push(tech.id)
         }
       }
@@ -1428,14 +1643,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
         completedTechnologies,
         quizStreak: prev.stats.quizStreak,
         minigamesCompleted: prev.stats.minigameCount,
-        hasDefeatedBoss: prev.completedQuests.some(q => {
-          const quest = allQuests.find(aq => aq.id === q.questId)
+        hasDefeatedBoss: prev.completedQuests.some((q) => {
+          const quest = allQuests.find((aq) => aq.id === q.questId)
           return quest?.type === 'boss'
         }),
         hasPerfectQuiz: prev.stats.perfectQuiz,
       }
       const newRecentMilestones: Milestone[] = []
-      const updated = prev.milestones.map(m => {
+      const updated = prev.milestones.map((m) => {
         if (m.unlocked) return m
         if (checkMilestone(m, state)) {
           const unlocked = { ...m, unlocked: true, unlockedAt: new Date().toISOString() }
@@ -1455,11 +1670,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const refreshSideQuests = useCallback(() => {
-    setGame(prev => {
-      const newQuests = [...generateDailyQuests(), ...generateWeeklyQuests(), ...generateSecretQuests()]
-      const existingInProgress = prev.sideQuests.filter(q => !q.completed)
-      const existingCompletedIds = new Set(prev.sideQuests.filter(q => q.completed).map(q => q.id))
-      const freshQuests = newQuests.filter(q => !existingCompletedIds.has(q.id))
+    setGame((prev) => {
+      const newQuests = [
+        ...generateDailyQuests(),
+        ...generateWeeklyQuests(),
+        ...generateSecretQuests(),
+      ]
+      const existingInProgress = prev.sideQuests.filter((q) => !q.completed)
+      const existingCompletedIds = new Set(
+        prev.sideQuests.filter((q) => q.completed).map((q) => q.id),
+      )
+      const freshQuests = newQuests.filter((q) => !existingCompletedIds.has(q.id))
       return {
         ...prev,
         sideQuests: [...existingInProgress, ...freshQuests],
@@ -1469,15 +1690,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const claimSideQuest = useCallback((questId: string): { xp: number; gold: number } => {
     let rewards = { xp: 0, gold: 0 }
-    setGame(prev => {
-      const quest = prev.sideQuests.find(q => q.id === questId)
+    setGame((prev) => {
+      const quest = prev.sideQuests.find((q) => q.id === questId)
       if (!quest || quest.completed) return prev
       rewards = quest.rewards
       return {
         ...prev,
-        sideQuests: prev.sideQuests.map(q =>
-          q.id === questId ? { ...q, completed: true } : q
-        ),
+        sideQuests: prev.sideQuests.map((q) => (q.id === questId ? { ...q, completed: true } : q)),
         character: {
           ...prev.character,
           xp: prev.character.xp + quest.rewards.xp,
@@ -1490,8 +1709,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const claimMilestone = useCallback((milestoneId: string): { xpBonus: number } => {
     let xpBonus = 0
-    setGame(prev => {
-      const milestone = prev.milestones.find(m => m.id === milestoneId)
+    setGame((prev) => {
+      const milestone = prev.milestones.find((m) => m.id === milestoneId)
       if (!milestone || !milestone.unlocked) return prev
       xpBonus = milestone.xpBonus
       return {
@@ -1507,8 +1726,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const claimBadge = useCallback((badgeId: string): { xp: number; gold: number } => {
     let rewards = { xp: 0, gold: 0 }
-    setGame(prev => {
-      const badge = prev.badges.find(b => b.id === badgeId)
+    setGame((prev) => {
+      const badge = prev.badges.find((b) => b.id === badgeId)
       if (!badge || !badge.unlockedAt) return prev
       rewards = { xp: badge.xpReward, gold: badge.goldReward }
       return {
@@ -1526,7 +1745,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   // Skill allocation methods
   const allocateSkillPoint = useCallback((skillId: string): boolean => {
     let success = false
-    setGame(prev => {
+    setGame((prev) => {
       if (prev.character.skillPoints <= 0) return prev
       const currentLevel = prev.character.skillAllocations[skillId] || 0
       success = true
@@ -1545,18 +1764,24 @@ export function GameProvider({ children }: { children: ReactNode }) {
     return success
   }, [])
 
-  const getSkillLevel = useCallback((skillId: string): number => {
-    return game.character.skillAllocations[skillId] || 0
-  }, [game.character.skillAllocations])
+  const getSkillLevel = useCallback(
+    (skillId: string): number => {
+      return game.character.skillAllocations[skillId] || 0
+    },
+    [game.character.skillAllocations],
+  )
 
   const getAvailableSkillPoints = useCallback((): number => {
     return game.character.skillPoints
   }, [game.character.skillPoints])
 
   // Get XP for a specific technology/skill
-  const getSkillXp = useCallback((techId: string): number => {
-    return game.skillXp[techId] || 0
-  }, [game.skillXp])
+  const getSkillXp = useCallback(
+    (techId: string): number => {
+      return game.skillXp[techId] || 0
+    },
+    [game.skillXp],
+  )
 
   // Calculate skill level from XP (each level requires more XP)
   const getSkillLevelFromXp = useCallback((xp: number): number => {
@@ -1575,12 +1800,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const dismissRealmCompletion = useCallback(() => {
-    setGame(prev => ({ ...prev, showRealmCompletion: null }))
+    setGame((prev) => ({ ...prev, showRealmCompletion: null }))
   }, [])
 
   // Complete onboarding with character name and class
   const completeOnboarding = useCallback((name: string, charClass: CharacterClass) => {
-    setGame(prev => ({
+    setGame((prev) => ({
       ...prev,
       hasSeenOnboarding: true,
       character: {
@@ -1593,7 +1818,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   // Add XP to character (used by mini-games)
   const addXP = useCallback((amount: number) => {
-    setGame(prev => {
+    setGame((prev) => {
       const newXp = prev.character.xp + amount
       const newLevel = calculateLevel(newXp)
       return {
@@ -1609,7 +1834,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   // Add gold to character
   const addGold = useCallback((amount: number) => {
-    setGame(prev => ({
+    setGame((prev) => ({
       ...prev,
       character: {
         ...prev.character,
@@ -1620,17 +1845,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   // Grant a badge directly
   const grantBadge = useCallback((badgeId: string) => {
-    setGame(prev => {
-      const badge = BADGES.find(b => b.id === badgeId)
+    setGame((prev) => {
+      const badge = BADGES.find((b) => b.id === badgeId)
       // The full catalog is pre-seeded in locked state, so an existing entry
       // only blocks the grant when it is already unlocked.
-      const existing = prev.badges.find(b => b.id === badgeId)
+      const existing = prev.badges.find((b) => b.id === badgeId)
       if (!badge || existing?.unlockedAt) return prev
       const newlyUnlocked = { ...badge, unlockedAt: new Date().toISOString() }
       return {
         ...prev,
         badges: existing
-          ? prev.badges.map(b => (b.id === badgeId ? newlyUnlocked : b))
+          ? prev.badges.map((b) => (b.id === badgeId ? newlyUnlocked : b))
           : [...prev.badges, newlyUnlocked],
         recentBadgeUnlocks: [...prev.recentBadgeUnlocks, newlyUnlocked],
       }
@@ -1639,7 +1864,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   // Dismiss recent unlocks (clear the notification queue)
   const dismissRecentUnlocks = useCallback(() => {
-    setGame(prev => ({
+    setGame((prev) => ({
       ...prev,
       recentBadgeUnlocks: [],
       recentMilestoneUnlocks: [],
@@ -1649,7 +1874,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   // Use a streak shield to protect the current streak
   const useStreakShield = useCallback(() => {
     if (game.character.streakShields <= 0) return false
-    setGame(prev => ({
+    setGame((prev) => ({
       ...prev,
       character: {
         ...prev.character,
@@ -1661,7 +1886,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   // Add streak shields (e.g., from collectibles or rewards)
   const addStreakShield = useCallback((count = 1) => {
-    setGame(prev => ({
+    setGame((prev) => ({
       ...prev,
       character: {
         ...prev.character,
@@ -1672,7 +1897,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   // Daily Dash speedrun challenge
   const startDailyDash = useCallback(() => {
-    setGame(prev => ({
+    setGame((prev) => ({
       ...prev,
       dailyDash: {
         active: true,
@@ -1685,7 +1910,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const completeDailyDashQuest = useCallback((questId: string) => {
-    setGame(prev => {
+    setGame((prev) => {
       if (!prev.dailyDash.active || !prev.dailyDash.startTime) return prev
       if (prev.dailyDash.completedQuests.includes(questId)) return prev
 
@@ -1694,9 +1919,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
       // Auto-complete dash when all 5 quests done
       if (newCompletedQuests.length >= 5) {
         const elapsed = Math.floor((Date.now() - prev.dailyDash.startTime) / 1000)
-        const newBestTime = prev.dailyDash.bestTime === null || elapsed < prev.dailyDash.bestTime
-          ? elapsed
-          : prev.dailyDash.bestTime
+        const newBestTime =
+          prev.dailyDash.bestTime === null || elapsed < prev.dailyDash.bestTime
+            ? elapsed
+            : prev.dailyDash.bestTime
 
         return {
           ...prev,
@@ -1721,7 +1947,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const abandonDailyDash = useCallback(() => {
-    setGame(prev => ({
+    setGame((prev) => ({
       ...prev,
       dailyDash: {
         active: false,
@@ -1737,55 +1963,64 @@ export function GameProvider({ children }: { children: ReactNode }) {
     return game.dailyDash.active
   }, [game.dailyDash.active])
 
-  const purchaseItem = useCallback((itemId: string, price: number): boolean => {
-    if (game.character.gold < price) return false
+  const purchaseItem = useCallback(
+    (itemId: string, price: number): boolean => {
+      if (game.character.gold < price) return false
 
-    // Check if it's a companion purchase
-    if (itemId.startsWith('buy_companion_')) {
-      const companionKey = itemId.replace('buy_companion_', '')
-      const companion = COMPANIONS_DATA[companionKey]
-      if (companion) {
-        // Check if already owned
-        if (game.companions.some(c => c.id === companion.id)) return false
+      // Check if it's a companion purchase
+      if (itemId.startsWith('buy_companion_')) {
+        const companionKey = itemId.replace('buy_companion_', '')
+        const companion = lookupRecordValue(COMPANIONS_DATA, companionKey)
+        if (companion) {
+          // Check if already owned
+          if (game.companions.some((c) => c.id === companion.id)) return false
 
-        setGame(prev => ({
+          setGame((prev) => ({
+            ...prev,
+            character: { ...prev.character, gold: prev.character.gold - price },
+            companions: [...prev.companions, companion],
+            activeCompanion: companion, // Auto-equip
+          }))
+          return true
+        }
+      }
+
+      // Check if it's a collectible purchase
+      const collectibleId = itemId.replace('buy_', '')
+      const collectible = COLLECTIBLES_POOL.find((c) => c.id === collectibleId)
+      if (collectible) {
+        setGame((prev) => ({
           ...prev,
           character: { ...prev.character, gold: prev.character.gold - price },
-          companions: [...prev.companions, companion],
-          activeCompanion: companion, // Auto-equip
+          collectibles: [...prev.collectibles, { ...collectible, used: false }],
         }))
         return true
       }
-    }
 
-    // Check if it's a collectible purchase
-    const collectibleId = itemId.replace('buy_', '')
-    const collectible = COLLECTIBLES_POOL.find(c => c.id === collectibleId)
-    if (collectible) {
-      setGame(prev => ({
-        ...prev,
-        character: { ...prev.character, gold: prev.character.gold - price },
-        collectibles: [...prev.collectibles, { ...collectible, used: false }],
-      }))
-      return true
-    }
-
-    return false
-  }, [game.character.gold, game.companions])
+      return false
+    },
+    [game.character.gold, game.companions],
+  )
 
   // Equip a companion
-  const equipCompanion = useCallback((companionId: string) => {
-    const companion = game.companions.find(c => c.id === companionId)
-    if (companion) {
-      setGame(prev => ({ ...prev, activeCompanion: companion }))
-    }
-  }, [game.companions])
+  const equipCompanion = useCallback(
+    (companionId: string) => {
+      const companion = game.companions.find((c) => c.id === companionId)
+      if (companion) {
+        setGame((prev) => ({ ...prev, activeCompanion: companion }))
+      }
+    },
+    [game.companions],
+  )
 
-  const checkAndUnlockTitlesFrames = useCallback((): { unlockedTitles: string[], unlockedFrames: string[] } => {
+  const checkAndUnlockTitlesFrames = useCallback((): {
+    unlockedTitles: string[]
+    unlockedFrames: string[]
+  } => {
     let newTitles: string[] = []
     let newFrames: string[] = []
 
-    setGame(prev => {
+    setGame((prev) => {
       const completedQuestCount = prev.completedQuests.length
       const level = prev.character.level
       const streakDays = prev.character.streakDays
@@ -1793,7 +2028,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       // Count tech-specific completions
       const techCounts: Record<string, number> = {}
       for (const cq of prev.completedQuests) {
-        const quest = allQuests.find(q => q.id === cq.questId)
+        const quest = allQuests.find((q) => q.id === cq.questId)
         if (quest) {
           techCounts[quest.technologyId] = (techCounts[quest.technologyId] || 0) + 1
         }
@@ -1806,24 +2041,60 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
         let unlocked = false
         switch (title.id) {
-          case 'novice-devops': unlocked = completedQuestCount >= 5; break
-          case 'eager-learner': unlocked = completedQuestCount >= 10; break
-          case 'quest-seeker': unlocked = completedQuestCount >= 15; break
-          case 'code-crusader': unlocked = completedQuestCount >= 25; break
-          case 'cloud-hopeful': unlocked = (techCounts['aws'] || 0) >= 5; break
-          case 'container-captain': unlocked = (techCounts['docker'] || 0) >= 5; break
-          case 'git-guru': unlocked = (techCounts['git'] || 0) >= 5; break
-          case 'python-pro': unlocked = (techCounts['python'] || 0) >= 5; break
-          case 'ci-cd-champion': unlocked = (techCounts['cicd'] || 0) >= 10; break
-          case 'kubernetes-knight': unlocked = (techCounts['kubernetes'] || 0) >= 10; break
-          case 'infrastructure-inquisitor': unlocked = (techCounts['terraform'] || 0) >= 10; break
-          case 'monitoring-master': unlocked = (techCounts['monitoring'] || 0) >= 10; break
-          case 'streak-slayer': unlocked = streakDays >= 14; break
-          case 'devops-dragon': unlocked = completedQuestCount >= 100; break
-          case 'realm-ruler': unlocked = prev.completedRealms.length >= Object.keys(realms).length; break
-          case 'almighty-architect': unlocked = level >= 50; break
-          case 'golden-gamer': unlocked = prev.badges.filter(b => b.unlockedAt).length >= 50; break
-          case 'speed-demon': unlocked = prev.stats.fastestQuestTime < 30; break
+          case 'novice-devops':
+            unlocked = completedQuestCount >= 5
+            break
+          case 'eager-learner':
+            unlocked = completedQuestCount >= 10
+            break
+          case 'quest-seeker':
+            unlocked = completedQuestCount >= 15
+            break
+          case 'code-crusader':
+            unlocked = completedQuestCount >= 25
+            break
+          case 'cloud-hopeful':
+            unlocked = (techCounts['aws'] || 0) >= 5
+            break
+          case 'container-captain':
+            unlocked = (techCounts['docker'] || 0) >= 5
+            break
+          case 'git-guru':
+            unlocked = (techCounts['git'] || 0) >= 5
+            break
+          case 'python-pro':
+            unlocked = (techCounts['python'] || 0) >= 5
+            break
+          case 'ci-cd-champion':
+            unlocked = (techCounts['cicd'] || 0) >= 10
+            break
+          case 'kubernetes-knight':
+            unlocked = (techCounts['kubernetes'] || 0) >= 10
+            break
+          case 'infrastructure-inquisitor':
+            unlocked = (techCounts['terraform'] || 0) >= 10
+            break
+          case 'monitoring-master':
+            unlocked = (techCounts['monitoring'] || 0) >= 10
+            break
+          case 'streak-slayer':
+            unlocked = streakDays >= 14
+            break
+          case 'devops-dragon':
+            unlocked = completedQuestCount >= 100
+            break
+          case 'realm-ruler':
+            unlocked = prev.completedRealms.length >= Object.keys(realms).length
+            break
+          case 'almighty-architect':
+            unlocked = level >= 50
+            break
+          case 'golden-gamer':
+            unlocked = prev.badges.filter((b) => b.unlockedAt).length >= 50
+            break
+          case 'speed-demon':
+            unlocked = prev.stats.fastestQuestTime < 30
+            break
         }
         if (unlocked) newTitles.push(title.id)
       }
@@ -1835,16 +2106,36 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
         let unlocked = false
         switch (frame.id) {
-          case 'default': unlocked = true; break
-          case 'bronze': unlocked = completedQuestCount >= 10; break
-          case 'silver': unlocked = completedQuestCount >= 25; break
-          case 'gold': unlocked = completedQuestCount >= 50; break
-          case 'emerald': unlocked = (techCounts['python'] || 0) >= 10; break
-          case 'ruby': unlocked = (techCounts['git'] || 0) >= 10; break
-          case 'sapphire': unlocked = (techCounts['aws'] || 0) >= 10; break
-          case 'amethyst': unlocked = (techCounts['docker'] || 0) >= 10; break
-          case 'diamond': unlocked = completedQuestCount >= 100; break
-          case 'prismatic': unlocked = level >= 50; break
+          case 'default':
+            unlocked = true
+            break
+          case 'bronze':
+            unlocked = completedQuestCount >= 10
+            break
+          case 'silver':
+            unlocked = completedQuestCount >= 25
+            break
+          case 'gold':
+            unlocked = completedQuestCount >= 50
+            break
+          case 'emerald':
+            unlocked = (techCounts['python'] || 0) >= 10
+            break
+          case 'ruby':
+            unlocked = (techCounts['git'] || 0) >= 10
+            break
+          case 'sapphire':
+            unlocked = (techCounts['aws'] || 0) >= 10
+            break
+          case 'amethyst':
+            unlocked = (techCounts['docker'] || 0) >= 10
+            break
+          case 'diamond':
+            unlocked = completedQuestCount >= 100
+            break
+          case 'prismatic':
+            unlocked = level >= 50
+            break
         }
         if (unlocked) newFrames.push(frame.id)
       }
@@ -1863,27 +2154,33 @@ export function GameProvider({ children }: { children: ReactNode }) {
     return { unlockedTitles: newTitles, unlockedFrames: newFrames }
   }, [])
 
-  const equipTitle = useCallback((titleId: string): boolean => {
-    if (!game.character.unlockedTitles.includes(titleId)) return false
-    setGame(prev => ({
-      ...prev,
-      character: { ...prev.character, equippedTitle: titleId },
-    }))
-    return true
-  }, [game.character.unlockedTitles])
+  const equipTitle = useCallback(
+    (titleId: string): boolean => {
+      if (!game.character.unlockedTitles.includes(titleId)) return false
+      setGame((prev) => ({
+        ...prev,
+        character: { ...prev.character, equippedTitle: titleId },
+      }))
+      return true
+    },
+    [game.character.unlockedTitles],
+  )
 
-  const equipFrame = useCallback((frameId: string): boolean => {
-    if (!game.character.unlockedFrames.includes(frameId)) return false
-    setGame(prev => ({
-      ...prev,
-      character: { ...prev.character, equippedFrame: frameId },
-    }))
-    return true
-  }, [game.character.unlockedFrames])
+  const equipFrame = useCallback(
+    (frameId: string): boolean => {
+      if (!game.character.unlockedFrames.includes(frameId)) return false
+      setGame((prev) => ({
+        ...prev,
+        character: { ...prev.character, equippedFrame: frameId },
+      }))
+      return true
+    },
+    [game.character.unlockedFrames],
+  )
 
   // Equipment management
   const equipItem = useCallback((itemId: string): boolean => {
-    setGame(prev => {
+    setGame((prev) => {
       const equipped = prev.character.equippedItems
       if (equipped.includes(itemId)) return prev // Already equipped
       return {
@@ -1898,14 +2195,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const unequipItem = useCallback((itemId: string): boolean => {
-    setGame(prev => {
+    setGame((prev) => {
       const equipped = prev.character.equippedItems
       if (!equipped.includes(itemId)) return prev // Not equipped
       return {
         ...prev,
         character: {
           ...prev.character,
-          equippedItems: equipped.filter(id => id !== itemId),
+          equippedItems: equipped.filter((id) => id !== itemId),
         },
       }
     })

@@ -16,9 +16,7 @@ describe('LeaderboardPage', () => {
     const { character } = seedDefaultGame()
     renderSeededPage(<LeaderboardPage />, { route: '/leaderboard', url: '/leaderboard' })
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: /Leaderboard/ }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: /Leaderboard/ })).toBeInTheDocument()
     expect(screen.getByText('Your Rank')).toBeInTheDocument()
     expect(screen.getByText(character.name)).toBeInTheDocument()
     // The player's own row is labelled and highlighted
@@ -81,8 +79,6 @@ describe('LeaderboardPage', () => {
     expect(screen.getByText('Badges Earned')).toBeInTheDocument()
     expect(screen.getByText('Current Realm')).toBeInTheDocument()
     // The XP figure next to its label matches the character save
-    expect(screen.getByText('Your XP').nextElementSibling).toHaveTextContent(
-      String(character.xp),
-    )
+    expect(screen.getByText('Your XP').nextElementSibling).toHaveTextContent(String(character.xp))
   })
 })

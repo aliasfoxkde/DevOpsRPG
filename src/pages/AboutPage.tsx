@@ -18,10 +18,23 @@ export default function AboutPage() {
           <h2 className="text-2xl font-bold text-amber-400 mb-4">🎮 What is DevOpsQuest?</h2>
           <div className="prose prose-invert prose-amber max-w-none">
             <p className="text-slate-300 leading-relaxed mb-4">
-              DevOpsQuest is an <span className="text-amber-400 font-semibold">open-source project</span> designed to make learning DevOps concepts engaging and fun. Instead of passive watching or reading, you actively level up your character by completing real-world challenges across the DevOps pipeline.
+              DevOpsQuest is an{' '}
+              <span className="text-amber-400 font-semibold">open-source project</span> designed to
+              make learning DevOps concepts engaging and fun. Instead of passive watching or
+              reading, you actively level up your character by completing real-world challenges
+              across the DevOps pipeline.
             </p>
             <p className="text-slate-300 leading-relaxed">
-              The game covers topics including: <span className="text-amber-400">Linux fundamentals</span>, <span className="text-amber-400">Bash scripting</span>, <span className="text-amber-400">Git & version control</span>, <span className="text-amber-400">CI/CD pipelines</span>, <span className="text-amber-400">Docker & containers</span>, <span className="text-amber-400">Kubernetes orchestration</span>, <span className="text-amber-400">AWS cloud services</span>, <span className="text-amber-400">Ansible automation</span>, and <span className="text-amber-400">DevOps culture & practices</span>.
+              The game covers topics including:{' '}
+              <span className="text-amber-400">Linux fundamentals</span>,{' '}
+              <span className="text-amber-400">Bash scripting</span>,{' '}
+              <span className="text-amber-400">Git & version control</span>,{' '}
+              <span className="text-amber-400">CI/CD pipelines</span>,{' '}
+              <span className="text-amber-400">Docker & containers</span>,{' '}
+              <span className="text-amber-400">Kubernetes orchestration</span>,{' '}
+              <span className="text-amber-400">AWS cloud services</span>,{' '}
+              <span className="text-amber-400">Ansible automation</span>, and{' '}
+              <span className="text-amber-400">DevOps culture & practices</span>.
             </p>
           </div>
         </section>
@@ -35,21 +48,30 @@ export default function AboutPage() {
                 <span className="text-3xl">1️⃣</span>
               </div>
               <h3 className="text-lg font-bold text-white mb-2">Choose Your Quest</h3>
-              <p className="text-slate-400 text-sm">Browse available quests across different realms and topics. Each quest has a difficulty level and XP reward.</p>
+              <p className="text-slate-400 text-sm">
+                Browse available quests across different realms and topics. Each quest has a
+                difficulty level and XP reward.
+              </p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-amber-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">2️⃣</span>
               </div>
               <h3 className="text-lg font-bold text-white mb-2">Battle & Learn</h3>
-              <p className="text-slate-400 text-sm">Answer questions based on real documentation. Complete quests to earn XP, level up, and unlock new areas.</p>
+              <p className="text-slate-400 text-sm">
+                Answer questions based on real documentation. Complete quests to earn XP, level up,
+                and unlock new areas.
+              </p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-amber-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">3️⃣</span>
               </div>
               <h3 className="text-lg font-bold text-white mb-2">Level Up</h3>
-              <p className="text-slate-400 text-sm">Track your progress, earn achievements, maintain streaks, and become a DevOps master!</p>
+              <p className="text-slate-400 text-sm">
+                Track your progress, earn achievements, maintain streaks, and become a DevOps
+                master!
+              </p>
             </div>
           </div>
         </section>
@@ -59,7 +81,10 @@ export default function AboutPage() {
           <h2 className="text-2xl font-bold text-purple-400 mb-4">🧪 AI Pipeline Experiment</h2>
           <div className="prose prose-invert prose-purple max-w-none">
             <p className="text-slate-300 leading-relaxed mb-4">
-              DevOpsQuest is more than just a game — it's an <span className="text-purple-400 font-semibold">AI pipeline experiment</span>. The project explores how large language models (LLMs) can be used to generate dynamic learning content, adaptive quizzes, and personalized feedback at scale.
+              DevOpsQuest is more than just a game — it&apos;s an{' '}
+              <span className="text-purple-400 font-semibold">AI pipeline experiment</span>. The
+              project explores how large language models (LLMs) can be used to generate dynamic
+              learning content, adaptive quizzes, and personalized feedback at scale.
             </p>
             <ul className="text-slate-300 space-y-2">
               <li>🤖 AI-generated quiz questions that adapt to your skill level</li>
@@ -98,7 +123,8 @@ export default function AboutPage() {
         <section className="bg-gradient-to-br from-green-900/30 to-slate-800/50 rounded-2xl border border-green-600/30 p-8 mb-8">
           <h2 className="text-2xl font-bold text-green-400 mb-4">🌱 Open Source</h2>
           <p className="text-slate-300 leading-relaxed mb-4">
-            DevOpsQuest is completely open source and freely available. We believe everyone should have access to quality DevOps education regardless of their background or resources.
+            DevOpsQuest is completely open source and freely available. We believe everyone should
+            have access to quality DevOps education regardless of their background or resources.
           </p>
           <div className="flex flex-wrap gap-4">
             <a
@@ -126,7 +152,9 @@ export default function AboutPage() {
         <section className="bg-slate-800/50 rounded-2xl border border-slate-700 p-8 mb-8">
           <h2 className="text-2xl font-bold text-slate-100 mb-4">🤝 Contributing</h2>
           <p className="text-slate-300 leading-relaxed mb-4">
-            Want to improve DevOpsQuest? Contributions are welcome! Whether it's fixing bugs, adding new topics, improving the UI, or enhancing the AI content generation — every bit helps make this a better learning resource.
+            Want to improve DevOpsQuest? Contributions are welcome! Whether it&apos;s fixing bugs,
+            adding new topics, improving the UI, or enhancing the AI content generation — every bit
+            helps make this a better learning resource.
           </p>
           <ul className="text-slate-300 space-y-2">
             <li>🐛 Report bugs via GitHub Issues</li>
@@ -151,9 +179,7 @@ export default function AboutPage() {
         {/* Footer */}
         <footer className="mt-12 pt-8 border-t border-slate-700 text-center text-slate-500 text-sm">
           <p>DevOpsQuest — Open Source DevOps Education</p>
-          <p className="mt-2">
-            Built with ⚡ by developers, for developers.
-          </p>
+          <p className="mt-2">Built with ⚡ by developers, for developers.</p>
         </footer>
       </div>
     </div>

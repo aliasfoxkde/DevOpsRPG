@@ -188,7 +188,7 @@ describe('importGameData sanitization', () => {
 
   it('clamps level to 1-100 and xp/gold to non-negative bounds', () => {
     const result = importGameData(
-      valid({ character: { name: 'Hero', level: 9999, xp: -50, gold: 20_000_000 } })
+      valid({ character: { name: 'Hero', level: 9999, xp: -50, gold: 20_000_000 } }),
     )
     expect(result?.character.level).toBe(100)
     expect(result?.character.xp).toBe(0)
@@ -209,7 +209,7 @@ describe('importGameData sanitization', () => {
 
   it('truncates title and avatar fields', () => {
     const result = importGameData(
-      valid({ character: { name: 'Hero', title: 't'.repeat(150), avatar: 'a'.repeat(300) } })
+      valid({ character: { name: 'Hero', title: 't'.repeat(150), avatar: 'a'.repeat(300) } }),
     )
     expect(result?.character.title).toHaveLength(100)
     expect(result?.character.avatar).toHaveLength(200)
@@ -221,7 +221,7 @@ describe('importGameData sanitization', () => {
         completedQuests: [{ id: 42 }, { nope: true }, { id: 'quest_1' }],
         badges: [{ id: 'b1' }, null, { id: 'b2', unlockedAt: '2026-01-01' }],
         companions: [{ id: 'c1' }, 'garbage'],
-      })
+      }),
     )
     expect(result?.completedQuests).toEqual([{ id: '42' }, { id: 'quest_1' }])
     expect(result?.badges).toEqual([
@@ -243,7 +243,7 @@ describe('importGameData sanitization', () => {
 
   it('bounds prestige values', () => {
     const result = importGameData(
-      valid({ prestigeLevel: 500, prestigeMultiplier: 99, totalPrestigeXp: -10 })
+      valid({ prestigeLevel: 500, prestigeMultiplier: 99, totalPrestigeXp: -10 }),
     )
     expect(result?.prestigeLevel).toBe(100)
     expect(result?.prestigeMultiplier).toBe(10)
@@ -256,24 +256,47 @@ describe('importGameData sanitization', () => {
   })
 })
 
+// The exporter's JSON payload shape, narrowed from the untrusted parse.
+interface ExportedSnapshot {
+  version: string
+  character: { name: string }
+  badges: Array<{ id: string }>
+  prestigeLevel: number
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+function isExportedSnapshot(value: unknown): value is ExportedSnapshot {
+  if (!isRecord(value)) return false
+  const { version, character, badges, prestigeLevel } = value
+  return (
+    typeof version === 'string' &&
+    isRecord(character) &&
+    typeof character.name === 'string' &&
+    Array.isArray(badges) &&
+    badges.every((badge) => isRecord(badge) && typeof badge.id === 'string') &&
+    typeof prestigeLevel === 'number'
+  )
+}
+
 describe('downloadExport', () => {
   const createObjectURL = vi.fn<(blob: Blob) => string>(() => 'blob:mock-url')
   const revokeObjectURL = vi.fn<(url: string) => void>()
-  // downloadExport removes its anchor from the DOM after clicking, so capture
-  // the created element in a spy to inspect the download attributes.
-  let clicked: HTMLAnchorElement | null = null
-  const realCreateElement = document.createElement.bind(document)
+  // downloadExport removes its anchor from the DOM right after clicking, so
+  // record the anchors as they are clicked to inspect the download attributes.
+  const clickedAnchors: HTMLAnchorElement[] = []
 
   beforeEach(() => {
-    clicked = null
+    clickedAnchors.length = 0
     Object.defineProperty(URL, 'createObjectURL', { value: createObjectURL, configurable: true })
     Object.defineProperty(URL, 'revokeObjectURL', { value: revokeObjectURL, configurable: true })
-    vi.spyOn(document, 'createElement').mockImplementation((tag: string) => {
-      const el = realCreateElement(tag)
-      if (tag === 'a') clicked = el as HTMLAnchorElement
-      return el
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function click(
+      this: HTMLAnchorElement,
+    ) {
+      clickedAnchors.push(this)
     })
-    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
   })
 
   afterEach(() => {
@@ -295,17 +318,20 @@ describe('downloadExport', () => {
         prestigeMultiplier: 1.5,
         totalPrestigeXp: 900,
       },
-      'my-save.json'
+      'my-save.json',
     )
 
     expect(createObjectURL).toHaveBeenCalledTimes(1)
-    const data = JSON.parse(await createObjectURL.mock.calls[0][0].text())
-    expect(data.version).toBe('1.0.0')
-    expect(data.character.name).toBe('DlHero')
-    expect(data.badges.map((b: { id: string }) => b.id)).toEqual(['earned'])
-    expect(data.prestigeLevel).toBe(2)
+    const exported: unknown = JSON.parse(await createObjectURL.mock.calls[0][0].text())
+    if (!isExportedSnapshot(exported)) {
+      throw new Error('exported payload did not match the expected shape')
+    }
+    expect(exported.version).toBe('1.0.0')
+    expect(exported.character.name).toBe('DlHero')
+    expect(exported.badges.map((badge) => badge.id)).toEqual(['earned'])
+    expect(exported.prestigeLevel).toBe(2)
 
-    expect(clicked?.download).toBe('my-save.json')
+    expect(clickedAnchors[0]?.download).toBe('my-save.json')
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:mock-url')
   })
 
@@ -318,7 +344,7 @@ describe('downloadExport', () => {
       stats: {},
     })
     const today = new Date().toISOString().split('T')[0]
-    expect(clicked?.download).toBe(`devopsquest-backup-${today}.json`)
+    expect(clickedAnchors[0]?.download).toBe(`devopsquest-backup-${today}.json`)
   })
 })
 
@@ -339,7 +365,7 @@ describe('mergeImportData keeps the player ahead', () => {
         badges: [],
         companions: [],
         stats: {},
-      }
+      },
     )
     expect(result.character.xp).toBe(900)
     expect(result.character.gold).toBe(500)
@@ -364,7 +390,7 @@ describe('mergeImportData keeps the player ahead', () => {
         badges: [],
         companions: [],
         stats: {},
-      }
+      },
     )
     expect(result.companions).toEqual([{ id: 'kept' }])
   })

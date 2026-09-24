@@ -59,9 +59,9 @@ describe('CodePuzzleGame', () => {
     expect(screen.getByText('1/3')).toBeInTheDocument()
     expect(screen.getByText('✓ 0')).toBeInTheDocument()
     expect(screen.getByText('✗ 0')).toBeInTheDocument()
-    puzzle.options!.forEach((option) => {
+    for (const option of puzzle.options ?? []) {
       expect(screen.getByRole('button', { name: option })).toBeInTheDocument()
-    })
+    }
     // The blank is rendered as a highlighted placeholder inside the snippet.
     expect(screen.getByText('___')).toBeInTheDocument()
   })
@@ -88,14 +88,15 @@ describe('CodePuzzleGame', () => {
   it('shows the correct answer when the player picks wrong', () => {
     const { onComplete, onSkip } = setup(3)
     const puzzle = codePuzzles[0]
-    const wrong = puzzle.options!.find((option) => option !== puzzle.answer)!
+    const wrong = (puzzle.options ?? []).find((option) => option !== puzzle.answer)
+    if (!wrong) throw new Error(`Puzzle "${puzzle.id}" offers no wrong option`)
 
     choose(wrong)
     expect(screen.getByText('✗ Incorrect')).toBeInTheDocument()
     expect(screen.getByText(/Correct answer:/)).toBeInTheDocument()
     // The revealed answer is rendered inside the feedback panel.
     expect(
-      screen.getByText(puzzle.answer!, { selector: 'p span.text-green-400' }),
+      screen.getByText(puzzle.answer, { selector: 'p span.text-green-400' }),
     ).toBeInTheDocument()
     expect(screen.getByText('✗ 1')).toBeInTheDocument()
 
@@ -150,7 +151,8 @@ describe('CodePuzzleGame', () => {
 
     solve(puzzle)
     expect(screen.getByText('✓ Correct!')).toBeInTheDocument()
-    const other = puzzle.options!.find((option) => option !== puzzle.answer)!
+    const other = (puzzle.options ?? []).find((option) => option !== puzzle.answer)
+    if (!other) throw new Error(`Puzzle "${puzzle.id}" offers no wrong option`)
     expect(screen.getByRole('button', { name: other })).toBeDisabled()
     expect(screen.getByText('1/3')).toBeInTheDocument()
   })

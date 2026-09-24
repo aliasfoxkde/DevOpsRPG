@@ -14,22 +14,23 @@ export default function AnalyticsPage() {
     const completionRate = totalQuests > 0 ? Math.round((completed / totalQuests) * 100) : 0
 
     // Quest completion by realm
-    const realmStats = Object.values(realms).map(realm => {
-      const realmQuests = allQuests.filter(q => q.realmId === realm.id)
-      const realmCompleted = realmQuests.filter(q =>
-        completedQuests.some(c => c.questId === q.id)
+    const realmStats = Object.values(realms).map((realm) => {
+      const realmQuests = allQuests.filter((q) => q.realmId === realm.id)
+      const realmCompleted = realmQuests.filter((q) =>
+        completedQuests.some((c) => c.questId === q.id),
       ).length
       return {
         name: realm.name,
         icon: realm.icon,
         completed: realmCompleted,
         total: realmQuests.length,
-        percentage: realmQuests.length > 0 ? Math.round((realmCompleted / realmQuests.length) * 100) : 0,
+        percentage:
+          realmQuests.length > 0 ? Math.round((realmCompleted / realmQuests.length) * 100) : 0,
       }
     })
 
     // Badge stats
-    const unlockedBadges = badges.filter(b => b.unlockedAt).length
+    const unlockedBadges = badges.filter((b) => b.unlockedAt).length
     const totalBadges = BADGES.length
 
     // XP breakdown
@@ -43,9 +44,10 @@ export default function AnalyticsPage() {
 
     // Performance stats
     const perfectQuests = stats.perfectQuestCount
-    const quizAccuracy = stats.quizCount > 0
-      ? Math.round(((stats.quizCount - stats.quizPerfectCount) / stats.quizCount) * 100)
-      : 0
+    const quizAccuracy =
+      stats.quizCount > 0
+        ? Math.round(((stats.quizCount - stats.quizPerfectCount) / stats.quizCount) * 100)
+        : 0
 
     // Streak analysis
     const currentStreak = character.streakDays
@@ -53,14 +55,15 @@ export default function AnalyticsPage() {
 
     // Technology breakdown
     const techStats = Object.entries(
-      completedQuests.reduce((acc, cq) => {
-        const quest = allQuests.find(q => q.id === cq.questId)
+      completedQuests.reduce<Record<string, number>>((acc, cq) => {
+        const quest = allQuests.find((q) => q.id === cq.questId)
         if (quest) {
           acc[quest.technologyId] = (acc[quest.technologyId] || 0) + 1
         }
         return acc
-      }, {} as Record<string, number>)
-    ).map(([tech, count]) => ({ tech, count }))
+      }, {}),
+    )
+      .map(([tech, count]) => ({ tech, count }))
       .sort((a, b) => b.count - a.count)
 
     return {
@@ -115,18 +118,20 @@ export default function AnalyticsPage() {
       <div className="grid md:grid-cols-2 gap-6 mb-8">
         {/* XP Progress */}
         <div className="bg-card rounded-xl border border-border p-6">
-          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-            ⭐ Level Progress
-          </h2>
+          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">⭐ Level Progress</h2>
           <div className="mb-4">
             <div className="flex justify-between text-sm mb-1">
               <span className="text-slate-400">Level {character.level}</span>
-              <span className="text-amber-400">{analytics.xpInCurrentLevel} / {analytics.xpToNextLevel} XP</span>
+              <span className="text-amber-400">
+                {analytics.xpInCurrentLevel} / {analytics.xpToNextLevel} XP
+              </span>
             </div>
             <div className="h-4 bg-slate-700 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all"
-                style={{ width: `${(analytics.xpInCurrentLevel / analytics.xpToNextLevel) * 100}%` }}
+                style={{
+                  width: `${(analytics.xpInCurrentLevel / analytics.xpToNextLevel) * 100}%`,
+                }}
               />
             </div>
           </div>
@@ -140,7 +145,9 @@ export default function AnalyticsPage() {
               <div className="text-xs text-slate-400">Gold</div>
             </div>
             <div className="bg-slate-800/50 rounded-lg p-3">
-              <div className="text-xl font-bold text-purple-400">{game.prestigeMultiplier.toFixed(1)}x</div>
+              <div className="text-xl font-bold text-purple-400">
+                {game.prestigeMultiplier.toFixed(1)}x
+              </div>
               <div className="text-xs text-slate-400">Prestige Bonus</div>
             </div>
           </div>
@@ -148,9 +155,7 @@ export default function AnalyticsPage() {
 
         {/* Activity Breakdown */}
         <div className="bg-card rounded-xl border border-border p-6">
-          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-            🕐 Activity Breakdown
-          </h2>
+          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">🕐 Activity Breakdown</h2>
           <div className="space-y-3">
             <div>
               <div className="flex justify-between text-sm mb-1">
@@ -160,7 +165,9 @@ export default function AnalyticsPage() {
               <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-yellow-600 to-orange-500"
-                  style={{ width: `${analytics.completed > 0 ? (analytics.earlyQuests / analytics.completed) * 100 : 0}%` }}
+                  style={{
+                    width: `${analytics.completed > 0 ? (analytics.earlyQuests / analytics.completed) * 100 : 0}%`,
+                  }}
                 />
               </div>
             </div>
@@ -172,7 +179,9 @@ export default function AnalyticsPage() {
               <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-amber-600 to-yellow-500"
-                  style={{ width: `${analytics.completed > 0 ? (analytics.dayQuests / analytics.completed) * 100 : 0}%` }}
+                  style={{
+                    width: `${analytics.completed > 0 ? (analytics.dayQuests / analytics.completed) * 100 : 0}%`,
+                  }}
                 />
               </div>
             </div>
@@ -184,7 +193,9 @@ export default function AnalyticsPage() {
               <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-indigo-600 to-purple-500"
-                  style={{ width: `${analytics.completed > 0 ? (analytics.nightQuests / analytics.completed) * 100 : 0}%` }}
+                  style={{
+                    width: `${analytics.completed > 0 ? (analytics.nightQuests / analytics.completed) * 100 : 0}%`,
+                  }}
                 />
               </div>
             </div>
@@ -194,18 +205,18 @@ export default function AnalyticsPage() {
 
       {/* Realm Progress */}
       <div className="bg-card rounded-xl border border-border p-6 mb-8">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          🗺️ Realm Progress
-        </h2>
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">🗺️ Realm Progress</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {analytics.realmStats.map(realm => (
+          {analytics.realmStats.map((realm) => (
             <div key={realm.name} className="bg-slate-800/50 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-2xl">{realm.icon}</span>
                 <span className="font-medium text-white">{realm.name}</span>
               </div>
               <div className="flex justify-between text-sm mb-1">
-                <span className="text-slate-400">{realm.completed}/{realm.total}</span>
+                <span className="text-slate-400">
+                  {realm.completed}/{realm.total}
+                </span>
                 <span className={realm.percentage === 100 ? 'text-green-400' : 'text-amber-400'}>
                   {realm.percentage}%
                 </span>
@@ -235,7 +246,9 @@ export default function AnalyticsPage() {
                   <div className="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-cyan-600 to-blue-500"
-                      style={{ width: `${analytics.completed > 0 ? (count / analytics.completed) * 100 : 0}%` }}
+                      style={{
+                        width: `${analytics.completed > 0 ? (count / analytics.completed) * 100 : 0}%`,
+                      }}
                     />
                   </div>
                   <span className="text-sm text-slate-400 w-8">{count}</span>
@@ -247,9 +260,7 @@ export default function AnalyticsPage() {
 
         {/* Performance Stats */}
         <div className="bg-card rounded-xl border border-border p-6">
-          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-            🎯 Performance Metrics
-          </h2>
+          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">🎯 Performance Metrics</h2>
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-slate-800/50 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-green-400">{analytics.perfectQuests}</div>
@@ -265,7 +276,9 @@ export default function AnalyticsPage() {
             </div>
             <div className="bg-slate-800/50 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-orange-400">
-                {Number.isFinite(stats.fastestQuestTime) ? `${Math.round(stats.fastestQuestTime)}s` : '--'}
+                {Number.isFinite(stats.fastestQuestTime)
+                  ? `${Math.round(stats.fastestQuestTime)}s`
+                  : '--'}
               </div>
               <div className="text-xs text-slate-400">Fastest Quest</div>
             </div>
@@ -275,14 +288,14 @@ export default function AnalyticsPage() {
 
       {/* Badges Progress */}
       <div className="bg-card rounded-xl border border-border p-6">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          🏅 Badge Collection
-        </h2>
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">🏅 Badge Collection</h2>
         <div className="flex items-center gap-4 mb-4">
           <div className="flex-1">
             <div className="flex justify-between text-sm mb-1">
               <span className="text-slate-400">Progress</span>
-              <span className="text-amber-400">{analytics.unlockedBadges} / {analytics.totalBadges}</span>
+              <span className="text-amber-400">
+                {analytics.unlockedBadges} / {analytics.totalBadges}
+              </span>
             </div>
             <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
               <div

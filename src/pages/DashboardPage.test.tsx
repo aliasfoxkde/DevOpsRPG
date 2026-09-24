@@ -5,11 +5,13 @@ import { GameProvider } from '@/contexts/GameContext'
 import DashboardPage from './DashboardPage'
 
 function renderWithRouter(ui: React.ReactElement) {
-  return render(ui, { wrapper: ({ children }) => (
-    <MemoryRouter>
-      <GameProvider>{children}</GameProvider>
-    </MemoryRouter>
-  )})
+  return render(ui, {
+    wrapper: ({ children }) => (
+      <MemoryRouter>
+        <GameProvider>{children}</GameProvider>
+      </MemoryRouter>
+    ),
+  })
 }
 
 describe('DashboardPage', () => {
@@ -242,12 +244,14 @@ describe('DashboardPage', () => {
         skillPoints: 0,
         skillAllocations: {},
       },
-      completedQuests: Array(10).fill(null).map((_, i) => ({
-        id: `topic-${i}`,
-        title: `Topic ${i}`,
-        xpRewarded: 25,
-        completedAt: new Date().toISOString(),
-      })),
+      completedQuests: Array(10)
+        .fill(null)
+        .map((_, i) => ({
+          id: `topic-${i}`,
+          title: `Topic ${i}`,
+          xpRewarded: 25,
+          completedAt: new Date().toISOString(),
+        })),
       currentQuestId: null,
       achievements: [],
       showVictory: false,
@@ -353,12 +357,14 @@ describe('DashboardPage', () => {
         skillPoints: 0,
         skillAllocations: {},
       },
-      completedQuests: Array(15).fill(null).map((_, i) => ({
-        id: `topic-${i}`,
-        title: `Topic ${i}`,
-        xpRewarded: 25,
-        completedAt: new Date().toISOString(),
-      })),
+      completedQuests: Array(15)
+        .fill(null)
+        .map((_, i) => ({
+          id: `topic-${i}`,
+          title: `Topic ${i}`,
+          xpRewarded: 25,
+          completedAt: new Date().toISOString(),
+        })),
       currentQuestId: null,
       achievements: [],
       showVictory: false,
@@ -467,12 +473,14 @@ describe('DashboardPage', () => {
         skillPoints: 0,
         skillAllocations: {},
       },
-      completedQuests: Array(5).fill(null).map((_, i) => ({
-        id: `topic-${i}`,
-        title: `Topic ${i}`,
-        xpRewarded: 25,
-        completedAt: new Date().toISOString(),
-      })),
+      completedQuests: Array(5)
+        .fill(null)
+        .map((_, i) => ({
+          id: `topic-${i}`,
+          title: `Topic ${i}`,
+          xpRewarded: 25,
+          completedAt: new Date().toISOString(),
+        })),
       currentQuestId: null,
       achievements: [],
       showVictory: false,
