@@ -12,7 +12,6 @@ import {
   type DailyReward,
 } from '../data/collectibles'
 import { technologies } from '../data/technologies'
-import { TITLES, FRAMES } from '../data/titles'
 import { getEquipmentById, calculateEquipmentBonuses } from '../data/equipment'
 import { COLLECTIBLE_DROP_RATE, GOLD_XP_RATIO } from '../utils/gameUtils'
 
@@ -20,6 +19,9 @@ import { COMPANIONS_DATA, EVOLVED_COMPANIONS } from '../data/companions'
 import { loadInitialGame, useGamePersistence } from './game/gameStorage'
 import { createEmptyStats } from './game/defaultState'
 import { calculateLevel, calculateXpToNextLevel, getTitle } from './game/xp'
+import { isLegacyAchievementUnlocked } from './game/achievementsRules'
+import { computeFullyCompletedTechnologies } from './game/progression'
+import { countTechQuests, getUnlockedFrameIds, getUnlockedTitleIds } from './game/titlesFramesRules'
 import type { Character, CharacterClass, GameContextType, GameState } from './game/types'
 
 // State types live in ./game/types; re-exported so existing imports of
@@ -103,51 +105,19 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const newAchievements = prev.achievements.map((a) => {
         if (a.unlockedAt) return a
 
-        let unlocked = false
-        switch (a.id) {
-          case 'first_steps':
-            unlocked = completedCount >= 1
-            break
-          case 'dedicated':
-          case 'streak_7':
-            unlocked = newStreak >= 7
-            break
-          case 'level_5':
-            unlocked = newLevel >= 5
-            break
-          case 'level_10':
-            unlocked = newLevel >= 10
-            break
-          case 'level_15':
-            unlocked = newLevel >= 15
-            break
-          case 'xp_500':
-            unlocked = newXp >= 500
-            break
-          case 'xp_1000':
-            unlocked = newXp >= 1000
-            break
-          case 'topics_10':
-            unlocked = completedCount >= 10
-            break
-          case 'topics_25':
-            unlocked = completedCount >= 25
-            break
-          case 'all_foundations': {
-            // Check if all foundations quests are complete
-            const foundationsQuests = allQuests.filter((q) => q.realmId === 'foundations')
-            const allFoundationsDone = foundationsQuests.every(
-              (fq) => prev.completedQuests.some((cq) => cq.questId === fq.id) || fq.id === questId,
-            )
-            unlocked = allFoundationsDone
-            break
-          }
-          case 'streak_30':
-            unlocked = newStreak >= 30
-            break
-        }
-
-        return unlocked ? { ...a, unlockedAt: new Date().toISOString() } : a
+        return isLegacyAchievementUnlocked(
+          a.id,
+          {
+            completedCount,
+            newStreak,
+            newLevel,
+            newXp,
+            completedQuestIds: prev.completedQuests.map((cq) => cq.questId),
+          },
+          questId,
+        )
+          ? { ...a, unlockedAt: new Date().toISOString() }
+          : a
       })
 
       // Determine next quest
@@ -729,14 +699,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const newlyUnlocked: Badge[] = []
     setGame((prev) => {
       // Compute completed technologies from completed quests
-      const completedTopicIds = new Set(prev.completedQuests.map((q) => q.topicId))
-      const techCompleted: string[] = []
-      for (const tech of Object.values(technologies)) {
-        const techQuests = allQuests.filter((q) => q.technologyId === tech.id)
-        if (techQuests.length > 0 && techQuests.every((q) => completedTopicIds.has(q.topicId))) {
-          techCompleted.push(tech.id)
-        }
-      }
+      const techCompleted = computeFullyCompletedTechnologies(
+        new Set(prev.completedQuests.map((q) => q.topicId)),
+      )
 
       const stats = {
         questCount: prev.completedQuests.length,
@@ -963,14 +928,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const newlyUnlocked: Milestone[] = []
     setGame((prev) => {
       // Compute completed technologies from completed quests
-      const completedTopicIds = new Set(prev.completedQuests.map((q) => q.topicId))
-      const completedTechnologies: string[] = []
-      for (const tech of Object.values(technologies)) {
-        const techQuests = allQuests.filter((q) => q.technologyId === tech.id)
-        if (techQuests.length > 0 && techQuests.every((q) => completedTopicIds.has(q.topicId))) {
-          completedTechnologies.push(tech.id)
-        }
-      }
+      const completedTechnologies = computeFullyCompletedTechnologies(
+        new Set(prev.completedQuests.map((q) => q.topicId)),
+      )
 
       const state = {
         completedQuests: prev.completedQuests.length,
@@ -1359,124 +1319,21 @@ export function GameProvider({ children }: { children: ReactNode }) {
     let newFrames: string[] = []
 
     setGame((prev) => {
-      const completedQuestCount = prev.completedQuests.length
-      const level = prev.character.level
-      const streakDays = prev.character.streakDays
-
-      // Count tech-specific completions
-      const techCounts: Record<string, number> = {}
-      for (const cq of prev.completedQuests) {
-        const quest = allQuests.find((q) => q.id === cq.questId)
-        if (quest) {
-          techCounts[quest.technologyId] = (techCounts[quest.technologyId] || 0) + 1
-        }
+      const unlockContext = {
+        unlockedTitles: prev.character.unlockedTitles,
+        unlockedFrames: prev.character.unlockedFrames,
+        completedQuestCount: prev.completedQuests.length,
+        level: prev.character.level,
+        streakDays: prev.character.streakDays,
+        techCounts: countTechQuests(prev.completedQuests.map((cq) => cq.questId)),
+        completedRealmCount: prev.completedRealms.length,
+        badgesEarned: prev.badges.filter((b) => b.unlockedAt).length,
+        fastestQuestTime: prev.stats.fastestQuestTime,
       }
 
-      // Check titles
-      newTitles = []
-      for (const title of TITLES) {
-        if (prev.character.unlockedTitles.includes(title.id)) continue
-
-        let unlocked = false
-        switch (title.id) {
-          case 'novice-devops':
-            unlocked = completedQuestCount >= 5
-            break
-          case 'eager-learner':
-            unlocked = completedQuestCount >= 10
-            break
-          case 'quest-seeker':
-            unlocked = completedQuestCount >= 15
-            break
-          case 'code-crusader':
-            unlocked = completedQuestCount >= 25
-            break
-          case 'cloud-hopeful':
-            unlocked = (techCounts['aws'] || 0) >= 5
-            break
-          case 'container-captain':
-            unlocked = (techCounts['docker'] || 0) >= 5
-            break
-          case 'git-guru':
-            unlocked = (techCounts['git'] || 0) >= 5
-            break
-          case 'python-pro':
-            unlocked = (techCounts['python'] || 0) >= 5
-            break
-          case 'ci-cd-champion':
-            unlocked = (techCounts['cicd'] || 0) >= 10
-            break
-          case 'kubernetes-knight':
-            unlocked = (techCounts['kubernetes'] || 0) >= 10
-            break
-          case 'infrastructure-inquisitor':
-            unlocked = (techCounts['terraform'] || 0) >= 10
-            break
-          case 'monitoring-master':
-            unlocked = (techCounts['monitoring'] || 0) >= 10
-            break
-          case 'streak-slayer':
-            unlocked = streakDays >= 14
-            break
-          case 'devops-dragon':
-            unlocked = completedQuestCount >= 100
-            break
-          case 'realm-ruler':
-            unlocked = prev.completedRealms.length >= Object.keys(realms).length
-            break
-          case 'almighty-architect':
-            unlocked = level >= 50
-            break
-          case 'golden-gamer':
-            unlocked = prev.badges.filter((b) => b.unlockedAt).length >= 50
-            break
-          case 'speed-demon':
-            unlocked = prev.stats.fastestQuestTime < 30
-            break
-        }
-        if (unlocked) newTitles.push(title.id)
-      }
-
-      // Check frames
-      newFrames = []
-      for (const frame of FRAMES) {
-        if (prev.character.unlockedFrames.includes(frame.id)) continue
-
-        let unlocked = false
-        switch (frame.id) {
-          case 'default':
-            unlocked = true
-            break
-          case 'bronze':
-            unlocked = completedQuestCount >= 10
-            break
-          case 'silver':
-            unlocked = completedQuestCount >= 25
-            break
-          case 'gold':
-            unlocked = completedQuestCount >= 50
-            break
-          case 'emerald':
-            unlocked = (techCounts['python'] || 0) >= 10
-            break
-          case 'ruby':
-            unlocked = (techCounts['git'] || 0) >= 10
-            break
-          case 'sapphire':
-            unlocked = (techCounts['aws'] || 0) >= 10
-            break
-          case 'amethyst':
-            unlocked = (techCounts['docker'] || 0) >= 10
-            break
-          case 'diamond':
-            unlocked = completedQuestCount >= 100
-            break
-          case 'prismatic':
-            unlocked = level >= 50
-            break
-        }
-        if (unlocked) newFrames.push(frame.id)
-      }
+      // Check titles and frames against the same progression snapshot
+      newTitles = getUnlockedTitleIds(unlockContext)
+      newFrames = getUnlockedFrameIds(unlockContext)
 
       if (newTitles.length === 0 && newFrames.length === 0) return prev
 
