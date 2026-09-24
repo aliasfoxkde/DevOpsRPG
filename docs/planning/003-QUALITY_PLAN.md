@@ -438,6 +438,22 @@ gitforge pipeline --list && gitforge pipeline --watch <run-id>
 **Phase F — Release cadence.** Gates → CHANGELOG 0.1.3 → tag + GitHub release →
 wrangler deploy with existing env vars → byte-verify production.
 
+**v0.1.3 shipped 2026-09-24** (commit `5f6400c`, release
+https://github.com/aliasfoxkde/DevOpsRPG/releases/tag/v0.1.3): all gates green
+(lint, typecheck ×3, prettier, knip, 1537/1537 unit, 30/30 e2e across
+chromium/firefox/webkit, build, `audit:secrets` on a re-triaged 354-finding
+baseline), deployed to the existing `devopsquest` Pages project and byte-verified
+— all 40 `dist/` assets including `index.html` hash-identical in production
+(one transient CDN-edge DIFF during the seconds after deploy, re-verified clean).
+
+Deliberately **not** deployed: `worker/` (`devopsquest-api`). Its `wrangler.toml`
+still carries the placeholder `your-kv-namespace-id`, the account has no
+devopsquest KV namespace or D1 database, and no worker was ever deployed — it is
+optional scaffolding per CLAUDE.md ("No backend is required for the app to
+work"). Provisioning one is new account infrastructure, so the v0.1.3 CORS fix
+ships tested (18 worker tests) but dormant until someone creates the namespace
+and fills in the id. Pages-app deploys are unaffected.
+
 ### 4.3 Honest constraints
 
 - 99% _lines_ is reachable; 99% _branch_ on a content-heavy SPA has long-tail files
