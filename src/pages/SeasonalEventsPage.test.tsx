@@ -14,9 +14,10 @@ import { STORAGE_KEYS } from '@/utils/gameUtils'
 const now = new Date()
 const pastEvents = SEASONAL_EVENTS.filter((e) => new Date(e.endDate) < now)
 const upcomingEvents = SEASONAL_EVENTS.filter((e) => new Date(e.startDate) > now)
-// Events that ask for more than the starting level 1 and are not running now
+// Events that ask for more than the starting level 1 and are still to come —
+// ended events carry only their Ended badge, not a missed requirement.
 const gatedEvents = SEASONAL_EVENTS.filter(
-  (e) => (e.requirements?.minLevel ?? 0) > 1 && !isEventActive(e.id),
+  (e) => (e.requirements?.minLevel ?? 0) > 1 && upcomingEvents.includes(e),
 )
 
 describe('SeasonalEventsPage', () => {
@@ -69,6 +70,11 @@ describe('SeasonalEventsPage', () => {
     expect(character.level).toBe(1)
     // Every event asking for more than level 1 is out of reach for a new hero
     expect(screen.getAllByText('Requirements not met')).toHaveLength(gatedEvents.length)
+    // Ended events keep only their Ended badge — no missed-requirement noise
+    for (const past of pastEvents) {
+      const card = closestContainer(screen.getByText(past.name), 'div')
+      expect(within(card).queryByText('Requirements not met')).not.toBeInTheDocument()
+    }
     // Only some events hand out claimable rewards
     expect(screen.getAllByText('Event Rewards:').length).toBeGreaterThan(0)
   })

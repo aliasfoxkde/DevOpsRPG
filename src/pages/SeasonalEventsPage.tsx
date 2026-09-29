@@ -166,7 +166,7 @@ function EventCard({
           </div>
         )}
 
-        {!meetsRequirements && !isActive && (
+        {!meetsRequirements && !isActive && !isEnded && (
           <div className="text-center text-sm text-slate-500">Requirements not met</div>
         )}
       </div>
