@@ -26,8 +26,9 @@ export default function GuildPage() {
 
   // State
   const [activeTab, setActiveTab] = useState<Tab>('overview')
-  const [joinedGuild] = useState<Guild | null>(MOCK_GUILD)
-  const [showJoinConfirm, setShowJoinConfirm] = useState<string | null>(null)
+  // Guild membership is the demo guild until guild state exists in the save —
+  // the page must not offer a join action it cannot honour.
+  const joinedGuild: Guild = MOCK_GUILD
 
   // Player's guild role - determined by their real character data
   const playerRole: GuildMember['role'] = character.level >= 30 ? 'officer' : 'member'
@@ -36,14 +37,6 @@ export default function GuildPage() {
   // Calculate player's weekly contribution based on their character stats
   const playerWeeklyXP = Object.values(game.skillXp).reduce((sum, xp) => sum + xp, 0)
   const playerTotalQuests = game.completedQuests.length
-
-  // Check if player meets guild requirements
-  const canJoinGuild = (guild: Guild): boolean => {
-    return (
-      character.level >= guild.requirements.minLevel &&
-      game.completedQuests.length >= guild.requirements.minQuests
-    )
-  }
 
   // Real members with player's actual stats mixed in
   const members: GuildMember[] = [
@@ -114,67 +107,54 @@ export default function GuildPage() {
         </div>
 
         {/* Current Guild Banner */}
-        {joinedGuild ? (
-          <div className="bg-gradient-to-r from-purple-900/50 to-indigo-900/50 rounded-xl border border-purple-500/30 p-6 mb-8">
-            <div className="flex items-center gap-4">
-              <div className="text-6xl">{joinedGuild.icon}</div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-2xl font-bold text-white">{joinedGuild.name}</h2>
-                  <span className="px-2 py-1 bg-purple-600/30 text-purple-300 text-xs rounded">
-                    Rank #{joinedGuild.rank}
-                  </span>
-                </div>
-                <p className="text-slate-300">{joinedGuild.description}</p>
-                <div className="flex gap-4 mt-2 text-sm text-slate-400">
-                  <span>Level {joinedGuild.level}</span>
-                  <span>•</span>
-                  <span>
-                    {joinedGuild.memberCount}/{joinedGuild.maxMembers} members
-                  </span>
-                  <span>•</span>
-                  <span>🏆 {joinedGuild.totalQuests} total quests</span>
-                </div>
-              </div>
-              <div className="text-right hidden md:block">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl">{playerRank.icon}</span>
-                  <span className="font-bold" style={{ color: playerRank.color }}>
-                    {playerRank.name}
-                  </span>
-                </div>
-                <p className="text-sm text-slate-400 mt-1">Your Role</p>
-              </div>
-            </div>
-
-            {/* Guild XP Progress */}
-            <div className="mt-4">
-              <div className="flex justify-between text-sm mb-1">
-                <span className="text-slate-400">Guild XP</span>
-                <span className="text-purple-400">
-                  {joinedGuild.xp} / {joinedGuild.xpToNextLevel}
+        <div className="bg-gradient-to-r from-purple-900/50 to-indigo-900/50 rounded-xl border border-purple-500/30 p-6 mb-8">
+          <div className="flex items-center gap-4">
+            <div className="text-6xl">{joinedGuild.icon}</div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-white">{joinedGuild.name}</h2>
+                <span className="px-2 py-1 bg-purple-600/30 text-purple-300 text-xs rounded">
+                  Rank #{joinedGuild.rank}
                 </span>
               </div>
-              <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-purple-600 to-indigo-500 transition-all"
-                  style={{ width: `${(joinedGuild.xp / joinedGuild.xpToNextLevel) * 100}%` }}
-                />
+              <p className="text-slate-300">{joinedGuild.description}</p>
+              <div className="flex gap-4 mt-2 text-sm text-slate-400">
+                <span>Level {joinedGuild.level}</span>
+                <span>•</span>
+                <span>
+                  {joinedGuild.memberCount}/{joinedGuild.maxMembers} members
+                </span>
+                <span>•</span>
+                <span>🏆 {joinedGuild.totalQuests} total quests</span>
               </div>
             </div>
+            <div className="text-right hidden md:block">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">{playerRank.icon}</span>
+                <span className="font-bold" style={{ color: playerRank.color }}>
+                  {playerRank.name}
+                </span>
+              </div>
+              <p className="text-sm text-slate-400 mt-1">Your Role</p>
+            </div>
           </div>
-        ) : (
-          <div className="bg-card rounded-xl border border-border p-8 mb-8 text-center">
-            <div className="text-6xl mb-4">🏰</div>
-            <h2 className="text-2xl font-bold mb-2">Join a Guild!</h2>
-            <p className="text-slate-400 mb-4">
-              Team up with other players to complete group challenges and earn guild rewards.
-            </p>
-            <p className="text-sm text-slate-500">
-              Your Level: {character.level} | Quests: {game.completedQuests.length}
-            </p>
+
+          {/* Guild XP Progress */}
+          <div className="mt-4">
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-slate-400">Guild XP</span>
+              <span className="text-purple-400">
+                {joinedGuild.xp} / {joinedGuild.xpToNextLevel}
+              </span>
+            </div>
+            <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-purple-600 to-indigo-500 transition-all"
+                style={{ width: `${(joinedGuild.xp / joinedGuild.xpToNextLevel) * 100}%` }}
+              />
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
       {/* Tabs */}
@@ -203,7 +183,7 @@ export default function GuildPage() {
       </div>
 
       {/* Overview Tab */}
-      {activeTab === 'overview' && joinedGuild && (
+      {activeTab === 'overview' && (
         <div className="space-y-6">
           {/* Your Contribution */}
           <div className="bg-gradient-to-r from-purple-900/30 to-slate-800/50 rounded-xl border border-purple-500/30 p-6">
@@ -589,115 +569,48 @@ export default function GuildPage() {
         <div>
           <h3 className="text-lg font-bold mb-4">🔍 Featured Guilds</h3>
           <p className="text-slate-400 mb-6">
-            Join a guild to team up with other players and earn guild rewards!
+            The realm&apos;s most active guilds — your hero currently serves with the{' '}
+            {joinedGuild.name}.
           </p>
 
           <div className="space-y-4">
-            {FEATURED_GUILDS.map((guild) => {
-              const meetsRequirements = canJoinGuild(guild)
-
-              return (
-                <div key={guild.id} className="bg-card rounded-xl border border-border p-4">
-                  <div className="flex items-center gap-4">
-                    <div className="text-5xl">{guild.icon}</div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-bold text-white">{guild.name}</h4>
-                        <span className="px-2 py-0.5 bg-slate-700 text-slate-400 text-xs rounded">
-                          Rank #{guild.rank}
-                        </span>
-                      </div>
-                      <p className="text-sm text-slate-400">{guild.description}</p>
-                      <div className="flex gap-4 mt-2 text-xs text-slate-500">
-                        <span>Level {guild.level}</span>
-                        <span>•</span>
-                        <span>
-                          {guild.memberCount}/{guild.maxMembers} members
-                        </span>
-                        <span>•</span>
-                        <span>
-                          Requires: Lv.{guild.requirements.minLevel}, {guild.requirements.minQuests}{' '}
-                          quests
-                        </span>
-                      </div>
+            {FEATURED_GUILDS.map((guild) => (
+              <div key={guild.id} className="bg-card rounded-xl border border-border p-4">
+                <div className="flex items-center gap-4">
+                  <div className="text-5xl">{guild.icon}</div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-bold text-white">{guild.name}</h4>
+                      <span className="px-2 py-0.5 bg-slate-700 text-slate-400 text-xs rounded">
+                        Rank #{guild.rank}
+                      </span>
                     </div>
-                    <div>
-                      {joinedGuild ? (
-                        <button
-                          disabled
-                          className="px-4 py-2 bg-slate-700 text-slate-500 rounded-lg cursor-not-allowed"
-                        >
-                          Already in Guild
-                        </button>
-                      ) : meetsRequirements ? (
-                        <button
-                          onClick={() => {
-                            setShowJoinConfirm(guild.id)
-                          }}
-                          className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition-colors"
-                        >
-                          Join Guild
-                        </button>
-                      ) : (
-                        <button
-                          disabled
-                          className="px-4 py-2 bg-slate-700 text-slate-500 rounded-lg cursor-not-allowed"
-                          title={`Requires Level ${guild.requirements.minLevel} and ${guild.requirements.minQuests} quests`}
-                        >
-                          Requirements Not Met
-                        </button>
-                      )}
+                    <p className="text-sm text-slate-400">{guild.description}</p>
+                    <div className="flex gap-4 mt-2 text-xs text-slate-500">
+                      <span>Level {guild.level}</span>
+                      <span>•</span>
+                      <span>
+                        {guild.memberCount}/{guild.maxMembers} members
+                      </span>
+                      <span>•</span>
+                      <span>
+                        Requires: Lv.{guild.requirements.minLevel}, {guild.requirements.minQuests}{' '}
+                        quests
+                      </span>
                     </div>
                   </div>
-
-                  {/* Join Confirmation */}
-                  {showJoinConfirm === guild.id && (
-                    <div className="mt-4 p-4 bg-purple-900/30 rounded-lg border border-purple-500/30">
-                      <p className="text-center mb-4">
-                        Are you sure you want to join <strong>{guild.name}</strong>?
-                      </p>
-                      <div className="flex gap-3 justify-center">
-                        <button
-                          onClick={() => {
-                            setShowJoinConfirm(null)
-                          }}
-                          className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          onClick={() => {
-                            // Would handle join in real implementation
-                            setShowJoinConfirm(null)
-                          }}
-                          className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors"
-                        >
-                          Confirm Join
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                  <div>
+                    <button
+                      disabled
+                      className="px-4 py-2 bg-slate-700 text-slate-500 rounded-lg cursor-not-allowed"
+                    >
+                      Already in Guild
+                    </button>
+                  </div>
                 </div>
-              )
-            })}
+              </div>
+            ))}
           </div>
-        </div>
-      )}
-
-      {/* Empty State */}
-      {!joinedGuild && activeTab === 'overview' && (
-        <div className="text-center py-12">
-          <div className="text-6xl mb-4">🏰</div>
-          <h2 className="text-xl font-bold mb-2">You&apos;re not in a guild yet!</h2>
-          <p className="text-slate-400 mb-6">Visit the Discover tab to find and join a guild.</p>
-          <button
-            onClick={() => {
-              setActiveTab('discover')
-            }}
-            className="px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium transition-colors"
-          >
-            Find a Guild
-          </button>
         </div>
       )}
     </div>

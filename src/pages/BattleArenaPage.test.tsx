@@ -9,10 +9,18 @@ import { technologies } from '@/data/technologies'
 import { getQuizForTopic, type QuizQuestion } from '@/data/quizzes'
 import { MILESTONES } from '@/data/milestones'
 import { BADGES } from '@/data/badges'
+import { CLASS_BONUSES } from '@/contexts/game/bonusEngine'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import { GameProvider, useGame, type GameState } from '@/contexts/GameContext'
 import { closestContainer, renderPage, seedDefaultGame } from './test-utils'
 import { STORAGE_KEYS, GOLD_XP_RATIO } from '@/utils/gameUtils'
+
+// Quest payouts include the live seasonal event multiplier; pin it to 1x so
+// reward math stays deterministic no matter when the suite runs.
+vi.mock('@/data/seasonalEvents', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/data/seasonalEvents')>()),
+  getActiveEventMultiplier: () => 1,
+}))
 
 function renderQuest(questId: string) {
   return renderPage(<BattleArenaPage />, {
@@ -60,6 +68,19 @@ function questById(questId: string) {
   const quest = allQuests.find((entry) => entry.id === questId)
   if (!quest) throw new Error(`Unknown quest id: ${questId}`)
   return quest
+}
+
+// Quest and bonus payouts run through the bonus engine before they are
+// banked — the default DevOps Sage class grants +10% XP on everything — so
+// expectations mirror the granted amounts instead of the raw advertised ones.
+function xpFactorFor(base: GameState): number {
+  return 1 + CLASS_BONUSES[base.character.class].bonus
+}
+function grantedQuestXp(quest: ReturnType<typeof questById>, base: GameState): number {
+  return Math.floor(quest.xpReward * xpFactorFor(base))
+}
+function grantedBonusXp(amount: number, base: GameState): number {
+  return Math.floor(amount * xpFactorFor(base))
 }
 
 /** A completed-quest record shaped the way GameContext persists them. */
@@ -306,7 +327,7 @@ describe('BattleArenaPage', () => {
 
     const stored = storedGame()
     expect(stored.completedQuests.map((entry) => entry.questId)).toEqual(['quest_html_intro'])
-    expect(stored.character.xp).toBe(game.character.xp + quest.xpReward)
+    expect(stored.character.xp).toBe(game.character.xp + grantedQuestXp(quest, game))
     expect(stored.character.gold).toBe(
       game.character.gold + Math.floor(quest.xpReward * GOLD_XP_RATIO),
     )
@@ -422,7 +443,9 @@ describe('BattleArenaPage', () => {
     })
     expect(screen.queryByText('🔗 Match the Terms!')).not.toBeInTheDocument()
     // The bonus is only visible in the study panel, so assert on the balance
-    expect(storedGame().character.xp).toBe(baseXp + quest.xpReward + 10)
+    expect(storedGame().character.xp).toBe(
+      baseXp + grantedQuestXp(quest, game) + grantedBonusXp(10, game),
+    )
 
     // Chest and random encounter pop up while the celebrations are still up
     act(() => {
@@ -447,8 +470,8 @@ describe('BattleArenaPage', () => {
     expect(within(chestOverlay).getByText('+10 XP!')).toBeInTheDocument()
     expect(within(chestOverlay).getByText(/common loot acquired!/)).toBeInTheDocument()
 
-    const bonusXp = 10 + 10 + 20
-    expect(storedGame().character.xp).toBe(baseXp + quest.xpReward + bonusXp)
+    const bonusXp = grantedBonusXp(10, game) + grantedBonusXp(20, game) + grantedBonusXp(10, game)
+    expect(storedGame().character.xp).toBe(baseXp + grantedQuestXp(quest, game) + bonusXp)
     expect(storedGame().character.gold).toBe(
       baseGold + Math.floor(quest.xpReward * GOLD_XP_RATIO) + 10,
     )
@@ -496,7 +519,7 @@ describe('BattleArenaPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /^Continue$/ }))
 
     expect(screen.queryByText('🎯 Quick Trivia!')).not.toBeInTheDocument()
-    expect(storedGame().character.xp).toBe(game.character.xp + quest.xpReward)
+    expect(storedGame().character.xp).toBe(game.character.xp + grantedQuestXp(quest, game))
     expect(storedGame().character.gold).toBe(
       game.character.gold + Math.floor(quest.xpReward * GOLD_XP_RATIO),
     )
@@ -581,7 +604,7 @@ describe('BattleArenaPage', () => {
     expect(storedGame().character.gold).toBe(
       game.character.gold + Math.floor(quest.xpReward * GOLD_XP_RATIO) + 10,
     )
-    expect(storedGame().character.xp).toBe(game.character.xp + quest.xpReward)
+    expect(storedGame().character.xp).toBe(game.character.xp + grantedQuestXp(quest, game))
     expect(storedGame().collectibles).toEqual([])
   })
 
@@ -612,7 +635,7 @@ describe('BattleArenaPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Skip for now' }))
 
     expect(screen.queryByText('🎯 Quick Trivia!')).not.toBeInTheDocument()
-    expect(storedGame().character.xp).toBe(game.character.xp + quest.xpReward)
+    expect(storedGame().character.xp).toBe(game.character.xp + grantedQuestXp(quest, game))
   })
 
   it('opens the quiz from the study call to action', () => {
@@ -664,12 +687,13 @@ describe('BattleArenaPage', () => {
 
     // One click completed it, the second was swallowed by a guard
     expect(storedGame().completedQuests.map((entry) => entry.questId)).toEqual(['quest_html_intro'])
-    expect(storedGame().character.xp).toBe(game.character.xp + quest.xpReward)
+    expect(storedGame().character.xp).toBe(game.character.xp + grantedQuestXp(quest, game))
   })
 
   it('refuses to complete a quest that another surface already finished', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.99)
     vi.useFakeTimers()
+    const game = seedDefaultGame()
     const quest = questById('quest_html_intro')
     renderQuestWithProbe('quest_html_intro')
 
@@ -677,7 +701,7 @@ describe('BattleArenaPage', () => {
     fireEvent.click(quizToggle())
     fireEvent.click(screen.getByRole('button', { name: 'force complete' }))
     const afterProbe = storedGame()
-    expect(afterProbe.character.xp).toBe(quest.xpReward)
+    expect(afterProbe.character.xp).toBe(grantedQuestXp(quest, game))
 
     passQuiz()
     fireEvent.click(screen.getByRole('button', { name: 'Complete Quest' }))

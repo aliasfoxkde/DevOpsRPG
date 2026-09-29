@@ -5,6 +5,7 @@ import { GameProvider, type GameState } from '../../contexts/GameContext'
 import { MiniGameHub } from './MiniGameHub'
 import { getRandomCommands, mathChallenges } from '../../data/minigames'
 import { INCIDENT_SCENARIOS } from '../../data/incidentScenarios'
+import { quizzes } from '../../data/quizzes'
 import { STORAGE_KEYS } from '../../utils/gameUtils'
 
 /**
@@ -16,6 +17,14 @@ import { STORAGE_KEYS } from '../../utils/gameUtils'
 const IDENTITY_SHUFFLE_RANDOM = 0.999999
 
 const UNLOCK_LEVEL = 3
+
+/**
+ * addXP banks `floor(raw * xpMultiplier)` and a fresh hero is a DevOps Sage
+ * (+10% XP), so every XP expectation is the granted amount, not the raw roll.
+ */
+function grantedXp(raw: number): number {
+  return Math.floor(raw * 1.1)
+}
 
 function seedLevel(level: number) {
   localStorage.setItem(STORAGE_KEYS.GAME, JSON.stringify({ character: { level }, badges: [] }))
@@ -183,6 +192,20 @@ describe('MiniGameHub', () => {
     expect(onClose).toHaveBeenCalledTimes(1)
   })
 
+  it('lands straight on a game when opened with an initialGame', () => {
+    // The game library deep-links into a specific game, skipping the menu.
+    seedLevel(UNLOCK_LEVEL)
+    render(
+      <GameProvider>
+        <MiniGameHub onClose={vi.fn()} initialGame="math" />
+      </GameProvider>,
+    )
+
+    expect(title('🔢 Math Challenge').length).toBeGreaterThan(0)
+    expect(screen.queryByRole('button', { name: 'Back to Game' })).not.toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Enter your answer...')).toBeInTheDocument()
+  })
+
   it('runs a Memory Match round to completion and banks the bonus', () => {
     seedLevel(UNLOCK_LEVEL)
     renderHub()
@@ -196,15 +219,16 @@ describe('MiniGameHub', () => {
     expect(screen.getByText('🧠 Memory Match Complete!')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /claim rewards/i }))
 
-    // 920 points of 1200 -> 77% accuracy, 38 bonus XP and 19 bonus gold.
+    // 920 points of 1200 -> 77% accuracy, raw 38 XP / 19 gold, and the
+    // DevOps Sage class bonus banks floor(38 * 1.1) = 41 XP.
     expect(screen.getByText('Good Job!')).toBeInTheDocument()
     expect(screen.getByText('920 / 1200')).toBeInTheDocument()
     expect(screen.getByText('77%')).toBeInTheDocument()
-    expect(screen.getByText('+38 XP')).toBeInTheDocument()
+    expect(screen.getByText(`+${grantedXp(38)} XP`)).toBeInTheDocument()
     expect(screen.getByText('+19 🪙')).toBeInTheDocument()
 
     const character = storedCharacter()
-    expect(character.xp).toBe(38)
+    expect(character.xp).toBe(grantedXp(38))
     expect(character.gold).toBe(19)
     expect(storedStat('memoryCount')).toBe(1)
     // 77% is under the 80% bar for the speed badge.
@@ -222,16 +246,19 @@ describe('MiniGameHub', () => {
     expect(screen.getByText('Math Wizard!')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /claim rewards/i }))
 
-    // 1175 of 750 points, accuracy clamped to 100%: 78 bonus XP and 39 bonus gold.
+    // 1175 of 750 points, accuracy clamped to 100%. Math Challenge's tile
+    // advertises +75 XP, so the payout must be capped off that same number:
+    // raw round(1175/750 * 75) = 118 XP and round(1175/750 * 38) = 60 gold,
+    // then the class bonus banks floor(118 * 1.1) = 129 XP.
     expect(screen.getByText('Excellent!')).toBeInTheDocument()
     expect(screen.getByText('1175 / 750')).toBeInTheDocument()
     expect(screen.getByText('100%')).toBeInTheDocument()
-    expect(screen.getByText('+78 XP')).toBeInTheDocument()
-    expect(screen.getByText('+39 🪙')).toBeInTheDocument()
+    expect(screen.getByText(`+${grantedXp(118)} XP`)).toBeInTheDocument()
+    expect(screen.getByText('+60 🪙')).toBeInTheDocument()
 
     const character = storedCharacter()
-    expect(character.xp).toBe(78)
-    expect(character.gold).toBe(39)
+    expect(character.xp).toBe(grantedXp(118))
+    expect(character.gold).toBe(60)
     expect(storedStat('mathCount')).toBe(1)
     expect(storedBadgeUnlock('speed_demon')).toBeTruthy()
   })
@@ -362,11 +389,11 @@ describe('MiniGameHub', () => {
 
     expect(screen.getByText('Excellent!')).toBeInTheDocument()
     expect(screen.getByText(`${accuracy}%`)).toBeInTheDocument()
-    expect(screen.getByText(`+${xpBonus} XP`)).toBeInTheDocument()
+    expect(screen.getByText(`+${grantedXp(xpBonus)} XP`)).toBeInTheDocument()
     expect(screen.getByText(`+${goldBonus} 🪙`)).toBeInTheDocument()
 
     const character = storedCharacter()
-    expect(character.xp).toBe(xpBonus)
+    expect(character.xp).toBe(grantedXp(xpBonus))
     expect(character.gold).toBe(goldBonus)
     expect(storedStat('typerCount')).toBe(1)
     expect(storedStat('minigameCount')).toBe(0)
@@ -400,17 +427,25 @@ describe('MiniGameHub', () => {
 
     expect(title('⚡ Quiz Dash').length).toBeGreaterThan(0)
 
-    // The pinned Math.random keeps the dealt deck in file order, so the five
-    // questions and their correct options are known up front.
-    const correctAnswers = [
-      'Continuous Deployment',
-      'Kubernetes',
-      'Build automation',
-      'Infrastructure as Code',
-      'Git',
-    ]
-    for (const answer of correctAnswers) {
-      fireEvent.click(screen.getByRole('button', { name: new RegExp(answer) }))
+    // The pinned Math.random keeps the dealt deck in bank order (the shuffle
+    // degenerates to identity), so the five dealt questions are the first five
+    // playable bank questions — answered straight from the bank's own keys.
+    const deck = Object.values(quizzes)
+      .flat()
+      .filter(
+        (question): question is typeof question & { options: string[]; correctIndex: number } =>
+          Array.isArray(question.options) &&
+          question.options.length > 1 &&
+          typeof question.correctIndex === 'number',
+      )
+      .slice(0, 5)
+    const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    for (const question of deck) {
+      fireEvent.click(
+        screen.getByRole('button', {
+          name: new RegExp(escape(question.options[question.correctIndex])),
+        }),
+      )
       act(() => {
         vi.advanceTimersByTime(1000)
       })
@@ -418,16 +453,17 @@ describe('MiniGameHub', () => {
 
     // The final answer reports straight to the hub, so the results screen
     // replaces the quiz view immediately (no intermediate quiz summary).
-    // A flawless run is 100%: full bonus, speed badge, quiz stat.
+    // A flawless run is 100%: the tile's advertised +75 XP potential in full
+    // (82 banked after the class bonus), plus the speed badge and quiz stat.
     expect(screen.getByText('Excellent!')).toBeInTheDocument()
     expect(screen.getByText('5 / 5')).toBeInTheDocument()
     expect(screen.getByText('100%')).toBeInTheDocument()
-    expect(screen.getByText('+50 XP')).toBeInTheDocument()
-    expect(screen.getByText('+25 🪙')).toBeInTheDocument()
+    expect(screen.getByText(`+${grantedXp(75)} XP`)).toBeInTheDocument()
+    expect(screen.getByText('+38 🪙')).toBeInTheDocument()
 
     const character = storedCharacter()
-    expect(character.xp).toBe(50)
-    expect(character.gold).toBe(25)
+    expect(character.xp).toBe(grantedXp(75))
+    expect(character.gold).toBe(38)
     expect(storedStat('quizCount')).toBe(1)
     expect(storedBadgeUnlock('speed_demon')).toBeTruthy()
 

@@ -6,6 +6,7 @@ import type { Milestone } from '../../data/milestones'
 import type { SideQuest } from '../../data/sidequests'
 import type { Collectible } from '../../data/collectibles'
 import type { Companion } from '../../data/companions'
+import type { RewardBonuses } from './bonusEngine'
 
 export type CharacterClass = 'Cloud Knight' | 'Script Warrior' | 'Data Mage' | 'DevOps Sage'
 
@@ -37,6 +38,7 @@ export interface Character {
   unlockedFrames: string[] // List of unlocked frame IDs
   // Equipment slots
   equippedItems: string[] // List of equipped equipment item IDs
+  ownedItems: string[] // List of purchased equipment item IDs (equipped is a subset)
 }
 
 interface TopicProgress {
@@ -96,6 +98,10 @@ export interface GameState {
   dailyRewardsClaimed: number[]
   lastDailyReset: string
   completedRealms: string[] // Track which realms have been completed
+  claimedStoryArcs: string[] // Story arc ids whose completion rewards were claimed
+  claimedCareerMilestones: string[] // "pathId:milestoneId" pairs already claimed
+  claimedCertifications: string[] // Certification ids already earned
+  claimedEvents: string[] // Seasonal event ids whose login bonus was claimed
   showRealmCompletion: string | null // Realm ID if showing realm completion modal
   hasSeenOnboarding: boolean // Track if user has completed onboarding
   // Notification system for recent unlocks
@@ -149,10 +155,22 @@ export interface GameState {
     weeklyXPCompleted: number
     lastWeekReset: string
   }
+  // Real per-day activity log (YYYY-MM-DD dates) for streak grids
+  dailyActivity: string[]
+  // Practice-duel record for the PvP arena (offline sparring rivals)
+  pvpStats: {
+    points: number
+    wins: number
+    losses: number
+    streak: number
+    bestStreak: number
+  }
 }
 
 export interface GameContextType {
   game: GameState
+  /** Aggregated class/skill/equipment bonuses; single source of truth for display + rewards. */
+  rewardBonuses: RewardBonuses
   completeQuest: (questId: string) => void
   setCurrentQuest: (questId: string | null) => void
   dismissVictory: () => void
@@ -187,6 +205,13 @@ export interface GameContextType {
   claimSideQuest: (questId: string) => { xp: number; gold: number }
   claimMilestone: (milestoneId: string) => { xpBonus: number }
   claimBadge: (badgeId: string) => { xp: number; gold: number }
+  claimStoryArcRewards: (arcId: string) => { xp: number; gold: number; badgeId?: string }
+  claimCareerMilestone: (
+    pathId: string,
+    milestoneId: string,
+  ) => { xp: number; gold: number }
+  claimCertification: (certId: string) => { xp: number; gold: number }
+  claimEventReward: (eventId: string) => { xp: number; gold: number }
   // Skill allocation
   allocateSkillPoint: (skillId: string) => boolean
   getSkillLevel: (skillId: string) => number
@@ -243,9 +268,14 @@ export interface GameContextType {
   equipItem: (itemId: string) => boolean
   unequipItem: (itemId: string) => boolean
   getEquippedItems: () => string[]
+  getOwnedItems: () => string[]
   getEquipmentBonuses: () => {
     xpBonus: number
     goldBonus: number
+    quizScoreBonus: number
+    streakProtection: number
     techBonuses: Record<string, number>
   }
+  // Practice-duel record (PvP arena)
+  recordPvpResult: (won: boolean, points: number) => void
 }

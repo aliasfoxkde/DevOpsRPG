@@ -1,240 +1,66 @@
 import { useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-interface KeyboardShortcut {
+export interface ShortcutSpec {
   key: string
-  action: () => void
   description: string
-  category?: 'navigation' | 'action' | 'accessibility'
+  category: 'navigation' | 'action' | 'accessibility'
 }
+
+/**
+ * The advertised catalogue, shared with the help modal so a shortcut can
+ * never be documented differently from how it behaves. Keys are matched
+ * case-sensitively: uppercase `G` scrolls to the bottom, lowercase `g`
+ * starts a two-key sequence, and `g L`/`g C`/`g S` are distinct from any
+ * lowercase neighbour.
+ */
+export const SHORTCUT_SPECS: ShortcutSpec[] = [
+  { key: 'j', description: 'Scroll down', category: 'navigation' },
+  { key: 'k', description: 'Scroll up', category: 'navigation' },
+  { key: 'G', description: 'Go to bottom', category: 'navigation' },
+  { key: 'g h', description: 'Go to Home', category: 'navigation' },
+  { key: 'g q', description: 'Go to Quests', category: 'navigation' },
+  { key: 'g c', description: 'Go to Character', category: 'navigation' },
+  { key: 'g r', description: 'Go to Rewards', category: 'navigation' },
+  { key: 'g b', description: 'Go to Badges', category: 'navigation' },
+  { key: 'g m', description: 'Go to Milestones', category: 'navigation' },
+  { key: 'g s', description: 'Go to Settings', category: 'navigation' },
+  { key: 'g w', description: 'Go to World Map', category: 'navigation' },
+  { key: 'g p', description: 'Go to Profile', category: 'navigation' },
+  { key: 'g a', description: 'Go to About', category: 'navigation' },
+  { key: 'g f', description: 'Go to FAQ', category: 'navigation' },
+  { key: 'g L', description: 'Go to Leaderboard', category: 'navigation' },
+  { key: 'g C', description: 'Go to Challenges', category: 'navigation' },
+  { key: 'g S', description: 'Go to Store', category: 'navigation' },
+  { key: 'g g', description: 'Go to Mini-Games', category: 'navigation' },
+  { key: '/', description: 'Focus search', category: 'action' },
+  { key: 'n', description: 'Activate primary action', category: 'action' },
+  { key: '?', description: 'Show keyboard shortcuts', category: 'accessibility' },
+]
 
 const SEQUENCE_TIMEOUT = 1000 // ms to wait for second key
 
+/** The routes the g-sequences bind to — all real paths in src/App.tsx. */
+const G_ROUTES: Record<string, string> = {
+  'g h': '/',
+  'g q': '/quests',
+  'g c': '/character',
+  'g r': '/rewards',
+  'g b': '/badges',
+  'g m': '/milestones',
+  'g s': '/settings',
+  'g w': '/worldmap',
+  'g p': '/profile',
+  'g a': '/about',
+  'g f': '/faq',
+  'g L': '/leaderboard',
+  'g C': '/challenges',
+  'g S': '/store',
+  'g g': '/games',
+}
+
 export function useKeyboardShortcuts(enabled = true) {
   const navigate = useNavigate()
-
-  const SHORTCUTS: KeyboardShortcut[] = [
-    // Vim-style navigation
-    /* istanbul ignore next */
-    {
-      key: 'j',
-      action: () => {
-        window.scrollBy({ top: 50, behavior: 'smooth' })
-      },
-      description: 'Scroll down',
-      category: 'navigation',
-    },
-    /* istanbul ignore next */
-    {
-      key: 'k',
-      action: () => {
-        window.scrollBy({ top: -50, behavior: 'smooth' })
-      },
-      description: 'Scroll up',
-      category: 'navigation',
-    },
-    /* istanbul ignore next */
-    {
-      key: 'gg',
-      action: () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-      },
-      description: 'Go to top',
-      category: 'navigation',
-    },
-    /* istanbul ignore next */
-    {
-      key: 'G',
-      action: () => {
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
-      },
-      description: 'Go to bottom',
-      category: 'navigation',
-    },
-
-    // Navigation shortcuts (g + key)
-    /* istanbul ignore next */
-    {
-      key: 'g h',
-      action: () => {
-        void navigate('/')
-      },
-      description: 'Go to Home',
-      category: 'navigation',
-    },
-    /* istanbul ignore next */
-    {
-      key: 'g l',
-      action: () => {
-        void navigate('/learn')
-      },
-      description: 'Go to Learn',
-      category: 'navigation',
-    },
-    /* istanbul ignore next */
-    {
-      key: 'g d',
-      action: () => {
-        void navigate('/dashboard')
-      },
-      description: 'Go to Dashboard',
-      category: 'navigation',
-    },
-    /* istanbul ignore next */
-    {
-      key: 'g q',
-      action: () => {
-        void navigate('/quests')
-      },
-      description: 'Go to Quests',
-      category: 'navigation',
-    },
-    /* istanbul ignore next */
-    {
-      key: 'g c',
-      action: () => {
-        void navigate('/character')
-      },
-      description: 'Go to Character',
-      category: 'navigation',
-    },
-    /* istanbul ignore next */
-    {
-      key: 'g r',
-      action: () => {
-        void navigate('/rewards')
-      },
-      description: 'Go to Rewards',
-      category: 'navigation',
-    },
-    /* istanbul ignore next */
-    {
-      key: 'g b',
-      action: () => {
-        void navigate('/badges')
-      },
-      description: 'Go to Badges',
-      category: 'navigation',
-    },
-    /* istanbul ignore next */
-    {
-      key: 'g m',
-      action: () => {
-        void navigate('/milestones')
-      },
-      description: 'Go to Milestones',
-      category: 'navigation',
-    },
-    /* istanbul ignore next */
-    {
-      key: 'g s',
-      action: () => {
-        void navigate('/settings')
-      },
-      description: 'Go to Settings',
-      category: 'navigation',
-    },
-    /* istanbul ignore next */
-    {
-      key: 'g w',
-      action: () => {
-        void navigate('/worldmap')
-      },
-      description: 'Go to World Map',
-      category: 'navigation',
-    },
-    /* istanbul ignore next */
-    {
-      key: 'g p',
-      action: () => {
-        void navigate('/profile')
-      },
-      description: 'Go to Profile',
-      category: 'navigation',
-    },
-    /* istanbul ignore next */
-    {
-      key: 'g a',
-      action: () => {
-        void navigate('/about')
-      },
-      description: 'Go to About',
-      category: 'navigation',
-    },
-    /* istanbul ignore next */
-    {
-      key: 'g f',
-      action: () => {
-        void navigate('/faq')
-      },
-      description: 'Go to FAQ',
-      category: 'navigation',
-    },
-    /* istanbul ignore next */
-    {
-      key: 'g L',
-      action: () => {
-        void navigate('/leaderboard')
-      },
-      description: 'Go to Leaderboard',
-      category: 'navigation',
-    },
-    /* istanbul ignore next */
-    {
-      key: 'g C',
-      action: () => {
-        void navigate('/challenges')
-      },
-      description: 'Go to Challenges',
-      category: 'navigation',
-    },
-    /* istanbul ignore next */
-    {
-      key: 'g S',
-      action: () => {
-        void navigate('/store')
-      },
-      description: 'Go to Store',
-      category: 'navigation',
-    },
-    /* istanbul ignore next */
-    {
-      key: 'g g',
-      action: () => {
-        void navigate('/games')
-      },
-      description: 'Go to Mini-Games',
-      category: 'navigation',
-    },
-
-    // Action shortcuts
-    /* istanbul ignore next */
-    {
-      key: '/',
-      action: () => {
-        const searchInput = document.querySelector<HTMLInputElement>(
-          'input[type="search"], input[placeholder*="Search"], input[placeholder*="search"]',
-        )
-        if (searchInput) searchInput.focus()
-      },
-      description: 'Focus search',
-      category: 'action',
-    },
-    /* istanbul ignore next */
-    {
-      key: '?',
-      description: 'Show keyboard shortcuts',
-      action: () => {},
-      category: 'accessibility',
-    },
-    /* istanbul ignore next */
-    {
-      key: 'm',
-      action: () => document.body.classList.toggle('hidden-scroll'),
-      description: 'Toggle sidebar',
-      category: 'action',
-    },
-  ]
 
   const pendingKeyRef = useRef<string | null>(null)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -248,7 +74,7 @@ export function useKeyboardShortcuts(enabled = true) {
     pendingKeyRef.current = null
   }, [])
 
-  // 'N' key - Click focused button OR primary button OR first button
+  // 'n' key - Click focused button OR primary button OR first action button
   const handleNKey = useCallback(() => {
     // Priority 1: Click already focused element if it's a button
     const activeElement = document.activeElement as HTMLButtonElement | null
@@ -308,25 +134,12 @@ export function useKeyboardShortcuts(enabled = true) {
     if (!enabled) return
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Ignore if user is on an input/textarea (except for specific keys)
+      // Ignore everything while the user is on an input/textarea, except the
+      // '?' help key — typing a letter must never trigger a shortcut.
       const target = event.target as HTMLElement
       const isTyping =
         target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable
 
-      // 'N' key works EVERYWHERE to click buttons (even in inputs if not disabled)
-      if (event.key.toLowerCase() === 'n') {
-        event.preventDefault()
-
-        // If in an input/textarea, blur it first then click button
-        if (isTyping && target.tagName !== 'TEXTAREA') {
-          target.blur()
-        }
-
-        handleNKey()
-        return
-      }
-
-      // Escape key - close modals or blur inputs
       if (event.key === 'Escape') {
         // If focused on input, blur it
         if (isTyping) {
@@ -345,14 +158,10 @@ export function useKeyboardShortcuts(enabled = true) {
         }
       }
 
-      // Ignore other shortcuts if typing (unless it's ? for help)
       if (isTyping && event.key !== '?') return
 
-      const key = event.key.toLowerCase()
-
       // '?' key - show keyboard shortcuts
-      if (key === '?') {
-        // Trigger the keyboard shortcuts help modal
+      if (event.key === '?') {
         const shortcutBtn = document.querySelector<HTMLButtonElement>(
           '[aria-label="Show keyboard shortcuts"]',
         )
@@ -360,34 +169,44 @@ export function useKeyboardShortcuts(enabled = true) {
         return
       }
 
-      // If we have a pending key, check for sequence
+      // Exact-key matching: shift+G scrolls, lowercase g opens a sequence.
       if (pendingKeyRef.current) {
-        const sequence = `${pendingKeyRef.current} ${key}`
+        const sequence = `${pendingKeyRef.current} ${event.key}`
         clearPendingKey()
 
-        const shortcut = SHORTCUTS.find((s: KeyboardShortcut) => s.key === sequence)
-        /* istanbul ignore if */
-        if (shortcut) {
+        const route = G_ROUTES[sequence]
+        if (route) {
           event.preventDefault()
-          shortcut.action()
+          void navigate(route)
           return
         }
-      }
-
-      // Start a new pending sequence if key could be part of a sequence
-      if (key === 'g') {
-        pendingKeyRef.current = key
+      } else if (event.key === 'g') {
+        pendingKeyRef.current = event.key
         timeoutRef.current = setTimeout(clearPendingKey, SEQUENCE_TIMEOUT)
-        /* istanbul ignore next */
         return
       }
 
-      // Check for single-key shortcuts
-      const shortcut = SHORTCUTS.find((s: KeyboardShortcut) => s.key === key)
-      /* istanbul ignore if */
-      if (shortcut) {
+      if (event.key === 'n') {
         event.preventDefault()
-        shortcut.action()
+        handleNKey()
+        return
+      }
+
+      const spec = SHORTCUT_SPECS.find((s) => s.key === event.key)
+      if (spec) {
+        event.preventDefault()
+        if (event.key === 'j') {
+          window.scrollBy({ top: 50, behavior: 'smooth' })
+        } else if (event.key === 'k') {
+          window.scrollBy({ top: -50, behavior: 'smooth' })
+        } else if (event.key === 'G') {
+          window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+        } else if (event.key === '/') {
+          const searchInput = document.querySelector<HTMLInputElement>(
+            'input[type="search"], input[placeholder*="Search"], input[placeholder*="search"]',
+          )
+          if (searchInput) searchInput.focus()
+        }
       }
     }
 
@@ -396,8 +215,7 @@ export function useKeyboardShortcuts(enabled = true) {
       window.removeEventListener('keydown', handleKeyDown)
       clearPendingKey()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, navigate, clearPendingKey, handleNKey])
 
-  return { shortcuts: SHORTCUTS }
+  return { shortcuts: SHORTCUT_SPECS }
 }

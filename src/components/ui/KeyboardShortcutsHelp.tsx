@@ -1,30 +1,20 @@
 import { useState, useEffect } from 'react'
+import { SHORTCUT_SPECS } from '../../hooks/useKeyboardShortcuts'
 
+/**
+ * The help modal renders the hook's own spec table, so the documented
+ * shortcuts can never drift from the ones actually bound. Escape is handled
+ * globally rather than through the table, so it is appended for display.
+ */
 const GAME_SHORTCUTS = [
-  // Navigation
-  { key: 'g h', description: 'Go to Home', category: 'Navigation' },
-  { key: 'g l', description: 'Go to Learn', category: 'Navigation' },
-  { key: 'g d', description: 'Go to Dashboard', category: 'Navigation' },
-  { key: 'g q', description: 'Go to Quests', category: 'Navigation' },
-  { key: 'g c', description: 'Go to Character', category: 'Navigation' },
-  { key: 'g r', description: 'Go to Rewards', category: 'Navigation' },
-  { key: 'g b', description: 'Go to Badges', category: 'Navigation' },
-  { key: 'g w', description: 'Go to World Map', category: 'Navigation' },
-  { key: 'g L', description: 'Go to Leaderboard', category: 'Navigation' },
-  { key: 'g C', description: 'Go to Challenges', category: 'Navigation' },
-  { key: 'g S', description: 'Go to Store', category: 'Navigation' },
-  { key: 'g g', description: 'Go to Mini-Games', category: 'Navigation' },
-  { key: 'g s', description: 'Go to Settings', category: 'Navigation' },
-  // Vim-style
-  { key: 'j', description: 'Scroll down', category: 'Navigation' },
-  { key: 'k', description: 'Scroll up', category: 'Navigation' },
-  { key: 'gg', description: 'Go to top', category: 'Navigation' },
-  { key: 'G', description: 'Go to bottom', category: 'Navigation' },
-  // Actions
-  { key: 'n', description: 'Click primary button', category: 'Actions' },
-  { key: '/', description: 'Focus search', category: 'Actions' },
+  ...SHORTCUT_SPECS.map((spec) => ({
+    key: spec.key,
+    description: spec.description,
+    // Capitalised for display: the spec's category names double as tab labels
+    category:
+      spec.category === 'navigation' ? 'Navigation' : spec.category === 'action' ? 'Actions' : 'Help',
+  })),
   { key: 'Esc', description: 'Close modal / Blur input', category: 'Actions' },
-  { key: '?', description: 'Show this help', category: 'Help' },
 ]
 
 export default function KeyboardShortcutsHelp() {

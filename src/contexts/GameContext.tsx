@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react'
 import { allQuests, getNextQuest, isRealmUnlocked, realms, type Realm } from '../data/quests'
 import { BADGES, shouldUnlockBadge, type Badge } from '../data/badges'
 import { checkMilestone, type Milestone } from '../data/milestones'
@@ -12,6 +12,15 @@ import {
   type DailyReward,
 } from '../data/collectibles'
 import { technologies } from '../data/technologies'
+import { STORY_ARCS } from '../data/storylines'
+import { CAREER_PATHS } from '../data/careerPaths'
+import { CERTIFICATIONS, checkCertificationRequirements } from '../data/certifications'
+import {
+  SEASONAL_EVENTS,
+  getActiveEventMultiplier,
+  isEventActive,
+  meetsEventRequirements,
+} from '../data/seasonalEvents'
 import { getEquipmentById, calculateEquipmentBonuses } from '../data/equipment'
 import { COLLECTIBLE_DROP_RATE, GOLD_XP_RATIO } from '../utils/gameUtils'
 
@@ -22,6 +31,7 @@ import { calculateLevel, calculateXpToNextLevel, getTitle } from './game/xp'
 import { isLegacyAchievementUnlocked } from './game/achievementsRules'
 import { computeFullyCompletedTechnologies } from './game/progression'
 import { countTechQuests, getUnlockedFrameIds, getUnlockedTitleIds } from './game/titlesFramesRules'
+import { computeRewardBonuses, techMultiplierFor, type RewardBonuses } from './game/bonusEngine'
 import type { Character, CharacterClass, GameContextType, GameState } from './game/types'
 
 // State types live in ./game/types; re-exported so existing imports of
@@ -40,6 +50,46 @@ function lookupRecordValue<T>(record: Record<string, T>, key: string): T | undef
 
 function lookupDailyReward(day: number): DailyReward | undefined {
   return DAILY_REWARDS[day - 1]
+}
+
+// Aggregate class/skill/equipment bonuses for a state snapshot. Pure so the
+// setGame updaters below can compute it from `prev` without staleness.
+function bonusesFor(state: GameState): RewardBonuses {
+  return computeRewardBonuses({
+    characterClass: state.character.class,
+    xpMultiplier: state.character.xpMultiplier,
+    goldMultiplier: state.character.goldMultiplier,
+    skillAllocations: state.character.skillAllocations,
+    equippedItemIds: state.character.equippedItems,
+  })
+}
+
+// Record today in the daily-activity log (drives the streak grid) if absent.
+function withActivityDay(state: GameState, day: string): string[] {
+  return state.dailyActivity.includes(day) ? state.dailyActivity : [...state.dailyActivity, day]
+}
+
+// True when every quest of every episode of the arc is completed.
+function arcIsComplete(
+  arc: (typeof STORY_ARCS)[number],
+  completedQuests: GameState['completedQuests'],
+): boolean {
+  const done = new Set(completedQuests.map((q) => q.questId))
+  return arc.episodes.every((episode) => episode.questIds.every((questId) => done.has(questId)))
+}
+
+// True when every technology a career milestone requires has all of its
+// quests completed.
+function careerMilestoneIsComplete(
+  milestone: { requiredTechnologies: string[] },
+  path: (typeof CAREER_PATHS)[number],
+  completedQuests: GameState['completedQuests'],
+): boolean {
+  const done = new Set(completedQuests.map((q) => q.questId))
+  return milestone.requiredTechnologies.every((techId) => {
+    const tech = path.technologies.find((entry) => entry.id === techId)
+    return tech !== undefined && tech.questIds.every((questId) => done.has(questId))
+  })
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined)
@@ -61,19 +111,27 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const today = new Date().toISOString().split('T')[0]
       const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
 
-      // Apply XP and gold multipliers from collectibles, companions, and prestige
+      // Apply XP and gold multipliers from class, skills, equipment,
+      // collectibles, companions, prestige, and any live seasonal event
+      const bonuses = bonusesFor(prev)
       const companionXpBonus = prev.activeCompanion ? prev.activeCompanion.xpBonus : 0
       const companionGoldBonus = prev.activeCompanion ? prev.activeCompanion.goldBonus : 0
       const prestigeMultiplier = prev.prestigeMultiplier
+      const eventMultiplier = getActiveEventMultiplier()
       const xpReward = Math.floor(
-        quest.xpReward * prev.character.xpMultiplier * (1 + companionXpBonus) * prestigeMultiplier,
+        quest.xpReward *
+          techMultiplierFor(bonuses, quest.technologyId) *
+          (1 + companionXpBonus) *
+          prestigeMultiplier *
+          eventMultiplier,
       )
       const goldReward = Math.floor(
         quest.xpReward *
           GOLD_XP_RATIO *
-          prev.character.goldMultiplier *
+          bonuses.goldMultiplier *
           (1 + companionGoldBonus) *
-          prestigeMultiplier,
+          prestigeMultiplier *
+          eventMultiplier,
       )
 
       // Calculate new XP and level
@@ -85,16 +143,20 @@ export function GameProvider({ children }: { children: ReactNode }) {
       let newStreak = prev.character.streakDays
       // A shield spent here is charged to the character below, so a broken day
       // costs exactly one shield instead of protecting the streak forever.
+      // Real shields are consumed first; passive protection from gear and the
+      // Persistence skill (bonuses.virtualStreakShields) is capacity and is
+      // not used up.
       let shieldSpent = false
       if (prev.character.lastActive === yesterday) {
         newStreak += 1
       } else if (prev.character.lastActive !== today) {
         // Streak was broken - use shield if available
-        if (prev.character.streakShields > 0 && newStreak > 0) {
-          // Shield protects the streak - don't reset
-          // Shield is consumed but streak is preserved
+        const hasProtection =
+          prev.character.streakShields > 0 || bonuses.virtualStreakShields > 0
+        if (hasProtection && newStreak > 0) {
+          // Protection saves the streak - don't reset
           newStreak = prev.character.streakDays // Keep current streak
-          shieldSpent = true
+          shieldSpent = prev.character.streakShields > 0
         } else {
           newStreak = 1
         }
@@ -306,6 +368,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
             completedAt: new Date().toISOString(),
           },
         ],
+        dailyActivity: withActivityDay(prev, today),
         // Award skill XP for this technology
         skillXp: {
           ...prev.skillXp,
@@ -450,18 +513,22 @@ export function GameProvider({ children }: { children: ReactNode }) {
         // Check if already completed
         if (prev.completedTopics.some((t) => t.topicId === topicId)) return prev
 
-        const newXp = prev.character.xp + xpEarned
+        const today = new Date().toISOString().split('T')[0]
+        const bonuses = bonusesFor(prev)
+        const xpReward = Math.floor(xpEarned * techMultiplierFor(bonuses, technologyId))
+        const newXp = prev.character.xp + xpReward
         const newLevel = calculateLevel(newXp)
 
         return {
           ...prev,
+          dailyActivity: withActivityDay(prev, today),
           completedTopics: [
             ...prev.completedTopics,
             {
               topicId,
               technologyId,
               completed: true,
-              xpEarned,
+              xpEarned: xpReward,
               completedAt: new Date().toISOString(),
             },
           ],
@@ -990,14 +1057,18 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setGame((prev) => {
       const quest = prev.sideQuests.find((q) => q.id === questId)
       if (!quest || quest.completed) return prev
-      rewards = quest.rewards
+      const bonuses = bonusesFor(prev)
+      rewards = {
+        xp: Math.floor(quest.rewards.xp * bonuses.xpMultiplier),
+        gold: Math.floor(quest.rewards.gold * bonuses.goldMultiplier),
+      }
       return {
         ...prev,
         sideQuests: prev.sideQuests.map((q) => (q.id === questId ? { ...q, completed: true } : q)),
         character: {
           ...prev.character,
-          xp: prev.character.xp + quest.rewards.xp,
-          gold: prev.character.gold + quest.rewards.gold,
+          xp: prev.character.xp + rewards.xp,
+          gold: prev.character.gold + rewards.gold,
         },
       }
     })
@@ -1009,12 +1080,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setGame((prev) => {
       const milestone = prev.milestones.find((m) => m.id === milestoneId)
       if (!milestone || !milestone.unlocked) return prev
-      xpBonus = milestone.xpBonus
+      xpBonus = Math.floor(milestone.xpBonus * bonusesFor(prev).xpMultiplier)
       return {
         ...prev,
         character: {
           ...prev.character,
-          xp: prev.character.xp + milestone.xpBonus,
+          xp: prev.character.xp + xpBonus,
         },
       }
     })
@@ -1026,18 +1097,265 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setGame((prev) => {
       const badge = prev.badges.find((b) => b.id === badgeId)
       if (!badge || !badge.unlockedAt) return prev
-      rewards = { xp: badge.xpReward, gold: badge.goldReward }
+      const bonuses = bonusesFor(prev)
+      rewards = {
+        xp: Math.floor(badge.xpReward * bonuses.xpMultiplier),
+        gold: Math.floor(badge.goldReward * bonuses.goldMultiplier),
+      }
+      const newXp = prev.character.xp + rewards.xp
+      const newLevel = calculateLevel(newXp)
       return {
         ...prev,
         character: {
           ...prev.character,
-          xp: prev.character.xp + badge.xpReward,
-          gold: prev.character.gold + badge.goldReward,
+          xp: newXp,
+          level: newLevel,
+          xpToNextLevel: calculateXpToNextLevel(newLevel),
+          gold: prev.character.gold + rewards.gold,
         },
       }
     })
     return rewards
   }, [])
+
+  // Grant a story arc's advertised completion rewards (XP, gold, badge). A
+  // no-op unless every quest in the arc is completed and the arc hasn't been
+  // claimed before — the "Complete Arc Rewards" promise on the Storylines
+  // page is backed by this.
+  const claimStoryArcRewards = useCallback(
+    (arcId: string): { xp: number; gold: number; badgeId?: string } => {
+      // The UI reports the payout immediately, but React defers setGame
+      // updaters, so compute the value from a pre-validated snapshot of the
+      // current state; the updater re-validates against `prev` for truth.
+      const snapshotArc = STORY_ARCS.find((a) => a.id === arcId)
+      if (
+        !snapshotArc ||
+        game.claimedStoryArcs.includes(arcId) ||
+        !arcIsComplete(snapshotArc, game.completedQuests)
+      ) {
+        return { xp: 0, gold: 0 }
+      }
+      const snapshotBonuses = bonusesFor(game)
+      const returnValue = {
+        xp: Math.floor(snapshotArc.rewards.xpBonus * snapshotBonuses.xpMultiplier),
+        gold: Math.floor(snapshotArc.rewards.goldBonus * snapshotBonuses.goldMultiplier),
+        badgeId: snapshotArc.rewards.badgeId,
+      }
+
+      setGame((prev) => {
+        const arc = STORY_ARCS.find((a) => a.id === arcId)
+        if (!arc || prev.claimedStoryArcs.includes(arcId)) return prev
+        const completedQuestIds = new Set(prev.completedQuests.map((q) => q.questId))
+        const allEpisodesDone = arc.episodes.every((episode) =>
+          episode.questIds.every((questId) => completedQuestIds.has(questId)),
+        )
+        if (!allEpisodesDone) return prev
+
+        const bonuses = bonusesFor(prev)
+        const rewards = {
+          xp: Math.floor(arc.rewards.xpBonus * bonuses.xpMultiplier),
+          gold: Math.floor(arc.rewards.goldBonus * bonuses.goldMultiplier),
+        }
+
+        let badges = prev.badges
+        let recentBadgeUnlocks = prev.recentBadgeUnlocks
+        const badge = arc.rewards.badgeId
+          ? BADGES.find((b) => b.id === arc.rewards.badgeId)
+          : undefined
+        const existing = badge ? prev.badges.find((b) => b.id === badge.id) : undefined
+        if (badge && !existing?.unlockedAt) {
+          const newlyUnlocked = { ...badge, unlockedAt: new Date().toISOString() }
+          badges = existing
+            ? prev.badges.map((b) => (b.id === badge.id ? newlyUnlocked : b))
+            : [...prev.badges, newlyUnlocked]
+          recentBadgeUnlocks = [...recentBadgeUnlocks, newlyUnlocked]
+        }
+
+        const newXp = prev.character.xp + rewards.xp
+        const newLevel = calculateLevel(newXp)
+        return {
+          ...prev,
+          claimedStoryArcs: [...prev.claimedStoryArcs, arcId],
+          character: {
+            ...prev.character,
+            xp: newXp,
+            level: newLevel,
+            xpToNextLevel: calculateXpToNextLevel(newLevel),
+            gold: prev.character.gold + rewards.gold,
+          },
+          badges,
+          recentBadgeUnlocks,
+        }
+      })
+      return returnValue
+    },
+    [game],
+  )
+
+  // Grant a career-path milestone's advertised rewards once every required
+  // technology is fully completed, mirroring the promise shown on the Career
+  // Paths page. Claims are recorded as "pathId:milestoneId".
+  const claimCareerMilestone = useCallback(
+    (pathId: string, milestoneId: string): { xp: number; gold: number } => {
+      const claimKey = `${pathId}:${milestoneId}`
+      const snapshotPath = CAREER_PATHS.find((p) => p.id === pathId)
+      const snapshotMilestone = snapshotPath?.milestones.find((m) => m.id === milestoneId)
+      const zero = { xp: 0, gold: 0 }
+      if (!snapshotPath || !snapshotMilestone || game.claimedCareerMilestones.includes(claimKey)) {
+        return zero
+      }
+      if (!careerMilestoneIsComplete(snapshotMilestone, snapshotPath, game.completedQuests)) {
+        return zero
+      }
+      const snapshotBonuses = bonusesFor(game)
+      const returnValue = {
+        xp: Math.floor(snapshotMilestone.rewards.xpBonus * snapshotBonuses.xpMultiplier),
+        gold: Math.floor(snapshotMilestone.rewards.goldBonus * snapshotBonuses.goldMultiplier),
+      }
+
+      setGame((prev) => {
+        if (prev.claimedCareerMilestones.includes(claimKey)) return prev
+        const path = CAREER_PATHS.find((p) => p.id === pathId)
+        const milestone = path?.milestones.find((m) => m.id === milestoneId)
+        if (!path || !milestone) return prev
+
+        const doneQuestIds = new Set(prev.completedQuests.map((q) => q.questId))
+        const questIdsByTech = new Map(
+          path.technologies.map((tech) => [tech.id, new Set(tech.questIds)]),
+        )
+        const allRequired = milestone.requiredTechnologies.every((techId) => {
+          const techQuests = questIdsByTech.get(techId)
+          return techQuests !== undefined && [...techQuests].every((id) => doneQuestIds.has(id))
+        })
+        if (!allRequired) return prev
+
+        const bonuses = bonusesFor(prev)
+        const rewards = {
+          xp: Math.floor(milestone.rewards.xpBonus * bonuses.xpMultiplier),
+          gold: Math.floor(milestone.rewards.goldBonus * bonuses.goldMultiplier),
+        }
+
+        const newXp = prev.character.xp + rewards.xp
+        const newLevel = calculateLevel(newXp)
+        return {
+          ...prev,
+          claimedCareerMilestones: [...prev.claimedCareerMilestones, claimKey],
+          character: {
+            ...prev.character,
+            xp: newXp,
+            level: newLevel,
+            xpToNextLevel: calculateXpToNextLevel(newLevel),
+            gold: prev.character.gold + rewards.gold,
+          },
+        }
+      })
+      return returnValue
+    },
+    [game],
+  )
+
+  // Earn a certification: validates the shared requirements check (level,
+  // total quests, per-technology quests), pays out the advertised XP/gold, and
+  // records the certification as earned.
+  const claimCertification = useCallback(
+    (certId: string): { xp: number; gold: number } => {
+      const zero = { xp: 0, gold: 0 }
+      if (game.claimedCertifications.includes(certId)) return zero
+      const cert = CERTIFICATIONS.find((c) => c.id === certId)
+      if (!cert) return zero
+      const completedQuestIds = game.completedQuests.map((q) => q.questId)
+      if (!checkCertificationRequirements(cert, game.character.level, completedQuestIds).met) {
+        return zero
+      }
+      const snapshotBonuses = bonusesFor(game)
+      const returnValue = {
+        xp: Math.floor(cert.xpReward * snapshotBonuses.xpMultiplier),
+        gold: Math.floor(cert.goldReward * snapshotBonuses.goldMultiplier),
+      }
+
+      setGame((prev) => {
+        if (prev.claimedCertifications.includes(certId)) return prev
+        const prevCert = CERTIFICATIONS.find((c) => c.id === certId)
+        if (!prevCert) return prev
+        const prevQuestIds = prev.completedQuests.map((q) => q.questId)
+        if (!checkCertificationRequirements(prevCert, prev.character.level, prevQuestIds).met) {
+          return prev
+        }
+
+        const bonuses = bonusesFor(prev)
+        const rewards = {
+          xp: Math.floor(prevCert.xpReward * bonuses.xpMultiplier),
+          gold: Math.floor(prevCert.goldReward * bonuses.goldMultiplier),
+        }
+        const newXp = prev.character.xp + rewards.xp
+        const newLevel = calculateLevel(newXp)
+        return {
+          ...prev,
+          claimedCertifications: [...prev.claimedCertifications, certId],
+          character: {
+            ...prev.character,
+            xp: newXp,
+            level: newLevel,
+            xpToNextLevel: calculateXpToNextLevel(newLevel),
+            gold: prev.character.gold + rewards.gold,
+          },
+        }
+      })
+      return returnValue
+    },
+    [game],
+  )
+
+  // Claim a live seasonal event's one-time login bonus: the event must be
+  // running now, its level/quest gates cleared (shared check), and it must not
+  // have been claimed before.
+  const claimEventReward = useCallback(
+    (eventId: string): { xp: number; gold: number } => {
+      const zero = { xp: 0, gold: 0 }
+      if (game.claimedEvents.includes(eventId)) return zero
+      const event = SEASONAL_EVENTS.find((e) => e.id === eventId)
+      if (!event || !event.rewards || !isEventActive(eventId)) return zero
+      if (!meetsEventRequirements(event, game.character.level, game.completedQuests.length)) {
+        return zero
+      }
+      const snapshotBonuses = bonusesFor(game)
+      const returnValue = {
+        xp: Math.floor((event.rewards.bonusXP ?? 0) * snapshotBonuses.xpMultiplier),
+        gold: Math.floor((event.rewards.bonusGold ?? 0) * snapshotBonuses.goldMultiplier),
+      }
+      if (returnValue.xp === 0 && returnValue.gold === 0) return zero
+
+      setGame((prev) => {
+        if (prev.claimedEvents.includes(eventId)) return prev
+        const prevEvent = SEASONAL_EVENTS.find((e) => e.id === eventId)
+        if (!prevEvent?.rewards || !isEventActive(eventId)) return prev
+        if (!meetsEventRequirements(prevEvent, prev.character.level, prev.completedQuests.length)) {
+          return prev
+        }
+
+        const bonuses = bonusesFor(prev)
+        const rewards = {
+          xp: Math.floor((prevEvent.rewards.bonusXP ?? 0) * bonuses.xpMultiplier),
+          gold: Math.floor((prevEvent.rewards.bonusGold ?? 0) * bonuses.goldMultiplier),
+        }
+        const newXp = prev.character.xp + rewards.xp
+        const newLevel = calculateLevel(newXp)
+        return {
+          ...prev,
+          claimedEvents: [...prev.claimedEvents, eventId],
+          character: {
+            ...prev.character,
+            xp: newXp,
+            level: newLevel,
+            xpToNextLevel: calculateXpToNextLevel(newLevel),
+            gold: prev.character.gold + rewards.gold,
+          },
+        }
+      })
+      return returnValue
+    },
+    [game],
+  )
 
   // Skill allocation methods
   const allocateSkillPoint = useCallback((skillId: string): boolean => {
@@ -1116,7 +1434,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
   // Add XP to character (used by mini-games)
   const addXP = useCallback((amount: number) => {
     setGame((prev) => {
-      const newXp = prev.character.xp + amount
+      const applied = Math.floor(amount * bonusesFor(prev).xpMultiplier)
+      const newXp = prev.character.xp + applied
       const newLevel = calculateLevel(newXp)
       return {
         ...prev,
@@ -1130,15 +1449,20 @@ export function GameProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
-  // Add gold to character
+  // Add gold to character. Negative amounts are purchases: the gold bonus
+  // multiplies earnings only, never the price of things.
   const addGold = useCallback((amount: number) => {
-    setGame((prev) => ({
-      ...prev,
-      character: {
-        ...prev.character,
-        gold: prev.character.gold + amount,
-      },
-    }))
+    setGame((prev) => {
+      const applied =
+        amount >= 0 ? Math.floor(amount * bonusesFor(prev).goldMultiplier) : amount
+      return {
+        ...prev,
+        character: {
+          ...prev.character,
+          gold: prev.character.gold + applied,
+        },
+      }
+    })
   }, [])
 
   // Grant a badge directly
@@ -1295,9 +1619,28 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return true
       }
 
+      // Equipment purchase: record ownership and auto-equip, matching the
+      // companion flow. Unequipping later keeps the item owned.
+      const equipment = getEquipmentById(itemId)
+      if (equipment) {
+        if (game.character.ownedItems.includes(itemId)) return false
+        setGame((prev) => ({
+          ...prev,
+          character: {
+            ...prev.character,
+            gold: prev.character.gold - price,
+            ownedItems: [...prev.character.ownedItems, itemId],
+            equippedItems: prev.character.equippedItems.includes(itemId)
+              ? prev.character.equippedItems
+              : [...prev.character.equippedItems, itemId],
+          },
+        }))
+        return true
+      }
+
       return false
     },
-    [game.character.gold, game.companions],
+    [game.character.gold, game.companions, game.character.ownedItems],
   )
 
   // Equip a companion
@@ -1373,11 +1716,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
     [game.character.unlockedFrames],
   )
 
-  // Equipment management
+  // Equipment management. Ownership lives in ownedItems; equippedItems is a
+  // subset, so unequipping keeps the purchase and items can be re-equipped.
   const equipItem = useCallback((itemId: string): boolean => {
+    if (!getEquipmentById(itemId)) return false
+    let success = false
     setGame((prev) => {
       const equipped = prev.character.equippedItems
+      if (!prev.character.ownedItems.includes(itemId)) return prev // Not owned
       if (equipped.includes(itemId)) return prev // Already equipped
+      success = true
       return {
         ...prev,
         character: {
@@ -1386,7 +1734,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         },
       }
     })
-    return true
+    return success
   }, [])
 
   const unequipItem = useCallback((itemId: string): boolean => {
@@ -1408,6 +1756,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
     return game.character.equippedItems
   }, [game.character.equippedItems])
 
+  const getOwnedItems = useCallback((): string[] => {
+    return game.character.ownedItems
+  }, [game.character.ownedItems])
+
   const getEquipmentBonuses = useCallback(() => {
     const equipped = game.character.equippedItems
       .map((id: string) => getEquipmentById(id))
@@ -1415,10 +1767,34 @@ export function GameProvider({ children }: { children: ReactNode }) {
     return calculateEquipmentBonuses(equipped)
   }, [game.character.equippedItems])
 
+  // Record a practice-duel result for the PvP arena. Wins earn more points
+  // than losses so the rank ladder still rewards winning.
+  const recordPvpResult = useCallback((won: boolean, points: number) => {
+    setGame((prev) => {
+      const streak = won ? prev.pvpStats.streak + 1 : 0
+      return {
+        ...prev,
+        pvpStats: {
+          points: prev.pvpStats.points + points,
+          wins: prev.pvpStats.wins + (won ? 1 : 0),
+          losses: prev.pvpStats.losses + (won ? 0 : 1),
+          streak,
+          bestStreak: Math.max(prev.pvpStats.bestStreak, streak),
+        },
+      }
+    })
+  }, [])
+
+  // Aggregated class/skill/equipment bonuses for display surfaces; reward
+  // paths recompute from `prev` inside their updaters. Recomputing per state
+  // change is cheap (a handful of equipped items and skill entries).
+  const rewardBonuses = useMemo(() => bonusesFor(game), [game])
+
   return (
     <GameContext.Provider
       value={{
         game,
+        rewardBonuses,
         completeQuest,
         setCurrentQuest,
         dismissVictory,
@@ -1446,6 +1822,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
         claimSideQuest,
         claimMilestone,
         claimBadge,
+        claimStoryArcRewards,
+        claimCareerMilestone,
+        claimCertification,
+        claimEventReward,
         // Skill allocation
         allocateSkillPoint,
         getSkillLevel,
@@ -1492,6 +1872,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
         unequipItem,
         getEquippedItems,
         getEquipmentBonuses,
+        getOwnedItems,
+        recordPvpResult,
       }}
     >
       {children}

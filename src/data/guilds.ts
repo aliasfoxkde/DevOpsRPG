@@ -117,7 +117,9 @@ export const MOCK_GUILD: Guild = {
   level: 15,
   xp: 8500,
   xpToNextLevel: 10000,
-  memberCount: 8,
+  // Matches MOCK_GUILD_MEMBERS.length — the guild page renders
+  // "{memberCount}/{maxMembers} members" next to that roster.
+  memberCount: 6,
   maxMembers: 20,
   leaderId: 'member_1',
   leaderName: 'CloudMaster',

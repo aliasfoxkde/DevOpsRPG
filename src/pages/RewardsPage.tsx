@@ -4,6 +4,17 @@ import { DAILY_REWARDS } from '../data/collectibles'
 import { COLLECTIBLES_POOL, openMysteryBox, type Collectible } from '../data/collectibles'
 import { REWARD_TIERS } from '../data/milestones'
 
+// This week's Monday..Sunday day keys in the same UTC format the activity log
+// records, plus which column is today.
+function currentWeekDays(now: number): { days: string[]; todayIndex: number } {
+  const DAY_MS = 24 * 60 * 60 * 1000
+  const todayIndex = (new Date(now).getUTCDay() + 6) % 7 // Monday = 0
+  const days = Array.from({ length: 7 }, (_, index) =>
+    new Date(now - (todayIndex - index) * DAY_MS).toISOString().split('T')[0],
+  )
+  return { days, todayIndex }
+}
+
 export default function RewardsPage() {
   const {
     game,
@@ -16,7 +27,13 @@ export default function RewardsPage() {
     addXP,
     addGold,
     grantBadge,
+    rewardBonuses,
   } = useGame()
+  // What a payout announcement must show: the amount the grant functions
+  // actually bank after the class/skill/equipment multipliers, not the base
+  // table value.
+  const grantedXp = (amount: number): number => Math.floor(amount * rewardBonuses.xpMultiplier)
+  const grantedGold = (amount: number): number => Math.floor(amount * rewardBonuses.goldMultiplier)
   const [wheelSpinning, setWheelSpinning] = useState(false)
   const [wheelResult, setWheelResult] = useState<{ label: string; icon: string } | null>(null)
   const [mysteryBoxToOpen, setMysteryBoxToOpen] = useState<Collectible | null>(null)
@@ -27,6 +44,7 @@ export default function RewardsPage() {
   } | null>(null)
   const [showMystery, setShowMystery] = useState(false)
   const [claimedTiers, setClaimedTiers] = useState<string[]>([])
+  const week = currentWeekDays(Date.now()) // eslint-disable-line react-hooks/purity
 
   const activeCollectibles = getActiveCollectibles()
 
@@ -239,15 +257,13 @@ export default function RewardsPage() {
           </div>
         </div>
 
-        {/* Weekly view */}
+        {/* Weekly view — drawn from the real activity log, not the streak count */}
         <div className="mb-4">
           <div className="text-sm text-slate-400 mb-2">This Week</div>
           <div className="grid grid-cols-7 gap-2">
-            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => {
-              // Simulate activity for demo - in real app would track daily activity
-              const dayIndex = (new Date().getDay() + 6) % 7 // Convert Sunday=0 to Monday=0
-              const isActive = index < dayIndex || index === dayIndex
-              const isToday = index === dayIndex
+            {(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const).map((day, index) => {
+              const isToday = index === week.todayIndex
+              const isActive = game.dailyActivity.includes(week.days[index])
 
               return (
                 <div
@@ -259,12 +275,10 @@ export default function RewardsPage() {
                   <div className="text-xs text-slate-300 mb-1">{day}</div>
                   <div
                     className={`w-8 h-8 mx-auto rounded-full flex items-center justify-center ${
-                      isActive && game.character.streakDays > 0
-                        ? 'bg-green-600 text-white'
-                        : 'bg-slate-700 text-slate-300'
+                      isActive ? 'bg-green-600 text-white' : 'bg-slate-700 text-slate-300'
                     }`}
                   >
-                    {isActive && game.character.streakDays > 0 ? '✓' : '○'}
+                    {isActive ? '✓' : '○'}
                   </div>
                 </div>
               )
@@ -514,8 +528,8 @@ export default function RewardsPage() {
 
                     {/* Rewards preview */}
                     <div className="flex gap-3 text-xs mb-2">
-                      <span className="text-purple-400">+{tier.rewards.xp} XP</span>
-                      <span className="text-orange-400">+{tier.rewards.gold} Gold</span>
+                      <span className="text-purple-400">+{grantedXp(tier.rewards.xp)} XP</span>
+                      <span className="text-orange-400">+{grantedGold(tier.rewards.gold)} Gold</span>
                       {tier.rewards.badge && <span className="text-blue-400">+ Badge</span>}
                     </div>
 
@@ -550,8 +564,8 @@ export default function RewardsPage() {
             <div className="text-6xl mb-4">🎁</div>
             <h3 className="text-2xl font-bold mb-2">Mystery Box Opened!</h3>
             <div className="text-4xl mb-4">
-              {mysteryResult.type === 'xp' && `✨ +${mysteryResult.value} XP`}
-              {mysteryResult.type === 'gold' && `🪙 +${mysteryResult.value} Gold`}
+              {mysteryResult.type === 'xp' && mysteryResult.value !== undefined && `✨ +${grantedXp(mysteryResult.value)} XP`}
+              {mysteryResult.type === 'gold' && mysteryResult.value !== undefined && `🪙 +${grantedGold(mysteryResult.value)} Gold`}
               {mysteryResult.type === 'collectible' && mysteryResult.collectible && (
                 <span>
                   {mysteryResult.collectible.icon} {mysteryResult.collectible.name}

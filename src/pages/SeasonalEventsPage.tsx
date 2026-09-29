@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useGame } from '../contexts/GameContext'
 import {
   SEASONAL_EVENTS,
@@ -6,6 +6,8 @@ import {
   getNextEvent,
   getCurrentSeason,
   getSeasonalColors,
+  isEventActive,
+  meetsEventRequirements,
   type SeasonalEvent,
 } from '../data/seasonalEvents'
 
@@ -13,18 +15,23 @@ function EventCard({
   event,
   isActive,
   isUpcoming,
-  isCompleted,
+  isEnded,
+  claimed,
+  onClaim,
 }: {
   event: SeasonalEvent
   isActive: boolean
   isUpcoming: boolean
-  isCompleted: boolean
+  isEnded: boolean
+  claimed: boolean
+  onClaim: (event: SeasonalEvent) => void
 }) {
   const { game } = useGame()
-  const meetsRequirements = event.requirements
-    ? game.character.level >= (event.requirements.minLevel || 0) &&
-      game.completedQuests.length >= (event.requirements.minQuests || 0)
-    : true
+  const meetsRequirements = meetsEventRequirements(
+    event,
+    game.character.level,
+    game.completedQuests.length,
+  )
 
   // Memoize date calculations to avoid recalculation on every render
   const { startDate, endDate, daysUntilStart } = useMemo(() => {
@@ -67,9 +74,9 @@ function EventCard({
               🔥 LIVE NOW
             </div>
           )}
-          {isCompleted && (
-            <div className="px-3 py-1 bg-green-600/80 rounded-full text-white text-sm font-bold">
-              ✓ Completed
+          {isEnded && (
+            <div className="px-3 py-1 bg-slate-600/80 rounded-full text-white text-sm font-bold">
+              Ended
             </div>
           )}
         </div>
@@ -112,39 +119,48 @@ function EventCard({
         {/* Rewards */}
         {event.rewards && (
           <div className="bg-slate-800/50 rounded-lg p-3 mb-4">
-            <div className="text-sm font-medium text-slate-300 mb-2">Exclusive Rewards:</div>
+            <div className="text-sm font-medium text-slate-300 mb-2">Event Rewards:</div>
             <div className="flex flex-wrap gap-2">
-              {event.rewards.badgeId && (
-                <span className="px-2 py-1 bg-purple-600/30 text-purple-300 text-xs rounded">
-                  🏅 Special Badge
-                </span>
-              )}
-              {event.rewards.title && (
-                <span className="px-2 py-1 bg-blue-600/30 text-blue-300 text-xs rounded">
-                  📜 {event.rewards.title}
-                </span>
-              )}
-              {event.rewards.frame && (
-                <span className="px-2 py-1 bg-amber-600/30 text-amber-300 text-xs rounded">
-                  🖼️ Special Frame
-                </span>
-              )}
-              {event.rewards.bonusXP && (
+              {event.rewards.bonusXP ? (
                 <span className="px-2 py-1 bg-green-600/30 text-green-300 text-xs rounded">
                   +{event.rewards.bonusXP} XP
                 </span>
-              )}
-              {event.rewards.bonusGold && (
+              ) : null}
+              {event.rewards.bonusGold ? (
                 <span className="px-2 py-1 bg-yellow-600/30 text-yellow-300 text-xs rounded">
                   +{event.rewards.bonusGold} Gold
                 </span>
-              )}
+              ) : null}
             </div>
           </div>
         )}
 
+        {/* Claim the one-time event bonus while the event is live */}
+        {isActive && event.rewards && (
+          <div className="mb-4">
+            {claimed ? (
+              <div className="text-center text-sm text-green-400 font-medium">
+                ✓ Event reward claimed
+              </div>
+            ) : meetsRequirements ? (
+              <button
+                onClick={() => {
+                  onClaim(event)
+                }}
+                className="w-full py-2 bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 text-white text-sm font-bold rounded transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400"
+              >
+                🎁 Claim Event Reward
+              </button>
+            ) : (
+              <div className="text-center text-sm text-slate-500">
+                Reach the requirements to claim the event reward
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Status */}
-        {!isActive && !isCompleted && isUpcoming && meetsRequirements && (
+        {!isActive && !isEnded && isUpcoming && meetsRequirements && (
           <div className="text-center">
             <div className="text-sm text-slate-400 mb-2">Event starts in {daysUntilStart} days</div>
           </div>
@@ -159,6 +175,22 @@ function EventCard({
 }
 
 export default function SeasonalEventsPage() {
+  const { game, claimEventReward } = useGame()
+  const [claimFeedback, setClaimFeedback] = useState<{ ok: boolean; text: string } | null>(null)
+
+  const handleClaim = (event: SeasonalEvent) => {
+    const rewards = claimEventReward(event.id)
+    if (rewards.xp === 0 && rewards.gold === 0) {
+      setClaimFeedback({ ok: false, text: `${event.name}: reward unavailable right now.` })
+      return
+    }
+    const parts = [
+      rewards.xp > 0 ? `+${rewards.xp} XP` : null,
+      rewards.gold > 0 ? `+${rewards.gold} gold` : null,
+    ].filter(Boolean)
+    setClaimFeedback({ ok: true, text: `${event.name} reward claimed: ${parts.join(', ')}!` })
+  }
+
   const activeEvents = useMemo(() => getActiveEvents(), [])
   const nextEvent = useMemo(() => getNextEvent(), [])
   const currentSeason = useMemo(() => getCurrentSeason(), [])
@@ -173,10 +205,10 @@ export default function SeasonalEventsPage() {
     })
   }, [])
 
-  // Completed events (past events)
-  const completedEvents = useMemo(() => {
+  // Ended events (their window has passed)
+  const endedEvents = useMemo(() => {
     const now = new Date()
-    return sortedEvents.filter((e) => new Date(e.endDate) < now)
+    return sortedEvents.filter((e) => !isEventActive(e.id, now) && new Date(e.startDate) <= now)
   }, [sortedEvents])
 
   // Upcoming events (future events)
@@ -235,6 +267,28 @@ export default function SeasonalEventsPage() {
         </div>
       </div>
 
+      {/* Claim feedback */}
+      {claimFeedback && (
+        <div
+          role="status"
+          className={`mb-6 p-3 rounded-lg border text-sm ${
+            claimFeedback.ok
+              ? 'bg-green-900/30 border-green-700/50 text-green-300'
+              : 'bg-red-900/30 border-red-700/50 text-red-300'
+          }`}
+        >
+          {claimFeedback.text}
+          <button
+            onClick={() => {
+              setClaimFeedback(null)
+            }}
+            className="ml-3 underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-current"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Active Events */}
       {activeEvents.length > 0 && (
         <div className="mb-12">
@@ -246,7 +300,9 @@ export default function SeasonalEventsPage() {
                 event={event}
                 isActive={true}
                 isUpcoming={false}
-                isCompleted={false}
+                isEnded={false}
+                claimed={game.claimedEvents.includes(event.id)}
+                onClaim={handleClaim}
               />
             ))}
           </div>
@@ -264,7 +320,9 @@ export default function SeasonalEventsPage() {
                 event={event}
                 isActive={false}
                 isUpcoming={true}
-                isCompleted={false}
+                isEnded={false}
+                claimed={game.claimedEvents.includes(event.id)}
+                onClaim={handleClaim}
               />
             ))}
           </div>
@@ -272,17 +330,19 @@ export default function SeasonalEventsPage() {
       )}
 
       {/* Past Events */}
-      {completedEvents.length > 0 && (
+      {endedEvents.length > 0 && (
         <div>
-          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">✅ Past Events</h2>
+          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">🏁 Past Events</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {completedEvents.slice(0, 6).map((event) => (
+            {endedEvents.slice(0, 6).map((event) => (
               <EventCard
                 key={event.id}
                 event={event}
                 isActive={false}
                 isUpcoming={false}
-                isCompleted={true}
+                isEnded={true}
+                claimed={game.claimedEvents.includes(event.id)}
+                onClaim={handleClaim}
               />
             ))}
           </div>

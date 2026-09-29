@@ -4,6 +4,59 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+Honesty-pass cycle: removed the remaining fabricated marketing surfaces, closed the
+advertised-vs-paid reward gaps, and pinned data invariants with new tripwire tests.
+
+### Added
+
+- `src/components/minigames/gameCatalog.ts`: single source of truth for the 7 mini-games
+  (names, icons, descriptions, advertised XP/gold potential, theming) consumed by the hub
+  menu, payouts, game library and home page
+- `SHORTCUT_SPECS` exported from `useKeyboardShortcuts` and rendered by the keyboard-help
+  modal, so documented shortcuts cannot drift from bound ones
+- Data-invariant tripwires in `src/data/integrity.test.ts` (34 → 59 tests): equipment bonus
+  payability, storyline quest references and unlock ordering, certification requirement/
+  display consistency, seasonal event date/multiplier/reward sanity, PvP rank band continuity
+  and question answerability, guild roster/leader/challenge consistency, and career-path
+  milestone reachability
+- `src/contexts/game/bonusEngine.test.ts` covering class bonuses, skill/equipment stacking,
+  quiz-score bonuses and streak shields
+- `src/components/layout/Layout.test.tsx` covering the skip link, boundary containment and
+  boundary reset on navigation
+
+### Changed
+
+- HomePage, GameLibraryPage and MiniGameHub now derive every displayed number from real game
+  data: realm previews use the real realm ladder with save state, the games grid lists the 7
+  playable games, stats show real catalog counts, and mini-game tiles pay the XP/gold
+  potential they advertise
+- Equipment `server_rack` and `linux_penguin_plush` tech bonuses remapped from the
+  non-existent `linux` technology to `networking`/`bash` so the store bonuses actually pay
+- `MOCK_GUILD.memberCount` corrected to match its rendered roster (6)
+
+### Removed
+
+- `MarketplacePage` (fake user-to-user trading backed by mock listings) with its route and
+  navigation entries
+- GuildPage's unreachable join flow (membership is fixed to the demo guild; the confirm
+  dialog only closed itself)
+- Dead keyboard bindings (`gg` scroll-top, `g l`/`g d` to removed routes, the `m` sidebar
+  toggle with no CSS behind it)
+
+### Fixed
+
+- **Specialist class bonus double-applied**: the bonus engine multiplied specialist tech XP
+  by `(1 + classTechFactor)` where `classTechFactor` already holds `1 + bonus`, making a
+  +20% class bonus pay +120% (Cloud Knight AWS etc.)
+- **Keyboard `n` intercepted while typing**: the global "activate primary action" shortcut
+  fired before the typing guard, eating every "n" typed into search fields
+- **Uppercase `G` never scrolled**: keys were lower-cased before matching, so `G`
+  scroll-to-bottom opened a g-sequence instead
+- **Route error boundary stuck**: `Layout`'s ErrorBoundary is keyed by pathname so leaving a
+  crashed route remounts a clean boundary
+
 ## [0.1.3] - 2026-09-24
 
 Quality-infrastructure cycle: GitForge-first CI, a production worker CORS fix found by the

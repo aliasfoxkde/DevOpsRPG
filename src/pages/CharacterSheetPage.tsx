@@ -4,7 +4,8 @@ import { XPBar } from '../components/ui/XPBar'
 import { EQUIPMENT_ITEMS, RARITY_COLORS, type EquipmentItem } from '../data/equipment'
 
 export default function CharacterSheetPage() {
-  const { game, completedCount, totalQuests, getEquipmentBonuses, unequipItem } = useGame()
+  const { game, completedCount, totalQuests, getEquipmentBonuses, unequipItem, equipItem } =
+    useGame()
   const { character, companions, activeCompanion } = game
   const { achievements } = game
 
@@ -32,6 +33,12 @@ export default function CharacterSheetPage() {
     },
     {},
   )
+
+  // Owned but not currently equipped — these can be re-equipped at will.
+  const stashedItems = character.ownedItems
+    .filter((id) => !character.equippedItems.includes(id))
+    .map((id) => EQUIPMENT_ITEMS.find((item) => item.id === id))
+    .filter((item): item is EquipmentItem => item !== undefined)
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
@@ -135,6 +142,8 @@ export default function CharacterSheetPage() {
           {/* Active Bonuses */}
           {(equipmentBonuses.xpBonus > 0 ||
             equipmentBonuses.goldBonus > 0 ||
+            equipmentBonuses.quizScoreBonus > 0 ||
+            equipmentBonuses.streakProtection > 0 ||
             Object.keys(equipmentBonuses.techBonuses).length > 0) && (
             <div className="mb-4 p-3 bg-green-900/30 border border-green-700/50 rounded-lg">
               <h4 className="text-sm font-semibold text-green-400 mb-2">Active Bonuses</h4>
@@ -147,6 +156,17 @@ export default function CharacterSheetPage() {
                 {equipmentBonuses.goldBonus > 0 && (
                   <span className="px-2 py-1 bg-yellow-900/50 rounded text-sm text-yellow-300">
                     +{Math.round(equipmentBonuses.goldBonus * 100)}% Gold
+                  </span>
+                )}
+                {equipmentBonuses.quizScoreBonus > 0 && (
+                  <span className="px-2 py-1 bg-purple-900/50 rounded text-sm text-purple-300">
+                    +{Math.round(equipmentBonuses.quizScoreBonus * 100)}% Quiz XP
+                  </span>
+                )}
+                {equipmentBonuses.streakProtection > 0 && (
+                  <span className="px-2 py-1 bg-orange-900/50 rounded text-sm text-orange-300">
+                    +{Math.round(equipmentBonuses.streakProtection)} Streak{" "}
+                    {equipmentBonuses.streakProtection === 1 ? 'Save' : 'Saves'}
                   </span>
                 )}
                 {Object.entries(equipmentBonuses.techBonuses).map(([techId, bonus]) => (
@@ -225,6 +245,38 @@ export default function CharacterSheetPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Owned but unequipped items — re-equip without repurchasing */}
+          {stashedItems.length > 0 && (
+            <div className="mt-6 pt-4 border-t border-slate-700/50">
+              <h4 className="text-sm text-slate-400 mb-2">In Your Bag (not equipped)</h4>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {stashedItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="p-3 rounded-lg border flex items-center justify-between gap-2"
+                    style={{
+                      borderColor: RARITY_COLORS[item.rarity],
+                      backgroundColor: `${RARITY_COLORS[item.rarity]}15`,
+                    }}
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-2xl">{item.icon}</span>
+                      <span className="text-sm font-semibold text-slate-100 truncate">
+                        {item.name}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => equipItem(item.id)}
+                      className="shrink-0 px-2 py-1 text-xs font-semibold rounded bg-amber-600 hover:bg-amber-500 text-white transition-colors"
+                    >
+                      Equip
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

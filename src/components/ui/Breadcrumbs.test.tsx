@@ -73,6 +73,14 @@ describe('Breadcrumbs', () => {
     expect(screen.getByText('Home').closest('span')).toHaveAttribute('aria-current', 'page')
   })
 
+  it('labels the feedback route, which the navbar does not reach', () => {
+    renderAt('/feedback')
+    const items = screen.getAllByRole('listitem')
+    expect(items).toHaveLength(2)
+    expect(items[1]).toHaveTextContent('Feedback')
+    expect(screen.getByText('Feedback').closest('span')).toHaveAttribute('aria-current', 'page')
+  })
+
   it('renders the separator as hidden decoration between crumbs', () => {
     renderAt('/worldmap')
     const separator = screen.getByText('/')

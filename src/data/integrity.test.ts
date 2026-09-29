@@ -14,6 +14,22 @@ import { SKILL_TREES } from './skills'
 import { CAREER_PATHS } from './careerPaths'
 import { COLLECTIBLES_POOL, DAILY_REWARDS } from './collectibles'
 import { codePuzzles } from './minigames'
+import { EQUIPMENT_ITEMS } from './equipment'
+import { STORY_ARCS, DIFFICULTY_CONFIG as STORY_DIFFICULTY_CONFIG } from './storylines'
+import {
+  CERTIFICATIONS,
+  DIFFICULTY_COLORS as CERT_DIFFICULTY_COLORS,
+  DIFFICULTY_LABELS as CERT_DIFFICULTY_LABELS,
+} from './certifications'
+import { SEASONAL_EVENTS } from './seasonalEvents'
+import { PVP_RANKS, PVP_QUESTIONS, getRankByPoints, getRankProgress } from './pvpArena'
+import {
+  MOCK_GUILD,
+  MOCK_GUILD_MEMBERS,
+  MOCK_GUILD_CHALLENGES,
+  FEATURED_GUILDS,
+  getGuildRankInfo,
+} from './guilds'
 
 const techList = Object.values(technologies)
 const allTopics = techList.flatMap((t) => t.topics)
@@ -370,5 +386,328 @@ describe('skill trees and career paths', () => {
 
   it('has unique career path ids', () => {
     expect(duplicates(CAREER_PATHS.map((p) => p.id))).toEqual([])
+  })
+
+  it('builds each path from real technologies and their generated quests', () => {
+    const questIds = new Set(allQuests.map((q) => q.id))
+    for (const path of CAREER_PATHS) {
+      expect(path.estimatedMonths, path.id).toBeGreaterThan(0)
+      expect(['high', 'medium', 'growing'], path.id).toContain(path.demandLevel)
+      expect(path.technologies.length, path.id).toBeGreaterThan(0)
+      expect(duplicates(path.technologies.map((t) => t.id)), `${path.id} tech ids`).toEqual([])
+      for (const tech of path.technologies) {
+        expect(technologies[tech.id], `${path.id} tech ${tech.id}`).toBeDefined()
+        // tech() throws at import when a technology has no quests; this keeps
+        // the guarantee visible and checks the ids against the live catalog.
+        expect(tech.questIds.length, `${path.id}/${tech.id}`).toBeGreaterThan(0)
+        for (const questId of tech.questIds) {
+          expect(questIds.has(questId), `${path.id}/${tech.id} quest ${questId}`).toBe(true)
+        }
+      }
+    }
+  })
+
+  it('only gates milestones on technologies the path itself tracks', () => {
+    // careerMilestoneIsComplete looks the requirement up in the path's own
+    // technologies; a milestone naming any other tech could never be claimed,
+    // even while the page's global progress view showed it complete.
+    for (const path of CAREER_PATHS) {
+      const pathTechIds = new Set(path.technologies.map((t) => t.id))
+      expect(duplicates(path.milestones.map((m) => m.id)), `${path.id} milestone ids`).toEqual([])
+      for (const milestone of path.milestones) {
+        expect(milestone.requiredTechnologies.length, milestone.id).toBeGreaterThan(0)
+        for (const techId of milestone.requiredTechnologies) {
+          expect(
+            pathTechIds.has(techId),
+            `${path.id}/${milestone.id} requires off-path tech ${techId}`,
+          ).toBe(true)
+        }
+        expect(milestone.rewards.xpBonus, milestone.id).toBeGreaterThan(0)
+        expect(milestone.rewards.goldBonus, milestone.id).toBeGreaterThanOrEqual(0)
+      }
+    }
+  })
+})
+
+describe('equipment', () => {
+  it('has unique ids with positive prices', () => {
+    expect(duplicates(EQUIPMENT_ITEMS.map((e) => e.id))).toEqual([])
+    for (const item of EQUIPMENT_ITEMS) {
+      expect(item.price, item.id).toBeGreaterThan(0)
+      expect(item.name.trim().length, item.id).toBeGreaterThan(0)
+    }
+  })
+
+  it('advertises bonuses the game can actually pay', () => {
+    // A techBonus on a non-catalog id renders in the store ("+8% XP from …")
+    // but never applies — the bonus engine drops unknown technology ids.
+    for (const item of EQUIPMENT_ITEMS) {
+      if (item.techBonus) {
+        expect(
+          technologies[item.techBonus.technologyId],
+          `${item.id} techBonus ${item.techBonus.technologyId}`,
+        ).toBeDefined()
+        expect(item.techBonus.bonus, item.id).toBeGreaterThan(0)
+      }
+      for (const [key, value] of Object.entries(item.bonuses)) {
+        expect(value, `${item.id} bonus ${key}`).toBeGreaterThan(0)
+      }
+    }
+  })
+})
+
+describe('storylines', () => {
+  it('has unique arc and episode ids', () => {
+    expect(duplicates(STORY_ARCS.map((a) => a.id))).toEqual([])
+    expect(duplicates(STORY_ARCS.flatMap((a) => a.episodes.map((e) => e.id)))).toEqual([])
+  })
+
+  it('sends every episode to quests that exist', () => {
+    const questIds = new Set(allQuests.map((q) => q.id))
+    for (const arc of STORY_ARCS) {
+      expect(arc.episodes.length, `${arc.id} has episodes`).toBeGreaterThan(0)
+      for (const episode of arc.episodes) {
+        expect(episode.questIds.length, `${arc.id}/${episode.id}`).toBeGreaterThan(0)
+        for (const questId of episode.questIds) {
+          expect(questIds.has(questId), `${arc.id}/${episode.id} quest ${questId}`).toBe(true)
+        }
+      }
+    }
+  })
+
+  it('unlocks episodes in ascending episode order', () => {
+    for (const arc of STORY_ARCS) {
+      const unlocksAt = arc.episodes.map((e) => e.unlocksAt)
+      expect(unlocksAt, arc.id).toEqual([...unlocksAt].sort((a, b) => a - b))
+      for (const episode of arc.episodes) {
+        expect(episode.unlocksAt, `${arc.id}/${episode.id}`).toBeGreaterThanOrEqual(1)
+      }
+    }
+  })
+
+  it('references prerequisites that exist (never the arc itself)', () => {
+    const arcIds = new Set(STORY_ARCS.map((a) => a.id))
+    for (const arc of STORY_ARCS) {
+      for (const episode of arc.episodes) {
+        if (episode.prerequisite) {
+          expect(arcIds.has(episode.prerequisite), `${arc.id}/${episode.id} prerequisite`).toBe(
+            true,
+          )
+          expect(episode.prerequisite, `${arc.id}/${episode.id}`).not.toBe(arc.id)
+        }
+      }
+    }
+  })
+
+  it('uses a displayable difficulty and pays only real rewards', () => {
+    for (const arc of STORY_ARCS) {
+      expect(Object.keys(STORY_DIFFICULTY_CONFIG), arc.id).toContain(arc.difficulty)
+      expect(arc.estimatedTime.trim().length, arc.id).toBeGreaterThan(0)
+      expect(arc.rewards.xpBonus, arc.id).toBeGreaterThanOrEqual(0)
+      expect(arc.rewards.goldBonus, arc.id).toBeGreaterThanOrEqual(0)
+      if (arc.rewards.badgeId) {
+        expect(
+          BADGES.some((b) => b.id === arc.rewards.badgeId),
+          `${arc.id} badge ${arc.rewards.badgeId}`,
+        ).toBe(true)
+      }
+    }
+  })
+})
+
+describe('certifications', () => {
+  it('has unique ids with positive requirements and rewards', () => {
+    expect(duplicates(CERTIFICATIONS.map((c) => c.id))).toEqual([])
+    for (const cert of CERTIFICATIONS) {
+      expect(cert.level, cert.id).toBeGreaterThanOrEqual(1)
+      expect(cert.requiredQuests, cert.id).toBeGreaterThan(0)
+      expect(cert.requiredTechnologies.length, cert.id).toBeGreaterThan(0)
+      expect(cert.xpReward, cert.id).toBeGreaterThan(0)
+      expect(cert.goldReward, cert.id).toBeGreaterThan(0)
+      expect(cert.fullName.trim().length, cert.id).toBeGreaterThan(0)
+    }
+  })
+
+  it('requires technologies that exist', () => {
+    for (const cert of CERTIFICATIONS) {
+      expect(duplicates(cert.requiredTechnologies), `${cert.id} required techs`).toEqual([])
+      for (const techId of cert.requiredTechnologies) {
+        expect(technologies[techId], `${cert.id} requires ${techId}`).toBeDefined()
+      }
+    }
+  })
+
+  it('has color and label entries for every difficulty tier, all in use', () => {
+    const tiers = new Set<string>(CERTIFICATIONS.map((c) => c.difficulty))
+    for (const cert of CERTIFICATIONS) {
+      expect(CERT_DIFFICULTY_COLORS[cert.difficulty], cert.id).toMatch(/^#[0-9a-fA-F]{6}$/)
+      expect(CERT_DIFFICULTY_LABELS[cert.difficulty], cert.id).toBeTruthy()
+    }
+    // A tier with no certification would be dead display data.
+    for (const tier of Object.keys(CERT_DIFFICULTY_COLORS)) {
+      expect(tiers.has(tier), `certification tier ${tier} is unused`).toBe(true)
+    }
+  })
+})
+
+describe('seasonal events', () => {
+  it('has unique ids that start before they end', () => {
+    expect(duplicates(SEASONAL_EVENTS.map((e) => e.id))).toEqual([])
+    for (const event of SEASONAL_EVENTS) {
+      expect(new Date(event.startDate).getTime(), `${event.id} start`).not.toBeNaN()
+      expect(new Date(event.endDate).getTime(), `${event.id} end`).not.toBeNaN()
+      expect(new Date(event.endDate).getTime(), event.id).toBeGreaterThan(
+        new Date(event.startDate).getTime(),
+      )
+    }
+  })
+
+  it('multiplies rewards by at least 1 within a known event type', () => {
+    for (const event of SEASONAL_EVENTS) {
+      expect(event.bonusMultiplier, event.id).toBeGreaterThanOrEqual(1)
+      expect(['holiday', 'challenge', 'limited', 'special'], event.id).toContain(event.type)
+      expect(event.description.trim().length, event.id).toBeGreaterThan(0)
+    }
+  })
+
+  it('grants only currency the game can pay out', () => {
+    for (const event of SEASONAL_EVENTS) {
+      if (event.rewards) {
+        for (const key of Object.keys(event.rewards)) {
+          expect(['bonusXP', 'bonusGold'], `${event.id} reward ${key}`).toContain(key)
+        }
+        if (event.rewards.bonusXP !== undefined) {
+          expect(event.rewards.bonusXP, event.id).toBeGreaterThan(0)
+        }
+        if (event.rewards.bonusGold !== undefined) {
+          expect(event.rewards.bonusGold, event.id).toBeGreaterThan(0)
+        }
+      }
+      if (event.requirements?.minLevel !== undefined) {
+        expect(event.requirements.minLevel, event.id).toBeGreaterThanOrEqual(1)
+      }
+      if (event.requirements?.minQuests !== undefined) {
+        expect(event.requirements.minQuests, event.id).toBeGreaterThanOrEqual(0)
+      }
+    }
+  })
+
+  it('lists event quests that exist', () => {
+    const questIds = new Set(allQuests.map((q) => q.id))
+    for (const event of SEASONAL_EVENTS) {
+      for (const questId of event.quests ?? []) {
+        expect(questIds.has(questId), `${event.id} quest ${questId}`).toBe(true)
+      }
+    }
+  })
+})
+
+describe('pvp arena', () => {
+  it('covers points from 0 upward with contiguous, ascending rank bands', () => {
+    const byMinPoints = [...PVP_RANKS].sort((a, b) => a.minPoints - b.minPoints)
+    expect(PVP_RANKS.map((r) => r.id)).toEqual(byMinPoints.map((r) => r.id))
+    expect(PVP_RANKS[0].minPoints).toBe(0)
+    for (let i = 0; i < PVP_RANKS.length; i++) {
+      const rank = PVP_RANKS[i]
+      expect(rank.maxPoints, rank.id).toBeGreaterThanOrEqual(rank.minPoints)
+      if (i > 0) {
+        // No gap and no overlap: the previous band ends exactly where this
+        // one begins, so no point total falls between ranks.
+        expect(rank.minPoints, rank.id).toBe(PVP_RANKS[i - 1].maxPoints + 1)
+      }
+    }
+  })
+
+  it('resolves rank boundaries and progress consistently', () => {
+    for (const rank of PVP_RANKS) {
+      expect(getRankByPoints(rank.minPoints).id, `${rank.id} min`).toBe(rank.id)
+      expect(getRankByPoints(rank.maxPoints).id, `${rank.id} max`).toBe(rank.id)
+      const { current, next, progress } = getRankProgress(rank.minPoints)
+      expect(current.id).toBe(rank.id)
+      if (next) {
+        expect(PVP_RANKS.map((r) => r.id)).toContain(next.id)
+        expect(progress).toBe(0)
+      } else {
+        // The top rank has no next rung, so progress reads as complete.
+        expect(rank.id).toBe(PVP_RANKS[PVP_RANKS.length - 1].id)
+        expect(progress).toBe(100)
+      }
+    }
+    expect(getRankProgress(PVP_RANKS[PVP_RANKS.length - 1].maxPoints).progress).toBe(100)
+  })
+
+  it('keeps rank multipliers at or above 1', () => {
+    for (const rank of PVP_RANKS) {
+      if (rank.rewards?.bonusXP !== undefined) {
+        expect(rank.rewards.bonusXP, rank.id).toBeGreaterThanOrEqual(1)
+      }
+      if (rank.rewards?.bonusGold !== undefined) {
+        expect(rank.rewards.bonusGold, rank.id).toBeGreaterThanOrEqual(1)
+      }
+    }
+  })
+
+  it('has answerable questions — every topic can field a full match', () => {
+    // generatePVPMatch takes 2 questions from each of 3 random topics, so a
+    // topic with fewer than 2 questions silently short-changes the match.
+    for (const [topic, questions] of Object.entries(PVP_QUESTIONS)) {
+      expect(questions.length, `pvp topic ${topic}`).toBeGreaterThanOrEqual(2)
+      for (const question of questions) {
+        expect(question.options.length, question.question).toBeGreaterThan(1)
+        expect(duplicates(question.options), question.question).toEqual([])
+        expect(question.correctIndex, question.question).toBeGreaterThanOrEqual(0)
+        expect(question.correctIndex, question.question).toBeLessThan(question.options.length)
+        expect(question.topic.trim().length, `pvp topic ${topic}`).toBeGreaterThan(0)
+      }
+    }
+  })
+})
+
+describe('guilds', () => {
+  const guilds = [MOCK_GUILD, ...FEATURED_GUILDS]
+  const memberIds = new Set(MOCK_GUILD_MEMBERS.map((m) => m.id))
+
+  it('has unique guild and member ids', () => {
+    expect(duplicates(guilds.map((g) => g.id))).toEqual([])
+    expect(duplicates(MOCK_GUILD_MEMBERS.map((m) => m.id))).toEqual([])
+  })
+
+  it('matches the roster to what the guild page advertises', () => {
+    // The page renders "{memberCount}/{maxMembers} members" beside this exact
+    // roster, so the count must agree with the members actually listed.
+    expect(MOCK_GUILD.memberCount).toBe(MOCK_GUILD_MEMBERS.length)
+    const leader = MOCK_GUILD_MEMBERS.find((m) => m.id === MOCK_GUILD.leaderId)
+    expect(leader, 'guild leader sits in the roster').toBeDefined()
+    expect(leader?.role).toBe('leader')
+    expect(leader?.name).toBe(MOCK_GUILD.leaderName)
+  })
+
+  it('resolves every member role to a real guild rank', () => {
+    for (const member of MOCK_GUILD_MEMBERS) {
+      expect(getGuildRankInfo(member.role).id, member.id).toBe(member.role)
+      expect(member.level, member.id).toBeGreaterThanOrEqual(1)
+      expect(member.weeklyXP, member.id).toBeGreaterThanOrEqual(0)
+      expect(member.totalXP, member.id).toBeGreaterThanOrEqual(member.weeklyXP)
+    }
+  })
+
+  it('points active challenges and participants at real records', () => {
+    const challengeIds = new Set(MOCK_GUILD_CHALLENGES.map((c) => c.id))
+    for (const guild of guilds) {
+      expect(guild.memberCount, guild.id).toBeLessThanOrEqual(guild.maxMembers)
+      expect(guild.xp, guild.id).toBeLessThan(guild.xpToNextLevel)
+      for (const challengeId of guild.activeChallenges) {
+        expect(challengeIds.has(challengeId), `${guild.id} challenge ${challengeId}`).toBe(true)
+      }
+    }
+    for (const challenge of MOCK_GUILD_CHALLENGES) {
+      expect(challenge.target, challenge.id).toBeGreaterThan(0)
+      expect(challenge.progress, challenge.id).toBeGreaterThanOrEqual(0)
+      expect(challenge.rewardXP, challenge.id).toBeGreaterThanOrEqual(0)
+      expect(challenge.rewardGold, challenge.id).toBeGreaterThanOrEqual(0)
+      for (const participant of challenge.participants) {
+        expect(memberIds.has(participant), `${challenge.id} participant ${participant}`).toBe(true)
+      }
+    }
   })
 })

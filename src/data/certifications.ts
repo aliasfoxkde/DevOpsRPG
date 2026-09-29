@@ -2,8 +2,15 @@
 // "Certification Collection: AWS Practitioner, AWS Associate, Terraform Associate, CKA, Security+"
 // "These become endgame milestones."
 
+import { allQuests } from './quests'
+
 type CertificationProvider =
-  'aws' | 'terraform' | 'kubernetes' | 'security' | 'docker' | 'google' | 'microsoft' | 'linux'
+  | 'aws'
+  | 'terraform'
+  | 'kubernetes'
+  | 'security'
+  | 'docker'
+  | 'linux'
 
 export interface Certification {
   id: string
@@ -19,7 +26,6 @@ export interface Certification {
   // Rewards
   xpReward: number
   goldReward: number
-  badgeId?: string
   // Display
   difficulty: 'foundation' | 'associate' | 'professional' | 'expert'
   flavorText: string
@@ -39,7 +45,6 @@ export const CERTIFICATIONS: Certification[] = [
     level: 5,
     xpReward: 500,
     goldReward: 250,
-    badgeId: 'aws_practitioner',
     difficulty: 'foundation',
     flavorText: '"Your first step into the AWS cloud."',
   },
@@ -55,7 +60,6 @@ export const CERTIFICATIONS: Certification[] = [
     level: 10,
     xpReward: 1000,
     goldReward: 500,
-    badgeId: 'aws_solutions_architect',
     difficulty: 'associate',
     flavorText: '"Architecting resilient solutions on AWS."',
   },
@@ -71,7 +75,6 @@ export const CERTIFICATIONS: Certification[] = [
     level: 12,
     xpReward: 1000,
     goldReward: 500,
-    badgeId: 'aws_developer',
     difficulty: 'associate',
     flavorText: '"Code, build, and deploy on AWS."',
   },
@@ -83,11 +86,10 @@ export const CERTIFICATIONS: Certification[] = [
     icon: '⚙️',
     description: 'Deploy, manage, and operate on AWS.',
     requiredQuests: 15,
-    requiredTechnologies: ['aws', 'monitoring'],
+    requiredTechnologies: ['aws', 'observability'],
     level: 12,
     xpReward: 1000,
     goldReward: 500,
-    badgeId: 'aws_sysops',
     difficulty: 'associate',
     flavorText: '"Keep the cloud running smoothly."',
   },
@@ -105,7 +107,6 @@ export const CERTIFICATIONS: Certification[] = [
     level: 8,
     xpReward: 750,
     goldReward: 400,
-    badgeId: 'terraform_associate',
     difficulty: 'associate',
     flavorText: '"IaC is the future of infrastructure."',
   },
@@ -123,7 +124,6 @@ export const CERTIFICATIONS: Certification[] = [
     level: 15,
     xpReward: 1500,
     goldReward: 750,
-    badgeId: 'cka_certified',
     difficulty: 'professional',
     flavorText: '"Master of Kubernetes clusters."',
   },
@@ -139,7 +139,6 @@ export const CERTIFICATIONS: Certification[] = [
     level: 18,
     xpReward: 2000,
     goldReward: 1000,
-    badgeId: 'cks_certified',
     difficulty: 'expert',
     flavorText: '"Security in the container world."',
   },
@@ -157,7 +156,6 @@ export const CERTIFICATIONS: Certification[] = [
     level: 8,
     xpReward: 750,
     goldReward: 400,
-    badgeId: 'docker_certified',
     difficulty: 'associate',
     flavorText: '"Container expertise certified."',
   },
@@ -175,7 +173,6 @@ export const CERTIFICATIONS: Certification[] = [
     level: 10,
     xpReward: 800,
     goldReward: 400,
-    badgeId: 'security_plus',
     difficulty: 'associate',
     flavorText: '"Security fundamentals certified."',
   },
@@ -189,31 +186,29 @@ export const CERTIFICATIONS: Certification[] = [
     icon: '🐧',
     description: 'Linux system administration mastery.',
     requiredQuests: 10,
-    requiredTechnologies: ['linux', 'bash'],
+    requiredTechnologies: ['bash', 'networking'],
     level: 10,
     xpReward: 800,
     goldReward: 400,
-    badgeId: 'linux_foundation',
     difficulty: 'associate',
     flavorText: '"Master the command line."',
   },
 
-  // Google Cloud
+  // Multi-Cloud
   {
-    id: 'gcp_architect',
-    name: 'Cloud Architect',
-    fullName: 'Google Cloud Professional Cloud Architect',
-    provider: 'google',
+    id: 'multi_cloud_architect',
+    name: 'Multi-Cloud Architect',
+    fullName: 'Multi-Cloud Architecture Professional',
+    provider: 'aws',
     icon: '☁️',
-    description: 'Design and manage Google Cloud solutions.',
+    description: 'Design and operate workloads across cloud providers.',
     requiredQuests: 15,
-    requiredTechnologies: ['networking'],
+    requiredTechnologies: ['aws', 'networking', 'terraform'],
     level: 15,
     xpReward: 1500,
     goldReward: 750,
-    badgeId: 'gcp_architect',
     difficulty: 'professional',
-    flavorText: '"Google Cloud architecture expertise."',
+    flavorText: '"Architecture expertise that spans clouds."',
   },
 
   // DevOps
@@ -229,7 +224,6 @@ export const CERTIFICATIONS: Certification[] = [
     level: 15,
     xpReward: 1500,
     goldReward: 750,
-    badgeId: 'devops_master',
     difficulty: 'professional',
     flavorText: '"Bridging development and operations."',
   },
@@ -249,4 +243,39 @@ export const DIFFICULTY_LABELS: Record<Certification['difficulty'], string> = {
   associate: 'Associate',
   professional: 'Professional',
   expert: 'Expert',
+}
+
+// Quests the player must complete within each of the certification's
+// technologies for that technology requirement to count as met.
+export const MIN_TECH_QUESTS = 3
+
+export interface CertificationRequirements {
+  met: boolean
+  levelMet: boolean
+  questMet: boolean
+  techsMet: boolean
+  techProgress: Record<string, { completed: number; total: number }>
+}
+
+// Shared earnability check so the Certifications page and the claim action in
+// GameContext can never disagree about what "requirements met" means.
+export function checkCertificationRequirements(
+  cert: Certification,
+  level: number,
+  completedQuestIds: readonly string[],
+): CertificationRequirements {
+  const done = new Set(completedQuestIds)
+  const levelMet = level >= cert.level
+  const questMet = done.size >= cert.requiredQuests
+  const techProgress: Record<string, { completed: number; total: number }> = {}
+  let techsMet = true
+  for (const techId of cert.requiredTechnologies) {
+    const techQuestIds = allQuests
+      .filter((q) => q.technologyId === techId)
+      .map((q) => q.id)
+    const completed = techQuestIds.filter((id) => done.has(id)).length
+    techProgress[techId] = { completed, total: techQuestIds.length }
+    if (completed < MIN_TECH_QUESTS) techsMet = false
+  }
+  return { met: levelMet && questMet && techsMet, levelMet, questMet, techsMet, techProgress }
 }

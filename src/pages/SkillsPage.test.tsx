@@ -1,14 +1,25 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { screen, within, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import SkillsPage from './SkillsPage'
 import { SKILL_TREES } from '@/data/skills'
 import { allQuests } from '@/data/quests'
+import { CLASS_BONUSES } from '@/contexts/game/bonusEngine'
 import { closestContainer, renderPage, renderSeededPage, seedDefaultGame } from './test-utils'
 import { renderGame } from '@/contexts/test-utils'
 import { MemoryRouter } from 'react-router-dom'
 import { STORAGE_KEYS } from '@/utils/gameUtils'
 import type { GameState } from '@/contexts/GameContext'
+
+// Quest payouts include the live seasonal event multiplier; pin it to 1x so
+// reward math stays deterministic no matter when the suite runs.
+vi.mock(
+  '@/data/seasonalEvents',
+  async (importOriginal: () => Promise<typeof import('@/data/seasonalEvents')>) => ({
+    ...(await importOriginal()),
+    getActiveEventMultiplier: () => 1,
+  }),
+)
 
 /** Seeds the default save with `overrides` applied on top of it. */
 function seedWith(overrides: (base: GameState) => Partial<GameState>): void {
@@ -88,8 +99,9 @@ describe('SkillsPage', () => {
     renderPage(<SkillsPage />)
 
     expect(screen.getByText('Spend your point to unlock a new ability!')).toBeInTheDocument()
-    // Nothing allocated yet, so the bonuses panel is hidden
-    expect(screen.queryByText('Active Skill Bonuses')).not.toBeInTheDocument()
+    // Nothing allocated yet, so the panel only shows the class's passive bonus
+    expect(screen.getByText('Active Bonuses')).toBeInTheDocument()
+    expect(screen.queryByText('+2% XP on Containerization quests')).not.toBeInTheDocument()
 
     const upgradeButton = screen
       .getAllByRole('button', { name: '+1' })
@@ -97,9 +109,8 @@ describe('SkillsPage', () => {
     expect(upgradeButton).toBeDefined()
     await user.click(upgradeButton as HTMLButtonElement)
 
-    // The allocation is reflected in the Active Skill Bonuses panel
+    // The allocation is reflected in the Active Bonuses panel
     // (tech skills grant +2% XP per level) and the point pool is drained
-    expect(screen.getByText('Active Skill Bonuses')).toBeInTheDocument()
     expect(screen.getByText('+2% XP on Containerization quests')).toBeInTheDocument()
     expect(screen.getByText('Complete more quests to earn skill points!')).toBeInTheDocument()
   })
@@ -178,15 +189,18 @@ describe('SkillsPage', () => {
       getGame().completeQuest(quest.id)
     })
 
-    // The mastery grid lists the technology with its XP and level
+    // The mastery grid lists the technology with its XP and level; the banked
+    // XP is what the quest granted (the default DevOps Sage class adds +10%)
     expect(screen.queryByText('Complete quests to earn technology XP!')).not.toBeInTheDocument()
+    const classBonus = CLASS_BONUSES[getGame().game.character.class].bonus
+    const grantedXp = Math.floor(quest.xpReward * (1 + classBonus))
     const masteryTile = closestContainer(screen.getByText('Html'), 'div.rounded-lg')
     expect(within(masteryTile).getByText('Lv 0')).toBeInTheDocument()
-    expect(within(masteryTile).getByText(`${quest.xpReward} XP`)).toBeInTheDocument()
+    expect(within(masteryTile).getByText(`${grantedXp} XP`)).toBeInTheDocument()
 
     // The quest log, and the XP it granted, survived a save round-trip
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEYS.GAME) ?? '{}') as GameState
-    expect(stored.skillXp[quest.technologyId]).toBe(quest.xpReward)
+    expect(stored.skillXp[quest.technologyId]).toBe(grantedXp)
     expect(stored.completedQuests).toHaveLength(1)
   })
 })

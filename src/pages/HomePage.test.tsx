@@ -48,6 +48,17 @@ describe('HomePage', () => {
     expect(matches.length).toBeGreaterThan(0)
   })
 
+  it('shows every real mini-game as a deep link into the library', () => {
+    renderWithRouter(<HomePage />)
+    for (const gameName of ['Command Typer', 'Memory Match', 'Quiz Dash', 'Incident Response']) {
+      expect(screen.getByText(gameName)).toBeInTheDocument()
+    }
+    // Nothing in the showcase is a tease - every card links to the library
+    expect(screen.queryByText('Coming Soon')).not.toBeInTheDocument()
+    const quizDash = screen.getByText('Quiz Dash').closest('a')
+    expect(quizDash).toHaveAttribute('href', '/games')
+  })
+
   it('renders chronicle section', () => {
     renderWithRouter(<HomePage />)
     expect(screen.getByText(/Chronicle/i)).toBeInTheDocument()
@@ -133,7 +144,10 @@ describe('HomePage player state', () => {
   it('opens the mini-game hub from the quick actions and closes it again', () => {
     renderSeededPage(<HomePage />)
 
-    expect(screen.queryByText('🎮 Mini-Games')).not.toBeInTheDocument()
+    // The hub is closed: no modal heading (the footer's Game Systems link
+    // legitimately carries the same words)
+    expect(screen.queryByRole('heading', { name: '🎮 Mini-Games' })).not.toBeInTheDocument()
+    // The quick-action button (the footer's Game Systems link also matches)
     fireEvent.click(screen.getByRole('button', { name: /Mini-Games/ }))
 
     // A level 1 hero has not unlocked the games yet
@@ -143,16 +157,20 @@ describe('HomePage player state', () => {
     expect(screen.getByText('Complete more quests to unlock mini-games!')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'Back to Game' }))
-    expect(screen.queryByText('🎮 Mini-Games')).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: '🎮 Mini-Games' })).not.toBeInTheDocument()
   })
 
   it('gates the realm preview behind the hero level and reports overall progress', () => {
     renderSeededPage(<HomePage />)
 
-    // Foundations is open at level 1, the remaining four realms stay locked
-    const openRealm = closestContainer(screen.getByText('Foundations'), 'div.relative')
+    // The preview mirrors the world map data: real realm names, all six of them
+    for (const realmName of ['Village of Foundations', 'Forest of Scripts']) {
+      expect(screen.getByText(realmName)).toBeInTheDocument()
+    }
+    // Foundations is open at level 1, the level-5 realm stays locked
+    const openRealm = closestContainer(screen.getByText('Village of Foundations'), 'div.relative')
     expect(within(openRealm).getByText('⭐')).toBeInTheDocument()
-    const lockedRealm = closestContainer(screen.getByText('Scripts'), 'div.relative')
+    const lockedRealm = closestContainer(screen.getByText('Forest of Scripts'), 'div.relative')
     expect(within(lockedRealm).getByText('🔒')).toBeInTheDocument()
     expect(within(lockedRealm).getByText('Lvl 5')).toBeInTheDocument()
     expect(screen.getByText('0%')).toBeInTheDocument()
@@ -162,18 +180,40 @@ describe('HomePage player state', () => {
     )
   })
 
-  it('shows the game showcase, community proof and quick links', () => {
+  it('marks a realm completed once the save records it', () => {
+    seedWith({
+      character: { ...seedDefaultGame().character, level: 8 },
+      completedRealms: ['foundations'],
+    })
+    renderPage(<HomePage />)
+
+    const doneRealm = closestContainer(screen.getByText('Village of Foundations'), 'div.relative')
+    expect(within(doneRealm).getByText('✅')).toBeInTheDocument()
+    // Level 8 opens the next realm too, but it is not finished yet
+    const openRealm = closestContainer(screen.getByText('Forest of Scripts'), 'div.relative')
+    expect(within(openRealm).getByText('⭐')).toBeInTheDocument()
+  })
+
+  it('shows the game showcase, real catalog stats and quick links', () => {
     renderSeededPage(<HomePage />)
 
     expect(screen.getByText('🎮 More Learning Games')).toBeInTheDocument()
-    expect(screen.getAllByText('Coming Soon').length).toBeGreaterThan(10)
     expect(screen.getByRole('link', { name: /Browse All Games/ })).toHaveAttribute('href', '/games')
 
-    // A testimonial and a community stat prove the marketing sections render
-    expect(screen.getByText('Sarah K.')).toBeInTheDocument()
-    expect(screen.getByText('Frontend Dev')).toBeInTheDocument()
-    expect(screen.getByText('10K+')).toBeInTheDocument()
-    expect(screen.getByText('Active Learners')).toBeInTheDocument()
+    // The catalog numbers come from the real content data, not marketing copy
+    expect(screen.getByText('📊 Inside DevOpsQuest')).toBeInTheDocument()
+    const statsSection = closestContainer(
+      screen.getByText('📊 Inside DevOpsQuest'),
+      'section',
+    )
+    expect(within(statsSection).getByText('Technologies')).toBeInTheDocument()
+    expect(within(statsSection).getByText('Quests')).toBeInTheDocument()
+    expect(within(statsSection).getByText('Realms')).toBeInTheDocument()
+    expect(within(statsSection).getByText('Mini-Games')).toBeInTheDocument()
+    // No invented community numbers survive
+    expect(screen.queryByText('10K+')).not.toBeInTheDocument()
+    expect(screen.queryByText('Sarah K.')).not.toBeInTheDocument()
+    expect(screen.queryByText(/Join thousands/)).not.toBeInTheDocument()
 
     // Tips and the built-with strip close out the page
     expect(screen.getByText('💡 Pro Tips')).toBeInTheDocument()

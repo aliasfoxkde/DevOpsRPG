@@ -5,8 +5,22 @@ import { screen, act } from '@testing-library/react'
 import { STORAGE_KEYS, XP_PER_LEVEL, GOLD_XP_RATIO } from '@/utils/gameUtils'
 import { allQuests } from '@/data/quests'
 import { BADGES } from '@/data/badges'
+import { CLASS_BONUSES } from '@/contexts/game/bonusEngine'
 import { click, renderGame } from './test-utils'
 import { useGame } from './GameContext'
+
+// Quest payouts include the live seasonal event multiplier; pin it to 1x so
+// reward math stays deterministic no matter when the suite runs.
+vi.mock('@/data/seasonalEvents', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/data/seasonalEvents')>()),
+  getActiveEventMultiplier: () => 1,
+}))
+
+// XP payouts run through the bonus engine — the default DevOps Sage class
+// grants +10% — so expectations mirror the granted amounts, not raw inputs.
+function grantedXp(amount: number, charClass: keyof typeof CLASS_BONUSES): number {
+  return Math.floor(amount * (1 + CLASS_BONUSES[charClass].bonus))
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
@@ -166,10 +180,12 @@ describe('GameContext progression', () => {
   })
 
   it('levels up when XP crosses the threshold', async () => {
-    renderGame(<Harness />)
+    const getGame = renderGame(<Harness />)
     await click('add-level-xp')
     expect(screen.getByTestId('level')).toHaveTextContent('2')
-    expect(screen.getByTestId('xp')).toHaveTextContent(String(XP_PER_LEVEL))
+    expect(screen.getByTestId('xp')).toHaveTextContent(
+      String(grantedXp(XP_PER_LEVEL, getGame().game.character.class)),
+    )
   })
 
   it('accumulates gold', async () => {
@@ -189,22 +205,25 @@ describe('GameContext progression', () => {
   })
 
   it('completes a quest once: awards XP, gold and shows victory', async () => {
-    renderGame(<Harness />)
+    const getGame = renderGame(<Harness />)
     await click('complete-first-quest')
     expect(screen.getByTestId('quest-count')).toHaveTextContent('1')
     expect(screen.getByTestId('victory')).toHaveTextContent('true')
-    expect(screen.getByTestId('xp')).toHaveTextContent(String(firstQuest.xpReward))
+    const charClass = getGame().game.character.class
+    expect(screen.getByTestId('xp')).toHaveTextContent(String(grantedXp(firstQuest.xpReward, charClass)))
     expect(screen.getByTestId('gold')).toHaveTextContent(
       String(Math.floor(firstQuest.xpReward * GOLD_XP_RATIO)),
     )
   })
 
   it('ignores repeated completion of the same quest', async () => {
-    renderGame(<Harness />)
+    const getGame = renderGame(<Harness />)
     await click('complete-first-quest')
     await click('complete-first-quest')
     expect(screen.getByTestId('quest-count')).toHaveTextContent('1')
-    expect(screen.getByTestId('xp')).toHaveTextContent(String(firstQuest.xpReward))
+    expect(screen.getByTestId('xp')).toHaveTextContent(
+      String(grantedXp(firstQuest.xpReward, getGame().game.character.class)),
+    )
   })
 
   it('ignores unknown quest ids', async () => {
@@ -254,17 +273,18 @@ describe('GameContext learning topics and daily rewards', () => {
 
   it('records a learning topic once with its XP', async () => {
     const getGame = renderGame(<Harness />)
+    const granted = grantedXp(30, getGame().game.character.class)
     await click('learn-topic')
     expect(screen.getByTestId('learned')).toHaveTextContent('true')
-    expect(screen.getByTestId('xp')).toHaveTextContent('30')
+    expect(screen.getByTestId('xp')).toHaveTextContent(String(granted))
     expect(getGame().game.completedTopics[0]).toMatchObject({
       topicId: 'css_flexbox',
       technologyId: 'css',
       completed: true,
-      xpEarned: 30,
+      xpEarned: granted,
     })
     await click('learn-topic')
-    expect(screen.getByTestId('xp')).toHaveTextContent('30')
+    expect(screen.getByTestId('xp')).toHaveTextContent(String(granted))
   })
 
   it('claims a daily reward once per cycle', async () => {
@@ -291,8 +311,9 @@ describe('GameContext persistence', () => {
   })
 
   it('persists state to the main and backup keys after an action', async () => {
-    renderGame(<Harness />)
+    const getGame = renderGame(<Harness />)
     await click('add-level-xp')
+    const expectedXp = grantedXp(XP_PER_LEVEL, getGame().game.character.class)
     for (const key of [STORAGE_KEYS.GAME, STORAGE_KEYS.BACKUP]) {
       const raw = localStorage.getItem(key)
       if (!raw) {
@@ -302,7 +323,7 @@ describe('GameContext persistence', () => {
       if (!isSavedState(stored)) {
         throw new Error(`the save under ${key} did not match the persisted shape`)
       }
-      expect(stored.character.xp).toBe(XP_PER_LEVEL)
+      expect(stored.character.xp).toBe(expectedXp)
       expect(stored.character.level).toBe(2)
     }
   })

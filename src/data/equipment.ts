@@ -77,7 +77,9 @@ export const EQUIPMENT_ITEMS: EquipmentItem[] = [
     rarity: 'rare',
     price: 450,
     bonuses: {},
-    techBonus: { technologyId: 'linux', bonus: 0.08 },
+    // Must name a real technology from technologies.ts — a bonus on a
+    // non-catalog id is advertised in the store but never paid.
+    techBonus: { technologyId: 'networking', bonus: 0.08 },
   },
 
   // Accessories
@@ -163,7 +165,8 @@ export const EQUIPMENT_ITEMS: EquipmentItem[] = [
     rarity: 'rare',
     price: 250,
     bonuses: {},
-    techBonus: { technologyId: 'linux', bonus: 0.05 },
+    // The catalog has no Linux technology; bash is its closest subject.
+    techBonus: { technologyId: 'bash', bonus: 0.05 },
   },
   {
     id: 'backpack',

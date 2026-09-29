@@ -81,9 +81,21 @@ function loadAndValidateGame(storedJson: string | null): GameState | null {
     if (!Array.isArray(merged.badges)) merged.badges = []
     if (!Array.isArray(merged.collectibles)) merged.collectibles = []
     if (!Array.isArray(merged.completedRealms)) merged.completedRealms = []
+    if (!Array.isArray(merged.claimedStoryArcs)) merged.claimedStoryArcs = []
+    if (!Array.isArray(merged.claimedCareerMilestones)) merged.claimedCareerMilestones = []
+    if (!Array.isArray(merged.claimedCertifications)) merged.claimedCertifications = []
+    if (!Array.isArray(merged.claimedEvents)) merged.claimedEvents = []
     // Ensure character fields
     if (typeof merged.character.streakShields !== 'number') {
       merged.character.streakShields = 0
+    }
+    // ownedItems was added after equippedItems; saves from before it existed
+    // treated equippedItems as the ownership list, so seed from it rather
+    // than letting those players' purchases vanish.
+    if (!Array.isArray(merged.character.ownedItems)) {
+      merged.character.ownedItems = Array.isArray(merged.character.equippedItems)
+        ? [...merged.character.equippedItems]
+        : []
     }
     // The "no record yet" sentinel is Infinity, which JSON serializes to
     // null; restore it or Math.min updates would collapse the record to 0.

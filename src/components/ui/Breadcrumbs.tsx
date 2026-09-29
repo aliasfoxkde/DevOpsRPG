@@ -26,7 +26,6 @@ const BREADCRUMB_MAP: Record<string, BreadcrumbItem> = {
   '/badges': { label: 'Badges', path: '/badges', icon: '🏅' },
   '/milestones': { label: 'Milestones', path: '/milestones', icon: '🎯' },
   '/store': { label: 'Shop', path: '/store', icon: '🏪' },
-  '/marketplace': { label: 'Marketplace', path: '/marketplace', icon: '🏪' },
   '/technology-collection': { label: 'Tech Cards', path: '/technology-collection', icon: '📚' },
   '/certifications': { label: 'Certifications', path: '/certifications', icon: '🏆' },
   '/titles-frames': { label: 'Titles & Frames', path: '/titles-frames', icon: '✨' },
@@ -41,6 +40,7 @@ const BREADCRUMB_MAP: Record<string, BreadcrumbItem> = {
   '/privacy-policy': { label: 'Privacy Policy', path: '/privacy-policy', icon: '🔒' },
   '/games': { label: 'Game Library', path: '/games', icon: '🎮' },
   '/pvp-arena': { label: 'PvP Arena', path: '/pvp-arena', icon: '⚔️' },
+  '/feedback': { label: 'Feedback', path: '/feedback', icon: '📝' },
 }
 
 function getBreadcrumbs(pathname: string): BreadcrumbItem[] {

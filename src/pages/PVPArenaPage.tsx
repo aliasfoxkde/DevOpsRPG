@@ -14,7 +14,7 @@ import {
 type MatchState = 'idle' | 'matching' | 'ready' | 'battle' | 'result'
 
 export default function PVPArenaPage() {
-  const { addXP, addGold } = useGame()
+  const { addXP, addGold, game, recordPvpResult } = useGame()
 
   // PVP state
   const [matchState, setMatchState] = useState<MatchState>('idle')
@@ -26,11 +26,9 @@ export default function PVPArenaPage() {
   const [correctCount, setCorrectCount] = useState(0)
   const [matchStartTime, setMatchStartTime] = useState<number | null>(null)
 
-  // PVP stats (placeholder - would need to add to GameState)
-  const pvpPoints = 0
-  const pvpWins = 0
-  const pvpLosses = 0
-  const pvpStreak = 0
+  // Real PVP record, persisted in game state via recordPvpResult.
+  const { points: pvpPoints, wins: pvpWins, losses: pvpLosses, streak: pvpStreak } =
+    game.pvpStats
 
   const currentRank = getRankByPoints(pvpPoints)
   const rankProgress = getRankProgress(pvpPoints)
@@ -112,10 +110,13 @@ export default function PVPArenaPage() {
         addGold(result.goldEarned)
       }
 
+      // Persist the ranked outcome (points, W/L, streak) to game state.
+      recordPvpResult(won, won ? result.pointsEarned : -result.pointsLost)
+
       setMatchResult(result)
       setMatchState('result')
     },
-    [currentMatch, matchStartTime, currentRank, addXP, addGold],
+    [currentMatch, matchStartTime, currentRank, addXP, addGold, recordPvpResult],
   )
 
   // Timer effect
@@ -145,7 +146,9 @@ export default function PVPArenaPage() {
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-2">⚔️ PvP Arena</h1>
-        <p className="text-slate-400">Challenge other players in rapid-fire quiz battles!</p>
+        <p className="text-slate-400">
+          Rapid-fire quiz duels against simulated rivals — offline sparring with a local rank.
+        </p>
       </div>
 
       {/* Rank Display */}
@@ -212,9 +215,9 @@ export default function PVPArenaPage() {
           <div className="text-6xl mb-6">⚔️</div>
           <h2 className="text-2xl font-bold mb-4">Ready for Battle?</h2>
           <p className="text-slate-400 mb-8">
-            Test your DevOps knowledge against other players!
+            Test your DevOps knowledge against simulated sparring rivals!
             <br />
-            Win to earn points and climb the ranks.
+            Win to earn points and climb the local ranks.
           </p>
           <button
             onClick={startMatchmaking}
@@ -228,8 +231,8 @@ export default function PVPArenaPage() {
       {matchState === 'matching' && (
         <div className="text-center py-12">
           <div className="text-6xl mb-6 animate-bounce">🔍</div>
-          <h2 className="text-2xl font-bold mb-4">Finding Opponent...</h2>
-          <p className="text-slate-400">Matching you with an opponent of similar rank</p>
+          <h2 className="text-2xl font-bold mb-4">Finding Sparring Rival...</h2>
+          <p className="text-slate-400">Selecting a simulated rival near your rank</p>
         </div>
       )}
 

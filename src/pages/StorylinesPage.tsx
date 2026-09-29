@@ -1,22 +1,24 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useGame } from '../contexts/GameContext'
-import { STORY_ARCS, DIFFICULTY_CONFIG, type StoryArc } from '../data/storylines'
+import { STORY_ARCS, DIFFICULTY_CONFIG, type StoryArc, type StoryEpisode } from '../data/storylines'
 
 export default function StorylinesPage() {
-  const { game } = useGame()
-  const { character, completedQuests } = game
+  const { game, claimStoryArcRewards } = useGame()
+  const { character, completedQuests, claimedStoryArcs } = game
+  const navigate = useNavigate()
 
   const [selectedArc, setSelectedArc] = useState<StoryArc | null>(null)
+  const [claimError, setClaimError] = useState<string | null>(null)
+  const [claimedSummary, setClaimedSummary] = useState<string | null>(null)
+
+  const isQuestDone = (questId: string) => completedQuests.some((q) => q.questId === questId)
 
   // Calculate progress for each arc
   const getArcProgress = (arc: StoryArc) => {
     let completed = 0
     for (const episode of arc.episodes) {
-      const allQuestsDone = episode.questIds.every((qId) =>
-        completedQuests.some((q) => q.questId === qId || q.technologyId === qId),
-      )
-      if (allQuestsDone) completed++
+      if (episode.questIds.every(isQuestDone)) completed++
     }
     return { completed, total: arc.episodes.length }
   }
@@ -25,18 +27,12 @@ export default function StorylinesPage() {
   const isEpisodeUnlocked = (arc: StoryArc, episodeIndex: number) => {
     if (episodeIndex === 0) return true
     // Previous episode must be completed
-    const prevEpisode = arc.episodes[episodeIndex - 1]
-    return prevEpisode.questIds.every((qId) =>
-      completedQuests.some((q) => q.questId === qId || q.technologyId === qId),
-    )
+    return arc.episodes[episodeIndex - 1].questIds.every(isQuestDone)
   }
 
   // Check if an episode is completed
   const isEpisodeCompleted = (arc: StoryArc, episodeIndex: number) => {
-    const episode = arc.episodes[episodeIndex]
-    return episode.questIds.every((qId) =>
-      completedQuests.some((q) => q.questId === qId || q.technologyId === qId),
-    )
+    return arc.episodes[episodeIndex].questIds.every(isQuestDone)
   }
 
   // Get the next incomplete episode
@@ -45,6 +41,24 @@ export default function StorylinesPage() {
       if (!isEpisodeCompleted(arc, i)) return i
     }
     return arc.episodes.length - 1
+  }
+
+  // First unfinished quest of an episode — the one "Continue Story" jumps to.
+  const getNextEpisodeQuest = (episode: StoryEpisode): string | undefined =>
+    episode.questIds.find((questId) => !isQuestDone(questId))
+
+  const handleClaimArc = (arc: StoryArc) => {
+    const rewards = claimStoryArcRewards(arc.id)
+    if (rewards.xp === 0 && rewards.gold === 0 && !rewards.badgeId) {
+      setClaimError(`"${arc.title}" isn't finished yet — complete every chapter first.`)
+      setClaimedSummary(null)
+      return
+    }
+    setClaimError(null)
+    setClaimedSummary(
+      `${arc.title}: +${rewards.xp} XP, +${rewards.gold} gold` +
+        (rewards.badgeId ? ', badge unlocked!' : ''),
+    )
   }
 
   return (
@@ -79,6 +93,29 @@ export default function StorylinesPage() {
             <span className="text-amber-400">🏆 {completedQuests.length} Quests Completed</span>
           </div>
         </div>
+
+        {/* Claim feedback */}
+        {(claimError || claimedSummary) && (
+          <div
+            role="status"
+            className={`mb-6 p-3 rounded-lg border text-sm ${
+              claimError
+                ? 'bg-red-900/30 border-red-700/50 text-red-300'
+                : 'bg-green-900/30 border-green-700/50 text-green-300'
+            }`}
+          >
+            {claimError ?? claimedSummary}
+            <button
+              onClick={() => {
+                setClaimError(null)
+                setClaimedSummary(null)
+              }}
+              className="ml-3 underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-current"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
 
         {/* Story Arcs */}
         <div className="space-y-6">
@@ -208,7 +245,15 @@ export default function StorylinesPage() {
                                       {episode.questIds.length} quests
                                     </span>
                                     {!completed && (
-                                      <button className="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-white text-xs font-medium rounded transition-colors">
+                                      <button
+                                        onClick={() => {
+                                          const nextQuestId = getNextEpisodeQuest(episode)
+                                          if (nextQuestId) {
+                                            void navigate(`/quest/${nextQuestId}`)
+                                          }
+                                        }}
+                                        className="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-white text-xs font-medium rounded transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400"
+                                      >
                                         Continue Story →
                                       </button>
                                     )}
@@ -226,13 +271,33 @@ export default function StorylinesPage() {
                       <h5 className="text-sm font-medium text-slate-400 mb-2">
                         Complete Arc Rewards
                       </h5>
-                      <div className="flex items-center gap-6">
+                      <div className="flex items-center flex-wrap gap-4">
                         <span className="text-green-400 font-bold">+{arc.rewards.xpBonus} XP</span>
                         <span className="text-amber-400 font-bold">
                           +{arc.rewards.goldBonus} Gold
                         </span>
                         {arc.rewards.badgeId && (
                           <span className="text-purple-400 font-bold">🏅 Special Badge</span>
+                        )}
+                        {isComplete ? (
+                          claimedStoryArcs.includes(arc.id) ? (
+                            <span className="ml-auto px-3 py-1 rounded text-xs bg-green-900/50 text-green-400 font-medium">
+                              ✓ Rewards Claimed
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                handleClaimArc(arc)
+                              }}
+                              className="ml-auto px-4 py-1.5 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white text-xs font-bold rounded transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400"
+                            >
+                              🎁 Claim Rewards
+                            </button>
+                          )
+                        ) : (
+                          <span className="ml-auto text-xs text-slate-500">
+                            Finish every chapter to claim
+                          </span>
                         )}
                       </div>
                     </div>

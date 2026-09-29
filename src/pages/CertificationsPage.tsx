@@ -1,62 +1,48 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useGame } from '../contexts/GameContext'
 import {
   CERTIFICATIONS,
   DIFFICULTY_COLORS,
   DIFFICULTY_LABELS,
+  checkCertificationRequirements,
   type Certification,
 } from '../data/certifications'
-import { allQuests, type Quest } from '../data/quests'
 
 export default function CertificationsPage() {
-  const { game } = useGame()
+  const { game, claimCertification } = useGame()
+  const { claimedCertifications } = game
+  const [claimFeedback, setClaimFeedback] = useState<{ ok: boolean; text: string } | null>(null)
 
-  // Check if certification requirements are met
-  const checkRequirements = (
-    cert: Certification,
-  ): {
-    met: boolean
-    levelMet: boolean
-    questMet: boolean
-    techsMet: boolean
-  } => {
-    const levelMet = game.character.level >= cert.level
-    const questMet = game.completedQuests.length >= cert.requiredQuests
+  const completedQuestIds = game.completedQuests.map((q) => q.questId)
 
-    // Check technology completion
-    const techProgress: Partial<Record<string, { completed: number; total: number }>> = {}
-    for (const techId of cert.requiredTechnologies) {
-      const techQuests = allQuests.filter(
-        (q: Quest) => q.technologyId.toLowerCase() === techId.toLowerCase(),
-      )
-      const completed = game.completedQuests.filter((cq) =>
-        techQuests.some((tq: Quest) => tq.id === cq.questId),
-      ).length
-      techProgress[techId] = { completed, total: techQuests.length }
-    }
-    const techsMet = cert.requiredTechnologies.every(
-      (techId) => (techProgress[techId]?.completed || 0) >= 3,
-    )
-
-    return {
-      met: levelMet && questMet && techsMet,
-      levelMet,
-      questMet,
-      techsMet,
-    }
-  }
+  const checkRequirements = (cert: Certification) =>
+    checkCertificationRequirements(cert, game.character.level, completedQuestIds)
 
   // Get certification state
   const getCertState = (cert: Certification): 'locked' | 'available' | 'earned' => {
-    // Check if already earned (has the badge)
-    const hasBadge = game.badges.some((b) => b.id === cert.badgeId && b.unlockedAt)
-    if (hasBadge) return 'earned'
+    if (claimedCertifications.includes(cert.id)) return 'earned'
 
     // Check if requirements are met
     const reqs = checkRequirements(cert)
     if (reqs.met) return 'available'
 
     return 'locked'
+  }
+
+  const handleClaim = (cert: Certification) => {
+    const rewards = claimCertification(cert.id)
+    if (rewards.xp === 0 && rewards.gold === 0) {
+      setClaimFeedback({
+        ok: false,
+        text: `${cert.fullName}: requirements aren't met yet.`,
+      })
+      return
+    }
+    setClaimFeedback({
+      ok: true,
+      text: `${cert.fullName} earned: +${rewards.xp} XP, +${rewards.gold} gold!`,
+    })
   }
 
   // Group by difficulty
@@ -91,6 +77,28 @@ export default function CertificationsPage() {
           <h1 className="text-4xl font-bold text-amber-400 mb-2">🏆 Certifications</h1>
           <p className="text-slate-400">Earn certifications as proof of your DevOps expertise!</p>
         </div>
+
+        {/* Claim feedback */}
+        {claimFeedback && (
+          <div
+            role="status"
+            className={`mb-6 p-3 rounded-lg border text-sm ${
+              claimFeedback.ok
+                ? 'bg-green-900/30 border-green-700/50 text-green-300'
+                : 'bg-red-900/30 border-red-700/50 text-red-300'
+            }`}
+          >
+            {claimFeedback.text}
+            <button
+              onClick={() => {
+                setClaimFeedback(null)
+              }}
+              className="ml-3 underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-current"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
 
         {/* Stats Bar */}
         <div className="bg-slate-800/80 rounded-xl border border-slate-700 p-4 mb-8">
@@ -193,11 +201,20 @@ export default function CertificationsPage() {
                             </span>
                           </div>
                           {cert.requiredTechnologies.length > 0 && (
-                            <div className="flex justify-between">
-                              <span className="text-slate-500">Tech:</span>
-                              <span className={reqs.techsMet ? 'text-green-400' : 'text-red-400'}>
-                                {cert.requiredTechnologies.join(', ')} {reqs.techsMet ? '✓' : '✗'}
-                              </span>
+                            <div>
+                              {cert.requiredTechnologies.map((techId) => {
+                                const progress = reqs.techProgress[techId]
+                                const techMet = progress.completed >= 3
+                                return (
+                                  <div key={techId} className="flex justify-between">
+                                    <span className="text-slate-500 capitalize">{techId}:</span>
+                                    <span className={techMet ? 'text-green-400' : 'text-red-400'}>
+                                      {progress.completed}/{progress.total}{' '}
+                                      {techMet ? '✓' : '✗'}
+                                    </span>
+                                  </div>
+                                )
+                              })}
                             </div>
                           )}
                         </div>
@@ -226,10 +243,15 @@ export default function CertificationsPage() {
                           </div>
                         )}
                         {state === 'available' && (
-                          <div className="mt-3 text-center">
-                            <span className="text-sm text-green-400 font-medium">
-                              🎉 Available to claim!
-                            </span>
+                          <div className="mt-3">
+                            <button
+                              onClick={() => {
+                                handleClaim(cert)
+                              }}
+                              className="w-full py-2 bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 text-white text-sm font-bold rounded transition-colors focus:outline-none focus:ring-2 focus:ring-green-400"
+                            >
+                              🎉 Claim Certification
+                            </button>
                           </div>
                         )}
                         {state === 'earned' && (

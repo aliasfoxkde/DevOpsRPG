@@ -127,8 +127,12 @@ describe('KeyboardShortcutsHelp', () => {
     expect(screen.getByRole('dialog')).toBeInTheDocument()
 
     expect(screen.getByText('Scroll down')).toBeInTheDocument()
-    expect(screen.getByText('Click primary button')).toBeInTheDocument()
+    expect(screen.getByText('Activate primary action')).toBeInTheDocument()
     expect(screen.getByText('Go to Home')).toBeInTheDocument()
+    // The dead bindings are no longer advertised
+    expect(screen.queryByText('Go to Learn')).toBeNull()
+    expect(screen.queryByText('Go to Dashboard')).toBeNull()
+    expect(screen.queryByText('Go to top')).toBeNull()
   })
 
   it('filters the list to the selected category', async () => {
@@ -138,7 +142,7 @@ describe('KeyboardShortcutsHelp', () => {
 
     await user.click(screen.getByRole('button', { name: 'Actions' }))
 
-    expect(screen.getByText('Click primary button')).toBeInTheDocument()
+    expect(screen.getByText('Activate primary action')).toBeInTheDocument()
     expect(screen.queryByText('Scroll down')).toBeNull()
     expect(screen.queryByText('Go to Home')).toBeNull()
   })
@@ -151,7 +155,7 @@ describe('KeyboardShortcutsHelp', () => {
 
     // The Help category only contains the "?" entry
     expect(screen.queryByText('Scroll down')).toBeNull()
-    expect(screen.getByText('Show this help')).toBeInTheDocument()
+    expect(screen.getByText('Show keyboard shortcuts')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'All' }))
     expect(screen.getByText('Scroll down')).toBeInTheDocument()

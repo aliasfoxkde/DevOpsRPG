@@ -24,6 +24,21 @@ import {
 } from '@/data/sidequests'
 import { actOn, renderGame, seedGame } from './test-utils'
 
+// Quest payouts include the live seasonal event multiplier; pin it to 1x so
+// reward math stays deterministic no matter when the suite runs.
+vi.mock('@/data/seasonalEvents', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/data/seasonalEvents')>()),
+  getActiveEventMultiplier: () => 1,
+}))
+
+import { CLASS_BONUSES } from './game/bonusEngine'
+
+// XP payouts run through the bonus engine — a fresh hero is a DevOps Sage and
+// grants +10% XP — so expectations mirror granted amounts, not raw inputs.
+function grantedXp(amount: number, cls: keyof typeof CLASS_BONUSES = 'DevOps Sage'): number {
+  return Math.floor(amount * (1 + CLASS_BONUSES[cls].bonus))
+}
+
 const DAY_MS = 24 * 60 * 60 * 1000
 const HOUR_MS = 60 * 60 * 1000
 const TODAY = new Date().toISOString().split('T')[0]
@@ -140,24 +155,27 @@ describe('GameContext quest helpers', () => {
     })
     expect(getGame().isLearningTopicCompleted('css_flexbox')).toBe(true)
     expect(getGame().getCompletedLearningTopicIds()).toEqual(new Set(['css_flexbox']))
+    const granted = grantedXp(30)
     expect(getGame().game.completedTopics[0]).toMatchObject({
       topicId: 'css_flexbox',
       technologyId: 'css',
       completed: true,
-      xpEarned: 30,
+      xpEarned: granted,
     })
     act(() => {
       getGame().completeLearningTopic('css_flexbox', 'css', 30)
     })
     expect(getGame().game.completedTopics.length).toBe(1)
-    expect(getGame().game.character.xp).toBe(30)
+    expect(getGame().game.character.xp).toBe(granted)
   })
 
   it('keeps the level boundary and derived xp-to-next in sync', () => {
     const getGame = renderGame()
     expect(getGame().game.character.xpToNextLevel).toBe(XP_PER_LEVEL)
+    // addXP grants floor(raw x 1.1), so 90 raw lands at 99 banked XP and
+    // the very next point crosses the level-2 threshold
     act(() => {
-      getGame().addXP(XP_PER_LEVEL - 1)
+      getGame().addXP(90)
     })
     expect(getGame().game.character.level).toBe(1)
     act(() => {
@@ -439,17 +457,17 @@ describe('GameContext badge and milestone unlocks', () => {
     act(() => {
       getGame().claimMilestone('level_5')
     })
-    expect(getGame().game.character.xp).toBe(75)
+    expect(getGame().game.character.xp).toBe(grantedXp(75))
     // Claiming is not recorded, so a second claim pays out again.
     act(() => {
       getGame().claimMilestone('level_5')
     })
-    expect(getGame().game.character.xp).toBe(150)
+    expect(getGame().game.character.xp).toBe(2 * grantedXp(75))
     act(() => {
       getGame().claimMilestone('quest_100')
     })
     // A locked milestone pays nothing.
-    expect(getGame().game.character.xp).toBe(150)
+    expect(getGame().game.character.xp).toBe(2 * grantedXp(75))
   })
 
   it('pays badge rewards only after the badge is unlocked', () => {
@@ -467,7 +485,7 @@ describe('GameContext badge and milestone unlocks', () => {
     act(() => {
       getGame().claimBadge('quest_10')
     })
-    expect(getGame().game.character.xp).toBe(badge.xpReward)
+    expect(getGame().game.character.xp).toBe(grantedXp(badge.xpReward))
     expect(getGame().game.character.gold).toBe(badge.goldReward)
   })
 })
@@ -491,13 +509,13 @@ describe('GameContext side quests', () => {
     act(() => {
       getGame().claimSideQuest(dailyQuest.id)
     })
-    expect(getGame().game.character.xp).toBe(75)
+    expect(getGame().game.character.xp).toBe(grantedXp(75))
     expect(getGame().game.character.gold).toBe(30)
     expect(getGame().game.sideQuests.find((q) => q.id === dailyQuest.id)?.completed).toBe(true)
     act(() => {
       getGame().claimSideQuest(dailyQuest.id)
     })
-    expect(getGame().game.character.xp).toBe(75)
+    expect(getGame().game.character.xp).toBe(grantedXp(75))
   })
 
   it('refreshes side quests without resurrecting completed ones', () => {
@@ -552,7 +570,9 @@ describe('GameContext skills', () => {
     act(() => {
       getGame().completeQuest(firstQuest().id)
     })
-    expect(getGame().getSkillXp(firstQuest().technologyId)).toBe(firstQuest().xpReward)
+    expect(getGame().getSkillXp(firstQuest().technologyId)).toBe(
+      grantedXp(firstQuest().xpReward),
+    )
   })
 
   it('maps xp onto the shared level ladder', () => {
@@ -856,10 +876,13 @@ describe('GameContext store purchases', () => {
 
 describe('GameContext equipment', () => {
   it('equips, sums bonuses and unequips items', () => {
+    // Ownership lives in ownedItems and equipping is gated on it
+    seedGame({ character: { ownedItems: ['laptop_basic', 'cloud_server'] } })
     const getGame = renderGame()
     expect(getGame().getEquippedItems()).toEqual([])
     expect(actOn(() => getGame().equipItem('laptop_basic'))).toBe(true)
-    expect(actOn(() => getGame().equipItem('laptop_basic'))).toBe(true)
+    // Equipping a second time is a no-op, not a duplicate slot
+    expect(actOn(() => getGame().equipItem('laptop_basic'))).toBe(false)
     expect(actOn(() => getGame().equipItem('cloud_server'))).toBe(true)
     expect(getGame().getEquippedItems()).toEqual(['laptop_basic', 'cloud_server'])
     expect(getGame().getEquipmentBonuses()).toEqual({
@@ -875,8 +898,12 @@ describe('GameContext equipment', () => {
   })
 
   it('keeps unknown item ids out of the bonus calculation', () => {
+    // equipItem refuses ids that are not in the catalog; a stale save that
+    // already carries one must not poison the bonus math either
+    seedGame({ character: { equippedItems: ['flux_capacitor'] } })
     const getGame = renderGame()
-    expect(actOn(() => getGame().equipItem('flux_capacitor'))).toBe(true)
+    expect(actOn(() => getGame().equipItem('flux_capacitor'))).toBe(false)
+    expect(getGame().getEquippedItems()).toEqual(['flux_capacitor'])
     expect(getGame().getEquipmentBonuses()).toEqual({
       xpBonus: 0,
       goldBonus: 0,
@@ -994,11 +1021,11 @@ describe('GameContext quest completion edge paths', () => {
       getGame().completeQuest(firstQuest().id)
     })
     const quest = firstQuest()
-    expect(getGame().game.character.xp).toBe(quest.xpReward * 2)
+    expect(getGame().game.character.xp).toBe(grantedXp(quest.xpReward * 2))
     // Gold has its own multiplier, which the xp scroll does not touch.
     expect(getGame().game.character.gold).toBe(Math.floor(quest.xpReward * 0.1))
     expect(getGame().game.character.xpMultiplier).toBe(1)
-    expect(getGame().getSkillXp(quest.technologyId)).toBe(quest.xpReward * 2)
+    expect(getGame().getSkillXp(quest.technologyId)).toBe(grantedXp(quest.xpReward * 2))
   })
 
   it('applies the active companion bonus to quest rewards', () => {
@@ -1009,7 +1036,7 @@ describe('GameContext quest completion edge paths', () => {
       getGame().completeQuest(quest.id)
     })
     const game = getGame().game
-    expect(game.character.xp).toBe(Math.floor(quest.xpReward * 1.05))
+    expect(game.character.xp).toBe(grantedXp(quest.xpReward * 1.05))
     expect(game.character.gold).toBe(Math.floor(quest.xpReward * 0.1 * 1.05))
     expect(game.companions[0]).toMatchObject({ id: 'owl', bondLevel: 2, totalQuestsCompleted: 1 })
   })
@@ -1047,7 +1074,7 @@ describe('GameContext quest completion edge paths', () => {
     })
     const game = getGame().game
     expect(game.communityStats.weeklyQuestsCompleted).toBe(1)
-    expect(game.communityStats.weeklyXPCompleted).toBe(firstQuest().xpReward)
+    expect(game.communityStats.weeklyXPCompleted).toBe(grantedXp(firstQuest().xpReward))
     expect(game.dailyDash.active).toBe(true)
     expect(game.dailyDash.completedQuests).toEqual([firstQuest().id])
     expect(game.stats.sessionQuestCount).toBe(1)

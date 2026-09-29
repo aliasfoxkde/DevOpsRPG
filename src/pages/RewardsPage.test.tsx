@@ -7,7 +7,15 @@ import { REWARD_TIERS } from '@/data/milestones'
 import { allQuests } from '@/data/quests'
 import { closestContainer, renderPage, renderSeededPage, seedDefaultGame } from './test-utils'
 import { STORAGE_KEYS } from '@/utils/gameUtils'
+import { CLASS_BONUSES } from '@/contexts/game/bonusEngine'
 import type { GameState } from '@/contexts/GameContext'
+
+// Pack and box announcements show what the grant functions actually bank —
+// the default DevOps Sage class multiplies XP by 1.1 — so the expectations
+// mirror the granted amount rather than the raw catalog value.
+function grantedXp(amount: number, game: GameState): number {
+  return Math.floor(amount * (1 + CLASS_BONUSES[game.character.class].bonus))
+}
 
 // The page maps Sunday (0) to day 7 of the weekly reward track
 const today = new Date().getDay()
@@ -83,6 +91,41 @@ describe('RewardsPage', () => {
       expect(screen.getByText(milestone)).toBeInTheDocument()
     }
     expect(screen.getAllByText('🔒')).toHaveLength(4)
+  })
+
+  it('draws the weekly grid from the real activity log, not the streak count', () => {
+    // Seed two really-logged days: today, and the Monday of the current week
+    // (which is last week's Monday when today is itself a Monday).
+    const DAY_MS = 24 * 60 * 60 * 1000
+    const now = new Date()
+    const todayKey = now.toISOString().split('T')[0]
+    const todayIndex = (now.getUTCDay() + 6) % 7 // Monday = 0
+    const lastMonday = new Date(now.getTime() - (todayIndex === 0 ? 7 : todayIndex) * DAY_MS)
+    seedAndRender((game) => ({
+      ...game,
+      dailyActivity: [todayKey, lastMonday.toISOString().split('T')[0]],
+    }))
+
+    const cellText = (label: string): string | undefined =>
+      screen.getByText(label).parentElement?.textContent
+
+    // Today is always logged, so its column shows the active tick
+    expect(cellText(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][todayIndex])).toMatch(/✓/)
+
+    // Monday is logged unless the week just started today
+    expect(cellText('Mon')).toMatch(todayIndex === 0 ? /○/ : /✓/)
+
+    // A weekday with no log entry stays hollow even with a long streak
+    const loggedKeys = new Set([todayKey, lastMonday.toISOString().split('T')[0]])
+    const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    const unlogged = labels.find((_, index) => {
+      const dayKey = new Date(now.getTime() - (todayIndex - index) * DAY_MS)
+        .toISOString()
+        .split('T')[0]
+      return !loggedKeys.has(dayKey)
+    })
+    if (!unlogged) throw new Error('the week has no unlogged day to assert against')
+    expect(cellText(unlogged)).toMatch(/○/)
   })
 
   it('maps Sunday onto the seventh daily reward slot', () => {
@@ -161,14 +204,15 @@ describe('RewardsPage', () => {
   })
 
   it('lists every milestone pack with its rewards and live progress', () => {
-    const { character, completedQuests } = seedDefaultGame()
+    const base = seedDefaultGame()
+    const { character, completedQuests } = base
     renderSeededPage(<RewardsPage />, { route: '/rewards', url: '/rewards' })
 
     expect(screen.getByText('Milestone Packs')).toBeInTheDocument()
     for (const tier of REWARD_TIERS) {
       const card = closestContainer(screen.getByText(tier.name), '.rounded-lg')
       expect(within(card).getByText(tier.description)).toBeInTheDocument()
-      expect(within(card).getByText(`+${tier.rewards.xp} XP`)).toBeInTheDocument()
+      expect(within(card).getByText(`+${grantedXp(tier.rewards.xp, base)} XP`)).toBeInTheDocument()
       expect(within(card).getByText(`+${tier.rewards.gold} Gold`)).toBeInTheDocument()
       // Progress is the current value over the required one, level 1 already
       // covers part of the level based packs
@@ -317,7 +361,7 @@ describe('RewardsPage', () => {
     await user.click(within(card).getByRole('button', { name: /CLAIM PACK/ }))
 
     const stored = storedGame()
-    expect(stored.character.xp).toBe(game.character.xp + tier.rewards.xp)
+    expect(stored.character.xp).toBe(game.character.xp + grantedXp(tier.rewards.xp, game))
     expect(stored.character.gold).toBe(game.character.gold + tier.rewards.gold)
     // The pack flips to its claimed state and cannot be claimed twice
     expect(within(card).getByText('✓ Claimed!')).toBeInTheDocument()
@@ -355,7 +399,7 @@ describe('RewardsPage', () => {
     await user.click(within(card).getByRole('button', { name: /CLAIM PACK/ }))
 
     const stored = storedGame()
-    expect(stored.character.xp).toBe(game.character.xp + tier.rewards.xp)
+    expect(stored.character.xp).toBe(game.character.xp + grantedXp(tier.rewards.xp, game))
     expect(stored.character.gold).toBe(game.character.gold + tier.rewards.gold)
     // The advertised badge is granted, the inventory is untouched
     expect(stored.badges.find((badge) => badge.id === tier.rewards.badge)?.unlockedAt).toBeTruthy()

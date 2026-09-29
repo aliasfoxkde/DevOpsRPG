@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { quizzes, type QuizQuestion as BankQuestion } from '../../data/quizzes'
 
 interface QuizQuestion {
   id: string
@@ -12,89 +13,42 @@ interface QuizDashProps {
   onSkip: () => void
 }
 
-// Generate quiz questions from the quiz data
+// The dash draws from the same bank the quest knowledge checks use: every
+// multiple-choice question across all technologies, flattened. Fill-blank and
+// code-challenge entries (no options array, or a single distractor-free one)
+// cannot be answered as a timed pick, so they stay out of the deck.
+const QUESTION_POOL: QuizQuestion[] = Object.values(quizzes)
+  .flat()
+  .filter(
+    (question): question is BankQuestion & { options: string[]; correctIndex: number } =>
+      Array.isArray(question.options) &&
+      question.options.length > 1 &&
+      typeof question.correctIndex === 'number',
+  )
+  .map((question) => ({
+    id: question.id,
+    question: question.question,
+    options: question.options,
+    correctAnswer: question.correctIndex,
+  }))
+
+// Fisher-Yates — the sort-by-random trick it replaces clustered the deck.
+function shuffle<T>(items: readonly T[]): T[] {
+  const shuffled = [...items]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
+}
+
 // eslint-disable-next-line react-refresh/only-export-components -- exported so tests can replay the exact dealt deck
 export function generateQuizQuestions(count: number): QuizQuestion[] {
-  // We'll generate placeholder questions since we don't have direct quiz access
-  // In production, this would pull from the actual quiz data
-  const sampleQuestions: Omit<QuizQuestion, 'id'>[] = [
-    {
-      question: 'What does CD stand for in DevOps?',
-      options: [
-        'Continuous Deployment',
-        'Container Docker',
-        'Code Development',
-        'Central Database',
-      ],
-      correctAnswer: 0,
-    },
-    {
-      question: 'Which tool is used for container orchestration?',
-      options: ['Docker', 'Kubernetes', 'Jenkins', 'Git'],
-      correctAnswer: 1,
-    },
-    {
-      question: 'What is the purpose of a CI pipeline?',
-      options: ['Build automation', 'Manual testing', 'Design UX', 'Manage servers'],
-      correctAnswer: 0,
-    },
-    {
-      question: 'What does IaC stand for?',
-      options: [
-        'Infrastructure as Code',
-        'Internet as Computer',
-        'Integrated Application Controller',
-        'Internal API Cache',
-      ],
-      correctAnswer: 0,
-    },
-    {
-      question: 'Which is a version control system?',
-      options: ['Docker', 'Jenkins', 'Git', 'Kubernetes'],
-      correctAnswer: 2,
-    },
-    {
-      question: 'What does CPU stand for?',
-      options: [
-        'Central Processing Unit',
-        'Computer Personal Unit',
-        'Central Program Utility',
-        'Core Processing Utility',
-      ],
-      correctAnswer: 0,
-    },
-    {
-      question: 'What is Docker used for?',
-      options: ['Version control', 'Containerization', 'Monitoring', 'Networking'],
-      correctAnswer: 1,
-    },
-    {
-      question: 'What does API stand for?',
-      options: [
-        'Application Programming Interface',
-        'Automated Program Integration',
-        'Application Process Integration',
-        'Advanced Programming Internet',
-      ],
-      correctAnswer: 0,
-    },
-  ]
-
-  // Shuffle and select questions
-  const shuffled = [...sampleQuestions].sort(() => Math.random() - 0.5)
-  const questionPool: QuizQuestion[] = []
-  for (let i = 0; i < Math.min(count, shuffled.length); i++) {
-    questionPool.push({
-      id: `quiz_${i}_${Date.now()}`,
-      ...shuffled[i],
-    })
-  }
-
-  return questionPool
+  return shuffle(QUESTION_POOL).slice(0, count)
 }
 
 export function QuizDashGame({ onComplete, onSkip }: QuizDashProps) {
-  const [questions] = useState(() => generateQuizQuestions(5))
+  const [questions, setQuestions] = useState(() => generateQuizQuestions(5))
   const [currentIndex, setCurrentIndex] = useState(0)
   const [score, setScore] = useState(0)
   const [timeLeft, setTimeLeft] = useState(10)
@@ -105,6 +59,19 @@ export function QuizDashGame({ onComplete, onSkip }: QuizDashProps) {
 
   const currentQuestion = questions[currentIndex]
   const maxScore = questions.length
+
+  // Deals a fresh deck and resets every round counter in place — no page
+  // reload, so the hub modal the game sits in stays open.
+  const dealNewDeck = useCallback(() => {
+    setQuestions(generateQuizQuestions(5))
+    setCurrentIndex(0)
+    setScore(0)
+    setTimeLeft(10)
+    setSelectedAnswer(null)
+    setShowResult(false)
+    setIsComplete(false)
+    setStreak(0)
+  }, [])
 
   const handleAnswer = useCallback(
     (answerIndex: number) => {
@@ -200,9 +167,7 @@ export function QuizDashGame({ onComplete, onSkip }: QuizDashProps) {
             Back to Menu
           </button>
           <button
-            onClick={() => {
-              window.location.reload()
-            }}
+            onClick={dealNewDeck}
             className="px-6 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg transition-colors"
           >
             Play Again

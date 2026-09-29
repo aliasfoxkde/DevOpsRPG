@@ -1,9 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, act, fireEvent } from '@testing-library/react'
 import { QuizDashGame, generateQuizQuestions } from './QuizDash'
+import { quizzes } from '@/data/quizzes'
 
 /**
- * generateQuizQuestions shuffles its pool with `[...].sort(() => Math.random() - 0.5)`.
+ * generateQuizQuestions shuffles the bank with Fisher-Yates over Math.random.
  * Pinning Math.random to a constant makes the order deterministic, so the test can
  * request the same five questions the component plays.
  */
@@ -172,17 +173,37 @@ describe('QuizDashGame', () => {
     expect(onComplete).not.toHaveBeenCalled()
   })
 
+  it('deals every question from the real quiz bank without repeats', () => {
+    const deck = generateQuizQuestions(QUESTION_COUNT)
+    const bankQuestions = new Set(
+      Object.values(quizzes)
+        .flat()
+        .map((question) => question.question),
+    )
+
+    expect(deck).toHaveLength(QUESTION_COUNT)
+    for (const question of deck) {
+      // The id/question pair must exist in the shared bank — no local fakes
+      expect(bankQuestions.has(question.question)).toBe(true)
+    }
+    expect(new Set(deck.map((question) => question.question)).size).toBe(QUESTION_COUNT)
+  })
+
   it('offers a replay and a way back to the menu on the result screen', () => {
-    const { onSkip, questions } = setup()
+    const { onComplete, onSkip, questions } = setup()
 
     for (const question of questions) answer(question.correctAnswer)
 
     expect(screen.getByText('Quiz Complete!')).toBeInTheDocument()
-    // "Play Again" is a full page reload (window.location.reload), which jsdom
-    // cannot perform - the result view stays up until the browser navigates.
-    const resultHeading = screen.getByText('Quiz Complete!')
+    // "Play Again" re-deals in place (same pinned random, so the same deck)
     fireEvent.click(screen.getByRole('button', { name: /play again/i }))
-    expect(screen.getByText('Quiz Complete!')).toBe(resultHeading)
+    expect(screen.getByText(`Question 1/${questions.length}`)).toBeInTheDocument()
+    expect(screen.getByText(questions[0].question)).toBeInTheDocument()
+
+    // The second round scores independently
+    for (const question of questions) answer(question.correctAnswer)
+    expect(screen.getByText('Quiz Complete!')).toBeInTheDocument()
+    expect(onComplete).toHaveBeenCalledTimes(2)
 
     fireEvent.click(screen.getByRole('button', { name: /back to menu/i }))
     expect(onSkip).toHaveBeenCalledTimes(1)

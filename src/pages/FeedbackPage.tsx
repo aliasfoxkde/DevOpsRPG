@@ -17,7 +17,7 @@ const FEEDBACK_AREAS = [
   'Mini-games',
   'World Map',
   'Social Features',
-  'Store/Marketplace',
+  'Store',
   'Settings',
   'UI/UX',
   'Performance',

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useGame } from '../../contexts/GameContext'
+import { MINI_GAMES, MINI_GAME_UNLOCK_LEVEL, miniGameById, type MiniGameId } from './gameCatalog'
 import { CommandTyper } from './CommandTyper'
 import { MemoryMatch } from './MemoryMatch'
 import { MathChallengeGame } from './MathChallenge'
@@ -8,13 +9,13 @@ import { QuizDashGame } from './QuizDash'
 import { TerminalSimulator } from './TerminalSimulator'
 import { IncidentSimulator } from './IncidentSimulator'
 
-type GameType = 'menu' | 'command' | 'memory' | 'math' | 'code' | 'quiz' | 'terminal' | 'incident'
+type HubView = 'menu' | MiniGameId
 
 interface MiniGameHubProps {
   onClose: () => void
+  /** Open straight onto one game instead of the menu. */
+  initialGame?: MiniGameId
 }
-
-const UNLOCK_LEVEL = 3
 
 /**
  * Share of a round's maximum score that the player actually hit.
@@ -29,22 +30,22 @@ function accuracyRatio(score: number, maxScore: number): number {
   return maxScore > 0 ? score / maxScore : 0
 }
 
-export function MiniGameHub({ onClose }: MiniGameHubProps) {
-  const { game, addXP, addGold, grantBadge, incrementStat } = useGame()
+export function MiniGameHub({ onClose, initialGame }: MiniGameHubProps) {
+  const { game, rewardBonuses, addXP, addGold, grantBadge, incrementStat } = useGame()
   const { character } = game
-  const [currentGame, setCurrentGame] = useState<GameType>('menu')
+  const [currentGame, setCurrentGame] = useState<HubView>(initialGame ?? 'menu')
   const [gameResult, setGameResult] = useState<{ score: number; maxScore: number } | null>(null)
 
-  const isUnlocked = character.level >= UNLOCK_LEVEL
+  const isUnlocked = character.level >= MINI_GAME_UNLOCK_LEVEL
 
   const handleGameComplete = (score: number, maxScore: number) => {
     setGameResult({ score, maxScore })
-    // Award bonus XP based on performance
+    // The payout caps come straight from the catalog, so a round can never pay
+    // less than its menu tile advertised.
+    const rewards = miniGameById(currentGame as MiniGameId)
     const ratio = accuracyRatio(score, maxScore)
-    const xpBonus = Math.round(ratio * 50)
-    const goldBonus = Math.round(ratio * 25)
-    addXP(xpBonus)
-    addGold(goldBonus)
+    addXP(Math.round(ratio * rewards.xpPotential))
+    addGold(Math.round(ratio * rewards.goldPotential))
 
     // Check for badges
     if (ratio >= 0.8) {
@@ -75,7 +76,7 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
       <h2 className="text-2xl font-bold text-white mb-2 text-center">🎮 Mini-Games</h2>
       {!isUnlocked && (
         <p className="text-amber-400 text-center mb-4 text-sm">
-          🔒 Unlocks at Level {UNLOCK_LEVEL} (Current: Level {character.level})
+          🔒 Unlocks at Level {MINI_GAME_UNLOCK_LEVEL} (Current: Level {character.level})
         </p>
       )}
       <p className="text-slate-400 text-center mb-8">
@@ -85,181 +86,36 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <button
-          onClick={() => {
-            if (isUnlocked) setCurrentGame('command')
-          }}
-          disabled={!isUnlocked}
-          aria-label={
-            isUnlocked
-              ? 'Play Command Typer game'
-              : `Command Typer - requires level ${UNLOCK_LEVEL}`
-          }
-          aria-disabled={!isUnlocked}
-          className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
-            isUnlocked
-              ? 'bg-gradient-to-br from-orange-900/30 to-red-900/30 border-orange-700/50 hover:border-orange-500'
-              : 'bg-slate-800/30 border-slate-700/50 grayscale cursor-not-allowed'
-          }`}
-        >
-          <div className={`text-4xl mb-3 ${!isUnlocked && 'grayscale'}`}>⌨️</div>
-          <h3 className="text-lg font-bold text-white mb-1">Command Typer</h3>
-          <p className="text-sm text-slate-400">Type DevOps commands quickly and accurately</p>
-          <div className="mt-3 text-xs text-orange-400">+50 XP potential</div>
-          {!isUnlocked && (
-            <div className="mt-2 text-xs text-slate-500">Level {UNLOCK_LEVEL} to unlock</div>
-          )}
-        </button>
-
-        <button
-          onClick={() => {
-            if (isUnlocked) setCurrentGame('memory')
-          }}
-          disabled={!isUnlocked}
-          aria-label={
-            isUnlocked ? 'Play Memory Match game' : `Memory Match - requires level ${UNLOCK_LEVEL}`
-          }
-          aria-disabled={!isUnlocked}
-          className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
-            isUnlocked
-              ? 'bg-gradient-to-br from-purple-900/30 to-pink-900/30 border-purple-700/50 hover:border-purple-500'
-              : 'bg-slate-800/30 border-slate-700/50 grayscale cursor-not-allowed'
-          }`}
-        >
-          <div className={`text-4xl mb-3 ${!isUnlocked && 'grayscale'}`}>🧠</div>
-          <h3 className="text-lg font-bold text-white mb-1">Memory Match</h3>
-          <p className="text-sm text-slate-400">Match DevOps icons and concepts</p>
-          <div className="mt-3 text-xs text-purple-400">+50 XP potential</div>
-          {!isUnlocked && (
-            <div className="mt-2 text-xs text-slate-500">Level {UNLOCK_LEVEL} to unlock</div>
-          )}
-        </button>
-
-        <button
-          onClick={() => {
-            if (isUnlocked) setCurrentGame('math')
-          }}
-          disabled={!isUnlocked}
-          aria-label={
-            isUnlocked
-              ? 'Play Math Challenge game'
-              : `Math Challenge - requires level ${UNLOCK_LEVEL}`
-          }
-          aria-disabled={!isUnlocked}
-          className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
-            isUnlocked
-              ? 'bg-gradient-to-br from-cyan-900/30 to-blue-900/30 border-cyan-700/50 hover:border-cyan-500'
-              : 'bg-slate-800/30 border-slate-700/50 grayscale cursor-not-allowed'
-          }`}
-        >
-          <div className={`text-4xl mb-3 ${!isUnlocked && 'grayscale'}`}>🔢</div>
-          <h3 className="text-lg font-bold text-white mb-1">Math Challenge</h3>
-          <p className="text-sm text-slate-400">Solve DevOps calculation problems</p>
-          <div className="mt-3 text-xs text-cyan-400">+75 XP potential</div>
-          {!isUnlocked && (
-            <div className="mt-2 text-xs text-slate-500">Level {UNLOCK_LEVEL} to unlock</div>
-          )}
-        </button>
-
-        <button
-          onClick={() => {
-            if (isUnlocked) setCurrentGame('code')
-          }}
-          disabled={!isUnlocked}
-          aria-label={
-            isUnlocked ? 'Play Code Puzzle game' : `Code Puzzle - requires level ${UNLOCK_LEVEL}`
-          }
-          aria-disabled={!isUnlocked}
-          className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
-            isUnlocked
-              ? 'bg-gradient-to-br from-green-900/30 to-emerald-900/30 border-green-700/50 hover:border-green-500'
-              : 'bg-slate-800/30 border-slate-700/50 grayscale cursor-not-allowed'
-          }`}
-        >
-          <div className={`text-4xl mb-3 ${!isUnlocked && 'grayscale'}`}>💻</div>
-          <h3 className="text-lg font-bold text-white mb-1">Code Puzzle</h3>
-          <p className="text-sm text-slate-400">Complete code snippets and find bugs</p>
-          <div className="mt-3 text-xs text-green-400">+50 XP potential</div>
-          {!isUnlocked && (
-            <div className="mt-2 text-xs text-slate-500">Level {UNLOCK_LEVEL} to unlock</div>
-          )}
-        </button>
-
-        <button
-          onClick={() => {
-            if (isUnlocked) setCurrentGame('quiz')
-          }}
-          disabled={!isUnlocked}
-          aria-label={
-            isUnlocked ? 'Play Quiz Dash game' : `Quiz Dash - requires level ${UNLOCK_LEVEL}`
-          }
-          aria-disabled={!isUnlocked}
-          className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
-            isUnlocked
-              ? 'bg-gradient-to-br from-red-900/30 to-orange-900/30 border-red-700/50 hover:border-red-500'
-              : 'bg-slate-800/30 border-slate-700/50 grayscale cursor-not-allowed'
-          }`}
-        >
-          <div className={`text-4xl mb-3 ${!isUnlocked && 'grayscale'}`}>⚡</div>
-          <h3 className="text-lg font-bold text-white mb-1">Quiz Dash</h3>
-          <p className="text-sm text-slate-400">Rapid-fire DevOps quiz challenge!</p>
-          <div className="mt-3 text-xs text-red-400">+75 XP potential</div>
-          {!isUnlocked && (
-            <div className="mt-2 text-xs text-slate-500">Level {UNLOCK_LEVEL} to unlock</div>
-          )}
-        </button>
-
-        <button
-          onClick={() => {
-            if (isUnlocked) setCurrentGame('terminal')
-          }}
-          disabled={!isUnlocked}
-          aria-label={
-            isUnlocked
-              ? 'Play Terminal Simulator game'
-              : `Terminal Simulator - requires level ${UNLOCK_LEVEL}`
-          }
-          aria-disabled={!isUnlocked}
-          className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
-            isUnlocked
-              ? 'bg-gradient-to-br from-slate-900/30 to-slate-800/30 border-slate-600/50 hover:border-slate-400'
-              : 'bg-slate-800/30 border-slate-700/50 grayscale cursor-not-allowed'
-          }`}
-        >
-          <div className={`text-4xl mb-3 ${!isUnlocked && 'grayscale'}`}>💻</div>
-          <h3 className="text-lg font-bold text-white mb-1">Terminal Simulator</h3>
-          <p className="text-sm text-slate-400">Type real DevOps commands</p>
-          <div className="mt-3 text-xs text-slate-400">+100 XP potential</div>
-          {!isUnlocked && (
-            <div className="mt-2 text-xs text-slate-500">Level {UNLOCK_LEVEL} to unlock</div>
-          )}
-        </button>
-
-        <button
-          onClick={() => {
-            if (isUnlocked) setCurrentGame('incident')
-          }}
-          disabled={!isUnlocked}
-          aria-label={
-            isUnlocked
-              ? 'Play Incident Response game'
-              : `Incident Response - requires level ${UNLOCK_LEVEL}`
-          }
-          aria-disabled={!isUnlocked}
-          className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
-            isUnlocked
-              ? 'bg-gradient-to-br from-red-900/30 to-orange-900/30 border-red-700/50 hover:border-red-500'
-              : 'bg-slate-800/30 border-slate-700/50 grayscale cursor-not-allowed'
-          }`}
-        >
-          <div className={`text-4xl mb-3 ${!isUnlocked && 'grayscale'}`}>🚨</div>
-          <h3 className="text-lg font-bold text-white mb-1">Incident Response</h3>
-          <p className="text-sm text-slate-400">Handle production emergencies</p>
-          <div className="mt-3 text-xs text-red-400">+350 XP potential</div>
-          {!isUnlocked && (
-            <div className="mt-2 text-xs text-slate-500">Level {UNLOCK_LEVEL} to unlock</div>
-          )}
-        </button>
+        {MINI_GAMES.map((entry) => (
+          <button
+            key={entry.id}
+            onClick={() => {
+              if (isUnlocked) setCurrentGame(entry.id)
+            }}
+            disabled={!isUnlocked}
+            aria-label={
+              isUnlocked
+                ? `Play ${entry.name} game`
+                : `${entry.name} - requires level ${MINI_GAME_UNLOCK_LEVEL}`
+            }
+            aria-disabled={!isUnlocked}
+            className={`p-6 rounded-xl border transition-all group focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+              isUnlocked
+                ? `bg-gradient-to-br ${entry.tileGradient}`
+                : 'bg-slate-800/30 border-slate-700/50 grayscale cursor-not-allowed'
+            }`}
+          >
+            <div className={`text-4xl mb-3 ${!isUnlocked && 'grayscale'}`}>{entry.icon}</div>
+            <h3 className="text-lg font-bold text-white mb-1">{entry.name}</h3>
+            <p className="text-sm text-slate-400">{entry.description}</p>
+            <div className={`mt-3 text-xs ${entry.accent}`}>
+              +{entry.xpPotential} XP potential
+            </div>
+            {!isUnlocked && (
+              <div className="mt-2 text-xs text-slate-500">Level {MINI_GAME_UNLOCK_LEVEL} to unlock</div>
+            )}
+          </button>
+        ))}
       </div>
 
       <button
@@ -273,14 +129,21 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
   )
 
   const renderResult = () => {
-    if (!gameResult) return null
+    if (!gameResult || currentGame === 'menu') return null
 
+    const rewards = miniGameById(currentGame)
     const ratio = accuracyRatio(gameResult.score, gameResult.maxScore)
     // The time bonus can push the raw score past maxScore; accuracy itself
     // is still capped at a perfect score.
     const percentage = Math.min(100, Math.round(ratio * 100))
-    const xpEarned = Math.round(ratio * 50)
-    const goldEarned = Math.round(ratio * 25)
+    // Display the amounts that actually land in the save (addXP/addGold apply
+    // the same multipliers), not the raw pre-bonus roll.
+    const xpEarned = Math.floor(
+      Math.round(ratio * rewards.xpPotential) * rewardBonuses.xpMultiplier,
+    )
+    const goldEarned = Math.floor(
+      Math.round(ratio * rewards.goldPotential) * rewardBonuses.goldMultiplier,
+    )
 
     return (
       <div className="p-6 text-center">
@@ -333,20 +196,40 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
     )
   }
 
+  const renderGame = () => {
+    switch (currentGame) {
+      case 'command':
+        return <CommandTyper rounds={5} onComplete={handleGameComplete} onSkip={handleSkip} />
+      case 'memory':
+        return <MemoryMatch pairs={6} onComplete={handleGameComplete} onSkip={handleSkip} />
+      case 'math':
+        return <MathChallengeGame rounds={5} onComplete={handleGameComplete} onSkip={handleSkip} />
+      case 'quiz':
+        return <QuizDashGame onComplete={handleGameComplete} onSkip={handleSkip} />
+      case 'terminal':
+        return <TerminalSimulator onComplete={handleGameComplete} />
+      case 'incident':
+        return <IncidentSimulator onComplete={handleGameComplete} />
+      case 'code':
+        return <CodePuzzleGame rounds={5} onComplete={handleGameComplete} onSkip={handleSkip} />
+      case 'menu':
+        return renderMenu()
+    }
+  }
+
+  const heading =
+    currentGame === 'menu' ? '🎮 Mini-Games' : (() => {
+      const entry = miniGameById(currentGame)
+      return `${entry.icon} ${entry.name}`
+    })()
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
       <div className="w-full max-w-2xl bg-slate-800 rounded-2xl border border-amber-600/50 shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-amber-900/30 via-slate-800 to-amber-900/30 px-6 py-4 border-b border-slate-700 flex items-center justify-between">
           <h2 className="text-xl font-bold text-white">
-            {currentGame === 'menu' && '🎮 Mini-Games'}
-            {currentGame === 'command' && '⌨️ Command Typer'}
-            {currentGame === 'memory' && '🧠 Memory Match'}
-            {currentGame === 'math' && '🔢 Math Challenge'}
-            {currentGame === 'code' && '💻 Code Puzzle'}
-            {currentGame === 'quiz' && '⚡ Quiz Dash'}
-            {currentGame === 'terminal' && '💻 Terminal Simulator'}
-            {currentGame === 'incident' && '🚨 Incident Response'}
+            {heading}
             {gameResult && '✨ Results'}
           </h2>
           <button
@@ -359,25 +242,7 @@ export function MiniGameHub({ onClose }: MiniGameHubProps) {
 
         {/* Content */}
         <div className="max-h-[70vh] overflow-y-auto">
-          {gameResult ? (
-            renderResult()
-          ) : currentGame === 'menu' ? (
-            renderMenu()
-          ) : currentGame === 'command' ? (
-            <CommandTyper rounds={5} onComplete={handleGameComplete} onSkip={handleSkip} />
-          ) : currentGame === 'memory' ? (
-            <MemoryMatch pairs={6} onComplete={handleGameComplete} onSkip={handleSkip} />
-          ) : currentGame === 'math' ? (
-            <MathChallengeGame rounds={5} onComplete={handleGameComplete} onSkip={handleSkip} />
-          ) : currentGame === 'quiz' ? (
-            <QuizDashGame onComplete={handleGameComplete} onSkip={handleSkip} />
-          ) : currentGame === 'terminal' ? (
-            <TerminalSimulator onComplete={handleGameComplete} />
-          ) : currentGame === 'incident' ? (
-            <IncidentSimulator onComplete={handleGameComplete} />
-          ) : (
-            <CodePuzzleGame rounds={5} onComplete={handleGameComplete} onSkip={handleSkip} />
-          )}
+          {gameResult ? renderResult() : renderGame()}
         </div>
       </div>
     </div>

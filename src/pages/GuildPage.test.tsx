@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { screen, within, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
@@ -10,11 +10,22 @@ import {
   FEATURED_GUILDS,
 } from '@/data/guilds'
 import { generateWeeklyChallenges } from '@/data/communityChallenges'
+import { CLASS_BONUSES } from '@/contexts/game/bonusEngine'
 import { allQuests } from '@/data/quests'
 import { closestContainer, renderPage, renderSeededPage, seedDefaultGame } from './test-utils'
 import { renderGame } from '@/contexts/test-utils'
 import { STORAGE_KEYS } from '@/utils/gameUtils'
 import type { GameState } from '@/contexts/GameContext'
+
+// Quest payouts include the live seasonal event multiplier; pin it to 1x so
+// reward math stays deterministic no matter when the suite runs.
+vi.mock(
+  '@/data/seasonalEvents',
+  async (importOriginal: () => Promise<typeof import('@/data/seasonalEvents')>) => ({
+    ...(await importOriginal()),
+    getActiveEventMultiplier: () => 1,
+  }),
+)
 
 /** A quest-completion record shaped like the provider's own `TopicProgress`. */
 interface SeededQuest {
@@ -316,18 +327,22 @@ describe('GuildPage', () => {
       getGame().completeQuest(quest.id)
     })
 
-    // Completing a quest banks skill XP for its technology...
-    expect(getGame().game.skillXp[quest.technologyId]).toBe(quest.xpReward)
+    // Completing a quest banks skill XP for its technology (the default
+    // DevOps Sage class grants +10% XP, and banked XP is the granted amount)
+    const grantedXp = Math.floor(
+      quest.xpReward * (1 + CLASS_BONUSES[getGame().game.character.class].bonus),
+    )
+    expect(getGame().game.skillXp[quest.technologyId]).toBe(grantedXp)
 
     await user.click(screen.getByRole('button', { name: '👥 Members' }))
 
     // ...and the roster credits it to the player's weekly contribution
     const playerRow = closestContainer(screen.getByText('Hero'), 'div.bg-card')
-    expect(within(playerRow).getByText(quest.xpReward.toLocaleString())).toBeInTheDocument()
+    expect(within(playerRow).getByText(grantedXp.toLocaleString())).toBeInTheDocument()
     expect(within(playerRow).getByText('1 this week')).toBeInTheDocument()
 
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEYS.GAME) ?? '{}') as GameState
-    expect(stored.skillXp[quest.technologyId]).toBe(quest.xpReward)
+    expect(stored.skillXp[quest.technologyId]).toBe(grantedXp)
     expect(stored.completedQuests).toHaveLength(1)
   })
 })

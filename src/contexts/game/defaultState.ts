@@ -94,6 +94,7 @@ function createDefaultCharacter(): Character {
     unlockedTitles: ['novice-devops'],
     unlockedFrames: ['default'],
     equippedItems: [],
+    ownedItems: [],
   }
 }
 
@@ -140,5 +141,11 @@ export function createDefaultGame(): GameState {
       weeklyXPCompleted: 0,
       lastWeekReset: new Date().toISOString(),
     },
+    dailyActivity: [], // Real completion dates; populated as the player plays
+    claimedStoryArcs: [], // Story arc ids whose completion rewards were claimed
+    claimedCareerMilestones: [], // "pathId:milestoneId" pairs already claimed
+    claimedCertifications: [], // Certification ids already earned
+    claimedEvents: [], // Seasonal event ids whose login bonus was claimed
+    pvpStats: { points: 0, wins: 0, losses: 0, streak: 0, bestStreak: 0 },
   }
 }

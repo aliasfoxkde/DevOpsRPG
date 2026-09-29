@@ -7,10 +7,10 @@ export interface SeasonalEvent {
   endDate: string // ISO date string
   type: 'holiday' | 'challenge' | 'limited' | 'special'
   bonusMultiplier: number // XP/Gold bonus during event
+  // One-time login bonus a player can claim from the events page while the
+  // event is live. Only currency the game actually pays out — anything that
+  // cannot be granted (badges, titles, frames) does not belong here.
   rewards?: {
-    badgeId?: string
-    title?: string
-    frame?: string
     bonusXP?: number
     bonusGold?: number
   }
@@ -63,7 +63,6 @@ export const SEASONAL_EVENTS: SeasonalEvent[] = [
     type: 'holiday',
     bonusMultiplier: 2.0,
     rewards: {
-      badgeId: 'holiday_spirit',
       bonusXP: 500,
       bonusGold: 200,
     },
@@ -96,8 +95,6 @@ export const SEASONAL_EVENTS: SeasonalEvent[] = [
     type: 'special',
     bonusMultiplier: 2.5,
     rewards: {
-      badgeId: 'anniversary_celebrant',
-      title: 'Anniversary Hero',
       bonusXP: 1000,
       bonusGold: 500,
     },
@@ -116,7 +113,6 @@ export const SEASONAL_EVENTS: SeasonalEvent[] = [
     type: 'holiday',
     bonusMultiplier: 1.75,
     rewards: {
-      badgeId: 'hacktober_survivor',
       bonusXP: 300,
       bonusGold: 150,
     },
@@ -150,7 +146,6 @@ export const SEASONAL_EVENTS: SeasonalEvent[] = [
     type: 'limited',
     bonusMultiplier: 2.0,
     rewards: {
-      badgeId: 'k8s_champion',
       bonusXP: 400,
     },
     requirements: {
@@ -159,24 +154,53 @@ export const SEASONAL_EVENTS: SeasonalEvent[] = [
   },
 ]
 
+// Date-only end dates parse as UTC midnight, but an event announced as ending
+// "Aug 31" should stay live through the whole day, not expire at 00:00.
+const END_OF_DAY_MS = 24 * 60 * 60 * 1000 - 1
+
+function isLive(event: SeasonalEvent, now: Date): boolean {
+  const start = new Date(event.startDate).getTime()
+  const end = new Date(event.endDate).getTime() + END_OF_DAY_MS
+  const at = now.getTime()
+  return at >= start && at <= end
+}
+
+// Whether `event`'s level/quest gates are cleared. Shared by the events page
+// and the claim action so they can never disagree about eligibility.
+export function meetsEventRequirements(
+  event: SeasonalEvent,
+  level: number,
+  completedQuestCount: number,
+): boolean {
+  if (!event.requirements) return true
+  return (
+    level >= (event.requirements.minLevel ?? 0) &&
+    completedQuestCount >= (event.requirements.minQuests ?? 0)
+  )
+}
+
+// Strongest XP/Gold multiplier among `events` at `now` (1 when none are live).
+// Overlapping events take the best multiplier rather than compounding.
+function eventMultiplierAt(events: readonly SeasonalEvent[], now: Date): number {
+  return events.reduce((best, event) => (isLive(event, now) ? Math.max(best, event.bonusMultiplier) : best), 1)
+}
+
 // Get currently active events
-export function getActiveEvents(): SeasonalEvent[] {
-  const now = new Date()
-  return SEASONAL_EVENTS.filter((event) => {
-    const start = new Date(event.startDate)
-    const end = new Date(event.endDate)
-    return now >= start && now <= end
-  })
+export function getActiveEvents(now: Date = new Date()): SeasonalEvent[] {
+  return SEASONAL_EVENTS.filter((event) => isLive(event, now))
+}
+
+// The calendar multiplier in effect right now — applied to quest XP and gold
+// in completeQuest so the advertised bonus is what players actually receive.
+export function getActiveEventMultiplier(now: Date = new Date()): number {
+  return eventMultiplierAt(SEASONAL_EVENTS, now)
 }
 
 // Check if a specific event is active
-export function isEventActive(eventId: string): boolean {
+export function isEventActive(eventId: string, now: Date = new Date()): boolean {
   const event = SEASONAL_EVENTS.find((e) => e.id === eventId)
   if (!event) return false
-  const now = new Date()
-  const start = new Date(event.startDate)
-  const end = new Date(event.endDate)
-  return now >= start && now <= end
+  return isLive(event, now)
 }
 
 // Get the next upcoming event

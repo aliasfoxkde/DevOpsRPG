@@ -114,7 +114,6 @@ const ROUTE_HEADINGS: ReadonlyArray<{ path: string; heading: string }> = [
   { path: '/storylines', heading: '📖 Story Quests' },
   { path: '/technology-collection', heading: '📚 Technology Collection' },
   { path: '/certifications', heading: '🏆 Certifications' },
-  { path: '/marketplace', heading: '🏪 Marketplace' },
   { path: '/feedback', heading: '📝 Submit Feedback' },
 ]
 

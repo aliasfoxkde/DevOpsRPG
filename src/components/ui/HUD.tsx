@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom'
 import { useGame } from '../../contexts/GameContext'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useSoundEffects } from '../../hooks/useSoundEffects'
+import { allQuests } from '../../data/quests'
+import { TITLES } from '../../data/titles'
 import { XPBar } from './XPBar'
 
 // Primary navigation - 7 essential items
@@ -53,6 +55,16 @@ export function HUD() {
 
   const themeIcons = { light: '☀️', dark: '🌙', system: '💻' }
   const themeLabels = { light: 'Light', dark: 'Dark', system: 'System' }
+
+  // The equipped cosmetic title wins when set; otherwise fall back to the
+  // level-derived title so the HUD always reflects what Titles & Frames shows.
+  const equippedTitleData = TITLES.find((t) => t.id === character.equippedTitle)
+  const displayTitle = equippedTitleData
+    ? `${equippedTitleData.icon} ${equippedTitleData.name}`
+    : character.title
+
+  // The quest the player has engaged (or the next up) — surfaced as a chip.
+  const currentQuest = allQuests.find((q) => q.id === game.currentQuestId) ?? null
 
   const cycleTheme = () => {
     const themes: ('light' | 'dark' | 'system')[] = ['light', 'dark', 'system']
@@ -178,18 +190,20 @@ export function HUD() {
             >
               <span className="text-xl">{character.avatar}</span>
               <div className="text-left">
-                <div className="text-xs text-slate-400">{character.title}</div>
+                <div className="text-xs text-slate-400">{displayTitle}</div>
                 <div className="text-sm font-bold text-amber-400">Lv {character.level}</div>
               </div>
             </Link>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile/Tablet Menu Button — visible below lg, where the inline
+                primary nav is hidden, so 768–1023px keeps a way to navigate */}
             <button
               onClick={() => {
                 setMobileMenuOpen(!mobileMenuOpen)
               }}
-              className="md:hidden flex items-center justify-center w-11 h-11 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
+              className="lg:hidden flex items-center justify-center w-11 h-11 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
               aria-label="Toggle menu"
+              aria-expanded={mobileMenuOpen}
             >
               <span className="text-xl">{mobileMenuOpen ? '✕' : '☰'}</span>
             </button>
@@ -199,21 +213,33 @@ export function HUD() {
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center justify-between py-2 border-t border-slate-700/50">
           {/* Quest Progress */}
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-slate-400">Progress:</span>
-            <div className="flex items-center gap-1">
-              <div className="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-green-500 to-emerald-400 transition-all duration-500"
-                  style={{
-                    width: `${totalQuests > 0 ? (completedCount / totalQuests) * 100 : 0}%`,
-                  }}
-                />
+          <div className="flex items-center gap-3 text-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-slate-400">Progress:</span>
+              <div className="flex items-center gap-1">
+                <div className="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-green-500 to-emerald-400 transition-all duration-500"
+                    style={{
+                      width: `${totalQuests > 0 ? (completedCount / totalQuests) * 100 : 0}%`,
+                    }}
+                  />
+                </div>
+                <span className="text-slate-300">
+                  {completedCount}/{totalQuests}
+                </span>
               </div>
-              <span className="text-slate-300">
-                {completedCount}/{totalQuests}
-              </span>
             </div>
+            {currentQuest && (
+              <Link
+                to={`/quest/${currentQuest.id}`}
+                className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-900/40 border border-emerald-600/40 text-emerald-300 hover:bg-emerald-800/50 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 max-w-xs"
+                title={`Resume ${currentQuest.title}`}
+              >
+                <span aria-hidden="true">🎯</span>
+                <span className="truncate">{currentQuest.title}</span>
+              </Link>
+            )}
           </div>
 
           {/* Primary Nav Links */}
@@ -261,9 +287,9 @@ export function HUD() {
           </div>
         </div>
 
-        {/* Mobile Nav Menu */}
+        {/* Mobile/Tablet Nav Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-slate-700/50 animate-slide-down">
+          <div className="lg:hidden py-4 border-t border-slate-700/50 animate-slide-down">
             {/* Primary Nav - 2 column grid */}
             <nav className="grid grid-cols-2 gap-2">
               {PRIMARY_NAV.map((item) => {
@@ -323,7 +349,7 @@ export function HUD() {
             <div className="mt-4 p-3 rounded-lg bg-slate-800 flex items-center gap-3">
               <span className="text-3xl">{character.avatar}</span>
               <div>
-                <div className="text-sm text-slate-400">{character.title}</div>
+                <div className="text-sm text-slate-400">{displayTitle}</div>
                 <div className="font-bold text-amber-400">Level {character.level}</div>
               </div>
               <div className="ml-auto text-right">

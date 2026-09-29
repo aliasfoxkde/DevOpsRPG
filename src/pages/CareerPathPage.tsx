@@ -11,27 +11,42 @@ import {
 type FilterDemand = 'all' | 'high' | 'medium' | 'growing'
 
 export default function CareerPathPage() {
-  const { game } = useGame()
-  const { completedQuests } = game
+  const { game, claimCareerMilestone } = useGame()
+  const { completedQuests, claimedCareerMilestones } = game
 
   const [selectedPath, setSelectedPath] = useState<CareerPath | null>(null)
   const [filterDemand, setFilterDemand] = useState<FilterDemand>('all')
+  const [claimFeedback, setClaimFeedback] = useState<{ ok: boolean; text: string } | null>(null)
 
-  // Calculate player's progress in each technology
+  // Real progress: completed quests over the technology's full quest list.
   const techProgress = useMemo(() => {
+    const doneQuestIds = new Set(completedQuests.map((q) => q.questId))
     const progress: Record<string, number> = {}
     for (const path of CAREER_PATHS) {
       for (const tech of path.technologies) {
-        // Check how many quests for this technology the player has completed
-        const techQuests = completedQuests.filter(
-          (q) => q.technologyId === tech.id || q.topicId.toLowerCase().includes(tech.id),
-        )
-        // For now, estimate progress based on completed quests (would need total quest count per tech)
-        progress[tech.id] = Math.min(100, techQuests.length * 25)
+        if (tech.questIds.length === 0) continue
+        const done = tech.questIds.filter((questId) => doneQuestIds.has(questId)).length
+        progress[tech.id] = Math.round((done / tech.questIds.length) * 100)
       }
     }
     return progress
   }, [completedQuests])
+
+  // A milestone is earned when every technology it requires is at 100%.
+  const isMilestoneComplete = (requiredTechnologies: string[]) =>
+    requiredTechnologies.every((techId) => techProgress[techId] === 100)
+
+  const handleClaimMilestone = (path: CareerPath, milestoneId: string, name: string) => {
+    const rewards = claimCareerMilestone(path.id, milestoneId)
+    if (rewards.xp === 0 && rewards.gold === 0) {
+      setClaimFeedback({
+        ok: false,
+        text: `"${name}" isn't finished yet — reach 100% in each required technology.`,
+      })
+      return
+    }
+    setClaimFeedback({ ok: true, text: `${name}: +${rewards.xp} XP, +${rewards.gold} gold` })
+  }
 
   // Calculate overall path progress
   const getPathProgress = (path: CareerPath) => {
@@ -232,6 +247,28 @@ export default function CareerPathPage() {
 
             {/* Content */}
             <div className="p-6 overflow-y-auto flex-1 space-y-6">
+              {/* Claim feedback */}
+              {claimFeedback && (
+                <div
+                  role="status"
+                  className={`p-3 rounded-lg border text-sm ${
+                    claimFeedback.ok
+                      ? 'bg-green-900/30 border-green-700/50 text-green-300'
+                      : 'bg-red-900/30 border-red-700/50 text-red-300'
+                  }`}
+                >
+                  {claimFeedback.text}
+                  <button
+                    onClick={() => {
+                      setClaimFeedback(null)
+                    }}
+                    className="ml-3 underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-current"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              )}
+
               {/* Quick Stats */}
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-slate-900/50 rounded-lg p-4 text-center">
@@ -321,32 +358,60 @@ export default function CareerPathPage() {
               <div>
                 <h3 className="text-lg font-bold text-white mb-3">🏆 Milestones</h3>
                 <div className="space-y-3">
-                  {selectedPath.milestones.map((milestone) => (
-                    <div
-                      key={milestone.id}
-                      className="bg-slate-900/50 rounded-lg p-4 border border-slate-700 flex items-start gap-3"
-                    >
-                      <span className="text-3xl">{milestone.icon}</span>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-bold text-white">{milestone.name}</h4>
-                          <span className="text-xs text-amber-400">
-                            +{milestone.rewards.xpBonus} XP • +{milestone.rewards.goldBonus} 🪙
-                          </span>
+                  {selectedPath.milestones.map((milestone) => {
+                    const complete = isMilestoneComplete(milestone.requiredTechnologies)
+                    const claimed = claimedCareerMilestones.includes(
+                      `${selectedPath.id}:${milestone.id}`,
+                    )
+                    return (
+                      <div
+                        key={milestone.id}
+                        className={`bg-slate-900/50 rounded-lg p-4 border flex items-start gap-3 ${
+                          complete ? 'border-green-700/50' : 'border-slate-700'
+                        }`}
+                      >
+                        <span className="text-3xl">{milestone.icon}</span>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-bold text-white">{milestone.name}</h4>
+                            <span className="text-xs text-amber-400">
+                              +{milestone.rewards.xpBonus} XP • +{milestone.rewards.goldBonus} 🪙
+                            </span>
+                          </div>
+                          <p className="text-sm text-slate-400 mt-1">{milestone.description}</p>
+                          <p className="text-xs text-slate-500 mt-2">
+                            Requires:{' '}
+                            {milestone.requiredTechnologies
+                              .map((t) => {
+                                const tech = selectedPath.technologies.find((tc) => tc.id === t)
+                                return tech ? `${tech.icon} ${tech.name}` : t
+                              })
+                              .join(', ')}
+                          </p>
                         </div>
-                        <p className="text-sm text-slate-400 mt-1">{milestone.description}</p>
-                        <p className="text-xs text-slate-500 mt-2">
-                          Requires:{' '}
-                          {milestone.requiredTechnologies
-                            .map((t) => {
-                              const tech = selectedPath.technologies.find((tc) => tc.id === t)
-                              return tech ? `${tech.icon} ${tech.name}` : t
-                            })
-                            .join(', ')}
-                        </p>
+                        {claimed ? (
+                          <span className="shrink-0 px-3 py-1 rounded text-xs bg-green-900/50 text-green-400 font-medium">
+                            ✓ Claimed
+                          </span>
+                        ) : complete ? (
+                          <button
+                            onClick={() => {
+                              handleClaimMilestone(
+                                selectedPath,
+                                milestone.id,
+                                milestone.name,
+                              )
+                            }}
+                            className="shrink-0 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white text-xs font-bold rounded transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400"
+                          >
+                            🎁 Claim
+                          </button>
+                        ) : (
+                          <span className="shrink-0 text-xs text-slate-500 self-center">🔒</span>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             </div>

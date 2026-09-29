@@ -4,15 +4,15 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import {
   SEASONAL_EVENTS,
   getActiveEvents,
+  getActiveEventMultiplier,
   isEventActive,
+  meetsEventRequirements,
   getNextEvent,
   getCurrentSeason,
   getSeasonalColors,
   type SeasonalEvent,
 } from './seasonalEvents'
-import { BADGES } from './badges'
 
-const badgeIds = new Set(BADGES.map((badge) => badge.id))
 const TYPES: SeasonalEvent['type'][] = ['holiday', 'challenge', 'limited', 'special']
 
 /** Local-time date so assertions hold regardless of the runner's timezone. */
@@ -73,39 +73,36 @@ describe('SEASONAL_EVENTS catalog', () => {
   it('pays the exact rewards the event cards advertise', () => {
     const byId = new Map(SEASONAL_EVENTS.map((event) => [event.id, event]))
     expect(byId.get('winter-holiday-2026')?.rewards).toEqual({
-      badgeId: 'holiday_spirit',
       bonusXP: 500,
       bonusGold: 200,
     })
     expect(byId.get('anniversary-2026')).toMatchObject({
       type: 'special',
       bonusMultiplier: 2.5,
-      rewards: { title: 'Anniversary Hero', bonusXP: 1000, bonusGold: 500 },
+      rewards: { bonusXP: 1000, bonusGold: 500 },
     })
     expect(byId.get('k8s-week')).toMatchObject({
       type: 'limited',
       bonusMultiplier: 2,
-      rewards: { badgeId: 'k8s_champion', bonusXP: 400 },
+      rewards: { bonusXP: 400 },
     })
     expect(byId.get('summer-quest-2026')?.rewards).toBeUndefined()
   })
 
-  it('references badge ids that exist in the badge catalog (documented gap)', () => {
-    // KNOWN GAP (tripwire, not an assertion of correctness): four events promise
-    // a "Special Badge" whose id has no BADGES entry, so nothing can ever award
-    // them. Adding those badges should let this whitelist shrink to [].
-    const referenced = [
-      ...new Set(
-        SEASONAL_EVENTS.flatMap((event) => (event.rewards?.badgeId ? [event.rewards.badgeId] : [])),
-      ),
-    ]
-    const dangling = referenced.filter((id) => !badgeIds.has(id))
-    expect(dangling).toEqual([
-      'holiday_spirit',
-      'anniversary_celebrant',
-      'hacktober_survivor',
-      'k8s_champion',
-    ])
+  it('never promises a reward the game cannot pay out', () => {
+    // Events used to list badge/title/frame rewards with no BADGES/TITLES
+    // entry and no granting code — fabrication. Rewards must be currency the
+    // claim action actually pays, and every rewards block must pay something.
+    for (const event of SEASONAL_EVENTS) {
+      if (!event.rewards) continue
+      const paysSomething =
+        (event.rewards.bonusXP ?? 0) > 0 || (event.rewards.bonusGold ?? 0) > 0
+      expect(paysSomething, `${event.id} rewards`).toBe(true)
+      expect(
+        Object.keys(event.rewards).every((key) => ['bonusXP', 'bonusGold'].includes(key)),
+        event.id,
+      ).toBe(true)
+    }
   })
 })
 
@@ -140,10 +137,13 @@ describe('getActiveEvents', () => {
 
   it('treats the first and last day of a window as active', () => {
     vi.useFakeTimers()
-    // startDate/endDate are date-only strings, parsed as UTC midnight.
+    // startDate/endDate are date-only strings, parsed as UTC midnight; the
+    // event stays live through the whole final day.
     vi.setSystemTime(new Date('2026-06-01T00:00:00Z'))
     expect(getActiveEvents().map((event) => event.id)).toContain('summer-quest-2026')
-    vi.setSystemTime(new Date('2026-08-31T00:00:00Z'))
+    vi.setSystemTime(new Date('2026-08-31T12:00:00Z'))
+    expect(getActiveEvents().map((event) => event.id)).toContain('summer-quest-2026')
+    vi.setSystemTime(new Date('2026-08-31T23:59:59Z'))
     expect(getActiveEvents().map((event) => event.id)).toContain('summer-quest-2026')
     vi.setSystemTime(new Date('2026-09-01T00:00:00Z'))
     expect(getActiveEvents().map((event) => event.id)).not.toContain('summer-quest-2026')
@@ -172,10 +172,55 @@ describe('isEventActive', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-12-01T00:00:00Z'))
     expect(isEventActive('winter-holiday-2026')).toBe(true)
-    vi.setSystemTime(new Date('2026-12-31T00:00:00Z'))
+    vi.setSystemTime(new Date('2026-12-31T23:59:59Z'))
     expect(isEventActive('winter-holiday-2026')).toBe(true)
-    vi.setSystemTime(new Date('2026-12-31T00:00:01Z'))
+    vi.setSystemTime(new Date('2027-01-01T00:00:00Z'))
     expect(isEventActive('winter-holiday-2026')).toBe(false)
+  })
+})
+
+describe('getActiveEventMultiplier', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('pays 1x when no event is live', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-01-15T12:00:00Z'))
+    expect(getActiveEventMultiplier()).toBe(1)
+  })
+
+  it('pays the strongest live multiplier, not a compound', () => {
+    vi.useFakeTimers()
+    // autumn-harvest (1.25x) and halloween (1.75x) overlap in October
+    vi.setSystemTime(new Date('2026-10-10T12:00:00Z'))
+    expect(getActiveEventMultiplier()).toBe(1.75)
+    vi.setSystemTime(new Date('2026-09-15T12:00:00Z'))
+    expect(getActiveEventMultiplier()).toBe(1.25)
+  })
+
+  it('covers the whole final day of a window', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-08-31T23:00:00Z'))
+    expect(getActiveEventMultiplier()).toBe(1.5) // summer-quest's last evening
+  })
+})
+
+describe('meetsEventRequirements', () => {
+  const event = SEASONAL_EVENTS.find((e) => e.id === 'summer-code-jam')
+  if (!event) throw new Error('summer-code-jam missing from SEASONAL_EVENTS')
+
+  it('requires both the level and quest gates', () => {
+    expect(meetsEventRequirements(event, 9, 100)).toBe(false)
+    expect(meetsEventRequirements(event, 10, 49)).toBe(false)
+    expect(meetsEventRequirements(event, 10, 50)).toBe(true)
+    expect(meetsEventRequirements(event, 12, 80)).toBe(true)
+  })
+
+  it('every shipped event declares at least a level gate', () => {
+    for (const candidate of SEASONAL_EVENTS) {
+      expect(candidate.requirements?.minLevel ?? 0, candidate.id).toBeGreaterThan(0)
+    }
   })
 })
 

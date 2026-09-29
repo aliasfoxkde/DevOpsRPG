@@ -640,3 +640,92 @@ private `--coverage.reportsDirectory` values. Sustained external machine load (b
 average ~60-70) can push the heaviest list-rendering tests past the 15s `testTimeout`;
 solo runs and `--testTimeout` overrides confirm they are contention flakes, not
 defects.
+
+---
+
+## 5. Cycle 3 — 2026-09-27/29: the honesty pass (advertised = paid, shown = real)
+
+Theme: every number, reward, and system the UI advertises must come from real game data and
+must actually pay. This cycle removed the remaining fabricated marketing surfaces, closed the
+advertised-vs-payed reward gaps, and pinned the data invariants with a tripped-wire suite.
+
+### 5.1 Fabricated surfaces removed
+
+1. **MarketplacePage deleted** — a fake user-to-user trading page backed by `MOCK_LISTINGS`;
+   route, lazy import, breadcrumb entry and its App-test row removed. FeedbackPage nav label
+   updated.
+2. **HomePage honesty rewrite** — the testimonials section (invented users) deleted; the
+   "10,000+ learners" stat block replaced with `📊 Inside DevOpsQuest` counts derived from the
+   real catalogs (technologies, quests, realms, mini-games); the fictional 34-game grid
+   replaced with the 7 real games deep-linking into the hub; the realm preview now renders the
+   real realm ladder with unlock/complete state from the save; footer "Categories" replaced
+   with real system links.
+3. **GameLibraryPage rewritten** — advertised the fictional "K8s Kingdom"/"Word Wizard"/
+   "Coming Soon" roster; now renders exactly `MINI_GAMES` with honest "+N XP potential"
+   tiles, search/sort, lock states, and an "every one playable today" tagline.
+4. **GuildPage dead join flow removed** — membership is fixed to the demo guild, so the
+   "Join Guild"/"Requirements Not Met"/"Confirm Join" branches (a confirmation dialog whose
+   Confirm only closed itself) were unreachable dead UI. The page now states the hero serves
+   with the DevOps Masters and shows "Already in Guild"; the unreachable empty state is gone.
+
+### 5.2 Advertised-vs-paid reward gaps closed
+
+`gameCatalog.ts` (new) is the single source for the 7 mini-games — names, icons, descriptions,
+`xpPotential`/`goldPotential`, gradients — consumed by the hub menu, the payout maths, the
+library page and HomePage, with `miniGameById()` throwing on unknown ids. MiniGameHub now pays
+`Math.round(ratio * potential)` and its result screen shows the granted (bonus-applied)
+amounts, so the tile that says "+350 XP potential" is the tile that pays it.
+
+### 5.3 Real defects fixed (each with regression tests)
+
+1. **Specialist class bonus double-applied** — `bonusEngine.ts` applied `classTechFactor`
+   (which already holds `1 + bonus`) through another `(1 + ...)`, turning Cloud Knight's +20%
+   AWS bonus into +120%. New `bonusEngine.test.ts` (10 tests) covers the Sage global bonus,
+   specialist tech scoping, skill/equipment stacking, quiz-score and streak-shield sources.
+2. **Keyboard `n` ate typed input** — the global "activate primary action" shortcut fired
+   before the typing guard, so every "n" typed into search or the onboarding name field
+   clicked a button instead. The `isTyping` check now precedes all handling.
+3. **Case-sensitive shortcut matching restored** — `G` had been lower-cased into a g-sequence
+   it could never complete (and `gg` shadowed `g g`); keys now match `event.key` exactly, with
+   dead `g l`/`g d` bindings removed.
+4. **Route-level ErrorBoundary stuck** — the boundary in `Layout` is keyed by pathname, so
+   navigating away from a crashed route remounts a clean boundary (`Layout.test.tsx`).
+5. **`MOCK_GUILD.memberCount` (8) exceeded its roster (6)** while the page renders
+   "{memberCount}/{maxMembers} members" beside that roster — fixed to 6 with an integrity
+   tripwire.
+6. **Equipment advertised a `linux` bonus with no such technology** — `server_rack` (+8%) and
+   `linux_penguin_plush` (+5%) displayed store bonuses the engine could never pay; remapped to
+   `networking`/`bash`, and a new integrity section rejects any `techBonus` outside the
+   technology catalog.
+
+### 5.4 Single-source catalogs
+
+`SHORTCUT_SPECS` in `useKeyboardShortcuts.ts` now drives both the bindings and the
+KeyboardShortcutsHelp modal (plus the appended `Esc` row), with tests asserting the exact
+21-entry catalogue and 15 g-sequences. Breadcrumbs gained the `/feedback` label the navbar
+does not reach.
+
+### 5.5 Data-invariant tripwires (integrity.test.ts 34 → 59 tests)
+
+New sections pin: equipment (unique ids, positive prices, payable bonuses); storylines
+(unique arc/episode ids, episodes resolving to real quest ids, ascending unlocks, external
+prerequisites, real badge rewards); certifications (positive requirements/rewards, real
+required technologies, color/label entries for every tier — all in use); seasonal events
+(start < end, ≥1 multipliers, currency-only rewards, real quest references); PvP arena
+(contiguous non-overlapping rank bands from 0, boundary-consistent `getRankByPoints`/
+`getRankProgress`, every topic able to field a full match, unambiguous options); guilds
+(roster = advertised count, leader in roster with matching name/role, challenges and
+participants resolving); career paths (real technologies, quest-derived `questIds`, and —
+because `careerMilestoneIsComplete` looks requirements up inside the path's own technologies —
+every milestone gated only on on-path techs).
+
+### 5.6 Disposition of the defects documented in 4.6
+
+Fixed this cycle: seasonal events no longer reference badge ids (rewards are currency-only);
+the `linux` equipment bonuses; `MOCK_GUILD.memberCount`; the seasonal end-date boundary
+(`isLive` includes end-of-day, so an event no longer vanishes on its last day); GuildPage's
+unreachable join flow (removed); the SkillsPage MASTER chip (skills level via
+level-up-granted skill points through `allocateSkillPoint`, making maxing reachable); the `N`
+shortcut eating typed input. Still a documented product decision: `curiosity`/`speed` meta
+skills produce no bonus — implementing them is feature work (first-attempt tracking, timed-
+challenge payout hooks) and must not be faked with display-only numbers.

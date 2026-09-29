@@ -10,6 +10,7 @@ import {
 export default function SkillsPage() {
   const {
     game,
+    rewardBonuses,
     allocateSkillPoint,
     getSkillLevel,
     getAvailableSkillPoints,
@@ -77,12 +78,21 @@ export default function SkillsPage() {
       </div>
 
       {/* Active Bonuses Display */}
-      {activeBonuses.length > 0 && (
+      {(activeBonuses.length > 0 || rewardBonuses.classBonus.bonus > 0) && (
         <div className="bg-slate-800/80 rounded-xl border border-green-600/50 p-4 mb-8">
           <h3 className="text-lg font-bold text-green-400 mb-3 flex items-center gap-2">
-            <span>✨</span> Active Skill Bonuses
+            <span>✨</span> Active Bonuses
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+            {rewardBonuses.classBonus.bonus > 0 && (
+              <div className="bg-amber-900/30 rounded-lg p-2 border border-amber-700/30">
+                <div className="text-sm font-medium text-amber-300">
+                  {rewardBonuses.classBonus.techs === null
+                    ? `+${Math.round(rewardBonuses.classBonus.bonus * 100)}% XP on all quests (${game.character.class})`
+                    : `+${Math.round(rewardBonuses.classBonus.bonus * 100)}% XP on ${rewardBonuses.classBonus.techs.map((t) => t.toUpperCase()).join(', ')} quests (${game.character.class})`}
+                </div>
+              </div>
+            )}
             {activeBonuses.map((bonus, bonusIdx) => (
               <div
                 key={bonusIdx}

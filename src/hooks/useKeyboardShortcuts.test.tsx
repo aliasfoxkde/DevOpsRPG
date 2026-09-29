@@ -62,14 +62,13 @@ describe('useKeyboardShortcuts', () => {
   })
 
   describe('shortcut catalogue', () => {
-    it('returns shortcuts list', () => {
+    it('returns the advertised shortcuts list', () => {
       const { result } = renderHook(() => useKeyboardShortcuts(), { wrapper })
 
-      expect(result.current.shortcuts).toHaveLength(24)
+      expect(result.current.shortcuts).toHaveLength(21)
       expect(result.current.shortcuts[0].key).toBe('j')
       expect(result.current.shortcuts[1].key).toBe('k')
-      expect(result.current.shortcuts[2].key).toBe('gg')
-      expect(result.current.shortcuts[3].key).toBe('G')
+      expect(result.current.shortcuts[2].key).toBe('G')
     })
 
     it('contains correct descriptions and categories', () => {
@@ -78,19 +77,47 @@ describe('useKeyboardShortcuts', () => {
       expect(result.current.shortcuts[0].description).toBe('Scroll down')
       expect(result.current.shortcuts[0].category).toBe('navigation')
       expect(result.current.shortcuts[1].description).toBe('Scroll up')
-      expect(result.current.shortcuts[2].description).toBe('Go to top')
-      expect(result.current.shortcuts[3].description).toBe('Go to bottom')
+      expect(result.current.shortcuts[2].description).toBe('Go to bottom')
       expect(result.current.shortcuts.find((s) => s.key === '/')?.category).toBe('action')
       expect(result.current.shortcuts.find((s) => s.key === '?')?.category).toBe('accessibility')
     })
 
-    it('every navigation sequence maps to a route', () => {
+    it('exactly the sequences whose routes the app mounts', () => {
       const { result } = renderHook(() => useKeyboardShortcuts(), { wrapper })
-      const routes = result.current.shortcuts.filter((s) => s.key.startsWith('g '))
+      const sequences = result.current.shortcuts.filter((s) => s.key.startsWith('g '))
 
-      expect(routes).toHaveLength(17)
+      expect(sequences).toHaveLength(15)
+      expect(sequences.map((s) => s.key).sort()).toEqual(
+        [
+          'g a',
+          'g b',
+          'g c',
+          'g C',
+          'g f',
+          'g g',
+          'g h',
+          'g L',
+          'g m',
+          'g p',
+          'g q',
+          'g r',
+          'g s',
+          'g S',
+          'g w',
+        ].sort(),
+      )
       expect(result.current.shortcuts.find((s) => s.key === 'g h')?.description).toBe('Go to Home')
-      expect(result.current.shortcuts.find((s) => s.key === 'g l')?.description).toBe('Go to Learn')
+    })
+
+    it('has no binding for a route the app does not mount', () => {
+      const { result } = renderHook(() => useKeyboardShortcuts(), { wrapper })
+
+      expect(result.current.shortcuts.find((s) => s.key === 'g l')).toBeUndefined()
+      expect(result.current.shortcuts.find((s) => s.key === 'g d')).toBeUndefined()
+      // The unreachable scroll-to-top alias is gone too, and with it the
+      // sidebar toggle that had no CSS behind it.
+      expect(result.current.shortcuts.find((s) => s.key === 'gg')).toBeUndefined()
+      expect(result.current.shortcuts.find((s) => s.key === 'm')).toBeUndefined()
     })
   })
 
@@ -100,16 +127,16 @@ describe('useKeyboardShortcuts', () => {
       renderHook(() => useKeyboardShortcuts(false), { wrapper })
 
       pressKey('j')
-      pressKey('m')
+      pressKey('g')
 
       expect(scrollBy).not.toHaveBeenCalled()
-      expect(document.body.classList.contains('hidden-scroll')).toBe(false)
+      expect(currentPath()).toBe('/')
     })
 
     it('still exposes the catalogue for the help screen', () => {
       const { result } = renderHook(() => useKeyboardShortcuts(false), { wrapper })
 
-      expect(result.current.shortcuts).toHaveLength(24)
+      expect(result.current.shortcuts).toHaveLength(21)
     })
   })
 
@@ -132,17 +159,20 @@ describe('useKeyboardShortcuts', () => {
       expect(scrollBy).toHaveBeenCalledWith({ top: -50, behavior: 'smooth' })
     })
 
-    it("treats uppercase 'G' as the sequence prefix, so 'Go to bottom' cannot fire", () => {
-      // Keys are lowercased before matching, so the standalone 'G' and 'gg'
-      // catalogue entries are shadowed: 'G' opens a pending g-sequence instead
-      // of scrolling, and 'g g' navigates to /games instead of scrolling to top.
+    it("scrolls to the bottom on uppercase 'G'", () => {
+      // Keys are matched case-sensitively now, so shift+G scrolls instead of
+      // silently opening a g-sequence it could never complete.
       const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
       renderHook(() => useKeyboardShortcuts(), { wrapper })
 
       pressKey('G')
 
-      expect(scrollTo).not.toHaveBeenCalled()
-      expect(vi.getTimerCount()).toBe(1)
+      expect(scrollTo).toHaveBeenCalledWith({
+        top: document.body.scrollHeight,
+        behavior: 'smooth',
+      })
+      // No pending sequence timer was started either.
+      expect(vi.getTimerCount()).toBe(0)
     })
 
     it('stops scrolling after unmount', () => {
@@ -159,8 +189,6 @@ describe('useKeyboardShortcuts', () => {
   describe('g sequences', () => {
     it.each([
       ['h', '/'],
-      ['l', '/learn'],
-      ['d', '/dashboard'],
       ['q', '/quests'],
       ['c', '/character'],
       ['r', '/rewards'],
@@ -171,7 +199,6 @@ describe('useKeyboardShortcuts', () => {
       ['p', '/profile'],
       ['a', '/about'],
       ['f', '/faq'],
-      ['g', '/games'],
     ])("navigates to %s route for 'g %s'", (key, expectedPath) => {
       renderHook(() => useKeyboardShortcuts(), { wrapper })
 
@@ -181,27 +208,48 @@ describe('useKeyboardShortcuts', () => {
       expect(currentPath()).toBe(expectedPath)
     })
 
-    it('navigates twice in a row without re-pressing g', () => {
+    it.each([
+      ['L', '/leaderboard'],
+      ['C', '/challenges'],
+      ['S', '/store'],
+    ])("keeps uppercase second key %s distinct from its lowercase neighbour", (key, expectedPath) => {
+      renderHook(() => useKeyboardShortcuts(), { wrapper })
+
+      pressKey('g')
+      pressKey(key)
+
+      expect(currentPath()).toBe(expectedPath)
+    })
+
+    it("navigates to the game library for 'g g'", () => {
+      renderHook(() => useKeyboardShortcuts(), { wrapper })
+
+      pressKey('g')
+      pressKey('g')
+
+      expect(currentPath()).toBe('/games')
+    })
+
+    it('navigates twice in a row without re-arming between sequences', () => {
+      renderHook(() => useKeyboardShortcuts(), { wrapper })
+
+      pressKey('g')
+      pressKey('q')
+      pressKey('g')
+      pressKey('b')
+
+      expect(currentPath()).toBe('/badges')
+    })
+
+    it('ignores a dead sequence without navigating anywhere', () => {
+      // 'g l' used to navigate to the removed /learn route; now it is simply
+      // an unknown sequence.
       renderHook(() => useKeyboardShortcuts(), { wrapper })
 
       pressKey('g')
       pressKey('l')
-      pressKey('g')
-      pressKey('d')
 
-      expect(currentPath()).toBe('/dashboard')
-    })
-
-    it("resolves uppercase 'L' to the lowercase binding, which wins the 'g l' route", () => {
-      // Keys are lowercased before matching, so the distinct 'g L'
-      // (leaderboard), 'g C' (challenges) and 'g S' (store) catalogue entries
-      // are shadowed by their lowercase counterparts.
-      renderHook(() => useKeyboardShortcuts(), { wrapper })
-
-      pressKey('g')
-      pressKey('L')
-
-      expect(currentPath()).toBe('/learn')
+      expect(currentPath()).toBe('/')
     })
 
     it('ignores the second key when the sequence times out', () => {
@@ -265,14 +313,13 @@ describe('useKeyboardShortcuts', () => {
       expect(click).toHaveBeenCalledTimes(1)
     })
 
-    it('toggles the sidebar class on m', () => {
+    it('has no binding on m — the old sidebar toggle had no CSS behind it', () => {
       renderHook(() => useKeyboardShortcuts(), { wrapper })
 
       pressKey('m')
-      expect(document.body.classList.contains('hidden-scroll')).toBe(true)
 
-      pressKey('m')
-      expect(document.body.classList.contains('hidden-scroll')).toBe(false)
+      expect(document.body.className).toBe('')
+      expect(currentPath()).toBe('/')
     })
 
     it('does nothing for keys without a binding', () => {
@@ -393,21 +440,6 @@ describe('useKeyboardShortcuts', () => {
       expect(hiddenClick).not.toHaveBeenCalled()
       expect(visibleClick).toHaveBeenCalledTimes(1)
     })
-
-    it('blurs a focused input before activating the action', () => {
-      renderHook(() => useKeyboardShortcuts(), { wrapper })
-      const input = addElement(addSearchInput())
-      const action = document.createElement('button')
-      action.textContent = 'Continue'
-      addElement(action)
-      const actionClick = vi.spyOn(action, 'click').mockImplementation(() => {})
-      input.focus()
-
-      pressKey('n', input)
-
-      expect(document.activeElement).not.toBe(input)
-      expect(actionClick).toHaveBeenCalledTimes(1)
-    })
   })
 
   describe('Escape', () => {
@@ -463,10 +495,28 @@ describe('useKeyboardShortcuts', () => {
       input.focus()
 
       pressKey('j', input)
-      pressKey('m', input)
+      pressKey('g', input)
 
       expect(scrollBy).not.toHaveBeenCalled()
-      expect(document.body.classList.contains('hidden-scroll')).toBe(false)
+      expect(currentPath()).toBe('/')
+    })
+
+    it("lets the user type the letter n into an input instead of clicking buttons", () => {
+      // The old hook intercepted 'n' even inside inputs, eating every "n" a
+      // user typed into a search box or the onboarding name field.
+      renderHook(() => useKeyboardShortcuts(), { wrapper })
+      const input = addElement(addSearchInput())
+      const action = document.createElement('button')
+      action.textContent = 'Continue'
+      addElement(action)
+      const actionClick = vi.spyOn(action, 'click').mockImplementation(() => {})
+      input.focus()
+
+      const before = document.activeElement
+      pressKey('n', input)
+
+      expect(actionClick).not.toHaveBeenCalled()
+      expect(document.activeElement).toBe(before)
     })
 
     it('ignores shortcuts typed into a textarea', () => {

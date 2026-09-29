@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import CertificationsPage from './CertificationsPage'
-import { BADGES } from '@/data/badges'
 import { CERTIFICATIONS, DIFFICULTY_LABELS } from '@/data/certifications'
+import { CLASS_BONUSES } from '@/contexts/game/bonusEngine'
 import { allQuests } from '@/data/quests'
 import { closestContainer, renderPage, renderSeededPage, seedDefaultGame } from './test-utils'
 import { STORAGE_KEYS } from '@/utils/gameUtils'
@@ -83,7 +84,9 @@ describe('CertificationsPage', () => {
     expect(within(card).getByText('Complete requirements to unlock')).toBeInTheDocument()
     expect(within(card).getByText('Lv 5 ✗')).toBeInTheDocument()
     expect(within(card).getByText('0/10 ✗')).toBeInTheDocument()
-    expect(within(card).getByText('aws ✗')).toBeInTheDocument()
+    expect(within(card).getByText('aws:')).toBeInTheDocument()
+    const awsTotal = allQuests.filter((quest) => quest.technologyId === 'aws').length
+    expect(within(card).getByText(`0/${awsTotal} ✗`)).toBeInTheDocument()
     expect(within(card).getByText(`+${cert.xpReward} XP`)).toBeInTheDocument()
     expect(within(card).getByText(`+${cert.goldReward} Gold`)).toBeInTheDocument()
     expect(within(card).queryByText('⭐')).not.toBeInTheDocument()
@@ -121,33 +124,76 @@ describe('CertificationsPage', () => {
     renderPage(<CertificationsPage />)
 
     const card = closestContainer(screen.getByText(cert.fullName), 'div.rounded-lg')
-    expect(within(card).getByText('🎉 Available to claim!')).toBeInTheDocument()
+    expect(
+      within(card).getByRole('button', { name: /Claim Certification/ }),
+    ).toBeInTheDocument()
     expect(within(card).getByText('⭐')).toBeInTheDocument()
     expect(within(card).getByText(`Lv ${cert.level} ✓`)).toBeInTheDocument()
     expect(
       within(card).getByText(`${cert.requiredQuests}/${cert.requiredQuests} ✓`),
     ).toBeInTheDocument()
-    expect(within(card).getByText(`${cert.requiredTechnologies.join(', ')} ✓`)).toBeInTheDocument()
+    expect(within(card).getByText('terraform:')).toBeInTheDocument()
+    expect(within(card).getByText(/^4\/4 ✓$/)).toBeInTheDocument()
 
     // The stats bar moves the certification from locked to available
     expect(screen.getByText('Available').previousElementSibling).toHaveTextContent('1')
     expect(screen.getByText('Earned').previousElementSibling).toHaveTextContent('0')
   })
 
-  it('marks a certification earned once its badge sits in the collection', () => {
+  it('pays out the advertised rewards when the player claims an available certification', async () => {
+    const user = userEvent.setup()
+    const cert = CERTIFICATIONS.find((entry) => entry.id === 'terraform_associate')
+    if (!cert) throw new Error('terraform_associate missing from CERTIFICATIONS')
+
+    const terraformQuests = allQuests
+      .filter((quest) => quest.technologyId === 'terraform')
+      .map((quest) => quest.id)
+    const filler = Array.from({ length: cert.requiredQuests - terraformQuests.length }, (_, i) =>
+      completedQuest(`side-quest-${i}`, i),
+    )
+    const base = seedDefaultGame()
+    seedWith({
+      character: { ...base.character, level: cert.level },
+      completedQuests: [
+        ...terraformQuests.map((questId, index) => completedQuest(questId, index)),
+        ...filler,
+      ],
+    })
+    renderPage(<CertificationsPage />)
+
+    const card = closestContainer(screen.getByText(cert.fullName), 'div.rounded-lg')
+    await user.click(within(card).getByRole('button', { name: /Claim Certification/ }))
+
+    // Rewards are announced (the default DevOps Sage class adds +10% XP) and
+    // the card flips to the earned state
+    const classBonus = CLASS_BONUSES[base.character.class].bonus
+    const expectedXp = Math.floor(cert.xpReward * (1 + classBonus))
+    expect(
+      await screen.findByText(
+        new RegExp(`${cert.fullName} earned: \\+${expectedXp} XP, \\+${cert.goldReward} gold`),
+      ),
+    ).toBeInTheDocument()
+    expect(within(card).getByText('✓ Certification Earned!')).toBeInTheDocument()
+    expect(within(card).getByText('✅')).toBeInTheDocument()
+    expect(
+      within(card).queryByRole('button', { name: /Claim Certification/ }),
+    ).not.toBeInTheDocument()
+
+    // The stats bar moves the certification from available to earned
+    expect(screen.getByText('Earned').previousElementSibling).toHaveTextContent('1')
+    expect(screen.getByText('Available').previousElementSibling).toHaveTextContent('0')
+  })
+
+  it('marks a certification earned once it is in the claimed list', () => {
     const cert = CERTIFICATIONS.find((entry) => entry.id === 'devops_master')
     if (!cert) throw new Error('devops_master missing from CERTIFICATIONS')
-    // The earned state is driven by the badge the certification grants
-    expect(BADGES.some((badge) => badge.id === cert.badgeId)).toBe(true)
 
     const base = seedDefaultGame()
     localStorage.setItem(
       STORAGE_KEYS.GAME,
       JSON.stringify({
         ...base,
-        badges: base.badges.map((badge) =>
-          badge.id === cert.badgeId ? { ...badge, unlockedAt: new Date().toISOString() } : badge,
-        ),
+        claimedCertifications: [cert.id],
       }),
     )
     renderPage(<CertificationsPage />)

@@ -257,7 +257,7 @@ const CATEGORIES = [
 ]
 
 export default function StorePage() {
-  const { game, purchaseItem, equipItem, equipCompanion, addGold } = useGame()
+  const { game, purchaseItem, equipCompanion } = useGame()
   const { character, activeCompanion } = game
   const [category, setCategory] = useState('all')
   const [purchaseMessage, setPurchaseMessage] = useState<string | null>(null)
@@ -283,16 +283,17 @@ export default function StorePage() {
 
     // Handle equipment purchase
     if (item.category === 'equipment' && item.equipmentData) {
-      // Check if already owned
-      if (character.equippedItems.includes(item.equipmentData.id)) {
-        setPurchaseMessage(`You already own ${item.name}!`)
+      // purchaseItem resolves equipment ids: it deducts gold, records
+      // ownership, and auto-equips. Unequipping later keeps the item owned.
+      const success = purchaseItem(item.equipmentData.id, item.price)
+      if (!success) {
+        setPurchaseMessage(
+          character.gold < item.price
+            ? `Not enough gold! Need ${item.price} gold.`
+            : `You already own ${item.name}!`,
+        )
         return
       }
-      // Deduct gold and equip. GameContext.purchaseItem only resolves
-      // companion and collectible ids, so an equipment id would be a silent
-      // no-op there and the price is paid here instead.
-      addGold(-item.price)
-      equipItem(item.equipmentData.id)
       setPurchaseMessage(`Purchased and equipped ${item.name}!`)
       setTimeout(() => {
         setPurchaseMessage(null)
@@ -437,7 +438,7 @@ export default function StorePage() {
             const borderClass = getRarityBorder(item.rarity)
             const isEquipment = item.category === 'equipment'
             const isOwned =
-              isEquipment && character.equippedItems.includes(item.equipmentData?.id || '')
+              isEquipment && character.ownedItems.includes(item.equipmentData?.id || '')
             // Companion ids in state are the shop suffix ("buy_companion_owl"
             // -> "owl"), so the comparison has to strip the shop prefix.
             const isAlreadyPurchased =

@@ -3,170 +3,12 @@ import { Link } from 'react-router-dom'
 import { useGame } from '../contexts/GameContext'
 import { getRandomEncouragement } from '../data/milestones'
 import { MiniGameHub } from '../components/minigames/MiniGameHub'
+import { realms } from '../data/quests'
+import { technologies } from '../data/technologies'
+import { MINI_GAMES } from '../components/minigames/gameCatalog'
 
-// Featured games for showcase
-const FEATURED_GAMES = [
-  {
-    id: 'devopsquest',
-    name: 'DevOpsQuest',
-    icon: '⚔️',
-    category: 'DevOps',
-    color: 'from-amber-600 to-orange-500',
-    desc: 'Master DevOps through quests',
-  },
-  {
-    id: 'codecombat',
-    name: 'Code Combat',
-    icon: '🛡️',
-    category: 'Programming',
-    color: 'from-green-600 to-emerald-500',
-    desc: 'Learn coding through RPG battles',
-  },
-  {
-    id: 'numberstorm',
-    name: 'Number Storm',
-    icon: '🌀',
-    category: 'Math',
-    color: 'from-blue-600 to-indigo-500',
-    desc: 'Arithmetic race challenges',
-  },
-  {
-    id: 'gitexplorer',
-    name: 'Git Explorer',
-    icon: '🌳',
-    category: 'DevOps',
-    color: 'from-orange-600 to-red-500',
-    desc: 'Version control adventures',
-  },
-  {
-    id: 'wordwizard',
-    name: 'Word Wizard',
-    icon: '✨',
-    category: 'Reading',
-    color: 'from-violet-600 to-purple-500',
-    desc: 'Vocabulary battles',
-  },
-  {
-    id: 'atomsmash',
-    name: 'Atom Smash',
-    icon: '⚛️',
-    category: 'Science',
-    color: 'from-cyan-600 to-blue-500',
-    desc: 'Chemistry adventures',
-  },
-  {
-    id: 'dockerdash',
-    name: 'Docker Dash',
-    icon: '🐳',
-    category: 'DevOps',
-    color: 'from-blue-600 to-cyan-500',
-    desc: 'Container racing',
-  },
-  {
-    id: 'geomjam',
-    name: 'Geom Jam',
-    icon: '📐',
-    category: 'Math',
-    color: 'from-pink-600 to-rose-500',
-    desc: 'Shape & spatial puzzles',
-  },
-  {
-    id: 'roborally',
-    name: 'Robo Rally',
-    icon: '🤖',
-    category: 'Robotics',
-    color: 'from-slate-600 to-gray-500',
-    desc: 'Program robot courses',
-  },
-  {
-    id: 'triviatitans',
-    name: 'Trivia Titans',
-    icon: '🏅',
-    category: 'Trivia',
-    color: 'from-gold-600 to-yellow-500',
-    desc: 'Knowledge showdowns',
-  },
-  {
-    id: 'algebraassault',
-    name: 'Algebra Assault',
-    icon: '⚡',
-    category: 'Math',
-    color: 'from-yellow-600 to-amber-500',
-    desc: 'Equation battles',
-  },
-  {
-    id: 'bioquest',
-    name: 'Bio Quest',
-    icon: '🧬',
-    category: 'Science',
-    color: 'from-green-600 to-emerald-500',
-    desc: 'Journey through cells & DNA',
-  },
-  {
-    id: 'mazemaster',
-    name: 'Maze Master',
-    icon: '🌀',
-    category: 'Puzzle',
-    color: 'from-violet-600 to-indigo-500',
-    desc: 'Navigate labyrinths',
-  },
-  {
-    id: 'bridgebuild',
-    name: 'Bridge Build',
-    icon: '🌉',
-    category: 'Engineering',
-    color: 'from-amber-600 to-red-500',
-    desc: 'Build & test bridges',
-  },
-  {
-    id: 'historyhunt',
-    name: 'History Hunt',
-    icon: '🏛️',
-    category: 'Trivia',
-    color: 'from-amber-700 to-amber-500',
-    desc: 'Time-travel events',
-  },
-  {
-    id: 'physix',
-    name: 'Physix Runner',
-    icon: '🎯',
-    category: 'Science',
-    color: 'from-purple-600 to-pink-500',
-    desc: 'Physics platformer',
-  },
-  {
-    id: 'storyforge',
-    name: 'Story Forge',
-    icon: '📖',
-    category: 'Reading',
-    color: 'from-rose-600 to-pink-500',
-    desc: 'Creative writing',
-  },
-  {
-    id: 'k8skingdom',
-    name: 'K8s Kingdom',
-    icon: '👑',
-    category: 'DevOps',
-    color: 'from-purple-600 to-indigo-500',
-    desc: 'Kubernetes realm',
-  },
-  {
-    id: 'geographypulse',
-    name: 'Geography Pulse',
-    icon: '🌐',
-    category: 'Trivia',
-    color: 'from-green-600 to-emerald-500',
-    desc: 'Explore the world',
-  },
-  {
-    id: 'circuit',
-    name: 'Circuit Sim',
-    icon: '🔌',
-    category: 'Robotics',
-    color: 'from-yellow-600 to-green-500',
-    desc: 'Electronics simulator',
-  },
-]
+// The realm preview mirrors the world map's data instead of a hand-copied list.
+const REALM_LADDER = Object.values(realms).sort((a, b) => a.requiredLevel - b.requiredLevel)
 
 export default function HomePage() {
   const { game, getNextQuest, completedCount, totalQuests } = useGame()
@@ -434,21 +276,19 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Realm Cards */}
-          <div className="grid grid-cols-5 gap-4">
-            {[
-              { icon: '🏘️', name: 'Foundations', level: 1, desc: 'HTML, CSS, JS basics' },
-              { icon: '🌲', name: 'Scripts', level: 5, desc: 'Git, SQL, Bash' },
-              { icon: '🏰', name: 'Frameworks', level: 10, desc: 'React, Node.js' },
-              { icon: '⛰️', name: 'Cloud', level: 15, desc: 'Docker, AWS' },
-              { icon: '🏛️', name: 'DevOps', level: 20, desc: 'K8s, CI/CD, Terraform' },
-            ].map((realm, idx) => {
-              const isUnlocked = character.level >= realm.level
-              const isCompleted = idx < Math.floor((completedCount / totalQuests) * 5)
+          {/* Realm Cards - straight from the world map data */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+            {REALM_LADDER.map((realm) => {
+              const isUnlocked = character.level >= realm.requiredLevel
+              const isCompleted = game.completedRealms.includes(realm.id)
+              const sampleTechs = realm.technologies
+                .map((techId) => technologies[techId].name)
+                .slice(0, 3)
+                .join(', ')
 
               return (
                 <div
-                  key={idx}
+                  key={realm.id}
                   className={`relative text-center p-4 rounded-xl transition-all hover:scale-105 ${
                     isUnlocked
                       ? 'bg-gradient-to-b from-slate-800 to-slate-900 border border-amber-600/30 shadow-lg shadow-amber-900/20'
@@ -469,11 +309,11 @@ export default function HomePage() {
                   <div className={`text-4xl mb-2 ${!isUnlocked && 'grayscale opacity-50'}`}>
                     {realm.icon}
                   </div>
-                  <h3 className={`font-bold mb-1 ${isUnlocked ? 'text-white' : 'text-slate-500'}`}>
+                  <h3 className={`font-bold mb-1 text-sm ${isUnlocked ? 'text-white' : 'text-slate-500'}`}>
                     {realm.name}
                   </h3>
-                  <p className="text-xs text-slate-500 mb-1">{realm.desc}</p>
-                  <p className="text-xs text-amber-400/70">Lvl {realm.level}</p>
+                  <p className="text-xs text-slate-500 mb-1">{sampleTechs}</p>
+                  <p className="text-xs text-amber-400/70">Lvl {realm.requiredLevel}</p>
                 </div>
               )
             })}
@@ -510,102 +350,49 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
-            {FEATURED_GAMES.map((game) => (
-              <div
-                key={game.id}
-                className="group relative bg-slate-800/60 rounded-xl border border-slate-700 overflow-hidden hover:border-amber-500/50 transition-all hover:shadow-lg hover:shadow-amber-500/10 cursor-pointer"
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
+            {MINI_GAMES.map((miniGame) => (
+              <Link
+                key={miniGame.id}
+                to="/games"
+                className="group bg-slate-800/60 rounded-xl border border-slate-700 overflow-hidden hover:border-amber-500/50 transition-all hover:shadow-lg hover:shadow-amber-500/10"
               >
-                <div
-                  className={`h-16 bg-gradient-to-br ${game.color} flex items-center justify-center`}
-                >
+                <div className="h-16 bg-gradient-to-br from-slate-700/60 to-slate-800 flex items-center justify-center">
                   <span className="text-3xl group-hover:scale-110 transition-transform">
-                    {game.icon}
+                    {miniGame.icon}
                   </span>
                 </div>
                 <div className="p-2">
-                  <p className="text-xs text-amber-400 font-medium truncate">{game.name}</p>
-                  <p className="text-[10px] text-slate-500 truncate">{game.category}</p>
+                  <p className="text-xs text-amber-400 font-medium truncate">{miniGame.name}</p>
+                  <p className="text-[10px] text-slate-500">{miniGame.description}</p>
                 </div>
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <span className="text-xs text-white font-medium bg-amber-600 px-2 py-1 rounded">
-                    Coming Soon
-                  </span>
-                </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="bg-gradient-to-b from-slate-900 to-slate-800 border-t border-slate-700">
-        <div className="max-w-5xl mx-auto px-4 py-12">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-amber-400 mb-2">💬 What Learners Say</h2>
-            <p className="text-slate-400">Join thousands of developers mastering DevOps</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                quote:
-                  'Finally a fun way to learn Git! I used to dread version control, now I actually enjoy it.',
-                name: 'Sarah K.',
-                role: 'Frontend Dev',
-                avatar: '👩‍💻',
-              },
-              {
-                quote:
-                  "The streak system keeps me motivated. I've learned more in 2 weeks than in months of watching videos.",
-                name: 'Marcus J.',
-                role: 'Backend Engineer',
-                avatar: '👨‍💻',
-              },
-              {
-                quote:
-                  'As someone transitioning to DevOps, this was the perfect hands-on learning tool. Highly recommended!',
-                name: 'Priya P.',
-                role: 'DevOps Engineer',
-                avatar: '👩‍🔧',
-              },
-            ].map((testimonial, idx) => (
-              <div
-                key={idx}
-                className="bg-slate-800/50 rounded-xl border border-slate-700 p-6 hover:border-amber-600/30 transition-all"
-              >
-                <div className="text-amber-400 text-2xl mb-3">&quot;</div>
-                <p className="text-slate-300 mb-4 italic">{testimonial.quote}</p>
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl">{testimonial.avatar}</span>
-                  <div>
-                    <div className="text-white font-semibold">{testimonial.name}</div>
-                    <div className="text-slate-500 text-sm">{testimonial.role}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
+      {/* Catalog Stats - the real content counts */}
       <section className="bg-slate-800/50 border-t border-slate-700">
         <div className="max-w-5xl mx-auto px-4 py-12">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-amber-400 mb-2">📊 Our Community</h2>
-            <p className="text-slate-400">Growing stronger every day</p>
+            <h2 className="text-3xl font-bold text-amber-400 mb-2">📊 Inside DevOpsQuest</h2>
+            <p className="text-slate-400">Everything in the game, all playable today</p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { value: '10K+', label: 'Active Learners', icon: '👥' },
-              { value: '50K+', label: 'Quests Completed', icon: '⚔️' },
-              { value: '35+', label: 'Learning Games', icon: '🎮' },
-              { value: '98%', label: 'Satisfaction', icon: '⭐' },
-            ].map((stat, idx) => (
+              {
+                value: Object.keys(technologies).length,
+                label: 'Technologies',
+                icon: '📚',
+              },
+              { value: totalQuests, label: 'Quests', icon: '⚔️' },
+              { value: Object.keys(realms).length, label: 'Realms', icon: '🗺️' },
+              { value: MINI_GAMES.length, label: 'Mini-Games', icon: '🎮' },
+            ].map((stat) => (
               <div
-                key={idx}
+                key={stat.label}
                 className="text-center p-6 bg-gradient-to-b from-slate-800 to-slate-900 rounded-xl border border-slate-700"
               >
                 <span className="text-4xl mb-3 block">{stat.icon}</span>
@@ -780,28 +567,27 @@ export default function HomePage() {
               </ul>
             </div>
 
-            {/* Categories */}
+            {/* Categories - the real game systems */}
             <div>
-              <h4 className="text-white font-semibold mb-3">Categories</h4>
+              <h4 className="text-white font-semibold mb-3">Game Systems</h4>
               <ul className="space-y-2 text-sm">
-                <li>
-                  <span className="text-slate-400">⚔️ DevOps & CI/CD</span>
-                </li>
-                <li>
-                  <span className="text-slate-400">🧮 Math & Logic</span>
-                </li>
-                <li>
-                  <span className="text-slate-400">🔬 Science</span>
-                </li>
-                <li>
-                  <span className="text-slate-400">📖 Reading & Language</span>
-                </li>
-                <li>
-                  <span className="text-slate-400">🤖 Robotics</span>
-                </li>
-                <li>
-                  <span className="text-slate-400">🏅 Trivia</span>
-                </li>
+                {[
+                  { label: '⚔️ Quests & Quizzes', to: '/quests' },
+                  { label: '🗺️ World Map', to: '/worldmap' },
+                  { label: '🎮 Mini-Games', to: '/games' },
+                  { label: '📜 Storylines', to: '/storylines' },
+                  { label: '🎓 Certifications', to: '/certifications' },
+                  { label: '🏆 Leaderboard', to: '/leaderboard' },
+                ].map((system) => (
+                  <li key={system.to}>
+                    <Link
+                      to={system.to}
+                      className="text-slate-400 hover:text-amber-400 transition-colors"
+                    >
+                      {system.label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
 
