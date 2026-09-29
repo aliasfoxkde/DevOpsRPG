@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [0.1.4] - 2026-09-29
 
 Honesty-pass cycle: removed the remaining fabricated marketing surfaces, closed the
 advertised-vs-paid reward gaps, and pinned data invariants with new tripwire tests.
@@ -25,6 +25,11 @@ advertised-vs-paid reward gaps, and pinned data invariants with new tripwire tes
   quiz-score bonuses and streak shields
 - `src/components/layout/Layout.test.tsx` covering the skip link, boundary containment and
   boundary reset on navigation
+- `src/components/ui/StreakTracker.test.tsx` covering the at-risk banner, earned-today state,
+  the 7-day activity grid, milestone countdowns and the fresh-hero invite
+- Claim-flow behavior tests: career-path milestone claiming (persistence, XP/gold payout,
+  dismissible receipt), story-arc reward claiming paid exactly once, and equipping owned but
+  unequipped gear from the character-sheet bag
 
 ### Changed
 
@@ -56,6 +61,14 @@ advertised-vs-paid reward gaps, and pinned data invariants with new tripwire tes
   scroll-to-bottom opened a g-sequence instead
 - **Route error boundary stuck**: `Layout`'s ErrorBoundary is keyed by pathname so leaving a
   crashed route remounts a clean boundary
+- **E2e first-test cold-start flake**: the first test of a run now navigates with
+  `domcontentloaded` and reuses the 15 s visibility window for the home greeting, so a cold
+  dev-server compile no longer trips the navigation/expectation timeouts on slower machines
+- The secrets-scan baseline was re-triaged and regenerated (221 findings, all reviewed
+  accepted classes: game randomness, doc prose, 5-digit-XP false positives) after the honesty
+  pass moved touched lines; error-level findings from plan-doc digit runs were eliminated
+- `package-lock.json` now carries the app version again (it had been left at 0.1.2 through
+  the 0.1.3 release)
 
 ## [0.1.3] - 2026-09-24
 
