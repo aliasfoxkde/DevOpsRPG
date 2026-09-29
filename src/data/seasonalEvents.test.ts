@@ -95,8 +95,7 @@ describe('SEASONAL_EVENTS catalog', () => {
     // claim action actually pays, and every rewards block must pay something.
     for (const event of SEASONAL_EVENTS) {
       if (!event.rewards) continue
-      const paysSomething =
-        (event.rewards.bonusXP ?? 0) > 0 || (event.rewards.bonusGold ?? 0) > 0
+      const paysSomething = (event.rewards.bonusXP ?? 0) > 0 || (event.rewards.bonusGold ?? 0) > 0
       expect(paysSomething, `${event.id} rewards`).toBe(true)
       expect(
         Object.keys(event.rewards).every((key) => ['bonusXP', 'bonusGold'].includes(key)),

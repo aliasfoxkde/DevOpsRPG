@@ -61,7 +61,8 @@ export const STORY_ARCS: StoryArc[] = [
       {
         id: 'migration-2',
         title: 'Chapter 2: The Plan',
-        description: "With the inventory complete, it's time to plan the landing zone in the cloud.",
+        description:
+          "With the inventory complete, it's time to plan the landing zone in the cloud.",
         questIds: questIdsFor(['aws_intro', 'aws_getstarted', 'aws_rds']),
         unlocksAt: 2,
       },
@@ -144,7 +145,8 @@ export const STORY_ARCS: StoryArc[] = [
       {
         id: 'security-6',
         title: 'Epilogue: The Audit',
-        description: 'Scan everything, watch the dashboards, and prove the infrastructure is secure.',
+        description:
+          'Scan everything, watch the dashboards, and prove the infrastructure is secure.',
         questIds: questIdsFor(['sec_scanning', 'istio_observability', 'obs_grafana']),
         unlocksAt: 6,
       },
@@ -220,7 +222,8 @@ export const STORY_ARCS: StoryArc[] = [
       {
         id: 'chaos-1',
         title: 'Act 1: The Philosophy',
-        description: 'Understand the principles of chaos engineering and pick your steady-state metrics.',
+        description:
+          'Understand the principles of chaos engineering and pick your steady-state metrics.',
         questIds: questIdsFor(['obs_intro', 'prom_getstarted', 'prom_metrics']),
         unlocksAt: 1,
       },

@@ -124,9 +124,7 @@ describe('CertificationsPage', () => {
     renderPage(<CertificationsPage />)
 
     const card = closestContainer(screen.getByText(cert.fullName), 'div.rounded-lg')
-    expect(
-      within(card).getByRole('button', { name: /Claim Certification/ }),
-    ).toBeInTheDocument()
+    expect(within(card).getByRole('button', { name: /Claim Certification/ })).toBeInTheDocument()
     expect(within(card).getByText('⭐')).toBeInTheDocument()
     expect(within(card).getByText(`Lv ${cert.level} ✓`)).toBeInTheDocument()
     expect(

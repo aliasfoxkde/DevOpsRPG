@@ -212,14 +212,17 @@ describe('useKeyboardShortcuts', () => {
       ['L', '/leaderboard'],
       ['C', '/challenges'],
       ['S', '/store'],
-    ])("keeps uppercase second key %s distinct from its lowercase neighbour", (key, expectedPath) => {
-      renderHook(() => useKeyboardShortcuts(), { wrapper })
+    ])(
+      'keeps uppercase second key %s distinct from its lowercase neighbour',
+      (key, expectedPath) => {
+        renderHook(() => useKeyboardShortcuts(), { wrapper })
 
-      pressKey('g')
-      pressKey(key)
+        pressKey('g')
+        pressKey(key)
 
-      expect(currentPath()).toBe(expectedPath)
-    })
+        expect(currentPath()).toBe(expectedPath)
+      },
+    )
 
     it("navigates to the game library for 'g g'", () => {
       renderHook(() => useKeyboardShortcuts(), { wrapper })
@@ -501,7 +504,7 @@ describe('useKeyboardShortcuts', () => {
       expect(currentPath()).toBe('/')
     })
 
-    it("lets the user type the letter n into an input instead of clicking buttons", () => {
+    it('lets the user type the letter n into an input instead of clicking buttons', () => {
       // The old hook intercepted 'n' even inside inputs, eating every "n" a
       // user typed into a search box or the onboarding name field.
       renderHook(() => useKeyboardShortcuts(), { wrapper })

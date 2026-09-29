@@ -22,10 +22,7 @@ export default function LeaderboardPage() {
   const xpToNext = character.xpToNextLevel
   const nextLevel = character.level + 1
 
-  const unlockedBadges = useMemo(
-    () => badges.filter((badge) => badge.unlockedAt).length,
-    [badges],
-  )
+  const unlockedBadges = useMemo(() => badges.filter((badge) => badge.unlockedAt).length, [badges])
   const masteredTechs = useMemo(
     () => Object.values(game.skillXp).filter((xp) => xp > 0).length,
     [game.skillXp],
@@ -83,8 +80,8 @@ export default function LeaderboardPage() {
 
       <main className="max-w-5xl mx-auto px-4 py-6">
         <p className="text-slate-400 text-center mb-6 text-sm">
-          DevOpsQuest runs entirely in your browser, so the only standings that exist are your
-          own: the realm ladder below is where every hero&apos;s climb is measured.
+          DevOpsQuest runs entirely in your browser, so the only standings that exist are your own:
+          the realm ladder below is where every hero&apos;s climb is measured.
         </p>
 
         {/* Player Rank Card */}
@@ -148,7 +145,13 @@ export default function LeaderboardPage() {
                     }`}
                   >
                     <div className="col-span-1 text-lg">
-                      {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                      {index === 0
+                        ? '🥇'
+                        : index === 1
+                          ? '🥈'
+                          : index === 2
+                            ? '🥉'
+                            : `#${index + 1}`}
                     </div>
                     <div className="col-span-4 sm:col-span-3">
                       <p

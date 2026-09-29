@@ -108,11 +108,11 @@ export function MiniGameHub({ onClose, initialGame }: MiniGameHubProps) {
             <div className={`text-4xl mb-3 ${!isUnlocked && 'grayscale'}`}>{entry.icon}</div>
             <h3 className="text-lg font-bold text-white mb-1">{entry.name}</h3>
             <p className="text-sm text-slate-400">{entry.description}</p>
-            <div className={`mt-3 text-xs ${entry.accent}`}>
-              +{entry.xpPotential} XP potential
-            </div>
+            <div className={`mt-3 text-xs ${entry.accent}`}>+{entry.xpPotential} XP potential</div>
             {!isUnlocked && (
-              <div className="mt-2 text-xs text-slate-500">Level {MINI_GAME_UNLOCK_LEVEL} to unlock</div>
+              <div className="mt-2 text-xs text-slate-500">
+                Level {MINI_GAME_UNLOCK_LEVEL} to unlock
+              </div>
             )}
           </button>
         ))}
@@ -218,10 +218,12 @@ export function MiniGameHub({ onClose, initialGame }: MiniGameHubProps) {
   }
 
   const heading =
-    currentGame === 'menu' ? '🎮 Mini-Games' : (() => {
-      const entry = miniGameById(currentGame)
-      return `${entry.icon} ${entry.name}`
-    })()
+    currentGame === 'menu'
+      ? '🎮 Mini-Games'
+      : (() => {
+          const entry = miniGameById(currentGame)
+          return `${entry.icon} ${entry.name}`
+        })()
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">

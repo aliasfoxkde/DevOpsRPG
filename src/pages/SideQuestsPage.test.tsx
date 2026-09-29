@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { act, fireEvent, screen, within } from '@testing-library/react'
 import SideQuestsPage from './SideQuestsPage'
-import { renderPage, renderSeededPage, seedDefaultGame } from './test-utils'
+import { expectedAppliedXp, renderPage, renderSeededPage, seedDefaultGame } from './test-utils'
 import { STORAGE_KEYS } from '@/utils/gameUtils'
 import type { GameState } from '@/contexts/GameContext'
 import type { SideQuest } from '@/data/sidequests'
@@ -115,7 +115,7 @@ describe('SideQuestsPage', () => {
     const raw = localStorage.getItem(STORAGE_KEYS.GAME)
     if (!raw) throw new Error('Expected the game state to be persisted')
     const save = JSON.parse(raw) as GameState
-    expect(save.character.xp).toBe(game.character.xp + 250)
+    expect(save.character.xp).toBe(game.character.xp + expectedAppliedXp(250, game.character))
     expect(save.character.gold).toBe(game.character.gold + 120)
     expect(within(section('Weekly Quests')).getByText('(1/1 complete)')).toBeInTheDocument()
     expect(within(section('Weekly Quests')).getByText('✓ Claimed')).toBeInTheDocument()

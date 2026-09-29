@@ -32,7 +32,7 @@ export interface CareerTechnology {
   questIds: string[]
 }
 
-export interface CareerMilestone {
+interface CareerMilestone {
   id: string
   name: string
   description: string

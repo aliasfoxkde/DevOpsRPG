@@ -3,6 +3,7 @@ import { render, type RenderResult } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import { GameProvider, useGame, type GameState } from '@/contexts/GameContext'
+import { CLASS_BONUSES } from '@/contexts/game/bonusEngine'
 import { STORAGE_KEYS } from '@/utils/gameUtils'
 
 /**
@@ -112,4 +113,17 @@ export function closestContainer(from: Element, selector: string): HTMLElement {
     throw new Error(`No element matching "${selector}" found around "${from.textContent}"`)
   }
   return container
+}
+
+/**
+ * The XP a flat award of `base` actually banks for `character`, i.e. the class
+ * bonus the reward path applies on top of the advertised amount. Only classes
+ * whose bonus covers every technology move the global number (a realm-bound
+ * class pays flat here unless the award names one of its technologies);
+ * mirrors addXP's Math.floor rounding.
+ */
+export function expectedAppliedXp(base: number, character: GameState['character']): number {
+  const bonus = CLASS_BONUSES[character.class]
+  const factor = bonus.techs === null ? 1 + bonus.bonus : 1
+  return Math.floor(base * factor)
 }

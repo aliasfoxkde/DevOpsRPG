@@ -4,13 +4,7 @@
 
 import { allQuests } from './quests'
 
-type CertificationProvider =
-  | 'aws'
-  | 'terraform'
-  | 'kubernetes'
-  | 'security'
-  | 'docker'
-  | 'linux'
+type CertificationProvider = 'aws' | 'terraform' | 'kubernetes' | 'security' | 'docker' | 'linux'
 
 export interface Certification {
   id: string
@@ -247,7 +241,7 @@ export const DIFFICULTY_LABELS: Record<Certification['difficulty'], string> = {
 
 // Quests the player must complete within each of the certification's
 // technologies for that technology requirement to count as met.
-export const MIN_TECH_QUESTS = 3
+const MIN_TECH_QUESTS = 3
 
 export interface CertificationRequirements {
   met: boolean
@@ -270,9 +264,7 @@ export function checkCertificationRequirements(
   const techProgress: Record<string, { completed: number; total: number }> = {}
   let techsMet = true
   for (const techId of cert.requiredTechnologies) {
-    const techQuestIds = allQuests
-      .filter((q) => q.technologyId === techId)
-      .map((q) => q.id)
+    const techQuestIds = allQuests.filter((q) => q.technologyId === techId).map((q) => q.id)
     const completed = techQuestIds.filter((id) => done.has(id)).length
     techProgress[techId] = { completed, total: techQuestIds.length }
     if (completed < MIN_TECH_QUESTS) techsMet = false

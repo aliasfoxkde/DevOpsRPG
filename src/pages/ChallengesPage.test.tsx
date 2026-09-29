@@ -4,7 +4,13 @@ import userEvent from '@testing-library/user-event'
 import ChallengesPage from './ChallengesPage'
 import { STORAGE_KEYS } from '@/utils/gameUtils'
 import { allQuests } from '@/data/quests'
-import { closestContainer, renderPage, renderSeededPage, seedDefaultGame } from './test-utils'
+import {
+  closestContainer,
+  expectedAppliedXp,
+  renderPage,
+  renderSeededPage,
+  seedDefaultGame,
+} from './test-utils'
 import type { GameState } from '@/contexts/GameContext'
 
 const WEEKLY_TITLES = [
@@ -122,12 +128,13 @@ describe('ChallengesPage', () => {
 
     await user.click(within(card).getByRole('button', { name: 'CLAIM!' }))
 
-    // Claiming pays out (400 XP / 200 gold for XP Harvest) and marks the card
-    // as claimed - the guard used to be inverted, making every claim a no-op.
+    // Claiming pays out (400 XP / 200 gold for XP Harvest, plus the class
+    // bonus addXP applies) and marks the card as claimed - the guard used to
+    // be inverted, making every claim a no-op.
     const raw = localStorage.getItem(STORAGE_KEYS.GAME)
     if (!raw) throw new Error('Expected the game state to be persisted')
     const save = JSON.parse(raw) as { character: { xp: number; gold: number } }
-    expect(save.character.xp).toBe(3000 + 400)
+    expect(save.character.xp).toBe(3000 + expectedAppliedXp(400, game.character))
     expect(save.character.gold).toBe(game.character.gold + 200)
     // The claimed card replaces its icon and claim button with ✓ markers.
     expect(
@@ -170,7 +177,7 @@ describe('ChallengesPage', () => {
     })
 
     const stored = storedGame()
-    expect(stored.character.xp).toBe(game.character.xp + 600)
+    expect(stored.character.xp).toBe(game.character.xp + expectedAppliedXp(600, game.character))
     expect(stored.character.gold).toBe(game.character.gold + 250)
     expect(stored.badges.find((badge) => badge.id === 'weekly_crusader')?.unlockedAt).toBeTruthy()
     expect(stored.stats.challengeComplete).toBe(game.stats.challengeComplete + 1)

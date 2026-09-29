@@ -182,7 +182,10 @@ export function meetsEventRequirements(
 // Strongest XP/Gold multiplier among `events` at `now` (1 when none are live).
 // Overlapping events take the best multiplier rather than compounding.
 function eventMultiplierAt(events: readonly SeasonalEvent[], now: Date): number {
-  return events.reduce((best, event) => (isLive(event, now) ? Math.max(best, event.bonusMultiplier) : best), 1)
+  return events.reduce(
+    (best, event) => (isLive(event, now) ? Math.max(best, event.bonusMultiplier) : best),
+    1,
+  )
 }
 
 // Get currently active events

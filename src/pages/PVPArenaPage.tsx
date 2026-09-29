@@ -27,8 +27,7 @@ export default function PVPArenaPage() {
   const [matchStartTime, setMatchStartTime] = useState<number | null>(null)
 
   // Real PVP record, persisted in game state via recordPvpResult.
-  const { points: pvpPoints, wins: pvpWins, losses: pvpLosses, streak: pvpStreak } =
-    game.pvpStats
+  const { points: pvpPoints, wins: pvpWins, losses: pvpLosses, streak: pvpStreak } = game.pvpStats
 
   const currentRank = getRankByPoints(pvpPoints)
   const rankProgress = getRankProgress(pvpPoints)

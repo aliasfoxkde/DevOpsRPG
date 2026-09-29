@@ -63,7 +63,9 @@ describe('GameLibraryPage', () => {
   it('lists exactly the real mini-games, with their real reward teasers', () => {
     renderSeededPage(<GameLibraryPage />)
 
-    expect(screen.getByText(`${MINI_GAMES.length} of ${MINI_GAMES.length} games`)).toBeInTheDocument()
+    expect(
+      screen.getByText(`${MINI_GAMES.length} of ${MINI_GAMES.length} games`),
+    ).toBeInTheDocument()
     for (const miniGame of MINI_GAMES) {
       const card = closestContainer(screen.getByText(miniGame.name), 'div.rounded-xl')
       expect(within(card).getByText(miniGame.description)).toBeInTheDocument()
@@ -169,13 +171,11 @@ describe('GameLibraryPage', () => {
   it('links the campaign card back to the main game', () => {
     renderSeededPage(<GameLibraryPage />)
 
-    const campaign = closestContainer(
-      screen.getByText('DevOpsQuest Campaign'),
-      'div.rounded-xl',
+    const campaign = closestContainer(screen.getByText('DevOpsQuest Campaign'), 'div.rounded-xl')
+    expect(within(campaign).getByRole('link', { name: /Continue Campaign/ })).toHaveAttribute(
+      'href',
+      '/',
     )
-    expect(
-      within(campaign).getByRole('link', { name: /Continue Campaign/ }),
-    ).toHaveAttribute('href', '/')
   })
 })
 

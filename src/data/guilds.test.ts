@@ -36,11 +36,11 @@ describe('guild mock data', () => {
     expect(leaders.map((leader) => leader.name)).toEqual([MOCK_GUILD.leaderName])
   })
 
-  it('advertises more members than the shipped roster shows (documented gap)', () => {
-    // The GuildPage header renders "8/20 members" above a roster of six rows.
-    // Either the roster is missing two members or the count is stale; fixing it
-    // needs a product call, so this pins the current numbers.
-    expect(MOCK_GUILD.memberCount).toBe(8)
+  it('advertises exactly the roster the guild page renders', () => {
+    // The GuildPage header renders "{memberCount}/{maxMembers} members" above
+    // the MOCK_GUILD_MEMBERS rows — the count must never drift from the
+    // roster (it used to claim 8 over six rows).
+    expect(MOCK_GUILD.memberCount).toBe(MOCK_GUILD_MEMBERS.length)
     expect(MOCK_GUILD_MEMBERS).toHaveLength(6)
     expect(MOCK_GUILD.memberCount).toBeLessThan(MOCK_GUILD.maxMembers)
   })

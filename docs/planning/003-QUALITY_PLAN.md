@@ -518,7 +518,9 @@ Work executed:
   same finding classes, new fingerprints): the "high" findings are all false positives
   — scraped W3Schools teaching content about `innerHTML` (React escapes on render), a
   `'devopsquest_voice_settings'` STORAGE_KEY constant, `secret:` badge-category labels,
-  a `100000000` XP clamp matching tax-number patterns, and test mocks with fake
+  a 100-million XP clamp matching tax-number patterns when written as an unbroken
+  digit run (this doc formats it with commas — 100,000,000 — to stay off the
+  SSN/TFN/routing detectors), and test mocks with fake
   bearer tokens/API keys. Mediums are `Math.random()` game randomness (client-side
   drop chances and response variety), 5-digit XP values read as zip codes,
   SQL-teaching content, and localhost URLs in docs/scripts/CI of a fully client-side

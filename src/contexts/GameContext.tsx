@@ -1,4 +1,12 @@
-import { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react'
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  ReactNode,
+} from 'react'
 import { allQuests, getNextQuest, isRealmUnlocked, realms, type Realm } from '../data/quests'
 import { BADGES, shouldUnlockBadge, type Badge } from '../data/badges'
 import { checkMilestone, type Milestone } from '../data/milestones'
@@ -151,8 +159,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         newStreak += 1
       } else if (prev.character.lastActive !== today) {
         // Streak was broken - use shield if available
-        const hasProtection =
-          prev.character.streakShields > 0 || bonuses.virtualStreakShields > 0
+        const hasProtection = prev.character.streakShields > 0 || bonuses.virtualStreakShields > 0
         if (hasProtection && newStreak > 0) {
           // Protection saves the streak - don't reset
           newStreak = prev.character.streakDays // Keep current streak
@@ -1453,8 +1460,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   // multiplies earnings only, never the price of things.
   const addGold = useCallback((amount: number) => {
     setGame((prev) => {
-      const applied =
-        amount >= 0 ? Math.floor(amount * bonusesFor(prev).goldMultiplier) : amount
+      const applied = amount >= 0 ? Math.floor(amount * bonusesFor(prev).goldMultiplier) : amount
       return {
         ...prev,
         character: {

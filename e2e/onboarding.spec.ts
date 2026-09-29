@@ -7,14 +7,20 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Fresh User Experience', () => {
   test('fresh user lands on home page with game HUD', async ({ page }) => {
-    await page.goto('/')
+    // Don't block on "load": the dev server compiles the module graph on
+    // demand, so the first navigation of a cold run can outlast the default
+    // navigation timeout on slower machines. The assertions below do the
+    // real waiting.
+    await page.goto('/', { waitUntil: 'domcontentloaded' })
 
     // HUD renders the character's XP progress
     await expect(page.getByRole('progressbar', { name: /experience/i })).toBeVisible({
       timeout: 15000,
     })
-    // Home page greets the new hero
-    await expect(page.getByRole('heading', { name: /welcome/i })).toBeVisible()
+    // Home page greets the new hero (lazy-loaded route chunk on a cold run)
+    await expect(page.getByRole('heading', { name: /welcome/i })).toBeVisible({
+      timeout: 15000,
+    })
   })
 
   test('HUD shows starting level and primary navigation', async ({ page }) => {

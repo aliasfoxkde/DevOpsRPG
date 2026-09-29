@@ -206,10 +206,7 @@ export interface GameContextType {
   claimMilestone: (milestoneId: string) => { xpBonus: number }
   claimBadge: (badgeId: string) => { xp: number; gold: number }
   claimStoryArcRewards: (arcId: string) => { xp: number; gold: number; badgeId?: string }
-  claimCareerMilestone: (
-    pathId: string,
-    milestoneId: string,
-  ) => { xp: number; gold: number }
+  claimCareerMilestone: (pathId: string, milestoneId: string) => { xp: number; gold: number }
   claimCertification: (certId: string) => { xp: number; gold: number }
   claimEventReward: (eventId: string) => { xp: number; gold: number }
   // Skill allocation

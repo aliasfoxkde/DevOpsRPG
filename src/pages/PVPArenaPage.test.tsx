@@ -8,7 +8,7 @@ import {
   getRankByPoints,
   type PVPQuestion,
 } from '@/data/pvpArena'
-import { renderSeededPage } from './test-utils'
+import { expectedAppliedXp, renderSeededPage } from './test-utils'
 import { STORAGE_KEYS } from '@/utils/gameUtils'
 import type { GameState } from '@/contexts/GameContext'
 
@@ -104,7 +104,7 @@ describe('PVPArenaPage', () => {
     renderSeededPage(<PVPArenaPage />, { route: '/pvp-arena', url: '/pvp-arena' })
 
     fireEvent.click(screen.getByRole('button', { name: /Find Match/ }))
-    expect(screen.getByText('Finding Opponent...')).toBeInTheDocument()
+    expect(screen.getByText('Finding Sparring Rival...')).toBeInTheDocument()
 
     // The matchmaking animation resolves after two seconds
     await act(async () => {
@@ -112,7 +112,7 @@ describe('PVPArenaPage', () => {
     })
 
     expect(screen.getByRole('button', { name: /Start Battle/ })).toBeInTheDocument()
-    expect(screen.queryByText('Finding Opponent...')).not.toBeInTheDocument()
+    expect(screen.queryByText('Finding Sparring Rival...')).not.toBeInTheDocument()
   })
 
   it('runs a battle and locks the options once an answer is picked', async () => {
@@ -167,8 +167,11 @@ describe('PVPArenaPage', () => {
     expect(screen.getByText(`+${expected.goldEarned} Gold`)).toBeInTheDocument()
 
     // Victory rewards land in the persisted character, nothing else moves
+    // (addXP applies the character's global class bonus on top)
     const stored = storedGame()
-    expect(stored.character.xp).toBe(game.character.xp + expected.xpEarned)
+    expect(stored.character.xp).toBe(
+      game.character.xp + expectedAppliedXp(expected.xpEarned, game.character),
+    )
     expect(stored.character.gold).toBe(game.character.gold + expected.goldEarned)
     expect(stored.completedQuests).toHaveLength(0)
   })

@@ -570,9 +570,7 @@ describe('GameContext skills', () => {
     act(() => {
       getGame().completeQuest(firstQuest().id)
     })
-    expect(getGame().getSkillXp(firstQuest().technologyId)).toBe(
-      grantedXp(firstQuest().xpReward),
-    )
+    expect(getGame().getSkillXp(firstQuest().technologyId)).toBe(grantedXp(firstQuest().xpReward))
   })
 
   it('maps xp onto the shared level ladder', () => {

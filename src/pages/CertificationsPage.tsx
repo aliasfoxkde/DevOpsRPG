@@ -209,8 +209,7 @@ export default function CertificationsPage() {
                                   <div key={techId} className="flex justify-between">
                                     <span className="text-slate-500 capitalize">{techId}:</span>
                                     <span className={techMet ? 'text-green-400' : 'text-red-400'}>
-                                      {progress.completed}/{progress.total}{' '}
-                                      {techMet ? '✓' : '✗'}
+                                      {progress.completed}/{progress.total} {techMet ? '✓' : '✗'}
                                     </span>
                                   </div>
                                 )

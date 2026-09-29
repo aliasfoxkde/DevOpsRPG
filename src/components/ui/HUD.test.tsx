@@ -356,8 +356,9 @@ describe('HUD', () => {
       expect(toggle).toHaveTextContent('✕')
       expect(screen.getByText('Level 1')).toBeInTheDocument()
       expect(screen.getAllByRole('link', { name: /Skills/ }).length).toBeGreaterThan(0)
-      // Character quick view repeats the title alongside the desktop avatar
-      expect(screen.getAllByText('DevOps Apprentice').length).toBeGreaterThanOrEqual(2)
+      // Character quick view repeats the equipped title (novice-devops by
+      // default) alongside the desktop avatar
+      expect(screen.getAllByText('📜 DevOps Novice').length).toBeGreaterThanOrEqual(2)
       expect(screen.getByText('🔥 0 streak')).toBeInTheDocument()
     })
 

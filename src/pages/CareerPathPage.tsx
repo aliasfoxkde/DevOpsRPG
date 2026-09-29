@@ -396,11 +396,7 @@ export default function CareerPathPage() {
                         ) : complete ? (
                           <button
                             onClick={() => {
-                              handleClaimMilestone(
-                                selectedPath,
-                                milestone.id,
-                                milestone.name,
-                              )
+                              handleClaimMilestone(selectedPath, milestone.id, milestone.name)
                             }}
                             className="shrink-0 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white text-xs font-bold rounded transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400"
                           >

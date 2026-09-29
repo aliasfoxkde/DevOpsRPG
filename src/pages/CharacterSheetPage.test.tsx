@@ -3,7 +3,7 @@ import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import CharacterSheetPage from './CharacterSheetPage'
 import { EQUIPMENT_ITEMS } from '@/data/equipment'
-import { renderPage, renderSeededPage, seedDefaultGame } from './test-utils'
+import { closestContainer, renderPage, renderSeededPage, seedDefaultGame } from './test-utils'
 import { STORAGE_KEYS } from '@/utils/gameUtils'
 import type { GameState } from '@/contexts/GameContext'
 
@@ -93,6 +93,35 @@ describe('CharacterSheetPage', () => {
     expect(
       screen.getByText('No equipment equipped. Visit the Store to buy gear!'),
     ).toBeInTheDocument()
+  })
+
+  it('stashes owned but unequipped gear in the bag and equips it on click', async () => {
+    const user = userEvent.setup()
+    const game = seedDefaultGame()
+    const [secondItem] = EQUIPMENT_ITEMS.slice(1)
+    localStorage.setItem(
+      STORAGE_KEYS.GAME,
+      JSON.stringify({
+        ...game,
+        character: {
+          ...game.character,
+          ownedItems: [firstItem.id, secondItem.id],
+          equippedItems: [firstItem.id],
+        },
+      }),
+    )
+    renderPage(<CharacterSheetPage />)
+
+    // The loadout shows the equipped item; the other purchase waits in the bag
+    expect(screen.getByText(firstItem.name)).toBeInTheDocument()
+    const bag = closestContainer(screen.getByText('In Your Bag (not equipped)'), 'div.mt-6')
+    expect(within(bag).getByText(secondItem.name)).toBeInTheDocument()
+    expect(within(bag).queryByText(firstItem.name)).not.toBeInTheDocument()
+
+    await user.click(within(bag).getByRole('button', { name: 'Equip' }))
+
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEYS.GAME) ?? '{}') as GameState
+    expect(stored.character.equippedItems).toContain(secondItem.id)
   })
 
   it('sums active bonuses, groups loadout slots and chips each item bonus', () => {

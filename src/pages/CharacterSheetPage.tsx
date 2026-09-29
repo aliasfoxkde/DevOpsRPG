@@ -165,7 +165,7 @@ export default function CharacterSheetPage() {
                 )}
                 {equipmentBonuses.streakProtection > 0 && (
                   <span className="px-2 py-1 bg-orange-900/50 rounded text-sm text-orange-300">
-                    +{Math.round(equipmentBonuses.streakProtection)} Streak{" "}
+                    +{Math.round(equipmentBonuses.streakProtection)} Streak{' '}
                     {equipmentBonuses.streakProtection === 1 ? 'Save' : 'Saves'}
                   </span>
                 )}

@@ -202,10 +202,7 @@ describe('HomePage player state', () => {
 
     // The catalog numbers come from the real content data, not marketing copy
     expect(screen.getByText('📊 Inside DevOpsQuest')).toBeInTheDocument()
-    const statsSection = closestContainer(
-      screen.getByText('📊 Inside DevOpsQuest'),
-      'section',
-    )
+    const statsSection = closestContainer(screen.getByText('📊 Inside DevOpsQuest'), 'section')
     expect(within(statsSection).getByText('Technologies')).toBeInTheDocument()
     expect(within(statsSection).getByText('Quests')).toBeInTheDocument()
     expect(within(statsSection).getByText('Realms')).toBeInTheDocument()

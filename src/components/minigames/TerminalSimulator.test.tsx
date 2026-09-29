@@ -3,6 +3,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react'
 import { GameProvider, type GameState } from '../../contexts/GameContext'
 import { TerminalSimulator } from './TerminalSimulator'
 import { getRandomChallenges, type TerminalChallenge } from '../../data/terminalChallenges'
+import { expectedAppliedXp } from '../../pages/test-utils'
 import { STORAGE_KEYS } from '../../utils/gameUtils'
 
 const ROUNDS = 10
@@ -148,7 +149,8 @@ describe('TerminalSimulator', () => {
     expect(score).toBe(210)
 
     const character = storedCharacter()
-    expect(character.xp).toBe(100)
+    // The context banks the advertised 100 XP through the class bonus engine
+    expect(character.xp).toBe(expectedAppliedXp(100, character))
     expect(character.level).toBe(2)
 
     // Exiting returns the player to the briefing.

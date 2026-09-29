@@ -100,18 +100,17 @@ describe('EQUIPMENT_ITEMS catalog', () => {
   })
 
   it('only grants tech bonuses for technologies the catalog knows about', () => {
-    // KNOWN GAP (tripwire, not an assertion of correctness): 'linux' is sold as
-    // a collectible card in technologyCollection.ts but has no entry in
-    // technologies.ts, so Server Rack Miniature and the Linux Penguin Plush
-    // advertise +X% Linux XP that can never apply to any quest. Adding a real
-    // Linux technology should let this whitelist shrink to [].
+    // Every advertised tech bonus must pay: a bonus on an id outside
+    // technologies.ts shows in the store but never applies to any quest.
+    // (server_rack and linux_penguin_plush used to advertise 'linux', which
+    // has no catalog entry; they now point at networking and bash.)
     const referenced = [
       ...new Set(
         EQUIPMENT_ITEMS.flatMap((entry) => (entry.techBonus ? [entry.techBonus.technologyId] : [])),
       ),
     ]
     const dangling = referenced.filter((id) => !TECH_IDS.has(id))
-    expect(dangling).toEqual(['linux'])
+    expect(dangling).toEqual([])
   })
 
   it('ships the exact loadout for one item per slot', () => {
@@ -189,11 +188,11 @@ describe('calculateEquipmentBonuses', () => {
     const totals = calculateEquipmentBonuses([
       item('cloud_server'), // aws 0.10
       item('notebook'), // aws 0.05
-      item('server_rack'), // linux 0.08
+      item('server_rack'), // networking 0.08
     ])
     expect(totals.techBonuses['aws']).toBeCloseTo(0.15, 10)
-    expect(totals.techBonuses['linux']).toBeCloseTo(0.08, 10)
-    expect(Object.keys(totals.techBonuses).sort()).toEqual(['aws', 'linux'])
+    expect(totals.techBonuses['networking']).toBeCloseTo(0.08, 10)
+    expect(Object.keys(totals.techBonuses).sort()).toEqual(['aws', 'networking'])
     expect(totals.xpBonus).toBe(0)
   })
 
@@ -223,7 +222,7 @@ describe('calculateEquipmentBonuses', () => {
     expect(totals.streakProtection).toBe(
       EQUIPMENT_ITEMS.reduce((total, entry) => total + (entry.bonuses.streakProtection ?? 0), 0),
     )
-    expect(Object.keys(totals.techBonuses).sort()).toEqual(['aws', 'linux', 'python'])
+    expect(Object.keys(totals.techBonuses).sort()).toEqual(['aws', 'bash', 'networking', 'python'])
   })
 
   it('never mutates the loadout it is handed', () => {

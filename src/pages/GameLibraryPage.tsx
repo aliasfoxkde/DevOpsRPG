@@ -115,7 +115,9 @@ export default function GameLibraryPage() {
                 <p className="text-sm text-slate-400 mb-3">{miniGame.description}</p>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-amber-400">+{miniGame.xpPotential} XP potential</span>
+                  <span className="text-xs text-amber-400">
+                    +{miniGame.xpPotential} XP potential
+                  </span>
                   {isUnlocked ? (
                     <button
                       onClick={() => {

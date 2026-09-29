@@ -12,7 +12,11 @@ const GAME_SHORTCUTS = [
     description: spec.description,
     // Capitalised for display: the spec's category names double as tab labels
     category:
-      spec.category === 'navigation' ? 'Navigation' : spec.category === 'action' ? 'Actions' : 'Help',
+      spec.category === 'navigation'
+        ? 'Navigation'
+        : spec.category === 'action'
+          ? 'Actions'
+          : 'Help',
   })),
   { key: 'Esc', description: 'Close modal / Blur input', category: 'Actions' },
 ]

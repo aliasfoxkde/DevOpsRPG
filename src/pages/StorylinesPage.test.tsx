@@ -1,10 +1,25 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { screen, fireEvent, within } from '@testing-library/react'
+import { render, screen, fireEvent, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter, Route, Routes, useParams } from 'react-router-dom'
 import StorylinesPage from './StorylinesPage'
 import { STORY_ARCS } from '@/data/storylines'
-import { closestContainer, renderPage, renderSeededPage, seedDefaultGame } from './test-utils'
+import { GameProvider } from '@/contexts/GameContext'
+import { ThemeProvider } from '@/contexts/ThemeContext'
+import {
+  closestContainer,
+  expectedAppliedXp,
+  renderPage,
+  renderSeededPage,
+  seedDefaultGame,
+} from './test-utils'
 import { STORAGE_KEYS } from '@/utils/gameUtils'
+
+/** Stand-in for the quest page: renders the param it was mounted with. */
+function QuestProbe() {
+  const { questId } = useParams()
+  return <div>quest:{questId}</div>
+}
 
 /** Re-seeds the default save with `questIds` recorded as completed quests. */
 function seedCompletedQuests(questIds: string[]): void {
@@ -136,5 +151,66 @@ describe('StorylinesPage', () => {
     expect(within(rewards).getByText(`+${arc.rewards.goldBonus} Gold`)).toBeInTheDocument()
     expect(within(rewards).getByText('🏅 Special Badge')).toBeInTheDocument()
     expect(screen.getByText(`⏱️ ${arc.estimatedTime}`)).toBeInTheDocument()
+  })
+
+  it('pays a finished arc exactly once and dismisses the receipt', () => {
+    const arc = STORY_ARCS[2]
+    const base = seedDefaultGame()
+    seedCompletedQuests(arc.episodes.flatMap((episode) => episode.questIds))
+    renderPage(<StorylinesPage />)
+
+    fireEvent.click(screen.getByText(arc.title))
+    fireEvent.click(screen.getByRole('button', { name: /🎁 Claim Rewards/ }))
+
+    // The receipt names the advertised bonus (XP through the class bonus
+    // engine) and the badge the arc ships
+    expect(screen.getByRole('status')).toHaveTextContent(
+      `${arc.title}: +${expectedAppliedXp(arc.rewards.xpBonus, base.character)}` +
+        ` XP, +${arc.rewards.goldBonus} gold, badge unlocked!`,
+    )
+    expect(screen.getByText('✓ Rewards Claimed')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /🎁 Claim Rewards/ })).not.toBeInTheDocument()
+
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEYS.GAME) ?? '{}') as {
+      claimedStoryArcs?: string[]
+      character: { xp: number; gold: number }
+    }
+    expect(stored.claimedStoryArcs).toEqual([arc.id])
+    expect(stored.character.xp).toBe(
+      base.character.xp + expectedAppliedXp(arc.rewards.xpBonus, base.character),
+    )
+    expect(stored.character.gold).toBe(base.character.gold + arc.rewards.goldBonus)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss' }))
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+  })
+
+  it('sends Continue Story to the first unfinished quest of the episode', () => {
+    const arc = STORY_ARCS[0]
+    const [firstEpisode] = arc.episodes
+    seedCompletedQuests(firstEpisode.questIds)
+
+    // Render with the quest route the page navigates to, so the jump is real
+    render(
+      <ThemeProvider>
+        <GameProvider>
+          <MemoryRouter initialEntries={['/storylines']}>
+            <Routes>
+              <Route path="/storylines" element={<StorylinesPage />} />
+              <Route path="/quest/:questId" element={<QuestProbe />} />
+            </Routes>
+          </MemoryRouter>
+        </GameProvider>
+      </ThemeProvider>,
+    )
+
+    fireEvent.click(screen.getByText(arc.title))
+    fireEvent.click(screen.getByRole('button', { name: 'Continue Story →' }))
+
+    const nextQuestId = arc.episodes[1].questIds.find(
+      (questId) => !firstEpisode.questIds.includes(questId),
+    )
+    if (!nextQuestId) throw new Error('Expected an unfinished quest in episode 2')
+    expect(screen.getByText(`quest:${nextQuestId}`)).toBeInTheDocument()
   })
 })

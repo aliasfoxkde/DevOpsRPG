@@ -7,6 +7,7 @@ import {
   type DiagnosticStep,
   type ResolutionStep,
 } from '../../data/incidentScenarios'
+import { expectedAppliedXp } from '../../pages/test-utils'
 import { STORAGE_KEYS } from '../../utils/gameUtils'
 
 /** Look up an authored scenario by id, failing loudly if the data ever changes. */
@@ -203,9 +204,13 @@ describe('IncidentSimulator', () => {
     expect(screen.getByText('+98 🪙')).toBeInTheDocument()
 
     const character = storedCharacter()
-    expect(character.xp).toBe(196)
+    // The displayed 196 XP is the advertised amount; the context banks it
+    // through the class bonus engine
+    expect(character.xp).toBe(expectedAppliedXp(196, character))
     expect(character.gold).toBe(98)
-    expect(character.level).toBe(2) // 196 XP crosses the 100 XP threshold
+    // Character levels use the linear curve (100 XP per level): the banked
+    // 215 crosses both the 100 and 200 marks.
+    expect(character.level).toBe(3)
 
     expect(onComplete).toHaveBeenCalledTimes(1)
     expect(onComplete).toHaveBeenCalledWith(98, 196)

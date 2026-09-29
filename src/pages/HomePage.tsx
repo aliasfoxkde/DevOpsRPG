@@ -309,7 +309,9 @@ export default function HomePage() {
                   <div className={`text-4xl mb-2 ${!isUnlocked && 'grayscale opacity-50'}`}>
                     {realm.icon}
                   </div>
-                  <h3 className={`font-bold mb-1 text-sm ${isUnlocked ? 'text-white' : 'text-slate-500'}`}>
+                  <h3
+                    className={`font-bold mb-1 text-sm ${isUnlocked ? 'text-white' : 'text-slate-500'}`}
+                  >
                     {realm.name}
                   </h3>
                   <p className="text-xs text-slate-500 mb-1">{sampleTechs}</p>

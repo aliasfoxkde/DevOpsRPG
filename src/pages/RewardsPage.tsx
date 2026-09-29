@@ -9,8 +9,9 @@ import { REWARD_TIERS } from '../data/milestones'
 function currentWeekDays(now: number): { days: string[]; todayIndex: number } {
   const DAY_MS = 24 * 60 * 60 * 1000
   const todayIndex = (new Date(now).getUTCDay() + 6) % 7 // Monday = 0
-  const days = Array.from({ length: 7 }, (_, index) =>
-    new Date(now - (todayIndex - index) * DAY_MS).toISOString().split('T')[0],
+  const days = Array.from(
+    { length: 7 },
+    (_, index) => new Date(now - (todayIndex - index) * DAY_MS).toISOString().split('T')[0],
   )
   return { days, todayIndex }
 }
@@ -529,7 +530,9 @@ export default function RewardsPage() {
                     {/* Rewards preview */}
                     <div className="flex gap-3 text-xs mb-2">
                       <span className="text-purple-400">+{grantedXp(tier.rewards.xp)} XP</span>
-                      <span className="text-orange-400">+{grantedGold(tier.rewards.gold)} Gold</span>
+                      <span className="text-orange-400">
+                        +{grantedGold(tier.rewards.gold)} Gold
+                      </span>
                       {tier.rewards.badge && <span className="text-blue-400">+ Badge</span>}
                     </div>
 
@@ -564,8 +567,12 @@ export default function RewardsPage() {
             <div className="text-6xl mb-4">🎁</div>
             <h3 className="text-2xl font-bold mb-2">Mystery Box Opened!</h3>
             <div className="text-4xl mb-4">
-              {mysteryResult.type === 'xp' && mysteryResult.value !== undefined && `✨ +${grantedXp(mysteryResult.value)} XP`}
-              {mysteryResult.type === 'gold' && mysteryResult.value !== undefined && `🪙 +${grantedGold(mysteryResult.value)} Gold`}
+              {mysteryResult.type === 'xp' &&
+                mysteryResult.value !== undefined &&
+                `✨ +${grantedXp(mysteryResult.value)} XP`}
+              {mysteryResult.type === 'gold' &&
+                mysteryResult.value !== undefined &&
+                `🪙 +${grantedGold(mysteryResult.value)} Gold`}
               {mysteryResult.type === 'collectible' && mysteryResult.collectible && (
                 <span>
                   {mysteryResult.collectible.icon} {mysteryResult.collectible.name}

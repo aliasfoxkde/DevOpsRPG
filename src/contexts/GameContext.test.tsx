@@ -210,7 +210,9 @@ describe('GameContext progression', () => {
     expect(screen.getByTestId('quest-count')).toHaveTextContent('1')
     expect(screen.getByTestId('victory')).toHaveTextContent('true')
     const charClass = getGame().game.character.class
-    expect(screen.getByTestId('xp')).toHaveTextContent(String(grantedXp(firstQuest.xpReward, charClass)))
+    expect(screen.getByTestId('xp')).toHaveTextContent(
+      String(grantedXp(firstQuest.xpReward, charClass)),
+    )
     expect(screen.getByTestId('gold')).toHaveTextContent(
       String(Math.floor(firstQuest.xpReward * GOLD_XP_RATIO)),
     )
