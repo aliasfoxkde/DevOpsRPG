@@ -73,4 +73,4 @@ The repository uses a Safeguards ruleset (imported from Atheon-Enhanced):
 
 - [Dark Factory](https://github.com/aliasfoxkde/dark-factory)
 - [Atheon-Enhanced](https://github.com/aliasfoxkde/Atheon-Enhanced)
-- [Getting Started](Getting-Started)
+- [Getting Started](Getting-Started.md)

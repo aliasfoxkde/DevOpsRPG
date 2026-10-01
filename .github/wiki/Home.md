@@ -4,10 +4,10 @@ Welcome to the DevOpsRPG project wiki!
 
 ## Quick Links
 
-- [Autonomous Workflow](Autonomous-Workflow) - Automated issue handling system
-- [Getting Started](Getting-Started) - Setup and configuration
-- [Contributing](Contributing) - How to contribute to the project
-- [Architecture](Architecture) - System design overview
+- [Autonomous Workflow](Autonomous-Workflow.md) - Automated issue handling system
+- [Getting Started](Getting-Started.md) - Setup and configuration
+- [Contributing](https://github.com/aliasfoxkde/DevOpsRPG/blob/main/CONTRIBUTING.md) - How to contribute to the project
+- [Architecture](https://github.com/aliasfoxkde/DevOpsRPG/blob/main/docs/architecture/ARCHITECTURE.md) - System design overview
 
 ## Project Overview
 

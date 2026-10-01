@@ -731,3 +731,109 @@ level-up-granted skill points through `allocateSkillPoint`, making maxing reacha
 shortcut eating typed input. Still a documented product decision: `curiosity`/`speed` meta
 skills produce no bonus — implementing them is feature work (first-attempt tracking, timed-
 challenge payout hooks) and must not be faked with display-only numbers.
+
+---
+
+## 6. Cycle 3 close-out — v0.1.4 ship (2026-09-29/30)
+
+### 6.1 Ship disposition
+
+v0.1.4 shipped as two commits on top of the honesty pass: `test(game): align reward
+assertions with the bonus engine` (39 files — bonus-aware XP expectations via a shared
+`expectedAppliedXp` helper, the StreakTracker suite, claim-flow behavior tests for career
+milestones / story arcs / bag equip, honest tripwires) and `chore(release): v0.1.4`.
+Tagged, pushed, released on GitHub, deployed to Cloudflare Pages and byte-verified: the
+production URL, the new deployment alias and the local `dist/` all served the identical
+`index-BI3k-dOA.js` bundle (HTTP 200). `package-lock.json` now carries the app version
+again — it had been left at 0.1.2 through the 0.1.3 release, which the lockfile audit
+caught and fixed.
+
+### 6.2 Gate evidence at ship time
+
+| Gate                               | Result                                                                                                                                   |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Unit + coverage                    | 103 files / 1,590 tests, EXIT 0 — stmts 97.26 / branch 91.62 / funcs 99.21 / lines 98.51 vs 97 / 91.5 / 98.5 / 98                        |
+| Worker tests                       | 18 / 18                                                                                                                                  |
+| E2e                                | 30 / 30 (chromium, firefox, webkit)                                                                                                      |
+| lint / typecheck / knip / prettier | all clean                                                                                                                                |
+| `audit:secrets`                    | exit 0 — 3 error-level findings eliminated (plan-doc digit run reworded); baseline regenerated over 221 reviewed accepted-class findings |
+| Accessibility                      | AAA-strict axe pass unchanged from Cycle 2                                                                                               |
+
+### 6.3 E2e stabilization: two real root causes
+
+1. **Cold-start latency (product test, fixed in repo)** — the first test of a run lost the
+   race against Vite's on-demand module graph: `page.goto` waited on `load` past the 30 s
+   test timeout (firefox) and the lazy home-route chunk landed after the HUD but outside
+   the greeting's default 5 s window (chromium). `onboarding.spec.ts` now navigates with
+   `domcontentloaded` and gives both web-first assertions the 15 s window the HUD check
+   already used.
+2. **Browser-profile I/O (environment, recorded in agent memory)** — Playwright writes
+   `playwright_firefoxdev_profile-*` into `$TMPDIR`; on this host that is NAS btrfs and
+   firefox launch/context-setup alone exceeded the timeout. `TMPDIR=/tmp` (tmpfs) took
+   firefox from mass timeouts to 10/10 in ~1.7 min. Local note: run firefox e2e as
+   `TMPDIR=/tmp npx playwright test --project=firefox --workers=1`; the dev-server port is
+   pinned to 5299 here because another project holds 5173.
+
+### 6.4 Documentation coverage audit (post-ship)
+
+Scripted audit (walk all markdown, resolve every relative link, check every docs file is
+indexed): 34 markdown files, **0 broken links, 0 unindexed docs** after fixes:
+
+- `docs/README.md` was stale at June levels ("187 tests", dead deploy alias, no GitForge
+  mention despite ADR 0001) — rewritten with the full tree (the 11 files it never indexed:
+  `PROGRESS.md`, `RESEARCH.md`, the five `archive/` docs, `development/DEVELOPMENT.md`,
+  `guides/DEPLOYMENT.md`, `process/TDD.md`, `process/VALIDATION.md`, plus `PLAN.md` and
+  `architecture/PLAN.md` which a substring check had hidden), current metrics (1,590 unit /
+  18 worker / 30 e2e), the real catalog counts (81 badges, 28 titles, 5 arcs, 12
+  certifications, 8 events, 7 mini-games, 18 equipment), and the full validation command
+  set. June-era documents are labelled "historical snapshot" in the index rather than
+  silently re-exported as current claims.
+- `.github/wiki/Home.md`/`Autonomous-Workflow.md` used bare wiki page-name links, two of
+  which pointed at pages that do not exist; links now resolve as relative `.md` targets,
+  and the two missing pages link to the real repo docs (`CONTRIBUTING.md`,
+  `architecture/ARCHITECTURE.md`).
+
+### 6.5 Import-guard tests (branch-coverage ladder, in flight)
+
+The largest remaining uncovered branches are the module-load defensive throws
+(`careerPaths.ts` `tech()`, `storylines.ts` `questIdsFor()`, `gameCatalog.ts`
+`miniGameById()`). `src/data/moduleGuardrails.test.ts` re-imports the modules via
+`vi.doMock('./quests', ...)` against an empty quest catalog to prove a corrupted catalog
+fails the import loudly, re-imports the real catalog to prove the guards never misfire, and
+exercises `miniGameById` for both the throw and every shipped id. NOTE (2026-09-30):
+written and typechecked, but not yet executed — see 6.6.
+
+### 6.6 Environment constraint of record
+
+This host is shared: an unrelated `llama-server` process was holding ~7 of 16 cores (load
+average ~86–99) through this session, which starves Vitest's worker startup ("Failed to
+start threads/forks worker… Timeout waiting for worker to respond", always at transform
+0 ms / import 0 ms — startup, never the test). Signature to recognise: the _control file_
+(`integrity.test.ts`, green earlier the same day) fails identically. Proven invocation
+under load: `npx vitest run --pool=threads --maxWorkers=1 --fileParallelism=false
+--testTimeout=60000 --coverage` after the load source subsides. Also recorded: this aegis
+build takes `--format` as a top-level flag (`aegis --format json scan .`), not on the
+`scan` subcommand.
+
+### 6.7 Next steps (mapped to the Phase 6/7 roadmap above)
+
+1. **Finish 6.5** — execute `moduleGuardrails.test.ts` once the host frees up, then
+   re-measure the coverage ladder; the next honest branch-coverage targets after the
+   import guards are the `gameStorage` corruption-fallback paths and `GameContext`'s
+   storage-quota error handling (both currently defensive-only).
+2. **Phase 6 (e2e expansion)** — 30 tests cover the critical paths of 2 spec files; the
+   route inventory is 29 routes. Highest-value additions: certification exam flow,
+   seasonal-event claiming under a manipulated clock, PvP matchmaking result, worker-API
+   integration (progress sync) against `wrangler dev`.
+3. **Phase 7 (release cadence)** — GitForge validation remains blocked on user
+   authentication (`gitforge auth --login` is the user's credential path; the repo needs a
+   `gitforge` remote alongside `origin`). Once authenticated: push, confirm the
+   `.gitforce.yml` pipeline stages mirror the local gate ladder, and attach the GitForge run
+   to the next release.
+4. **Docs modernization** — the June-era snapshots (`development/DEVELOPMENT.md`,
+   `guides/DEPLOYMENT.md`, `process/TDD.md`, `PROGRESS.md`, `RESEARCH.md`, both `PLAN.md`s)
+   are indexed as historical; refresh `DEVELOPMENT.md` and `DEPLOYMENT.md` to current
+   reality in a docs-only cycle (worker deploy disposition, GitForge-first pipeline, the
+   coverage ratchet replacing the 80% target).
+5. **Feature backlog of record** — `curiosity`/`speed` meta-skill effects (5.6) stay
+   deferred pending real mechanics; do not fake with display-only bonuses.
