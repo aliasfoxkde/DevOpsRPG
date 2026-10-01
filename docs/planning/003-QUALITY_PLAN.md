@@ -811,7 +811,19 @@ start threads/forks worker… Timeout waiting for worker to respond", always at 
 0 ms / import 0 ms — startup, never the test). Signature to recognise: the _control file_
 (`integrity.test.ts`, green earlier the same day) fails identically. Proven invocation
 under load: `npx vitest run --pool=threads --maxWorkers=1 --fileParallelism=false
---testTimeout=60000 --coverage` after the load source subsides. Also recorded: this aegis
+--testTimeout=60000 --coverage` after the load source subsides. The load is
+wave-shaped (an external `llama-server` process toggles between idle and ~7-9
+cores), so a full-suite run needs a quiet window: attempts through the small
+hours executed 83-102 of 104 files per pass with **zero test failures** in any
+executed file (the drops are always worker-start timeouts, never assertions).
+A per-file proof loop (one 60 s worker window per file, 2 retries) passed 87 of
+97 attempted files before its own load contribution made the tail starve.
+The coverage gate is therefore re-armed to fire automatically on a load guard
+(< 40) rather than by wall-clock hope; `--no-isolate` was evaluated and
+rejected because the suite has stateful tests that require per-file module
+registries (onboarding walk hung at 179 s sharing state), and the vitest 60 s
+worker-start window is a hardcoded constant, not configurable — patching
+node_modules to hide starvation was considered and rejected. Also recorded: this aegis
 build takes `--format` as a top-level flag (`aegis --format json scan .`), not on the
 `scan` subcommand.
 
