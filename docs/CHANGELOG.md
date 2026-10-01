@@ -4,6 +4,44 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.1.5] - 2026-10-01
+
+Persistence-integrity cycle: fixed a legacy-save migration bug, gave the
+storage layer its first behavior tests, and hardened e2e cold starts.
+
+### Fixed
+
+- `loadInitialGame` no longer discards legacy saves' owned items: the
+  pre-`ownedItems` migration checked the deep-merged object, which always
+  carries the default `[]`, so the key-absent case was invisible and the
+  `equippedItems` seeding never ran. The check now reads the parsed save
+- Test-suite hygiene bugs found by the load-resilient gate: `ThemeContext`
+  tests leaked their `window`/`matchMedia` global stubs (no
+  `unstubAllGlobals`), `SocialPage` left fake timers installed, and RTL DOM
+  cleanup anchored to whichever file first imported it — all invisible under
+  per-file isolation, all fixed so suites are safe shared or isolated
+
+### Added
+
+- `src/contexts/game/gameStorage.test.ts` (9 tests): loader validation, backup
+  recovery, deep-merge recovery, achievement re-stamping, the legacy
+  `ownedItems` seed, the `Infinity`/`fastestQuestTime` sentinel, corrupt
+  collection normalization and save round-trip fidelity
+- `src/contexts/game/useGamePersistence.test.tsx` (6 tests): dual-key saves,
+  quota-exceeded tolerance, cross-tab storage-event merging, malformed-payload
+  and foreign-key event tolerance, and listener teardown
+- `src/data/moduleGuardrails.test.ts` (4 tests): cross-referencing data modules
+  (`careerPaths`, `storylines`, `miniGameById`) throw at import time on broken
+  references and accept the real catalog
+
+### Changed
+
+- e2e onboarding test no longer blocks on dev-server cold-start compile latency
+  (`domcontentloaded` + explicit assertion windows), removing 11 environment
+  flake failures
+- Documentation index rewritten: all 34 docs catalogued with current counts,
+  GitForge-primary CI section, validation command set
+
 ## [0.1.4] - 2026-09-29
 
 Honesty-pass cycle: removed the remaining fabricated marketing surfaces, closed the

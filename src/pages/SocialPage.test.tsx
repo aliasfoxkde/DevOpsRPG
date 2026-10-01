@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { screen, within, act, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import SocialPage from './SocialPage'
@@ -15,6 +15,13 @@ function statValue(label: string): string | null {
 describe('SocialPage', () => {
   beforeEach(() => {
     localStorage.clear()
+  })
+
+  // The cooldown and toast tests install fake timers; restore them even when
+  // an assertion throws, or every later file in a shared worker inherits
+  // vitest's fake clock (per-file isolation normally hides this).
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
   it('renders the social hub header and friend statistics', () => {

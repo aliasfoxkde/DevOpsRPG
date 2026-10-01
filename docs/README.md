@@ -118,6 +118,8 @@ npm run typecheck      # TypeScript (strict)
 npm run format:check   # Prettier
 npm run knip           # Unused exports/files/dependencies
 npm run test           # Unit + component tests (Vitest, coverage-gated)
+./scripts/gate-sharded.sh   # Same suite, sharded with retries — pass/fail
+                            # only, for hosts with bursty background load
 npm run test:worker    # Worker KV API tests
 npm run test:e2e       # Playwright (chromium + firefox + webkit)
 npm run audit:secrets  # Aegis scan against the committed baseline

@@ -120,6 +120,10 @@ describe('ThemeContext', () => {
     document.documentElement.className = ''
     vi.useRealTimers()
     vi.restoreAllMocks()
+    // The SSR test stubs `window` to undefined; without this restore it
+    // leaks past the file (per-file isolation hides it, a shared worker
+    // inherits a dead window and every later render dies).
+    vi.unstubAllGlobals()
   })
 
   it('defaults to dark when no preference is stored (dark-first app)', () => {

@@ -24,6 +24,7 @@
   },
   "include": [
     "vite.config.ts",
+    "vitest.loadresilient.config.ts",
     "playwright.config.ts",
     "eslint.config.js",
     "scripts/**/*.mjs",
