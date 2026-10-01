@@ -67,3 +67,4 @@ public/workbox-*.js.map
 # Generated audit output (regenerate with npm run audit:secrets / audit:runtime)
 audit-report.json
 aegis-report.json
+.vitest-reports/

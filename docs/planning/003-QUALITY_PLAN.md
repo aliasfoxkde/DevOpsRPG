@@ -827,6 +827,41 @@ node_modules to hide starvation was considered and rejected. Also recorded: this
 build takes `--format` as a top-level flag (`aegis --format json scan .`), not on the
 `scan` subcommand.
 
+### 6.8 Gates on a shared host: sharded pass/fail + single-process coverage
+
+The load-guarded monolithic run still failed in practice: a wave can land _during_ the
+~14-minute run even when the guard fired at load < 40 (observed: fired at 36, spiked to
+50 mid-run, 4 of 106 files lost to worker-start timeouts with **zero assertion
+failures** in the 102 files and 1,551 tests that completed). Three mitigations were
+tried and measured, and one survived:
+
+1. **`--retry` does not cover worker-start failures.** Pool-level spawn timeouts
+   surface as unhandled errors outside the runner, so `--retry=2` re-ran nothing
+   (verified under load ~80: three previously-dropped page suites errored again,
+   "no tests", 3 errors).
+2. **Sharding cannot produce valid coverage on vitest 4.1.9.** The documented
+   `--reporter=blob` + `--merge-reports` flow was measured with both providers:
+   v8 shards that between them executed all 106 files merged to 89.94 % stmts /
+   82.08 % branch (identical denominators to the single-process run but ~5–9
+   points lost — raw v8 range sets don't union across processes), and istanbul
+   shards merged to 57.1 % / 50.6 % with fully-covered page components reading
+   0 % (per-file entries from `coverage.all` clobber real data at merge). A
+   sharded coverage number is wrong by construction on this version.
+3. **What survives**: `scripts/gate-sharded.sh` runs the suite in 4 shards
+   WITHOUT coverage, retries a starved shard alone (a 3–4 minute retry instead
+   of a 14-minute full run), and merges pass/fail results only. It proves
+   _correctness_ (every test file executed, zero failures) under load waves —
+   the pass/fail merge needs no per-file coverage arithmetic. All four shards
+   passed attempt-1 in both measured runs, including under load 65–80.
+
+**The authoritative coverage gate remains a single-process
+`npx vitest run --pool=threads --maxWorkers=1 --fileParallelism=false
+--testTimeout=60000 --coverage` in a quiet window (load < 40, re-checked by a
+session cron before each attempt).** It is the only run whose coverage numbers
+are valid, and it is the run that enforces the thresholds. The sharded gate is
+the fallback evidence that the suite itself is green when no quiet window
+exists; the cron no longer attempts it as a coverage substitute.
+
 ### 6.7 Next steps (mapped to the Phase 6/7 roadmap above)
 
 1. **Finish 6.5** — execute `moduleGuardrails.test.ts` once the host frees up, then
