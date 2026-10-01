@@ -91,10 +91,14 @@ function loadAndValidateGame(storedJson: string | null): GameState | null {
     }
     // ownedItems was added after equippedItems; saves from before it existed
     // treated equippedItems as the ownership list, so seed from it rather
-    // than letting those players' purchases vanish.
-    if (!Array.isArray(merged.character.ownedItems)) {
-      merged.character.ownedItems = Array.isArray(merged.character.equippedItems)
-        ? [...merged.character.equippedItems]
+    // than letting those players' purchases vanish. The check reads the
+    // parsed save — the merged object always carries the default [], which
+    // would make the key-absent case invisible here.
+    const savedCharacter = isPlainObject(parsed.character) ? parsed.character : {}
+    if (!Array.isArray(savedCharacter.ownedItems)) {
+      const savedEquipped: unknown = savedCharacter.equippedItems
+      merged.character.ownedItems = Array.isArray(savedEquipped)
+        ? savedEquipped.filter((id): id is string => typeof id === 'string')
         : []
     }
     // The "no record yet" sentinel is Infinity, which JSON serializes to
