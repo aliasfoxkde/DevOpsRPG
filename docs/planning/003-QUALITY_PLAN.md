@@ -884,3 +884,47 @@ exists; the cron no longer attempts it as a coverage substitute.
    coverage ratchet replacing the 80% target).
 5. **Feature backlog of record** — `curiosity`/`speed` meta-skill effects (5.6) stay
    deferred pending real mechanics; do not fake with display-only bonuses.
+
+## 6.9 v0.1.5 ship — the coverage gate went green under load (2026-10-01)
+
+§6.8 ended with the single-process coverage gate hostage to host load waves. That is
+now resolved: `vitest.loadresilient.config.ts` splits the suite into three vitest
+**projects** inside one invocation, so coverage still comes from a single process
+tree (valid thresholds) while worker spawns drop from ~106 to ~12:
+
+| project    | contents                                                                          | isolation             |
+| ---------- | --------------------------------------------------------------------------------- | --------------------- |
+| `stateful` | 9 suites that depend on per-file module registries or module-level provider state | per-file              |
+| `node`     | 2 suites declaring `@vitest-environment node` per file                            | per-file              |
+| `shared`   | the remaining 95 files                                                            | one long-lived worker |
+
+**Gate evidence (authoritative run, ship time):** exit 0; **106/106 test files,
+1,609/1,609 tests passed**; coverage **97.34 % statements (5419/5567) · 91.76 %
+branches (4113/4482) · 99.21 % functions (1519/1531) · 98.58 % lines (4864/4934)**
+against thresholds 97 / 91.5 / 98.5 / 98; **239.8 s wall clock** with the host in an
+elevated-load period. The default config loses random files at load ≥ ~45; this run
+was taken at load ~30–45 and did not flake.
+
+**Test-hygiene bugs the split exposed (all fixed):** per-file isolation had masked
+three real leaks — `ThemeContext`'s SSR test stubbed `window` to `undefined` and
+never restored it (`vi.unstubAllGlobals()` added), `SocialPage` leaked fake timers
+(`afterEach { vi.useRealTimers() }` added), and RTL's auto-cleanup anchored to
+whichever file first imported `@testing-library/react` in a shared registry (explicit
+`afterEach(cleanup)` in `src/test/setup.ts`).
+
+**Honest assessment against the 99 % goal.** Statements (97.34), functions (99.21)
+and lines (98.58) sit at or near the bar; **branches (91.76) do not** — the remaining
+~370 uncovered branches are concentrated in `GameContext`'s defensive storage-quota
+and corruption-fallback arms and in the e2e-only render paths of full-page components.
+Closing them means simulating `QuotaExceededError` and torn localStorage writes in
+unit tests — real work, not threshold nudging — and is the Phase 7 coverage ladder's
+next rung. The configured thresholds (97/91.5/98.5/98) sit at this measured frontier,
+so the ratchet cannot quietly loosen.
+
+**Known debt recorded honestly:** 9 of 106 suites still need per-file isolation in
+shared-worker mode (root causes commented in `vitest.loadresilient.config.ts`): Quiz
+has an unidentified suite that mutates its module-level question data, and
+`GameContext`'s provider initialises state from storage at module import, so
+absolute-XP assertions in BattleArena/Skills/Guild see earlier files' quest
+completions. A per-file provider reset unlocks all of these and is the next
+refactor-grade test task.
