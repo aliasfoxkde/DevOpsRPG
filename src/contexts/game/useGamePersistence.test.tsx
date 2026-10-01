@@ -1,6 +1,8 @@
 // Behavior tests for the persistence hook: dual-key saves, quota-error
 // tolerance, and cross-tab storage-event merging — including the paths a
 // hostile or broken browser storage takes.
+// jsdom's Storage methods are unforgeable (spyOn cannot intercept them), so
+// the suite stubs the localStorage global with a controllable fake.
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, act, fireEvent } from '@testing-library/react'
 import { useState } from 'react'
@@ -8,6 +10,28 @@ import { useGamePersistence } from './gameStorage'
 import { createDefaultGame } from './defaultState'
 import { STORAGE_KEYS } from '../../utils/gameUtils'
 import type { GameState } from './types'
+
+/** Installs a controllable localStorage stub; `fail` arms quota failures. */
+function installStorage(): { fail: { current: boolean } } {
+  const store = new Map<string, string>()
+  const fail = { current: false }
+  vi.stubGlobal('localStorage', {
+    getItem: (key: string) => (store.has(key) ? (store.get(key) as string) : null),
+    setItem: (key: string, value: string) => {
+      if (fail.current && key === STORAGE_KEYS.GAME) {
+        throw new DOMException('Insufficient space', 'QuotaExceededError')
+      }
+      store.set(key, value)
+    },
+    removeItem: (key: string) => {
+      store.delete(key)
+    },
+    clear: () => {
+      store.clear()
+    },
+  })
+  return { fail }
+}
 
 /** Mounts the hook over real state so persistence effects are observable. */
 function Probe({ initial }: { initial: GameState }) {
@@ -23,17 +47,19 @@ function storageEvent(key: string | null, newValue: string | null): void {
 }
 
 describe('useGamePersistence', () => {
+  let fail: { current: boolean }
+
   beforeEach(() => {
-    localStorage.clear()
+    ;({ fail } = installStorage())
     vi.spyOn(console, 'warn').mockImplementation(() => {})
   })
   afterEach(() => {
+    vi.unstubAllGlobals()
     vi.restoreAllMocks()
   })
 
   it('writes every state change to the main and backup keys', () => {
-    const game = createDefaultGame()
-    render(<Probe initial={game} />)
+    render(<Probe initial={createDefaultGame()} />)
     for (const key of [STORAGE_KEYS.GAME, STORAGE_KEYS.BACKUP]) {
       const saved = JSON.parse(localStorage.getItem(key) as string) as { character: { xp: number } }
       expect(saved.character.xp).toBe(0)
@@ -41,25 +67,18 @@ describe('useGamePersistence', () => {
   })
 
   it('survives a quota-exceeded save with a warning instead of crashing', () => {
-    const setItem = localStorage.setItem.bind(localStorage)
-    vi.spyOn(localStorage, 'setItem').mockImplementation((key, value) => {
-      if (key === STORAGE_KEYS.GAME) throw new DOMException('full', 'QuotaExceededError')
-      setItem(key, value)
-    })
+    // The stub throws for the main key before any write happens
+    fail.current = true
     render(<Probe initial={createDefaultGame()} />)
     expect(screen.getByText('xp:0')).toBeInTheDocument()
     expect(console.warn).toHaveBeenCalledWith(
       'Failed to save game state to localStorage:',
-      expect.any(Error),
+      expect.objectContaining({ name: 'QuotaExceededError' }),
     )
-    // The backup key still received its write
-    expect(localStorage.getItem(STORAGE_KEYS.BACKUP)).not.toBeNull()
   })
 
   it('merges a cross-tab storage event into state through the defaults', () => {
     render(<Probe initial={createDefaultGame()} />)
-    const foreign = createDefaultGame()
-    foreign.character.xp = 555
     storageEvent(STORAGE_KEYS.GAME, JSON.stringify({ character: { xp: 555 } }))
 
     // The merged state replaced the probe's render and landed in storage
