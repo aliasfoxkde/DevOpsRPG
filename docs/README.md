@@ -32,7 +32,8 @@ docs/
 ├── planning/
 │   ├── 000-AUDIT_OVERVIEW.md   # Project audit and status
 │   ├── 002-REFACTORING.md      # Refactoring roadmap
-│   └── 003-QUALITY_PLAN.md     # Quality baselines & phased roadmap (coverage, a11y, CI)
+│   ├── 003-QUALITY_PLAN.md     # Quality baselines & phased roadmap (coverage, a11y, CI)
+│   └── 004-INTEGRITY_PLAN.md   # ACTIVE: Phase 7 — CI integrity, docs truthing, test depth
 ├── decisions/                  # Architecture Decision Records (ADRs)
 │   ├── 0001-gitforge-primary-ci.md
 │   ├── 0002-service-worker-prod-only.md
