@@ -151,25 +151,77 @@ only historical, clearly-dated context or nothing.
 
 ### Phase 7C — Unit test depth (branch-coverage ladder)
 
-1. Direct tests: `defaultState.ts`, `gameCatalog.ts`, `xp.ts`.
+1. Direct tests: `defaultState.ts`, `gameCatalog.ts`, `xp.ts`. ✅ landed
+   (`xp.test.ts` 6 cases, `defaultState.test.ts` 9, `gameCatalog.test.ts` 7).
 2. `GameContext` persistence branches: simulate `QuotaExceededError` on persist, torn
-   JSON, and schema-mismatch saves → exercise the fallback arms.
+   JSON, and schema-mismatch saves → exercise the fallback arms. ✅ landed —
+   `useGamePersistence.test.tsx` (quota + cross-tab) and `gameStorage.test.ts`
+   (loader validation, backup recovery, legacy `ownedItems` seed, `Infinity`
+   sentinel, non-array repair including all four `claimed*` ledgers).
 3. Hunt the Quiz module-data mutator (isolation debt, `vitest.loadresilient.config.ts`).
+   ✅ **hunt closed, no mutator exists**: every in-place `sort`/`push`/`splice`
+   in pages/components operates on a fresh copy (`[...allQuests]` at
+   QuestJournalPage.tsx:73, `Object.values(realms).sort()` at
+   HomePage.tsx:11 and LeaderboardPage.tsx:10 — `Object.values` already
+   returns a new array, `[...SEASONAL_EVENTS]` at SeasonalEventsPage.tsx:201;
+   QuizDash's Fisher-Yates shuffles a spread). The sole consumer of the live
+   `getQuizForTopic` reference (Quiz.tsx:14) is read-only. The shared-registry
+   Quiz failure is therefore **module-mock registry leakage** (Quiz.test.tsx's
+   `vi.mock('../../data/quizzes')` interacting with other suites' imports
+   under `isolate: false`), not data mutation.
 4. Per-file provider reset so absolute-XP suites (BattleArena, Skills, Guild,
-   Leaderboard) can leave the stateful project.
+   Leaderboard) can leave the stateful project. ⏸ **Deferred with corrected
+   root cause**: the config comment says the provider initializes "at module
+   import", but it is `useState<GameState>(loadInitialGame)`
+   (GameContext.tsx:106) — per-render from storage. The leak is inter-file
+   localStorage hygiene (a file that does not clear/seed in `beforeEach`
+   inherits the previous file's writes), plus the mock leakage above for
+   Quiz. Fixable, but every iteration needs a full suite run, which is
+   load-window gated; not started while runs starve.
 
 **Done when:** branch coverage ≥ 95% with thresholds ratcheted to match; stateful
-project shrunk.
+project shrunk. (Coverage re-measurement itself is pending a quiet-host window;
+the four new suites were verified green individually.)
 
 ### Phase 7D — E2E expansion (core loop first)
 
 New specs, highest value first: quest completion → XP/level-up → victory modal →
 persistence across reload; store purchase (gold debit + ownership); worldmap realm
 gating; skills training; settings round-trip. Target ~10 → ~25 cases, ~12 routes.
+✅ Authored: `e2e/helpers.ts` (shared `seedGame` via the app's own storage
+contract + `gotoApp`), `progression.spec.ts` (quiz-driven completion, victory,
+reload persistence, journal filtering), `store.spec.ts` (disabled-at-zero,
+purchase debit + ownership round-trip), `worldmap.spec.ts` (level-gated nodes,
+modal travel, unlock-at-level), `skills.spec.ts` (allocation debit + reload),
+`settings.spec.ts` (theme radio + sound switch round-trips),
+`route-integrity.spec.ts` (6 heading-verified routes + a 20-route error-boundary
+sweep). UI contracts anchored to the real DOM: quiz driven via its `'n'`
+keyboard flow, XP asserted relative (quest payouts carry the live seasonal
+multiplier — pinned to 1× only in unit tests), worldmap modal has no
+`dialog` role so assertions scope by heading/CTA.
 
-**Done when:** `npm run test:e2e` green ×3 browsers; every new spec has a stable
-storage-seeding strategy (no fake data — real game state via the app's own storage
-contract).
+✅ **Green: 84/84 executions (28 cases × chromium/firefox/webkit), workers=1.**
+Three app contracts the suite had to learn, all now encoded in
+`e2e/helpers.ts` + spec comments:
+1. **`addInitScript` re-fires on every navigation** — a naive seed re-applies
+   over the state the app just wrote, so reload-persistence tests silently
+   assert the seed instead of the app. `seedGame` is one-shot: it writes only
+   when the storage key is absent, so post-reload assertions read the app's
+   own write.
+2. **Victory-modal header is variant**: `levelUp ? '🎉 LEVEL UP! 🎉' :
+   'QUEST COMPLETE!'` (VictoryModal.tsx:148) — a fresh save's first quest
+   payout always crosses into level 2, so the modal fires as the level-up
+   variant. Assertions match the heading regex `/LEVEL UP!|QUEST COMPLETE!/`.
+3. **A second "Experience progress" bar renders at level ≥ 2** (level-up
+   panel), so the `gotoApp` HUD wait scopes to the banner; unscoped it is a
+   strict-mode violation.
+
+**Done when:** ✅ `npm run test:e2e` green ×3 browsers; every new spec has a
+stable storage-seeding strategy (no fake data — real game state via the app's
+own storage contract). Flakiness note of record: concurrent heavy runs on this
+host produce contention timeouts (4 spurious failures while a vitest run ran
+simultaneously; all 8 affected executions passed on clean retry) — run e2e and
+unit suites serially.
 
 ### Phase 7E — Code smells (measured, opportunistic)
 
