@@ -4,6 +4,45 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.1.6] - 2026-10-03
+
+Integrity-plan Phase 7: the coverage ratchet became real CI enforcement, the
+stalest docs were rewritten to current reality, persistence-branch unit depth,
+and the e2e suite tripled with all three browsers green.
+
+### Added
+
+- e2e suite expansion (10 → 28 cases, 84/84 executions green across
+  chromium/firefox/webkit): quest completion → victory modal → reload
+  persistence driven through the quiz's real `'n'` keyboard flow, store
+  purchase debit + round-trip, worldmap level gating and realm travel, skill
+  allocation round-trip, settings theme/sound round-trips, and a 26-route
+  integrity sweep. `e2e/helpers.ts` seeds real game state through the app's
+  own storage contract — one-shot by design, because `addInitScript` re-fires
+  on every navigation and an unguarded seed silently overwrites the app state
+  a reload test is trying to verify
+- `src/contexts/game/xp.test.ts` (5 tests): level-curve boundaries and
+  XP-award arithmetic over the real `XP_THRESHOLDS`
+- `src/contexts/game/defaultState.test.ts` (9 tests): fresh-save shape,
+  collection independence and the defaults the loader deep-merges onto
+- `src/components/minigames/gameCatalog.test.ts` (7 tests): catalog
+  completeness against the mini-game registry, unique ids, and payout
+  sanity
+- `src/contexts/game/gameStorage.test.ts` grew to 10 loader tests: repair of
+  non-array `recentMilestoneUnlocks` and the three `claimed*` claim ledgers,
+  plus filtering of non-string ids from legacy seeds and non-array
+  `equippedItems`
+
+### Changed
+
+- Both pipelines now run `npm run test:coverage` so the vite coverage
+  thresholds (97/91.5/98.5/98) are actually enforced; the GitForge test job
+  gained timeout/retry and the build job gates on every other check. A local
+  `npm run validate` ladder mirrors the CI order
+- June-era guides (QUICKSTART, CONTRIBUTING, DEPLOYMENT, TESTING and nine
+  more) rewritten to current reality: real commands, real counts, GitForge
+  as primary CI
+
 ## [0.1.5] - 2026-10-01
 
 Persistence-integrity cycle: fixed a legacy-save migration bug, gave the

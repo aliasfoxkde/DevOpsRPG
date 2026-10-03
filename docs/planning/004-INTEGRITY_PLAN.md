@@ -228,6 +228,16 @@ unit suites serially.
 WorldMapPage extraction (realm/node subcomponents + hooks) and the next GameContext
 slice, only with the suite green before/after; do not start if 7C/7D regressed.
 
+⏸ **Deferred with cause**: the gate demands a demonstrable green suite before and
+after the extraction. 7D is green (84/84 e2e), but full unit-suite verification is
+host-load gated — external cargo builds drove 1-min load to 184, starved vitest
+worker spawns (see the execution constraints below), and made even a 4-file
+verification require a load-wait loop. Extracting 1381 lines of WorldMapPage with
+the verification harness unreliable is the exact risk the gate exists to prevent.
+The smell remains on record in `docs/planning/002-REFACTORING.md`; WorldMapPage's
+behavior is now pinned by `e2e/worldmap.spec.ts` (3 cases), which lowers the risk
+of a future extraction.
+
 ### Phase 7F — Release
 
 v0.1.6: CHANGELOG, tag, GitHub release, Cloudflare deploy, byte-verify. GitForge

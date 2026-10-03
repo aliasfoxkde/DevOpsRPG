@@ -150,15 +150,45 @@ describe('loadInitialGame', () => {
         character: { streakShields: 'many' },
         badges: [],
         recentBadgeUnlocks: 'oops',
+        recentMilestoneUnlocks: 'oops',
         collectibles: 'oops',
         completedRealms: 'oops',
+        claimedStoryArcs: 'oops',
+        claimedCareerMilestones: 'oops',
+        claimedCertifications: 'oops',
+        claimedEvents: 'oops',
       }),
     )
     const game = loadInitialGame()
     expect(game.character.streakShields).toBe(0)
     expect(game.recentBadgeUnlocks).toEqual([])
+    expect(game.recentMilestoneUnlocks).toEqual([])
     expect(game.collectibles).toEqual([])
     expect(game.completedRealms).toEqual([])
+    // The one-time-reward claim ledgers must survive repair as empty arrays,
+    // or claim-gated UI crashes on .includes()
+    expect(game.claimedStoryArcs).toEqual([])
+    expect(game.claimedCareerMilestones).toEqual([])
+    expect(game.claimedCertifications).toEqual([])
+    expect(game.claimedEvents).toEqual([])
+  })
+
+  it('filters non-string ids from the legacy seed and drops non-array equippedItems', () => {
+    localStorage.setItem(
+      STORAGE_KEYS.GAME,
+      JSON.stringify({
+        character: { name: 'Legacy', equippedItems: ['laptop_basic', 7, null] },
+        badges: [],
+      }),
+    )
+    expect(loadInitialGame().character.ownedItems).toEqual(['laptop_basic'])
+
+    // equippedItems itself corrupt: seed nothing rather than crash
+    localStorage.setItem(
+      STORAGE_KEYS.GAME,
+      JSON.stringify({ character: { name: 'Legacy', equippedItems: 'sword' }, badges: [] }),
+    )
+    expect(loadInitialGame().character.ownedItems).toEqual([])
   })
 
   it('keeps a valid save intact through the load round-trip', () => {
