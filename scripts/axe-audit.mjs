@@ -53,7 +53,6 @@ const ROUTES = [
   '/storylines',
   '/technology-collection',
   '/certifications',
-  '/marketplace',
   '/feedback',
 ]
 const AAA_STRICT = process.argv.includes('--aaa-strict')

@@ -1,24 +1,28 @@
 # Validation Criteria - DevOpsQuest
 
-**Last Updated**: 2026-09-24
+**Last Updated**: 2026-10-02
 **Status**: Active — gates are enforced in CI (`.gitforce.yml`, mirrored by `.github/workflows/ci.yml`)
 
 ---
 
 ## Automated Gates (all must pass before merge/release)
 
-| Gate            | Command                 | Standard                                                                                         |
-| --------------- | ----------------------- | ------------------------------------------------------------------------------------------------ |
-| Lint            | `npm run lint`          | typescript-eslint `strictTypeChecked`, 0 warnings allowed                                        |
-| Format          | `npm run format:check`  | Prettier (repo-wide, single style)                                                               |
-| Dead code       | `npm run knip`          | 0 unused exports / files / dependencies                                                          |
-| Typecheck       | `npm run typecheck`     | `tsc --noEmit` × 3 projects (app, tooling, worker), strict                                       |
-| Unit/component  | `npm run test`          | Vitest, all green; coverage ratchet in `vite.config.ts`                                          |
-| Worker tests    | `npm run test:worker`   | Vitest over the KV API router                                                                    |
-| E2E             | `npm run test:e2e`      | Playwright, chromium/firefox/webkit                                                              |
-| Secrets/pattern | `npm run audit:secrets` | Aegis production profile; fails only on findings not in the baseline                             |
-| Accessibility   | `npm run audit:a11y`    | axe-core over every route × both themes; AA **and** AAA violations fail the run (`--aaa-strict`) |
-| Build           | `npm run build`         | `tsc -b && vite build` must succeed                                                              |
+| Gate            | Command                 | Standard                                                                                                                                                                                            |
+| --------------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Lint            | `npm run lint`          | typescript-eslint `strictTypeChecked`, 0 warnings allowed                                                                                                                                           |
+| Format          | `npm run format:check`  | Prettier (repo-wide, single style)                                                                                                                                                                  |
+| Dead code       | `npm run knip`          | 0 unused exports / files / dependencies                                                                                                                                                             |
+| Typecheck       | `npm run typecheck`     | `tsc --noEmit` × 3 projects (app, tooling, worker), strict                                                                                                                                          |
+| Unit/component  | `npm run test:coverage` | Vitest, all green **and** the coverage ratchet in `vite.config.ts` (97/91.5/98.5/98) — CI runs this variant so the ratchet is enforced where the code runs; `npm run test` is the fast local loop   |
+| Worker tests    | `npm run test:worker`   | Vitest over the KV API router                                                                                                                                                                       |
+| E2E             | `npm run test:e2e`      | Playwright, chromium/firefox/webkit                                                                                                                                                                 |
+| Secrets/pattern | `npm run audit:secrets` | Aegis production profile against `aegis-baseline.json`; fails (exit 1) on any finding not in the baseline — verified 2026-10-02 (probe file outside the repo: exit 1 without and with `--baseline`) |
+| ↑ re-baseline   | `npm run audit:secrets:update` | Regenerates the baseline from a fresh full-tree scan. Only for deliberate, triaged changes (doc edits with localhost URLs, 5-digit constants in configs) — the scan matches on stable ids, so pure line-shifts do not re-fire |
+| Accessibility   | `npm run audit:a11y`    | axe-core over all 29 static routes × both themes; AA **and** AAA violations fail the run (`--aaa-strict`)                                                                                           |
+| Build           | `npm run build`         | `tsc -b && vite build` must succeed                                                                                                                                                                 |
+
+One command for the whole ladder except e2e: `npm run validate`
+(lint → typecheck → format → knip → unit → worker tests → build).
 
 Release validation additionally byte-verifies the deployed site against `dist/`
 (see `docs/CHANGELOG.md` release entries for the procedure).
@@ -64,8 +68,17 @@ Release validation additionally byte-verifies the deployed site against `dist/`
 ## Coverage Ratchet
 
 Thresholds live in `vite.config.ts` (`test.coverage.thresholds`) and only move up.
-Current measurement procedure: `npx vitest run --maxWorkers=1 --coverage`
-(single worker — parallel v8 coverage runs have been observed to drop test files).
+Authoritative measurement (single invocation — sharded coverage is invalid on
+vitest 4.1.9, see `docs/planning/003-QUALITY_PLAN.md` §6.8):
+
+```bash
+npx vitest run --config vitest.loadresilient.config.ts \
+  --maxWorkers=1 --fileParallelism=false --testTimeout=60000 --coverage
+```
+
+The load-resilient config splits the suite into three vitest projects (stateful /
+node / shared) so the run survives host CPU waves; do not add `--no-isolate`.
+On a quiet machine plain `npm run test:coverage` is equivalent.
 Numbers and history: `docs/planning/003-QUALITY_PLAN.md`.
 
 ---
@@ -76,5 +89,5 @@ Numbers and history: `docs/planning/003-QUALITY_PLAN.md`.
 - Quest Journal: filter/search, current-quest card, world map realms with
   `requiredLevel` gates
 - Battle Arena: quiz flow, HP bars, victory modal + XP award
-- Store/Marketplace: gold balances update on purchase, equipment equips
+- Store: gold balances update on purchase, equipment equips
 - Settings: every toggle mutates persisted state (sound, narration, theme)
