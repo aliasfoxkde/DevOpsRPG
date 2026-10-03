@@ -129,6 +129,26 @@ victories in the same session; per-victory remount restores them.
 **Done when:** controlled probe shows worldmap within ~1.2× of sibling-route
 FCP (cached), e2e worldmap 3/3, unit suite green.
 
+**Disposition (shipped 2026-10-03):** mechanism proven and fixed. `TrailPath`
+was defined inside the page body, so every render gave it a fresh type
+identity and each 3 s `pathAnimKey` tick remounted every trail subtree.
+Identity-sampling probe (level-15 save, local preview): **9 trail paths torn
+down and recreated every 3 s** (`25,0,0,0,9,0,0,9`) before; **0 after** the
+hoist (`25,0,0,0,…` across 13 samples / two ticks). Fix: hoist
+`generateSmoothPath` + `TrailPath` to module scope (matches the file's own
+idiom — MountainSVG et al.); the dash offset is now derived purely as
+`seededDashOffset(trailId, animKey)` (FNV-1a hash) — the react-hooks
+`set-state-in-effect` and `purity` rules forced out the old
+`Math.random()` + setState-in-effect pattern, leaving one state hook fewer
+with the same visual behaviour (per-trail, per-tick offset in [0, 20)).
+7E risk assessment: the fix required zero structural change → the page
+extraction stays deferred. Honest caveat on the FCP done-when: the
+interleaved prod-vs-fixed FCP A/B landed in a host contention window
+(prod rAF stalls up to 7.2 s during measurement), burying absolute FCP;
+the churn result above is noise-immune and quiet-window long tasks show no
+regression (120–665 ms). Verified: worldmap unit tests 18/18, e2e 3/3
+chromium, lint + typecheck clean.
+
 ### Phase 8E-3 — Coverage headroom
 
 Direct branch tests for the worst files, highest ratio-first:

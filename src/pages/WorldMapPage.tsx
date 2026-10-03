@@ -233,6 +233,94 @@ const TRAIL_PATHS = [
   },
 ]
 
+// Generate smooth path using bezier curves
+const generateSmoothPath = (points: { x: number; y: number }[]) => {
+  if (points.length < 2) return ''
+  let path = `M ${points[0].x} ${points[0].y}`
+  for (let i = 1; i < points.length - 1; i++) {
+    const xc = (points[i].x + points[i + 1].x) / 2
+    const yc = (points[i].y + points[i + 1].y) / 2
+    path += ` Q ${points[i].x} ${points[i].y} ${xc} ${yc}`
+  }
+  // Last point
+  const last = points[points.length - 1]
+  path += ` L ${last.x} ${last.y}`
+  return path
+}
+
+// Deterministic offset in [0, 20) for the trail dash animation. Hashing the
+// trail id with the animKey tick gives every trail a different offset that
+// still changes each tick — without render-phase impurity (Math.random is
+// banned by the react-hooks purity rule) and without per-trail state.
+const seededDashOffset = (seed: string, tick: number): number => {
+  let h = 2166136261 ^ tick
+  for (let i = 0; i < seed.length; i++) {
+    h ^= seed.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
+  return ((h >>> 0) % 2000) / 100
+}
+
+// Animated trail path component. Module scope on purpose: a component defined
+// inside the page body gets a fresh type identity every render, so each 3s
+// pathAnimKey tick remounted every trail subtree (teardown + recreate of all
+// trail <path> DOM, verified by identity-sampling probe — 9 fresh paths per
+// tick) instead of just updating the dash offset.
+const TrailPath = ({
+  trail,
+  isHighlighted,
+  color,
+  animKey,
+}: {
+  trail: (typeof TRAIL_PATHS)[0]
+  isHighlighted: boolean
+  color: string
+  animKey: number
+}) => {
+  const dashOffset = seededDashOffset(trail.from, animKey)
+  const pathD = generateSmoothPath(trail.cp)
+
+  return (
+    <g>
+      {/* Path shadow/glow */}
+      <path
+        d={pathD}
+        stroke={color}
+        strokeWidth={isHighlighted ? 12 : 8}
+        strokeOpacity={isHighlighted ? 0.3 : 0.15}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+        className="transition-all duration-500"
+      />
+      {/* Main path */}
+      <path
+        d={pathD}
+        stroke={color}
+        strokeWidth={isHighlighted ? 6 : 4}
+        strokeOpacity={isHighlighted ? 0.7 : 0.4}
+        strokeDasharray="12,8"
+        strokeDashoffset={dashOffset}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+        className="transition-all duration-300"
+      />
+      {/* Path dots pattern */}
+      <path
+        d={pathD}
+        stroke={color}
+        strokeWidth={2}
+        strokeOpacity={isHighlighted ? 0.5 : 0.25}
+        strokeDasharray="4,12"
+        strokeDashoffset={dashOffset * 2}
+        strokeLinecap="round"
+        fill="none"
+      />
+    </g>
+  )
+}
+
 // Terrain SVG Components
 const MountainSVG = ({ scale = 1, color = '#475569' }: { scale?: number; color?: string }) => (
   <svg width={`${80 * scale}`} height={`${60 * scale}`} viewBox="0 0 80 60" fill="none">
@@ -624,81 +712,6 @@ export default function WorldMapPage() {
         secondary: '#4f46e5',
         glow: 'rgba(99, 102, 241, 0.5)',
       }
-    )
-  }
-
-  // Generate smooth path using bezier curves
-  const generateSmoothPath = (points: { x: number; y: number }[]) => {
-    if (points.length < 2) return ''
-    let path = `M ${points[0].x} ${points[0].y}`
-    for (let i = 1; i < points.length - 1; i++) {
-      const xc = (points[i].x + points[i + 1].x) / 2
-      const yc = (points[i].y + points[i + 1].y) / 2
-      path += ` Q ${points[i].x} ${points[i].y} ${xc} ${yc}`
-    }
-    // Last point
-    const last = points[points.length - 1]
-    path += ` L ${last.x} ${last.y}`
-    return path
-  }
-
-  // Animated trail path component
-  const TrailPath = ({
-    trail,
-    isHighlighted,
-    color,
-    animKey,
-  }: {
-    trail: (typeof TRAIL_PATHS)[0]
-    isHighlighted: boolean
-    color: string
-    animKey: number
-  }) => {
-    const [dashOffset, setDashOffset] = useState(() => Math.random() * 20)
-    useEffect(() => {
-      // Re-randomize the dash animation offset only when the animation key bumps
-      setDashOffset(Math.random() * 20)
-    }, [animKey])
-    const pathD = generateSmoothPath(trail.cp)
-
-    return (
-      <g>
-        {/* Path shadow/glow */}
-        <path
-          d={pathD}
-          stroke={color}
-          strokeWidth={isHighlighted ? 12 : 8}
-          strokeOpacity={isHighlighted ? 0.3 : 0.15}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-          className="transition-all duration-500"
-        />
-        {/* Main path */}
-        <path
-          d={pathD}
-          stroke={color}
-          strokeWidth={isHighlighted ? 6 : 4}
-          strokeOpacity={isHighlighted ? 0.7 : 0.4}
-          strokeDasharray="12,8"
-          strokeDashoffset={dashOffset}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-          className="transition-all duration-300"
-        />
-        {/* Path dots pattern */}
-        <path
-          d={pathD}
-          stroke={color}
-          strokeWidth={2}
-          strokeOpacity={isHighlighted ? 0.5 : 0.25}
-          strokeDasharray="4,12"
-          strokeDashoffset={dashOffset * 2}
-          strokeLinecap="round"
-          fill="none"
-        />
-      </g>
     )
   }
 
