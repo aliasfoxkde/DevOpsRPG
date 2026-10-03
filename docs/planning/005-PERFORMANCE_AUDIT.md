@@ -99,6 +99,19 @@ record now.
 **Done when:** entry gzip ≤ 124 KB (−4 KB measured), e2e 84/84, unit suite
 green.
 
+**Disposition (shipped 2026-10-03):** entry chunk 448,382 → 429,930 B raw
+(−18.5 KB), **128.1 → 120.9 KB gzip** — beats the ≤124 KB target. All three
+overlays lazy with `Suspense fallback={null}`; VictoryModal's mount gate
+mirrors its own visibility condition (`game.showVictory && game.lastVictory`).
+MentorChat excluded (renders its floating toggle even when closed — must stay
+mounted); KeyboardShortcutsHelp excluded (owns its own `'?'` listener).
+Verified: onboarding+progression e2e 8/8 chromium (victory modal + onboarding
+through their lazy chunks), App + overlay unit tests 88/88 (run serially —
+the parallel 4-file run starved workers on this host and is not a signal).
+Side effect: gating fixed a latent bug — `victoryShownRef` previously stayed
+`true` after the first victory, so particles/sounds never re-fired for later
+victories in the same session; per-victory remount restores them.
+
 ### Phase 8E-2 — Worldmap render churn (runtime)
 
 1. Reproduce the mechanism precisely: count renders per second on the live

@@ -4,8 +4,6 @@ import { ThemeProvider } from './contexts'
 import { GameProvider, useGame } from './contexts/GameContext'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { HUD } from './components/ui/HUD'
-import { VictoryModal } from './components/ui/VictoryModal'
-import { RealmCompletionModal } from './components/ui/RealmCompletionModal'
 import { ToastManager } from './components/ui/CelebrationToast'
 import { Confetti } from './components/ui/Confetti'
 import { LevelUpEffect } from './components/ui/LevelUpEffect'
@@ -15,7 +13,6 @@ import { BackToTop } from './components/ui/BackToTop'
 import { OfflineIndicator, InstallPrompt } from './components/ui/OfflineIndicator'
 import { useKeyboardShortcuts } from './hooks'
 import Layout from './components/layout/Layout'
-import OnboardingWizard from './components/ui/OnboardingWizard'
 
 // Lazy load pages for code splitting
 const HomePage = lazy(() => import('./pages/HomePage'))
@@ -48,6 +45,21 @@ const StorylinesPage = lazy(() => import('./pages/StorylinesPage'))
 const TechnologyCollectionPage = lazy(() => import('./pages/TechnologyCollectionPage'))
 const CertificationsPage = lazy(() => import('./pages/CertificationsPage'))
 const FeedbackPage = lazy(() => import('./pages/FeedbackPage'))
+
+// Deferred overlays are lazy too: they render only when open, so bundling
+// them into the entry charged every first visit for dialogs most sessions
+// never see. VictoryModal's mount gate mirrors its own visibility condition
+// (game.showVictory && game.lastVictory) — remounting per victory preserves
+// its once-per-victory side effects. MentorChat (persistent floating toggle)
+// and KeyboardShortcutsHelp (owns its own toggle listener) must stay mounted
+// and are intentionally not deferred.
+const VictoryModal = lazy(() =>
+  import('./components/ui/VictoryModal').then((m) => ({ default: m.VictoryModal })),
+)
+const RealmCompletionModal = lazy(() =>
+  import('./components/ui/RealmCompletionModal').then((m) => ({ default: m.RealmCompletionModal })),
+)
+const OnboardingWizard = lazy(() => import('./components/ui/OnboardingWizard'))
 
 // Loading fallback component
 function PageLoader() {
@@ -191,9 +203,18 @@ function AppContent() {
           </Route>
         </Routes>
       </Suspense>
-      <VictoryModal />
+      {game.showVictory && game.lastVictory && (
+        <Suspense fallback={null}>
+          <VictoryModal />
+        </Suspense>
+      )}
       {game.showRealmCompletion && (
-        <RealmCompletionModal realmId={game.showRealmCompletion} onClose={dismissRealmCompletion} />
+        <Suspense fallback={null}>
+          <RealmCompletionModal
+            realmId={game.showRealmCompletion}
+            onClose={dismissRealmCompletion}
+          />
+        </Suspense>
       )}
       <ToastManager toasts={toasts} onRemove={removeToast} />
       <Confetti active={showConfetti} />
