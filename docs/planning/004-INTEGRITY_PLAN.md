@@ -255,6 +255,16 @@ of a future extraction.
 v0.1.6: CHANGELOG, tag, GitHub release, Cloudflare deploy, byte-verify. GitForge
 pipeline validation (#22) remains user-gated on `gitforge auth --login`.
 
+✅ **Shipped 2026-10-03.** Gates of record, all green before the tag: ESLint
+(`--max-warnings 0`), `tsc --noEmit` ×3 tsconfigs, the canonical unit suite
+**109/109 files, 1631/1631 tests**, and e2e **84/84 executions across
+chromium/firefox/webkit**. Tag `v0.1.6` on `4cb420b`; GitHub release published
+with notes; Cloudflare Pages deploy succeeded (preview
+`8e4596a2.devopsquest.pages.dev`); byte-verify passed — the deployed
+`index-*.js` sha256 matches the local build (448,382 bytes) and the production
+alias serves the same asset. Carry-over: coverage re-measurement for the 7C
+ratchet still wants a quiet-host window; #22 remains user-gated.
+
 ---
 
 ## 3. Execution constraints of record
