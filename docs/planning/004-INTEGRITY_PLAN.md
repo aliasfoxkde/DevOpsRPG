@@ -151,8 +151,9 @@ only historical, clearly-dated context or nothing.
 
 ### Phase 7C — Unit test depth (branch-coverage ladder)
 
-1. Direct tests: `defaultState.ts`, `gameCatalog.ts`, `xp.ts`. ✅ landed
-   (`xp.test.ts` 6 cases, `defaultState.test.ts` 9, `gameCatalog.test.ts` 7).
+1. Direct tests: `defaultState.ts`, `gameCatalog.ts`, `xp.ts`. ✅ landed and
+   verified green (21/21: `xp.test.ts` 5 cases, `defaultState.test.ts` 9,
+   `gameCatalog.test.ts` 7).
 2. `GameContext` persistence branches: simulate `QuotaExceededError` on persist, torn
    JSON, and schema-mismatch saves → exercise the fallback arms. ✅ landed —
    `useGamePersistence.test.tsx` (quota + cross-tab) and `gameStorage.test.ts`
@@ -179,9 +180,20 @@ only historical, clearly-dated context or nothing.
    Quiz. Fixable, but every iteration needs a full suite run, which is
    load-window gated; not started while runs starve.
 
-**Done when:** branch coverage ≥ 95% with thresholds ratcheted to match; stateful
-project shrunk. (Coverage re-measurement itself is pending a quiet-host window;
-the four new suites were verified green individually.)
+**Done when:** ✅ all four suites verified green at runtime (21/21 across the
+three direct suites + 10/10 gameStorage), branch coverage ≥ 95% with thresholds
+ratcheted to match; stateful project shrunk. (Coverage re-measurement remains
+pending a quiet-host window; the ratchet is CI-enforced since 7A.)
+
+**Host-load diagnosis of record (2026-10-03):** the "worker starvation" that
+blocked verification for ~5 hours was not CPU load alone — loadavg plateaus at
+46–50 still starved spawns while `environment: 187.81s` (jsdom setup, normally
+<2s) eventually succeeded. The NAS filesystem under multiple concurrent agent
+workloads is the bottleneck, invisible to loadavg. Vitest has two fixed
+deadlines in `cli-api.24X8XwN1.js` (`START_TIMEOUT = 6e4`, `WORKER_START_TIMEOUT
+= 9e4`); a local node_modules patch to 6e5/9e5 unblocks verification without
+touching the repo (a fresh `npm ci` reverts it). Verification invocations on
+this host should patch these deadlines before resorting to dip-hunting.
 
 ### Phase 7D — E2E expansion (core loop first)
 
