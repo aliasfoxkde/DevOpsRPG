@@ -359,11 +359,14 @@ We use [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Minor version**: New functionality in backwards compatible manner
 - **Patch version**: Backwards compatible bug fixes
 
-Current version: **0.1.3** (Pre-alpha - Feature complete for foundation)
+Current version: **0.1.5** (release history at the top of this file)
 
 ---
 
 ## Release Schedule
+
+> Historical schedule from the June 2026 planning era — actual releases are
+> recorded at the top of this file.
 
 - **v0.1.0** (2026-06-22): Foundation scaffold complete
 - **v0.2.0** (2026-07-06): Authentication + Core UI

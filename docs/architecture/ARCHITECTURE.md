@@ -1,144 +1,111 @@
 # Architecture - DevOpsQuest
 
-**Version**: 1.0.0
-**Last Updated**: 2026-06-22
+**Version**: 2.0.0
+**Last Updated**: 2026-10-03
 **Status**: APPROVED
+**Change history**: v1.0.0 (2026-06-22) described an aspirational auth/D1
+platform that was never built; v2.0.0 documents the system as it exists.
 
 ---
 
 ## Technology Stack
 
-| Layer      | Technology                   | Justification                                        |
-| ---------- | ---------------------------- | ---------------------------------------------------- |
-| Frontend   | ViteJS + React 19            | CSR-first SPA, excellent DX, fast builds             |
-| Styling    | Tailwind CSS v4              | Theme system, dark/light modes via @tailwindcss/vite |
-| State      | React Context + localStorage | Simple, offline-capable                              |
-| Backend    | Cloudflare Workers           | Edge computing, free tier                            |
-| Database   | Cloudflare D1 (SQLite)       | SQL at edge, zero config                             |
-| Sessions   | Cloudflare KV                | Fast key-value session store                         |
-| Auth       | Google/GitHub OAuth          | Standard SSO, Workers integration                    |
-| Deployment | Cloudflare Pages             | Free hosting, global CDN                             |
-| Testing    | Vitest + Playwright          | Unit and E2E coverage                                |
+| Layer        | Technology                   | Justification                                                      |
+| ------------ | ---------------------------- | ------------------------------------------------------------------ |
+| Frontend     | Vite 8 + React 19            | CSR-first SPA, fast builds, strict TypeScript                      |
+| Styling      | Tailwind CSS v4              | Theme system, dark/light modes via `@tailwindcss/vite`             |
+| State        | React Context + localStorage | Simple, offline-capable, zero backend required                     |
+| Deployment   | Cloudflare Pages             | Free hosting, global CDN, auto-deploy on `main`                    |
+| Optional API | Cloudflare Worker + KV       | Shared-progress/leaderboard scaffolding (not deployed — see below) |
+| Testing      | Vitest + Playwright          | Unit/component (co-located) and E2E (3 browsers)                   |
+
+There is **no auth, no OAuth, no D1, and no sessions** anywhere in this project.
 
 ---
 
 ## Architecture Overview
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Cloudflare Pages                         │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │              ViteJS + React SPA                      │    │
-│  │  ┌──────────┐  ┌──────────┐  ┌──────────────────┐  │    │
-│  │  │   PWA    │  │  Theme    │  │  Progress Track  │  │    │
-│  │  │  Service │  │  Manager  │  │  & Gamification  │  │    │
-│  │  └──────────┘  └──────────┘  └──────────────────┘  │    │
-│  └─────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    Cloudflare Workers                        │
-│  ┌──────────┐  ┌──────────┐  ┌──────────────────────────┐  │
-│  │   Auth    │  │   API     │  │   OAuth (Google/GitHub)  │  │
-│  │  Handler  │  │  Gateway  │  │                          │  │
-│  └──────────┘  └──────────┘  └──────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-                    │                    │
-                    ▼                    ▼
-         ┌──────────────────┐  ┌─────────────────┐
-         │   Cloudflare D1   │  │  Cloudflare KV  │
-         │   (User Data)     │  │   (Sessions)   │
-         └──────────────────┘  └─────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                    Browser (all state here)                  │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │              Vite + React SPA (devopsquest)            │  │
+│  │  src/App.tsx          lazy routes (29 static + 1 param)│  │
+│  │  src/contexts/        GameContext + game/ modules,     │  │
+│  │                       ThemeContext, ProgressContext    │  │
+│  │  src/data/            typed TS content modules         │  │
+│  │  src/utils/gameUtils  XP curve, balance, storage keys  │  │
+│  │  PWA service worker   production-only (ADR 0002)       │  │
+│  └───────────────────────────┬────────────────────────────┘  │
+│                              │  persists to                  │
+│                    localStorage ── devopsquest_game          │
+│                             (devopsquest_backup on load      │
+│                              failure)                        │
+└──────────────────────────────┬───────────────────────────────┘
+                               │ optional, off by default
+                               ▼
+┌──────────────────────────────────────────────────────────────┐
+│           Cloudflare Worker devopsquest-api (dormant)        │
+│   GET/POST /api/progress · GET /api/leaderboard · /api/health│
+│   KV binding PROGRESS, keys progress:<userId>                │
+│   CORS: echoes only ALLOWED_ORIGINS · bearer-token gates     │
+└──────────────────────────────────────────────────────────────┘
 ```
 
----
-
-## Career Path Themes
-
-1. **Web Developer**: HTML → CSS → JS → React → NodeJS → SQL → Bootstrap → jQuery
-2. **Backend Engineer**: Python → Java → SQL → PostgreSQL → NodeJS → Django → Docker
-3. **DevOps Engineer**: Git → Bash → AWS → Docker → Cybersecurity → Python → Tools
-4. **Data Scientist**: Python → SQL → NumPy → Pandas → SciPy → R → Data Science
-5. **Mobile Developer**: Swift → Kotlin → React → NodeJS → SASS
-
----
-
-## Learning Path Order (47 Technologies)
-
-### Phase 1 - Foundations (6)
-
-INTRO TO PROGRAMMING → INTRO TO HTML & CSS → HTML → CSS → JAVASCRIPT → SQL
-
-### Phase 2 - Backend Basics (8)
-
-PYTHON → JAVA → PHP → C → C++ → C# → HOW TO → W3.CSS
-
-### Phase 3 - Frameworks & Databases (11)
-
-BOOTSTRAP → REACT → MYSQL → JQUERY → EXCEL → XML → DJANGO → NUMPY → PANDAS → NODEJS → DSA
-
-### Phase 4 - Advanced & Cloud (9)
-
-TYPESCRIPT → ANGULAR → ANGULARJS → GIT → POSTGRESQL → MONGODB → ASP → AI → R
-
-### Phase 5 - Modern DevOps (13)
-
-GO → KOTLIN → SWIFT → SASS → VUE → GEN AI → SCIPY → AWS → CYBERSECURITY → DATA SCIENCE → BASH → RUST → TOOLS
+- **Game state of record is `localStorage`.** `GameContext` hydrates from
+  `devopsquest_game` at startup (falling back to `devopsquest_backup`, then a
+  default save); every transition persists. `src/contexts/game/` holds the
+  split-out pure modules (storage, persistence hook, XP, unlock rules).
+- **Content is compiled in.** `src/data/` modules are static typed TS —
+  `technologies.ts` (24 DevOps-flavored technologies, 7 phase categories) is
+  the source of truth; `quests.ts` generates quests and 6 world-map realms
+  (`requiredLevel` 1/5/10/15/20/25) from it;
+  `w3schools-content.ts` is generated by `npm run scrape`.
+- **The worker is optional scaffolding** and is deliberately not deployed
+  (placeholder KV id in `worker/wrangler.toml`, no namespace provisioned —
+  see `docs/guides/DEPLOYMENT.md`). The app never calls it by default.
 
 ---
 
-## Database Schema
+## Career Paths (10)
 
-```sql
-CREATE TABLE users (
-  id TEXT PRIMARY KEY,
-  email TEXT UNIQUE NOT NULL,
-  name TEXT,
-  avatar_url TEXT,
-  provider TEXT NOT NULL,
-  provider_id TEXT NOT NULL,
-  xp INTEGER DEFAULT 0,
-  level INTEGER DEFAULT 1,
-  streak_days INTEGER DEFAULT 0,
-  last_active DATE,
-  theme TEXT DEFAULT 'web-developer',
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+Defined in `src/data/careerPaths.ts`, each with staged milestones and
+certification checkpoints:
 
-CREATE TABLE progress (
-  id TEXT PRIMARY KEY,
-  user_id TEXT NOT NULL,
-  technology TEXT NOT NULL,
-  topic TEXT NOT NULL,
-  completed BOOLEAN DEFAULT FALSE,
-  xp_earned INTEGER DEFAULT 0,
-  time_spent INTEGER DEFAULT 0,
-  completed_at DATETIME,
-  FOREIGN KEY (user_id) REFERENCES users(id)
-);
-
-CREATE TABLE achievements (
-  id TEXT PRIMARY KEY,
-  user_id TEXT NOT NULL,
-  achievement_key TEXT NOT NULL,
-  earned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id)
-);
-```
+`devops-engineer` · `sre` · `cloud-architect` · `platform-engineer` ·
+`ai-engineer` · `software-engineer` · `ai-architect` · `it-support` ·
+`security-engineer` · `tech-lead`
 
 ---
 
-## Cloudflare Deployment
+## Learning Path (24 technologies, 7 phase categories)
 
-### Pages Configuration
+`src/data/technologies.ts` is authoritative for names, order, and phase
+groupings (Foundations → Backend Basics → Frameworks & Databases → Advanced &
+Cloud → Modern DevOps → AI & Intelligence → Streaming & Mesh). The world map
+renders 6 realms derived from them (`src/data/quests.ts`), gated by
+`requiredLevel`. Regenerating learning content: `npm run scrape`.
 
-- Build command: `npm run build:cloudflare`
-- Output directory: `dist`
-- Node version: 18
+---
 
-### Workers Configuration
+## Storage Model
 
-- Wrangler.toml for worker bindings
-- D1 database bindings
-- KV namespace bindings
+| Store               | Key                  | Written by                      | Notes                                    |
+| ------------------- | -------------------- | ------------------------------- | ---------------------------------------- |
+| Game state          | `devopsquest_game`   | `GameContext` via `gameStorage` | Full save; migrated on schema bumps      |
+| Backup              | `devopsquest_backup` | load path                       | Used when the primary save is unreadable |
+| Theme               | `theme`              | `ThemeContext`                  | `light` / `dark` / `system`              |
+| Worker KV (dormant) | `progress:<userId>`  | `worker/src/index.ts`           | Untouched unless the worker is deployed  |
+
+---
+
+## CI/CD
+
+- `.gitforce.yml` (primary) and `.github/workflows/ci.yml` run the same npm
+  scripts: lint (`strictTypeChecked`, 0 warnings), format (Prettier), knip,
+  typecheck (app + tooling + worker), unit tests with the coverage ratchet
+  (97/91.5/98.5/98), worker tests, e2e (3 browsers on GitHub; chromium on
+  GitForge), axe a11y audit (29 routes × 2 themes, AA + AAA strict), aegis
+  secret/pattern scan (baseline ratchet), build. Deploy gates on all jobs.
+- Node **20** in every pipeline; deployment flow and verification:
+  `docs/guides/DEPLOYMENT.md`.

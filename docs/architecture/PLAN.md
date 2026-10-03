@@ -1,8 +1,15 @@
 # Plan - DevOpsQuest
 
+> **Historical build plan (June 2026), preserved as-is.** It predates the real
+> product in several ways: it proposes a "Next.js 14 App" (the built product is
+> Vite + React 19 — see [ARCHITECTURE.md](./ARCHITECTURE.md)), includes auth/D1
+> tiers that were never implemented, and sets an "80% coverage" target that the
+> coverage ratchet (ADR 0004) superseded. Do not use it as a description of the
+> current system.
+
 **Version**: 1.0.0
 **Last Updated**: 2026-06-22
-**Status**: APPROVED
+**Status**: SUPERSEDED (historical snapshot)
 
 ---
 

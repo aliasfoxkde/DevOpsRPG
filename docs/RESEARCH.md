@@ -1,5 +1,10 @@
 # Research - DevOpsRPG Comprehensive Enhancement
 
+> **Historical snapshot (2026-06-26), preserved as-is.** The bug fixes and
+> enhancements researched here shipped in mid-2026 releases; current status of
+> record: `docs/README.md`, `docs/CHANGELOG.md`, and the planning docs under
+> `docs/planning/`.
+
 **Date**: 2026-06-26
 **Status**: PLANNING COMPLETE - EXECUTION PENDING
 

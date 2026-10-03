@@ -547,7 +547,7 @@ Coverage results (v8, before → after, statements / branches / functions):
 | ui batch 1         | RealmCompletionModal, QuickMiniGame, CelebrationOverlay, OnboardingWizard, CelebrationToast, TreasureChest, Confetti, MentorChat | 0-17% → **98.1 stmts / 93.2 branch / 100 funcs** (137 tests)         |
 | ui batch 2 + hooks | VoiceSettings, Quiz, VictoryModal, useSoundEffects, useVoiceNarration, useKeyboardShortcuts, achievementCardGenerator            | 12-53% → **96.7 stmts / 94.3 branch / 100 funcs** (201 tests)        |
 | data + GameContext | badges, collectibles, milestones, communityChallenges, quizzes, GameContext                                                      | 12-58% → **93-100 stmts; GameContext 97.5 / 91.0** (78 action tests) |
-| pages + App        | SettingsPage, BattleArenaPage, FeedbackPage, RewardsPage, PVPArenaPage, MarketplacePage, App (all 30 routes)                     | 43-67% → 72-100% (95 tests)                                          |
+| pages + App        | SettingsPage, BattleArenaPage, FeedbackPage, RewardsPage, PVPArenaPage, StorePage, App (all routes)                              | 43-67% → 72-100% (95 tests)                                          |
 | worker (direct)    | index.ts router                                                                                                                  | 18 tests: CORS, auth, merge semantics, leaderboard, routing          |
 
 Real defects found by writing the tests (all fixed with regression tests):

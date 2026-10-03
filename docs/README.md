@@ -42,10 +42,10 @@ docs/
 │
 ├── # Processes & Guides
 ├── process/
-│   ├── TDD.md                  # Historical TDD plan (80% era; superseded by ADR 0004)
+│   ├── TDD.md                  # Test architecture and coverage policy (current)
 │   └── VALIDATION.md           # Active validation gates (enforced in CI)
 ├── development/
-│   └── DEVELOPMENT.md          # Development guide (June 2026 snapshot)
+│   └── DEVELOPMENT.md          # Development guide (current)
 ├── guides/
 │   └── DEPLOYMENT.md           # Cloudflare Pages + Worker deployment
 │
@@ -118,7 +118,11 @@ npm run lint           # ESLint
 npm run typecheck      # TypeScript (strict)
 npm run format:check   # Prettier
 npm run knip           # Unused exports/files/dependencies
-npm run test           # Unit + component tests (Vitest, coverage-gated)
+npm run test           # Unit + component tests (Vitest, fast loop)
+npm run test:coverage  # Same suite + coverage ratchet (97/91.5/98.5/98) — this
+                       # is the variant CI runs
+npm run validate       # One command: lint, typecheck, format, knip, unit +
+                       # worker tests, build (load-resilient unit invocation)
 ./scripts/gate-sharded.sh   # Same suite, sharded with retries — pass/fail
                             # only, for hosts with bursty background load
 npm run test:worker    # Worker KV API tests
@@ -167,15 +171,15 @@ See [AUTONOMOUS_WORKFLOW.md](./AUTONOMOUS_WORKFLOW.md) for full details.
 
 ## 📊 Project Status
 
-| Metric            | Value                                      |
-| ----------------- | ------------------------------------------ |
-| Unit Tests        | 103 files / 1,590 passing (coverage-gated) |
-| Worker Tests      | 18 passing                                 |
-| E2E Tests         | 30 passing (chromium, firefox, webkit)     |
-| Lint Errors       | 0                                          |
-| TypeScript Errors | 0                                          |
-| Build             | ✅ Passing                                 |
-| Live              | https://devopsquest.pages.dev              |
+| Metric            | Value                                                                                                                |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Unit Tests        | 106 files / 1,609 passing; coverage ratchet 97.34% stmts / 91.76% branch / 99.21% funcs / 98.58% lines (v0.1.5 gate) |
+| Worker Tests      | 18 passing                                                                                                           |
+| E2E Tests         | 10 specs passing × 3 browsers (chromium, firefox, webkit); expansion tracked in `planning/004-INTEGRITY_PLAN.md`     |
+| Lint Errors       | 0                                                                                                                    |
+| TypeScript Errors | 0                                                                                                                    |
+| Build             | ✅ Passing                                                                                                           |
+| Live              | https://devopsquest.pages.dev                                                                                        |
 
 Current quality baselines and the phased roadmap live in
 [planning/003-QUALITY_PLAN.md](./planning/003-QUALITY_PLAN.md); version history

@@ -43,7 +43,7 @@ npm run deploy        # Build + wrangler pages deploy (CI deploys automatically 
 
 ### Data model (src/data/)
 
-`src/data/technologies.ts` is the source of truth: 47 W3Schools technologies grouped into 5 ordered phases (world map "realms"). Everything else derives from or complements it:
+`src/data/technologies.ts` is the source of truth: 24 DevOps-flavored technologies in 7 phase categories (the world map renders 6 realms derived from them). Everything else derives from or complements it:
 
 - `quests.ts` — generates `Quest`s (battle/boss) from technology topics and defines `realms` (phases → world map areas with `requiredLevel` gating).
 - Other files define content systems: badges, equipment, skills, sidequests, milestones, collectibles, minigame configs, incident scenarios, career paths, certifications, seasonal events, PvP, guilds, storylines.

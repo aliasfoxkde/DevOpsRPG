@@ -31,12 +31,14 @@ npm run preview
 
 ## What's Next?
 
-| Task            | Command                                                              |
-| --------------- | -------------------------------------------------------------------- |
-| Run tests       | `npm run test`                                                       |
-| Lint code       | `npm run lint`                                                       |
-| Type check      | `npm run typecheck`                                                  |
-| Full validation | `npm run lint && npm run typecheck && npm run test && npm run build` |
+| Task                                             | Command                                                                        |
+| ------------------------------------------------ | ------------------------------------------------------------------------------ |
+| Run tests                                        | `npm run test`                                                                 |
+| Lint code                                        | `npm run lint`                                                                 |
+| Type check                                       | `npm run typecheck`                                                            |
+| Full validation                                  | `npm run validate` (lint, typecheck, format, knip, unit + worker tests, build) |
+| Unit tests + coverage ratchet                    | `npm run test:coverage`                                                        |
+| E2E (3 browsers, needs `npx playwright install`) | `npm run test:e2e`                                                             |
 
 ---
 

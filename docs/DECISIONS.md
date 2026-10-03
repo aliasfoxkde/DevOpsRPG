@@ -24,7 +24,9 @@ Use Next.js 14 with App Router in CSR (Client-Side Rendering) mode as the defaul
 - **Pros**: Fast initial page loads for static content, SEO friendly, React 18 features
 - **Cons**: Requires careful handling for auth state (solved with client-side auth context)
 
-### Status: ACCEPTED
+### Status: SUPERSEDED — the shipped product is a Vite + React 19 SPA (no
+
+Next.js, no App Router); see [architecture/ARCHITECTURE.md](architecture/ARCHITECTURE.md).
 
 ---
 
@@ -43,7 +45,11 @@ Use Cloudflare Workers for all API endpoints and OAuth authentication.
 - **Pros**: Edge computing, global distribution, free tier, D1/KV integration
 - **Cons**: Workers have CPU time limits (50ms free tier), less flexible than full Node.js
 
-### Status: ACCEPTED
+### Status: PARTIALLY ADOPTED — the Worker (`worker/devopsquest-api`) exists as
+
+optional KV-backed progress/leaderboard scaffolding and is deliberately not
+deployed (placeholder KV id; see `docs/guides/DEPLOYMENT.md`). The OAuth/auth
+half was never built — the app is fully client-side with no auth.
 
 ---
 
@@ -141,9 +147,10 @@ Organize into 5 phases based on prerequisites and difficulty:
 - Phase 4: Advanced & Cloud (9)
 - Phase 5: Modern DevOps (13)
 
-### Status: SUPERSEDED — expanded to 51 technologies across 7 phases; see
+### Status: SUPERSEDED — the current content model is 24 technologies across
 
-`src/data/technologies.ts` (`categories`) and `src/data/quests.ts` (`realms`).
+7 phase categories; see `src/data/technologies.ts` (`categories`) and
+`src/data/quests.ts` (`realms`, 6 world-map areas).
 
 ---
 
@@ -163,7 +170,11 @@ Offer 5 career path themes:
 4. Data Scientist
 5. Mobile Developer
 
-### Status: ACCEPTED
+### Status: SUPERSEDED — `src/data/careerPaths.ts` ships 10 DevOps-oriented
+
+career paths (devops-engineer, sre, cloud-architect, platform-engineer,
+ai-engineer, software-engineer, ai-architect, it-support, security-engineer,
+tech-lead); none of the five original themes survive.
 
 ---
 

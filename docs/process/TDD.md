@@ -1,114 +1,88 @@
-# Test-Driven Development Plan - DevOpsQuest
+# Test Architecture - DevOpsQuest
 
-**Last Updated**: 2026-06-22
-**Coverage Target**: 80%
+**Last Updated**: 2026-10-03
+**Coverage policy**: ratchet, not a fixed target — thresholds live in
+`vite.config.ts` (97% statements / 91.5% branch / 98.5% functions / 98% lines),
+only move up, and are enforced by `npm run test:coverage` in CI. See ADR
+`docs/decisions/0004-coverage-ratchet-policy.md` and
+`docs/planning/003-QUALITY_PLAN.md` for history and measurement procedure.
+
+(The 2026-06-22 version of this file described an 80%-target, `msw`-based,
+`tests/`-tree plan with auth flows; none of that was ever built.)
 
 ---
 
 ## Testing Philosophy
 
-1. **Test behavior, not implementation** - Focus on user-facing functionality
-2. **Unit tests for utilities** - Pure functions, hooks, calculations
-3. **Integration tests for components** - React component behavior
-4. **E2E tests for critical paths** - Auth, learning flow, gamification
+1. **Test behavior, not implementation** — user-facing functionality first
+2. **Unit tests for pure logic** — game modules (`src/contexts/game/`),
+   utilities, data integrity
+3. **Component tests for behavior** — React Testing Library, co-located
+4. **E2E for critical paths** — real flows over the dev server in 3 browsers
 
 ---
 
-## Test Coverage Goals
+## Tools
 
-| Category          | Target | Priority |
-| ----------------- | ------ | -------- |
-| Utility functions | 90%    | High     |
-| React hooks       | 85%    | High     |
-| Components        | 70%    | Medium   |
-| E2E flows         | 100%   | Critical |
+- **Vitest** (globals, jsdom) — unit + component, co-located as `*.test.ts(x)`
+  next to the source; setup in `src/test/setup.ts`
+- **@testing-library/react + user-event** — component behavior
+- **Playwright** — E2E specs in `e2e/`, projects for chromium/firefox/webkit
+- No HTTP-mocking library: there is no client-side API to mock. The worker has
+  its own Vitest suite run separately (`npm run test:worker`)
 
----
-
-## Testing Tools
-
-- **Vitest** - Unit and integration tests
-- **React Testing Library** - Component testing
-- **Playwright** - E2E browser tests
-- **msw** - API mocking
-
----
-
-## Test Files Structure
+## Layout
 
 ```
-tests/
-├── setup.ts           # Test configuration
-├── unit/
-│   ├── lib/           # Utility function tests
-│   ├── hooks/         # Hook tests
-│   └── data/          # Data model tests
-├── integration/
-│   └── components/     # Component tests
-└── e2e/
-    ├── auth.spec.ts
-    ├── learn.spec.ts
-    └── gamification.spec.ts
+src/**/*.{test,spec}.{ts,tsx}   # co-located unit/component suites (setup: src/test/setup.ts)
+e2e/*.spec.ts                   # Playwright E2E (dev server auto-starts, port 5299)
+worker/src/index.test.ts        # KV API router suite (own package.json)
+vitest.loadresilient.config.ts  # 3-project split of the same suite for shared hosts
 ```
 
 ---
 
-## Critical Test Scenarios
+## Critical Scenarios (current suite)
 
-### Authentication
+### Learning/gamification core
 
-- [ ] Google OAuth flow
-- [ ] GitHub OAuth flow
-- [ ] Session persistence
-- [ ] Logout functionality
+- [x] XP calculation and level thresholds (`XP_THRESHOLDS`, `gameUtils`)
+- [x] Quest/topic completion transitions (`GameContext.actions`)
+- [x] Achievement/badge unlock rules (pure modules in `game/`)
+- [x] Streak and daily-reward logic
+- [x] Persistence: save/load, migration, corruption fallback, quota paths
+      (`gameStorage`, `useGamePersistence`)
 
-### Learning Flow
+### Theme
 
-- [ ] Technology catalog displays
-- [ ] Topic navigation
-- [ ] Progress marking
-- [ ] W3Schools iframe loads
+- [x] Dark/light/system resolution incl. OS change events and SSR default
 
-### Gamification
+### E2E (expand per `docs/planning/004-INTEGRITY_PLAN.md` Phase 7D)
 
-- [ ] XP calculation accuracy
-- [ ] Level progression
-- [ ] Achievement unlock
-- [ ] Streak calculation
-- [ ] Daily bonus application
-
-### Theme System
-
-- [ ] Dark mode toggle
-- [ ] Light mode toggle
-- [ ] System preference detection
-- [ ] Theme persistence
+- [x] Onboarding defaults, nav reachability, quest flow, victory modal
+- [ ] Quest completion → XP → level-up → reload persistence
+- [ ] Store purchase, world-map gating, settings round-trip
 
 ### PWA
 
-- [ ] Service worker registration
-- [ ] Offline functionality
-- [ ] Install prompt display
-- [ ] Cache management
+- [x] Service worker production-only registration (ADR 0002)
 
 ---
 
-## CI/CD Integration
+## CI Integration
 
-Tests run on every push:
-
-1. Lint check
-2. Type check
-3. Unit tests
-4. Integration tests
-5. E2E tests (chromium only on CI)
+Every push/PR runs (both `.gitforce.yml` and `.github/workflows/ci.yml`):
+lint → format → knip → typecheck (3 projects) → unit tests **with the coverage
+ratchet** → worker tests → e2e → axe a11y (AA+AAA strict, 29 routes × 2
+themes) → aegis baseline scan → build → deploy (GitHub; local `npm run deploy`
+for GitForge). Local equivalent: `npm run validate` + `npm run test:e2e`.
 
 ---
 
 ## Coverage Reporting
 
-Coverage reports generated on every test run:
-
-- `coverage/index.html` - HTML report
-- `coverage/coverage.json` - JSON for tooling
-- `coverage/text-summary` - Terminal output
+`npm run test:coverage` (v8) emits terminal summary plus `coverage/` HTML/JSON.
+Measurement constraints of record (measured, see 003 §6.8): valid coverage
+comes from a single vitest invocation; sharded runs cannot merge validly on
+vitest 4.1.9. On a loaded host use the load-resilient invocation documented in
+`docs/process/VALIDATION.md`.

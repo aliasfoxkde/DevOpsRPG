@@ -1,5 +1,13 @@
 # Project Progress - DevOpsRPG
 
+> **Historical snapshot (2026-06-26), preserved as-is.** The "ALL PHASES
+> COMPLETE / 100%" header below contradicts the unchecked sprint items in the
+> same document — it was aspirational, not measured. Current status of record:
+> `docs/README.md` (status table), `docs/planning/003-QUALITY_PLAN.md` and
+> `docs/planning/004-INTEGRITY_PLAN.md` (quality cycles), `docs/CHANGELOG.md`
+> (releases). Test counts and coverage percentages in this file predate the
+> coverage campaign and do not describe today's suite.
+
 **Last Updated**: 2026-06-26
 **Current Phase**: ALL PHASES COMPLETE
 **Overall Progress**: 100%
