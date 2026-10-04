@@ -89,6 +89,28 @@ describe('useGamePersistence', () => {
     expect(saved.character.xp).toBe(555)
   })
 
+  it('keeps the other tab’s dynamic records when merging its storage event', () => {
+    // Defaults-only merging strips keys that are not in the defaults object;
+    // the event path must re-attach them or cross-tab play loses progress
+    render(<Probe initial={createDefaultGame()} />)
+
+    const foreign = createDefaultGame()
+    foreign.skillXp.ci_cd = 4000
+    foreign.character.skillAllocations.containerization = 2
+    foreign.weakTopics.docker = {
+      wrongCount: 2,
+      lastReviewed: '2026-10-01',
+      nextReview: '2026-10-04',
+      masteryLevel: 1,
+    }
+    storageEvent(STORAGE_KEYS.GAME, JSON.stringify(foreign))
+
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.GAME) as string) as GameState
+    expect(saved.skillXp.ci_cd).toBe(4000)
+    expect(saved.character.skillAllocations.containerization).toBe(2)
+    expect(saved.weakTopics.docker).toEqual(foreign.weakTopics.docker)
+  })
+
   it('ignores unparseable and non-object payloads from other tabs', () => {
     render(<Probe initial={createDefaultGame()} />)
 

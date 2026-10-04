@@ -201,4 +201,45 @@ describe('loadInitialGame', () => {
       stats: { ...original.stats, fastestQuestTime: 0 },
     })
   })
+
+  it('retains skill XP and skill point allocations earned during play', () => {
+    // These records start as {} in the defaults, so every key is dynamic —
+    // the merge must not collapse them back to empty on load
+    localStorage.setItem(
+      STORAGE_KEYS.GAME,
+      JSON.stringify({
+        character: { name: 'Pip', skillAllocations: { containerization: 3, ci_cd: 1 } },
+        badges: [],
+        skillXp: { ci_cd: 4000, html: 120 },
+      }),
+    )
+    const game = loadInitialGame()
+    expect(game.skillXp).toEqual({ ci_cd: 4000, html: 120 })
+    expect(game.character.skillAllocations).toEqual({ containerization: 3, ci_cd: 1 })
+  })
+
+  it('retains weak-topic history recorded by quizzes', () => {
+    const entry = { wrongCount: 2, lastReviewed: '2026-10-01', nextReview: '2026-10-04', masteryLevel: 1 }
+    localStorage.setItem(
+      STORAGE_KEYS.GAME,
+      JSON.stringify({ character: {}, badges: [], weakTopics: { docker: entry } }),
+    )
+    expect(loadInitialGame().weakTopics).toEqual({ docker: entry })
+  })
+
+  it('drops malformed entries from the dynamic records instead of crashing', () => {
+    localStorage.setItem(
+      STORAGE_KEYS.GAME,
+      JSON.stringify({
+        character: { skillAllocations: { docker: 'all of them', ci_cd: 2 } },
+        badges: [],
+        skillXp: { html: 50, bash: null },
+        weakTopics: { kubernetes: 7 },
+      }),
+    )
+    const game = loadInitialGame()
+    expect(game.skillXp).toEqual({ html: 50 })
+    expect(game.character.skillAllocations).toEqual({ ci_cd: 2 })
+    expect(game.weakTopics).toEqual({})
+  })
 })

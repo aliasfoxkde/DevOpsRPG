@@ -50,6 +50,39 @@ function deepMerge<T extends object>(target: T, source: object): T {
   return output as T
 }
 
+// deepMerge keeps only keys that already exist in the defaults — right for
+// fixed-schema fields (obsolete ones must be dropped) but fatal for
+// open-ended Record fields whose keys are created during play: skill XP,
+// spent skill points, and weak-topic history would silently reset on every
+// load. These helpers re-attach such records wholesale from the parsed save.
+function pickNumberRecord(value: unknown): Record<string, number> {
+  if (!isPlainObject(value)) return {}
+  const restored: Record<string, number> = {}
+  for (const [key, entry] of Object.entries(value)) {
+    if (typeof entry === 'number') restored[key] = entry
+  }
+  return restored
+}
+
+function pickObjectRecord<T extends object>(value: unknown): Record<string, T> {
+  if (!isPlainObject(value)) return {}
+  const restored: Record<string, T> = {}
+  for (const [key, entry] of Object.entries(value)) {
+    if (isPlainObject(entry)) restored[key] = entry as T
+  }
+  return restored
+}
+
+// Re-attach the dynamic-key Record fields after a merge onto defaults.
+// Shared by the load path and cross-tab synchronization, which merges the
+// same way and would otherwise strip the other tab's records on receipt.
+function restoreRecordFields(merged: GameState, parsed: Record<string, unknown>): void {
+  merged.skillXp = pickNumberRecord(parsed.skillXp)
+  const savedCharacter = isPlainObject(parsed.character) ? parsed.character : {}
+  merged.character.skillAllocations = pickNumberRecord(savedCharacter.skillAllocations)
+  merged.weakTopics = pickObjectRecord<GameState['weakTopics'][string]>(parsed.weakTopics)
+}
+
 // Helper function to validate and merge game state
 function loadAndValidateGame(storedJson: string | null): GameState | null {
   if (!storedJson) return null
@@ -67,6 +100,8 @@ function loadAndValidateGame(storedJson: string | null): GameState | null {
     const defaults = createDefaultGame()
     // Merge stored data with defaults to ensure all fields exist
     const merged = deepMerge(defaults, parsed)
+    // Record fields with dynamic keys don't survive the merge — restore them
+    restoreRecordFields(merged, parsed)
     // Ensure achievements are properly restored
     const storedAchievements = isStoredAchievementList(parsed.achievements)
       ? parsed.achievements
@@ -165,6 +200,7 @@ export function useGamePersistence(
           // Deep merge with defaults to ensure all fields exist
           const defaults = createDefaultGame()
           const merged = deepMerge(defaults, parsed)
+          restoreRecordFields(merged, parsed)
           if (!Array.isArray(merged.achievements)) merged.achievements = defaults.achievements
           if (!Array.isArray(merged.recentBadgeUnlocks)) merged.recentBadgeUnlocks = []
           if (!Array.isArray(merged.recentMilestoneUnlocks)) merged.recentMilestoneUnlocks = []
