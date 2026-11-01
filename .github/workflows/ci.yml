@@ -24,6 +24,21 @@ jobs:
       - name: Install worker dependencies
         run: npm install --prefix worker --include=dev --no-audit --no-fund
 
+      - name: Generate formatted source snapshot
+        run: npx prettier --write docs/planning/004-INTEGRITY_PLAN.md docs/planning/005-PERFORMANCE_AUDIT.md docs/process/VALIDATION.md src/contexts/game/defaultState.test.ts src/contexts/game/gameStorage.test.ts
+
+      - name: Upload formatted source snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: formatted-source-snapshot
+          path: |
+            docs/planning/004-INTEGRITY_PLAN.md
+            docs/planning/005-PERFORMANCE_AUDIT.md
+            docs/process/VALIDATION.md
+            src/contexts/game/defaultState.test.ts
+            src/contexts/game/gameStorage.test.ts
+          retention-days: 3
+
       - name: Run ESLint
         run: npm run lint
 
