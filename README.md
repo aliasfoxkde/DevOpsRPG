@@ -45,8 +45,9 @@ For AI agents working on this codebase:
 
 ## Status
 
-| Metric | Value                                  |
-| ------ | -------------------------------------- |
-| Tests  | 187 passing                            |
-| Build  | ✅ Passing                             |
-| Deploy | https://378111cd.devopsquest.pages.dev |
+| Metric   | Value                                                                             |
+| -------- | --------------------------------------------------------------------------------- |
+| Tests    | 1,653 passing (1,635 app + 18 Worker)                                             |
+| Build    | ✅ Passing                                                                        |
+| Coverage | 97.37% statements / 91.74% branches / 99.02% functions / 98.54% lines (app suite) |
+| Deploy   | https://378111cd.devopsquest.pages.dev                                            |
